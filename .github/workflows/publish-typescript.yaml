@@ -29,7 +29,12 @@ jobs:
       - name: Generate date-based version
         id: version
         run: |
-          DATE_PREFIX=$(date +'%Y.%-m.%-d')
+          # npm requires semver (3-part). Use YYYY.MDD.BUILD where MDD = month*100+day
+          YEAR=$(date +'%Y')
+          MONTH=$(date +'%-m')
+          DAY=$(date +'%-d')
+          MDD=$((MONTH * 100 + DAY))
+          DATE_PREFIX="${YEAR}.${MDD}"
           LATEST_BUILD=$(node -e "
             const https = require('https');
             https.get('https://registry.npmjs.org/@acedatacloud/sdk', (res) => {
@@ -40,11 +45,11 @@ jobs:
                   const data = JSON.parse(body);
                   const versions = Object.keys(data.versions || {});
                   const todayPrefix = '${DATE_PREFIX}';
-                  const todayVersions = versions.filter(v => v.startsWith(todayPrefix));
+                  const todayVersions = versions.filter(v => v.startsWith(todayPrefix + '.'));
                   if (todayVersions.length === 0) { console.log(0); return; }
                   const builds = todayVersions.map(v => {
                     const parts = v.split('.');
-                    return parts.length === 4 ? parseInt(parts[3]) : 0;
+                    return parts.length === 3 ? parseInt(parts[2]) : 0;
                   });
                   console.log(Math.max(...builds) + 1);
                 } catch(e) { console.log(0); }
@@ -120,9 +125,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          registry-url: "https://registry.npmjs.org"
           cache: npm
           cache-dependency-path: typescript/package-lock.json
+
+      - name: Configure npm auth
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Update version in package.json
         run: |
@@ -142,8 +151,6 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   create-release:
     name: Create GitHub Release
