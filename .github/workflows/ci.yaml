@@ -56,6 +56,10 @@ jobs:
           pip install ".[test]"
 
       - name: Run tests
+        run: pytest -v
+
+      - name: Run tests with coverage
+        if: matrix.python-version == '3.12'
         run: pytest --cov=acedatacloud --cov-report=xml -v
 
       - name: Upload coverage to Codecov
