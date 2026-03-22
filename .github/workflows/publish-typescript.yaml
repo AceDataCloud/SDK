@@ -1,0 +1,165 @@
+name: Publish TypeScript SDK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "typescript/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: typescript
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      - name: Generate date-based version
+        id: version
+        run: |
+          DATE_PREFIX=$(date +'%Y.%-m.%-d')
+          LATEST_BUILD=$(node -e "
+            const https = require('https');
+            https.get('https://registry.npmjs.org/@acedatacloud/sdk', (res) => {
+              let body = '';
+              res.on('data', d => body += d);
+              res.on('end', () => {
+                try {
+                  const data = JSON.parse(body);
+                  const versions = Object.keys(data.versions || {});
+                  const todayPrefix = '${DATE_PREFIX}';
+                  const todayVersions = versions.filter(v => v.startsWith(todayPrefix));
+                  if (todayVersions.length === 0) { console.log(0); return; }
+                  const builds = todayVersions.map(v => {
+                    const parts = v.split('.');
+                    return parts.length === 4 ? parseInt(parts[3]) : 0;
+                  });
+                  console.log(Math.max(...builds) + 1);
+                } catch(e) { console.log(0); }
+              });
+            }).on('error', () => console.log(0));
+          ")
+          VERSION="${DATE_PREFIX}.${LATEST_BUILD}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
+
+      - name: Update version in package.json
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '$VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          echo "Updated package.json to version $VERSION"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: typescript-package
+          path: |
+            typescript/dist/
+            typescript/package.json
+            typescript/README.md
+
+  lint:
+    name: Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: typescript
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+  publish-npm:
+    name: Publish to npm
+    needs: [build, lint]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: typescript
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/@acedatacloud/sdk
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      - name: Update version in package.json
+        run: |
+          VERSION="${{ needs.build.outputs.version }}"
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '$VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  create-release:
+    name: Create GitHub Release
+    if: github.event_name == 'push'
+    needs: [build, publish-npm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "typescript-v${{ needs.build.outputs.version }}" \
+            --title "TypeScript SDK v${{ needs.build.outputs.version }}" \
+            --generate-notes \
+            --repo '${{ github.repository }}' || echo "Release already exists, skipping"
