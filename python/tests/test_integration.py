@@ -17,15 +17,15 @@ from pathlib import Path
 
 import pytest
 
+from acedatacloud import AceDataCloud, AsyncAceDataCloud
+from acedatacloud._runtime.errors import APIError
+
 # Load .env from repo root
 _env_path = Path(__file__).resolve().parents[2] / ".env"
 if _env_path.exists():
-    from dotenv import load_dotenv
+    from dotenv import load_dotenv  # noqa: E402
 
     load_dotenv(_env_path)
-
-from acedatacloud import AceDataCloud, AsyncAceDataCloud
-from acedatacloud._runtime.errors import APIError
 
 TOKEN = os.environ.get("ACEDATACLOUD_API_TOKEN", "")
 PLATFORM_TOKEN = os.environ.get("ACEDATACLOUD_PLATFORM_TOKEN", "")
