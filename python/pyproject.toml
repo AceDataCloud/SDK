@@ -7,7 +7,7 @@ name = "acedatacloud"
 version = "0.1.0"
 description = "Official Python SDK for AceDataCloud — AI-powered data services"
 readme = "README.md"
-license = "MIT"
+license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
     "httpx>=0.25.0",
