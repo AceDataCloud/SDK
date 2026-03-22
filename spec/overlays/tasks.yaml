@@ -1,0 +1,23 @@
+version: 1
+tasks:
+  - canonical_operation: images.generate
+    task:
+      kind: submit-and-poll
+      idField: task_id
+      statusPath: response.status
+      resultPath: response.data
+      pollEndpoint: /nano-banana/tasks
+  - canonical_operation: audio.generate
+    task:
+      kind: submit-and-poll
+      idField: task_id
+      statusPath: response.status
+      resultPath: response.data
+      pollEndpoint: /suno/tasks
+  - canonical_operation: video.generate
+    task:
+      kind: submit-and-poll
+      idField: task_id
+      statusPath: response.status
+      resultPath: response.data
+      pollEndpoint: /sora/tasks

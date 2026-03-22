@@ -1,0 +1,101 @@
+# AceDataCloud Python SDK
+
+Official Python client for the [AceDataCloud API](https://platform.acedata.cloud).
+
+## Installation
+
+```bash
+pip install acedatacloud
+```
+
+## Quick Start
+
+```python
+from acedatacloud import AceDataCloud
+
+client = AceDataCloud(api_token="your-token")
+
+# OpenAI-compatible chat completions
+response = client.openai.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Hello!"}],
+)
+print(response["choices"][0]["message"]["content"])
+
+# Streaming
+for chunk in client.openai.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Tell me a story"}],
+    stream=True,
+):
+    print(chunk.get("choices", [{}])[0].get("delta", {}).get("content", ""), end="")
+```
+
+## Async Usage
+
+```python
+import asyncio
+from acedatacloud import AsyncAceDataCloud
+
+async def main():
+    client = AsyncAceDataCloud(api_token="your-token")
+    result = await client.search.google(q="Python SDK")
+    print(result)
+    await client.close()
+
+asyncio.run(main())
+```
+
+## Resources
+
+| Resource | Description |
+|----------|-------------|
+| `client.openai` | OpenAI-compatible chat completions and responses |
+| `client.chat` | Native chat messages |
+| `client.images` | Image generation (Midjourney, Flux, etc.) |
+| `client.audio` | Music generation (Suno) |
+| `client.video` | Video generation (Luma, Sora, Veo, etc.) |
+| `client.search` | Web search (Google SERP) |
+| `client.tasks` | Cross-service async task polling |
+| `client.files` | File uploads |
+| `client.platform` | Applications, credentials, models management |
+
+## Image Generation (with Task Polling)
+
+```python
+task = client.images.generate(prompt="A sunset over mountains")
+result = task.wait()  # polls until complete
+print(result["image_url"])
+```
+
+## Error Handling
+
+```python
+from acedatacloud import AceDataCloud, AuthenticationError, RateLimitError
+
+client = AceDataCloud(api_token="your-token")
+try:
+    client.search.google(q="test")
+except AuthenticationError:
+    print("Invalid or expired token")
+except RateLimitError:
+    print("Too many requests, slow down")
+```
+
+## Configuration
+
+```python
+client = AceDataCloud(
+    api_token="your-token",
+    base_url="https://api.acedata.cloud",       # API gateway
+    platform_base_url="https://platform.acedata.cloud",  # Management plane
+    timeout=300.0,      # Request timeout in seconds
+    max_retries=2,      # Retry count for transient errors
+)
+```
+
+The token can also be set via the `ACEDATACLOUD_API_TOKEN` environment variable.
+
+## License
+
+MIT

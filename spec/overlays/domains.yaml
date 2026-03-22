@@ -1,0 +1,30 @@
+version: 1
+domains:
+  chat:
+    description: Native chat-style APIs.
+  images:
+    description: Image generation and editing APIs.
+  audio:
+    description: Audio and music generation APIs.
+  video:
+    description: Video generation APIs.
+  search:
+    description: Search APIs.
+  tasks:
+    description: Shared task retrieval and polling abstraction.
+  files:
+    description: Platform file upload APIs.
+  platform.services:
+    description: Management-plane service discovery.
+  platform.applications:
+    description: Management-plane application operations.
+  platform.credentials:
+    description: Management-plane credential operations.
+  platform.models:
+    description: Management-plane model listing.
+  platform.config:
+    description: Management-plane config retrieval.
+  openai.chat.completions:
+    description: OpenAI-compatible chat completions facade.
+  openai.responses:
+    description: OpenAI-compatible responses facade.
