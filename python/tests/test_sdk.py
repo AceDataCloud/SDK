@@ -1,7 +1,5 @@
 """Tests for AceDataCloud Python SDK."""
 
-import json
-
 import httpx
 import pytest
 import respx
@@ -66,9 +64,7 @@ def test_openai_responses(client):
         "id": "resp-123",
         "output": [{"type": "message", "content": [{"type": "output_text", "text": "Hi there"}]}],
     }
-    respx.post("https://api.acedata.cloud/openai/responses").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+    respx.post("https://api.acedata.cloud/openai/responses").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.openai.responses.create(
         model="gpt-4o",
@@ -89,9 +85,7 @@ def test_chat_messages(client):
         "content": [{"type": "text", "text": "Hi!"}],
         "usage": {"input_tokens": 10, "output_tokens": 5},
     }
-    respx.post("https://api.acedata.cloud/v1/messages").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+    respx.post("https://api.acedata.cloud/v1/messages").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.chat.messages.create(
         model="claude-sonnet-4-20250514",
@@ -143,9 +137,7 @@ def test_audio_generate(client):
         "task_id": "task-audio",
         "data": [{"title": "My Song", "audio_url": "https://cdn.acedata.cloud/song.mp3"}],
     }
-    respx.post("https://api.acedata.cloud/suno/audios").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+    respx.post("https://api.acedata.cloud/suno/audios").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.audio.generate(prompt="A happy song")
     assert result["data"][0]["title"] == "My Song"
@@ -161,9 +153,7 @@ def test_video_generate(client):
         "task_id": "task-video",
         "data": [{"video_url": "https://cdn.acedata.cloud/video.mp4"}],
     }
-    respx.post("https://api.acedata.cloud/sora/videos").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+    respx.post("https://api.acedata.cloud/sora/videos").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.video.generate(prompt="A sunset timelapse")
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
@@ -175,13 +165,9 @@ def test_video_generate(client):
 @respx.mock
 def test_search_google(client):
     mock_response = {
-        "organic": [
-            {"title": "Example", "link": "https://example.com", "snippet": "An example", "position": 1}
-        ],
+        "organic": [{"title": "Example", "link": "https://example.com", "snippet": "An example", "position": 1}],
     }
-    respx.post("https://api.acedata.cloud/serp/google").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+    respx.post("https://api.acedata.cloud/serp/google").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.search.google(query="example")
     assert result["organic"][0]["title"] == "Example"
@@ -196,9 +182,7 @@ def test_tasks_get(client):
         "id": "task-abc",
         "response": {"status": "succeeded", "data": [{"image_url": "https://cdn.acedata.cloud/ok.png"}]},
     }
-    respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+    respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.tasks.get("task-abc", service="nano-banana")
     assert result["response"]["status"] == "succeeded"
@@ -210,9 +194,7 @@ def test_tasks_get(client):
 @respx.mock
 def test_platform_applications_list(client):
     mock = {"count": 1, "results": [{"id": "app-1", "service_id": "svc-1"}]}
-    respx.get("https://platform.acedata.cloud/api/v1/applications/").mock(
-        return_value=httpx.Response(200, json=mock)
-    )
+    respx.get("https://platform.acedata.cloud/api/v1/applications/").mock(return_value=httpx.Response(200, json=mock))
     result = client.platform.applications.list()
     assert result["count"] == 1
 
@@ -220,9 +202,7 @@ def test_platform_applications_list(client):
 @respx.mock
 def test_platform_credentials_list(client):
     mock = {"count": 1, "results": [{"id": "cred-1", "token": "platform-abc"}]}
-    respx.get("https://platform.acedata.cloud/api/v1/credentials/").mock(
-        return_value=httpx.Response(200, json=mock)
-    )
+    respx.get("https://platform.acedata.cloud/api/v1/credentials/").mock(return_value=httpx.Response(200, json=mock))
     result = client.platform.credentials.list()
     assert result["results"][0]["token"] == "platform-abc"
 
@@ -240,9 +220,7 @@ def test_platform_credentials_rotate(client):
 @respx.mock
 def test_platform_models_list(client):
     mock = {"data": [{"id": "claude-sonnet-4-20250514", "owned_by": "anthropic"}]}
-    respx.get("https://platform.acedata.cloud/api/v1/models/").mock(
-        return_value=httpx.Response(200, json=mock)
-    )
+    respx.get("https://platform.acedata.cloud/api/v1/models/").mock(return_value=httpx.Response(200, json=mock))
     result = client.platform.models.list()
     assert result["data"][0]["id"] == "claude-sonnet-4-20250514"
 
@@ -250,9 +228,7 @@ def test_platform_models_list(client):
 @respx.mock
 def test_platform_config_get(client):
     mock = {"features": {"DISCOUNT_FOR_X402": 0.9}}
-    respx.get("https://platform.acedata.cloud/api/v1/config/").mock(
-        return_value=httpx.Response(200, json=mock)
-    )
+    respx.get("https://platform.acedata.cloud/api/v1/config/").mock(return_value=httpx.Response(200, json=mock))
     result = client.platform.config.get()
     assert result["features"]["DISCOUNT_FOR_X402"] == 0.9
 
@@ -268,9 +244,7 @@ def test_auth_error(client):
         )
     )
     with pytest.raises(AuthenticationError) as exc_info:
-        client.openai.chat.completions.create(
-            model="test", messages=[{"role": "user", "content": "hi"}]
-        )
+        client.openai.chat.completions.create(model="test", messages=[{"role": "user", "content": "hi"}])
     assert exc_info.value.status_code == 401
     assert exc_info.value.trace_id == "t-1"
 
@@ -283,9 +257,7 @@ def test_balance_error(client):
         )
     )
     with pytest.raises(InsufficientBalanceError):
-        client.openai.chat.completions.create(
-            model="test", messages=[{"role": "user", "content": "hi"}]
-        )
+        client.openai.chat.completions.create(model="test", messages=[{"role": "user", "content": "hi"}])
 
 
 @respx.mock
@@ -296,9 +268,7 @@ def test_rate_limit_error(client):
         )
     )
     with pytest.raises(RateLimitError):
-        client.openai.chat.completions.create(
-            model="test", messages=[{"role": "user", "content": "hi"}]
-        )
+        client.openai.chat.completions.create(model="test", messages=[{"role": "user", "content": "hi"}])
 
 
 @respx.mock
@@ -309,9 +279,7 @@ def test_validation_error(client):
         )
     )
     with pytest.raises(ValidationError):
-        client.openai.chat.completions.create(
-            model="bad", messages=[{"role": "user", "content": "hi"}]
-        )
+        client.openai.chat.completions.create(model="bad", messages=[{"role": "user", "content": "hi"}])
 
 
 # ── Async Tests ───────────────────────────────────────────────────────
@@ -341,9 +309,7 @@ async def test_async_openai_completions(async_client):
 @pytest.mark.asyncio
 async def test_async_search(async_client):
     mock_response = {"organic": [{"title": "Async Example", "link": "https://example.com"}]}
-    respx.post("https://api.acedata.cloud/serp/google").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+    respx.post("https://api.acedata.cloud/serp/google").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = await async_client.search.google(query="async test")
     assert result["organic"][0]["title"] == "Async Example"

@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import os
-import time
 import random
-from typing import Any, Iterator
+import time
+from collections.abc import Iterator
+from typing import Any
 
 import httpx
 
@@ -248,7 +249,6 @@ class AsyncTransport:
         max_retries: int,
         extra_headers: dict[str, str],
     ) -> None:
-        import asyncio
 
         token = api_token or os.environ.get("ACEDATACLOUD_API_TOKEN", "")
         if not token:

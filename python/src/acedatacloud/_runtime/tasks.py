@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import time
 import asyncio
+import time
 from typing import Any
 
 
