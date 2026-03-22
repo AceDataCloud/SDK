@@ -125,11 +125,12 @@ export class Transport {
         clearTimeout(timer);
 
         if (resp.status >= 400) {
+          const text = await resp.text();
           let body: Record<string, unknown>;
           try {
-            body = (await resp.json()) as Record<string, unknown>;
+            body = JSON.parse(text) as Record<string, unknown>;
           } catch {
-            body = { error: { code: 'unknown', message: await resp.text() } };
+            body = { error: { code: 'unknown', message: text } };
           }
           if (RETRY_STATUS_CODES.has(resp.status) && attempt < this.maxRetries) {
             await sleep(backoffDelay(attempt) * 1000);
@@ -171,11 +172,12 @@ export class Transport {
       });
 
       if (resp.status >= 400) {
+        const text = await resp.text();
         let body: Record<string, unknown>;
         try {
-          body = (await resp.json()) as Record<string, unknown>;
+          body = JSON.parse(text) as Record<string, unknown>;
         } catch {
-          body = { error: { code: 'unknown', message: '' } };
+          body = { error: { code: 'unknown', message: text } };
         }
         throw mapError(resp.status, body);
       }
@@ -241,11 +243,12 @@ export class Transport {
       clearTimeout(timer);
 
       if (resp.status >= 400) {
+        const text = await resp.text();
         let respBody: Record<string, unknown>;
         try {
-          respBody = (await resp.json()) as Record<string, unknown>;
+          respBody = JSON.parse(text) as Record<string, unknown>;
         } catch {
-          respBody = { error: { code: 'unknown', message: await resp.text() } };
+          respBody = { error: { code: 'unknown', message: text } };
         }
         throw mapError(resp.status, respBody);
       }
