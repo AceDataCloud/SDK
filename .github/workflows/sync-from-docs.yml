@@ -87,15 +87,16 @@ jobs:
           Compare models, endpoints, parameters, and provider lists against the SDK code. Fix any differences.
 
           If everything is already in sync, close this issue." \
-            --json number --jq '.number' 2>&1 || echo "")
+            2>&1 || echo "")
 
           if [ -z "$ISSUE_URL" ]; then
             echo "Failed to create issue"
             exit 1
           fi
 
-          echo "Created issue #$ISSUE_URL"
-          echo "issue_number=$ISSUE_URL" >> "$GITHUB_OUTPUT"
+          ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oE "[0-9]+$")
+          echo "Created issue #$ISSUE_NUMBER"
+          echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
 
   wait-and-merge:
     needs: create-task
