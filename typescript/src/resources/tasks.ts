@@ -6,6 +6,7 @@ import { TaskHandle } from '../runtime/tasks';
 const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   suno: '/suno/tasks',
   producer: '/producer/tasks',
+  fish: '/fish/tasks',
   'nano-banana': '/nano-banana/tasks',
   seedream: '/seedream/tasks',
   seedance: '/seedance/tasks',
