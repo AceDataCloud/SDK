@@ -8,6 +8,7 @@ from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
 _SERVICE_TASK_ENDPOINTS = {
     "suno": "/suno/tasks",
+    "producer": "/producer/tasks",
     "nano-banana": "/nano-banana/tasks",
     "seedream": "/seedream/tasks",
     "seedance": "/seedance/tasks",
@@ -16,6 +17,11 @@ _SERVICE_TASK_ENDPOINTS = {
     "luma": "/luma/tasks",
     "veo": "/veo/tasks",
     "flux": "/flux/tasks",
+    "kling": "/kling/tasks",
+    "hailuo": "/hailuo/tasks",
+    "wan": "/wan/tasks",
+    "pika": "/pika/tasks",
+    "pixverse": "/pixverse/tasks",
 }
 
 

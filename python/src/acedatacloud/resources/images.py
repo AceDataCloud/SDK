@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
+
+ImageProvider = Literal["nano-banana", "midjourney", "flux", "seedream"]
 
 
 class Images:
@@ -17,6 +19,7 @@ class Images:
         self,
         *,
         prompt: str,
+        provider: ImageProvider | str = "nano-banana",
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
@@ -36,13 +39,14 @@ class Images:
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        result = self._transport.request("POST", "/nano-banana/images", json=body)
+        endpoint = "/midjourney/imagine" if provider == "midjourney" else f"/{provider}/images"
+        result = self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 
         if not task_id or (result.get("data") and not wait):
             return result
 
-        handle = TaskHandle(task_id, "/nano-banana/tasks", self._transport)
+        handle = TaskHandle(task_id, f"/{provider}/tasks", self._transport)
         if wait:
             return handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
@@ -58,6 +62,7 @@ class AsyncImages:
         self,
         *,
         prompt: str,
+        provider: ImageProvider | str = "nano-banana",
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
@@ -77,13 +82,14 @@ class AsyncImages:
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        result = await self._transport.request("POST", "/nano-banana/images", json=body)
+        endpoint = "/midjourney/imagine" if provider == "midjourney" else f"/{provider}/images"
+        result = await self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 
         if not task_id or (result.get("data") and not wait):
             return result
 
-        handle = AsyncTaskHandle(task_id, "/nano-banana/tasks", self._transport)
+        handle = AsyncTaskHandle(task_id, f"/{provider}/tasks", self._transport)
         if wait:
             return await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle

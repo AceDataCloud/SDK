@@ -56,10 +56,38 @@ for await (const chunk of stream) {
 ## Image Generation (with Task Polling)
 
 ```typescript
+// Default provider (nano-banana)
 const task = await client.images.generate({ prompt: 'A sunset over mountains' });
 const result = await task.wait();
 console.log(result.image_url);
+
+// Use a specific provider
+const mjTask = await client.images.generate({
+  prompt: 'A sunset over mountains',
+  provider: 'midjourney',
+});
 ```
+
+## Multi-Provider Support
+
+Image, video, and audio resources support a `provider` parameter to switch between services:
+
+```typescript
+// Video — default is 'sora'
+await client.video.generate({ prompt: 'A cat playing piano', provider: 'kling' });
+await client.video.generate({ prompt: 'Ocean waves', provider: 'luma' });
+
+// Audio — default is 'suno'
+await client.audio.generate({ prompt: 'A jazz song', provider: 'producer' });
+```
+
+Available providers:
+
+| Resource | Providers |
+|----------|-----------|
+| `client.images` | `nano-banana` (default), `midjourney`, `flux`, `seedream` |
+| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
+| `client.audio` | `suno` (default), `producer` |
 
 ## Error Handling
 

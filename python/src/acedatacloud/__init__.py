@@ -15,10 +15,16 @@ from acedatacloud._runtime.errors import (
     TransportError,
     ValidationError,
 )
+from acedatacloud.resources.audio import AudioProvider
+from acedatacloud.resources.images import ImageProvider
+from acedatacloud.resources.video import VideoProvider
 
 __all__ = [
     "AceDataCloud",
     "AsyncAceDataCloud",
+    "AudioProvider",
+    "ImageProvider",
+    "VideoProvider",
     "AceDataCloudError",
     "APIError",
     "AuthenticationError",
