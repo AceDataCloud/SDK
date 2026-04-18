@@ -3,11 +3,14 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
+export type VideoProvider = 'sora' | 'luma' | 'veo' | 'kling' | 'hailuo' | 'seedance' | 'wan' | 'pika' | 'pixverse' | (string & {});
+
 export class Video {
   constructor(private transport: Transport) {}
 
   async generate(opts: {
     prompt: string;
+    provider?: VideoProvider;
     model?: string;
     imageUrl?: string;
     callbackUrl?: string;
@@ -16,18 +19,18 @@ export class Video {
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, model, imageUrl, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'sora', model, imageUrl, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (model !== undefined) body.model = model;
     if (imageUrl !== undefined) body.image_url = imageUrl;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
-    const result = await this.transport.request('POST', '/sora/videos', { json: body });
+    const result = await this.transport.request('POST', `/${provider}/videos`, { json: body });
     const taskId = result.task_id as string | undefined;
 
     if (!taskId || (result.data && !shouldWait)) return result;
 
-    const handle = new TaskHandle(taskId, '/sora/tasks', this.transport);
+    const handle = new TaskHandle(taskId, `/${provider}/tasks`, this.transport);
     if (shouldWait) return handle.wait({ pollInterval, maxWait });
     return handle;
   }

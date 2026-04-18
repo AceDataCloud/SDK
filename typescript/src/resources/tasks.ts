@@ -5,6 +5,7 @@ import { TaskHandle } from '../runtime/tasks';
 
 const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   suno: '/suno/tasks',
+  producer: '/producer/tasks',
   'nano-banana': '/nano-banana/tasks',
   seedream: '/seedream/tasks',
   seedance: '/seedance/tasks',
@@ -13,6 +14,11 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   luma: '/luma/tasks',
   veo: '/veo/tasks',
   flux: '/flux/tasks',
+  kling: '/kling/tasks',
+  hailuo: '/hailuo/tasks',
+  wan: '/wan/tasks',
+  pika: '/pika/tasks',
+  pixverse: '/pixverse/tasks',
 };
 
 export class Tasks {
