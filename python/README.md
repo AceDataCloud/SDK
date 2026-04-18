@@ -63,10 +63,35 @@ asyncio.run(main())
 ## Image Generation (with Task Polling)
 
 ```python
+# Default provider (nano-banana)
 task = client.images.generate(prompt="A sunset over mountains")
 result = task.wait()  # polls until complete
 print(result["image_url"])
+
+# Use a specific provider
+mj_task = client.images.generate(prompt="A sunset over mountains", provider="midjourney")
 ```
+
+## Multi-Provider Support
+
+Image, video, and audio resources support a `provider` parameter to switch between services:
+
+```python
+# Video — default is 'sora'
+client.video.generate(prompt="A cat playing piano", provider="kling")
+client.video.generate(prompt="Ocean waves", provider="luma")
+
+# Audio — default is 'suno'
+client.audio.generate(prompt="A jazz song", provider="producer")
+```
+
+Available providers:
+
+| Resource | Providers |
+|----------|-----------|
+| `client.images` | `nano-banana` (default), `midjourney`, `flux`, `seedream` |
+| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
+| `client.audio` | `suno` (default), `producer` |
 
 ## Error Handling
 

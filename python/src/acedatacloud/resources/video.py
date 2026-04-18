@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
+
+VideoProvider = Literal[
+    "sora", "luma", "veo", "kling", "hailuo", "seedance", "wan", "pika", "pixverse"
+]
 
 
 class Video:
@@ -17,6 +21,7 @@ class Video:
         self,
         *,
         prompt: str,
+        provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
         callback_url: str | None = None,
@@ -33,13 +38,13 @@ class Video:
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        result = self._transport.request("POST", "/sora/videos", json=body)
+        result = self._transport.request("POST", f"/{provider}/videos", json=body)
         task_id = result.get("task_id")
 
         if not task_id or (result.get("data") and not wait):
             return result
 
-        handle = TaskHandle(task_id, "/sora/tasks", self._transport)
+        handle = TaskHandle(task_id, f"/{provider}/tasks", self._transport)
         if wait:
             return handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
@@ -55,6 +60,7 @@ class AsyncVideo:
         self,
         *,
         prompt: str,
+        provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
         callback_url: str | None = None,
@@ -71,13 +77,13 @@ class AsyncVideo:
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        result = await self._transport.request("POST", "/sora/videos", json=body)
+        result = await self._transport.request("POST", f"/{provider}/videos", json=body)
         task_id = result.get("task_id")
 
         if not task_id or (result.get("data") and not wait):
             return result
 
-        handle = AsyncTaskHandle(task_id, "/sora/tasks", self._transport)
+        handle = AsyncTaskHandle(task_id, f"/{provider}/tasks", self._transport)
         if wait:
             return await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
