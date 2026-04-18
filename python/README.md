@@ -53,7 +53,7 @@ asyncio.run(main())
 | `client.openai` | OpenAI-compatible chat completions and responses |
 | `client.chat` | Native chat messages |
 | `client.images` | Image generation (Midjourney, Flux, etc.) |
-| `client.audio` | Music generation (Suno) |
+| `client.audio` | Music generation (Suno, Producer, Fish) |
 | `client.video` | Video generation (Luma, Sora, Veo, etc.) |
 | `client.search` | Web search (Google SERP) |
 | `client.tasks` | Cross-service async task polling |
@@ -83,6 +83,7 @@ client.video.generate(prompt="Ocean waves", provider="luma")
 
 # Audio — default is 'suno'
 client.audio.generate(prompt="A jazz song", provider="producer")
+client.audio.generate(prompt="A podcast intro", provider="fish")
 ```
 
 Available providers:
@@ -91,7 +92,7 @@ Available providers:
 |----------|-----------|
 | `client.images` | `nano-banana` (default), `midjourney`, `flux`, `seedream` |
 | `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
-| `client.audio` | `suno` (default), `producer` |
+| `client.audio` | `suno` (default), `producer`, `fish` |
 
 ## Error Handling
 
