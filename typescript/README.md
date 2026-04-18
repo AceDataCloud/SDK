@@ -96,7 +96,7 @@ import { AceDataCloud, AuthenticationError, RateLimitError } from '@acedatacloud
 
 const client = new AceDataCloud({ apiToken: 'your-token' });
 try {
-  await client.search.google({ q: 'test' });
+  await client.search.google({ query: 'test' });
 } catch (err) {
   if (err instanceof AuthenticationError) {
     console.error('Invalid or expired token');

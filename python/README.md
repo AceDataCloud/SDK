@@ -39,7 +39,7 @@ from acedatacloud import AsyncAceDataCloud
 
 async def main():
     client = AsyncAceDataCloud(api_token="your-token")
-    result = await client.search.google(q="Python SDK")
+    result = await client.search.google(query="Python SDK")
     print(result)
     await client.close()
 
@@ -100,7 +100,7 @@ from acedatacloud import AceDataCloud, AuthenticationError, RateLimitError
 
 client = AceDataCloud(api_token="your-token")
 try:
-    client.search.google(q="test")
+    client.search.google(query="test")
 except AuthenticationError:
     print("Invalid or expired token")
 except RateLimitError:
