@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-AudioProvider = Literal["suno", "producer"]
+AudioProvider = Literal["suno", "producer", "fish"]
 
 
 class Audio:

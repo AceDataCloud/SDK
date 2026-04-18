@@ -3,7 +3,7 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
-export type AudioProvider = 'suno' | 'producer' | (string & {});
+export type AudioProvider = 'suno' | 'producer' | 'fish' | (string & {});
 
 export class Audio {
   constructor(private transport: Transport) {}
