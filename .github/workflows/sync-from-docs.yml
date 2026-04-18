@@ -63,8 +63,7 @@ jobs:
             --repo "$REPO" \
             --title "sync: update from Docs ($COMMIT_INFO)" \
             --label "auto-sync" \
-            --assignee "copilot-swe-agent[bot]" \
-            --body "The upstream Docs have been updated. Ensure the SDK in this repo is in sync with the latest API specs.
+                      --body "The upstream Docs have been updated. Ensure the SDK in this repo is in sync with the latest API specs.
 
           ## Changed Services
 
@@ -97,6 +96,13 @@ jobs:
           ISSUE_NUMBER=$(echo "$ISSUE_URL" | grep -oE "[0-9]+$")
           echo "Created issue #$ISSUE_NUMBER"
           echo "issue_number=$ISSUE_NUMBER" >> "$GITHUB_OUTPUT"
+
+          # Assign Copilot bot via API (gh issue create can't resolve bot accounts)
+          gh api --method POST \
+            "repos/${{ github.repository }}/issues/$ISSUE_NUMBER/assignees" \
+            --input - <<ASSIGN_EOF
+          {"assignees":["copilot-swe-agent[bot]"]}
+          ASSIGN_EOF
 
   wait-and-merge:
     needs: create-task
