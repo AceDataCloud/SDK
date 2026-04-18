@@ -91,7 +91,7 @@ Available providers:
 |----------|-----------|
 | `client.images` | `nano-banana` (default), `midjourney`, `flux`, `seedream` |
 | `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
-| `client.audio` | `suno` (default), `producer` |
+| `client.audio` | `suno` (default), `producer`, `fish` |
 
 ## Error Handling
 
