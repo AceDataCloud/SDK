@@ -3,11 +3,14 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
+export type AudioProvider = 'suno' | 'producer' | (string & {});
+
 export class Audio {
   constructor(private transport: Transport) {}
 
   async generate(opts: {
     prompt: string;
+    provider?: AudioProvider;
     model?: string;
     tags?: string;
     callbackUrl?: string;
@@ -16,18 +19,18 @@ export class Audio {
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'suno', model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (model !== undefined) body.model = model;
     if (tags !== undefined) body.tags = tags;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
-    const result = await this.transport.request('POST', '/suno/audios', { json: body });
+    const result = await this.transport.request('POST', `/${provider}/audios`, { json: body });
     const taskId = result.task_id as string | undefined;
 
     if (!taskId || (result.data && !shouldWait)) return result;
 
-    const handle = new TaskHandle(taskId, '/suno/tasks', this.transport);
+    const handle = new TaskHandle(taskId, `/${provider}/tasks`, this.transport);
     if (shouldWait) return handle.wait({ pollInterval, maxWait });
     return handle;
   }
