@@ -165,11 +165,7 @@ class SyncTransport:
                     continue
                 raise last_exc from exc
 
-            if (
-                resp.status_code == 402
-                and self._payment_handler is not None
-                and not payment_attempted
-            ):
+            if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                 try:
                     body = resp.json()
                 except Exception as exc:
@@ -183,9 +179,7 @@ class SyncTransport:
                         402,
                         {"error": {"code": "invalid_402", "message": "No payment requirements"}},
                     )
-                result = self._payment_handler(
-                    {"url": url, "method": method, "body": json, "accepts": accepts}
-                )
+                result = self._payment_handler({"url": url, "method": method, "body": json, "accepts": accepts})
                 extra_auth_headers.update(result.get("headers", {}))
                 payment_attempted = True
                 continue
@@ -289,7 +283,6 @@ class AsyncTransport:
         extra_headers: dict[str, str],
         payment_handler: PaymentHandler | None = None,
     ) -> None:
-
         token = api_token or os.environ.get("ACEDATACLOUD_API_TOKEN", "")
         if not token and payment_handler is None:
             raise AuthenticationError(
@@ -363,11 +356,7 @@ class AsyncTransport:
                     continue
                 raise last_exc from exc
 
-            if (
-                resp.status_code == 402
-                and self._payment_handler is not None
-                and not payment_attempted
-            ):
+            if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                 try:
                     body = resp.json()
                 except Exception as exc:
@@ -381,9 +370,7 @@ class AsyncTransport:
                         402,
                         {"error": {"code": "invalid_402", "message": "No payment requirements"}},
                     )
-                handler_result = self._payment_handler(
-                    {"url": url, "method": method, "body": json, "accepts": accepts}
-                )
+                handler_result = self._payment_handler({"url": url, "method": method, "body": json, "accepts": accepts})
                 if inspect.isawaitable(handler_result):
                     handler_result = await handler_result
                 extra_auth_headers.update(handler_result.get("headers", {}))
