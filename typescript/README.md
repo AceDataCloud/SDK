@@ -120,6 +120,49 @@ const client = new AceDataCloud({
 
 The token can also be set via the `ACEDATACLOUD_API_TOKEN` environment variable.
 
+## Paying with X402 Instead of a Bearer Token
+
+The SDK supports a pluggable `paymentHandler` that is invoked when the
+API returns `402 Payment Required`. Combine it with
+[`@acedatacloud/x402-client`](https://github.com/AceDataCloud/X402Client)
+to pay for requests on-chain (Base, Solana, SKALE) instead of using a
+Bearer token:
+
+```bash
+npm install @acedatacloud/sdk @acedatacloud/x402-client
+```
+
+```typescript
+import { AceDataCloud } from '@acedatacloud/sdk';
+import { createX402PaymentHandler } from '@acedatacloud/x402-client';
+
+const client = new AceDataCloud({
+  // No apiToken needed — the x402 handler pays per request.
+  paymentHandler: createX402PaymentHandler({
+    network: 'base',               // or 'solana' | 'skale'
+    evmProvider: window.ethereum,
+    evmAddress: '0xYourAddress...',
+  }),
+});
+
+const result = await client.openai.chat.completions.create({
+  model: 'gpt-4o-mini',
+  messages: [{ role: 'user', content: 'Say hi in 3 words' }],
+  max_tokens: 10,
+});
+```
+
+On each API call, the SDK first sends the request unauthenticated. If
+the server replies with `402`, the SDK passes the `accepts` list to
+the handler, which signs and returns an `X-Payment` header. The SDK
+retries the request once with that header. Everything else — task
+polling, streaming, retries, error mapping — keeps working exactly the
+same.
+
+You can still pass a Bearer token alongside the handler if you want a
+mixed mode (some endpoints via subscription, others via x402) — the
+SDK only invokes the handler when it actually sees a `402`.
+
 ## License
 
 MIT

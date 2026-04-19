@@ -12,6 +12,10 @@ import {
   TransportError,
   ValidationError,
 } from './errors';
+import type {
+  PaymentHandler,
+  PaymentRequiredBody,
+} from './payment';
 
 const ERROR_CODE_MAP: Record<string, typeof APIError> = {
   invalid_token: AuthenticationError,
@@ -60,6 +64,14 @@ export interface TransportOptions {
   timeout?: number;
   maxRetries?: number;
   headers?: Record<string, string>;
+  /**
+   * Optional handler invoked when a request returns `402 Payment Required`.
+   * The handler receives the parsed `accepts` list and must return the extra
+   * headers (typically `X-Payment`) to attach to the automatic retry.
+   *
+   * See `@acedatacloud/x402-client` for a drop-in implementation.
+   */
+  paymentHandler?: PaymentHandler;
 }
 
 export class Transport {
@@ -68,12 +80,15 @@ export class Transport {
   private timeout: number;
   private maxRetries: number;
   private headers: Record<string, string>;
+  private paymentHandler?: PaymentHandler;
 
   constructor(opts: TransportOptions = {}) {
     const token = opts.apiToken ?? process.env.ACEDATACLOUD_API_TOKEN ?? '';
-    if (!token) {
+    if (!token && !opts.paymentHandler) {
       throw new AuthenticationError({
-        message: 'apiToken is required. Pass it to the client or set ACEDATACLOUD_API_TOKEN.',
+        message:
+          'apiToken is required (or provide a paymentHandler, e.g. from @acedatacloud/x402-client). ' +
+          'Pass it to the client or set ACEDATACLOUD_API_TOKEN.',
         statusCode: 0,
         code: 'no_token',
       });
@@ -82,13 +97,17 @@ export class Transport {
     this.platformBaseURL = (opts.platformBaseURL ?? 'https://platform.acedata.cloud').replace(/\/+$/, '');
     this.timeout = opts.timeout ?? 300_000;
     this.maxRetries = opts.maxRetries ?? 2;
-    this.headers = {
+    this.paymentHandler = opts.paymentHandler;
+    const baseHeaders: Record<string, string> = {
       accept: 'application/json',
-      authorization: `Bearer ${token}`,
       'content-type': 'application/json',
       'user-agent': 'acedatacloud-node/0.1.0',
       ...(opts.headers ?? {}),
     };
+    if (token) {
+      baseHeaders.authorization = `Bearer ${token}`;
+    }
+    this.headers = baseHeaders;
   }
 
   async request(
@@ -112,17 +131,41 @@ export class Transport {
     const timeoutMs = opts.timeout ?? this.timeout;
 
     let lastError: Error | null = null;
+    let paymentAttempted = false;
+    let extraHeaders: Record<string, string> = {};
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const resp = await fetch(url, {
           method,
-          headers,
+          headers: { ...headers, ...extraHeaders },
           body: opts.json ? JSON.stringify(opts.json) : undefined,
           signal: controller.signal,
         });
         clearTimeout(timer);
+
+        if (resp.status === 402 && this.paymentHandler && !paymentAttempted) {
+          const text = await resp.text();
+          let body: PaymentRequiredBody;
+          try {
+            body = JSON.parse(text) as PaymentRequiredBody;
+          } catch {
+            throw mapError(402, { error: { code: 'invalid_402', message: text } });
+          }
+          if (!body.accepts?.length) {
+            throw mapError(402, { error: { code: 'invalid_402', message: 'No payment requirements' } });
+          }
+          const result = await this.paymentHandler({
+            url,
+            method,
+            body: opts.json,
+            accepts: body.accepts,
+          });
+          extraHeaders = { ...extraHeaders, ...result.headers };
+          paymentAttempted = true;
+          continue;
+        }
 
         if (resp.status >= 400) {
           const text = await resp.text();
