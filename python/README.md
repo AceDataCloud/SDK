@@ -121,6 +121,37 @@ client = AceDataCloud(
 
 The token can also be set via the `ACEDATACLOUD_API_TOKEN` environment variable.
 
+## Paying with X402 Instead of a Bearer Token
+
+The SDK supports a pluggable `payment_handler` that is invoked when the
+API returns `402 Payment Required`. Any callable (or async callable)
+that returns the required headers is accepted:
+
+```python
+from acedatacloud import AceDataCloud, PaymentHandlerContext, PaymentHandlerResult
+
+def my_payment_handler(ctx: PaymentHandlerContext) -> PaymentHandlerResult:
+    # ctx["accepts"] is the list of payment requirements returned by the server.
+    # Your job: sign the preferred one and return the retry header.
+    x_payment = sign_and_encode(ctx["accepts"])  # your implementation
+    return {"headers": {"X-Payment": x_payment}}
+
+client = AceDataCloud(payment_handler=my_payment_handler)
+
+# Normal SDK calls — the handler is only invoked when the server returns 402.
+result = client.openai.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Hi"}],
+)
+```
+
+The `AsyncAceDataCloud` client accepts either a synchronous or
+asynchronous handler, so you can plug in wallet SDKs that use
+`asyncio`. A ready-made x402 signer for Python is not shipped yet
+(there is a TypeScript implementation in
+[`@acedatacloud/x402-client`](https://github.com/AceDataCloud/X402Client)
+— contributions for a Python port are welcome).
+
 ## License
 
 MIT

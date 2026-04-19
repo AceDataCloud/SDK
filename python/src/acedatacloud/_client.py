@@ -4,6 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from acedatacloud._runtime.payment import (
+    AsyncPaymentHandler,
+    PaymentHandler,
+    SyncPaymentHandler,
+)
 from acedatacloud._runtime.transport import AsyncTransport, SyncTransport
 from acedatacloud.resources.audio import AsyncAudio, Audio
 from acedatacloud.resources.chat import AsyncChat, Chat
@@ -31,6 +36,7 @@ class AceDataCloud:
         timeout: float = 300.0,
         max_retries: int = 2,
         headers: dict[str, str] | None = None,
+        payment_handler: SyncPaymentHandler | None = None,
     ) -> None:
         self._transport = SyncTransport(
             api_token=api_token,
@@ -39,6 +45,7 @@ class AceDataCloud:
             timeout=timeout,
             max_retries=max_retries,
             extra_headers=headers or {},
+            payment_handler=payment_handler,
         )
         self.chat = Chat(self._transport)
         self.images = Images(self._transport)
@@ -72,6 +79,7 @@ class AsyncAceDataCloud:
         timeout: float = 300.0,
         max_retries: int = 2,
         headers: dict[str, str] | None = None,
+        payment_handler: PaymentHandler | None = None,
     ) -> None:
         self._transport = AsyncTransport(
             api_token=api_token,
@@ -80,6 +88,7 @@ class AsyncAceDataCloud:
             timeout=timeout,
             max_retries=max_retries,
             extra_headers=headers or {},
+            payment_handler=payment_handler,
         )
         self.chat = AsyncChat(self._transport)
         self.images = AsyncImages(self._transport)

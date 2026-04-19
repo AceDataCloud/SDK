@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import os
 import random
 import time
@@ -21,6 +22,11 @@ from acedatacloud._runtime.errors import (
     TokenMismatchError,
     TransportError,
     ValidationError,
+)
+from acedatacloud._runtime.payment import (
+    AsyncPaymentHandler,
+    PaymentHandler,
+    SyncPaymentHandler,
 )
 
 _ERROR_CODE_MAP = {
@@ -87,11 +93,15 @@ class SyncTransport:
         timeout: float,
         max_retries: int,
         extra_headers: dict[str, str],
+        payment_handler: SyncPaymentHandler | None = None,
     ) -> None:
         token = api_token or os.environ.get("ACEDATACLOUD_API_TOKEN", "")
-        if not token:
+        if not token and payment_handler is None:
             raise AuthenticationError(
-                message="api_token is required. Pass it to the client or set ACEDATACLOUD_API_TOKEN.",
+                message=(
+                    "api_token is required (or provide a payment_handler). "
+                    "Pass it to the client or set ACEDATACLOUD_API_TOKEN."
+                ),
                 status_code=0,
                 code="no_token",
             )
@@ -99,13 +109,16 @@ class SyncTransport:
         self._platform_base_url = platform_base_url.rstrip("/")
         self._timeout = timeout
         self._max_retries = max_retries
-        self._headers = {
+        self._payment_handler = payment_handler
+        headers: dict[str, str] = {
             "accept": "application/json",
-            "authorization": f"Bearer {token}",
             "content-type": "application/json",
             "user-agent": "acedatacloud-python/0.1.0",
             **extra_headers,
         }
+        if token:
+            headers["authorization"] = f"Bearer {token}"
+        self._headers = headers
         self._client = httpx.Client(timeout=timeout)
 
     def request(
@@ -122,6 +135,8 @@ class SyncTransport:
         base = self._platform_base_url if platform else self._base_url
         url = f"{base}{path}"
         headers = {**self._headers, **(extra_headers or {})}
+        extra_auth_headers: dict[str, str] = {}
+        payment_attempted = False
 
         last_exc: Exception | None = None
         for attempt in range(self._max_retries + 1):
@@ -131,7 +146,7 @@ class SyncTransport:
                     url,
                     json=json,
                     params=params,
-                    headers=headers,
+                    headers={**headers, **extra_auth_headers},
                     timeout=timeout or self._timeout,
                 )
             except httpx.TimeoutException as exc:
@@ -150,6 +165,31 @@ class SyncTransport:
                     time.sleep(_backoff_delay(attempt))
                     continue
                 raise last_exc from exc
+
+            if (
+                resp.status_code == 402
+                and self._payment_handler is not None
+                and not payment_attempted
+            ):
+                try:
+                    body = resp.json()
+                except Exception as exc:
+                    raise _map_error(
+                        402,
+                        {"error": {"code": "invalid_402", "message": resp.text}},
+                    ) from exc
+                accepts = body.get("accepts") or []
+                if not accepts:
+                    raise _map_error(
+                        402,
+                        {"error": {"code": "invalid_402", "message": "No payment requirements"}},
+                    )
+                result = self._payment_handler(
+                    {"url": url, "method": method, "body": json, "accepts": accepts}
+                )
+                extra_auth_headers.update(result.get("headers", {}))
+                payment_attempted = True
+                continue
 
             if resp.status_code >= 400:
                 try:
@@ -248,12 +288,16 @@ class AsyncTransport:
         timeout: float,
         max_retries: int,
         extra_headers: dict[str, str],
+        payment_handler: PaymentHandler | None = None,
     ) -> None:
 
         token = api_token or os.environ.get("ACEDATACLOUD_API_TOKEN", "")
-        if not token:
+        if not token and payment_handler is None:
             raise AuthenticationError(
-                message="api_token is required. Pass it to the client or set ACEDATACLOUD_API_TOKEN.",
+                message=(
+                    "api_token is required (or provide a payment_handler). "
+                    "Pass it to the client or set ACEDATACLOUD_API_TOKEN."
+                ),
                 status_code=0,
                 code="no_token",
             )
@@ -261,13 +305,16 @@ class AsyncTransport:
         self._platform_base_url = platform_base_url.rstrip("/")
         self._timeout = timeout
         self._max_retries = max_retries
-        self._headers = {
+        self._payment_handler = payment_handler
+        headers: dict[str, str] = {
             "accept": "application/json",
-            "authorization": f"Bearer {token}",
             "content-type": "application/json",
             "user-agent": "acedatacloud-python/0.1.0",
             **extra_headers,
         }
+        if token:
+            headers["authorization"] = f"Bearer {token}"
+        self._headers = headers
         self._client = httpx.AsyncClient(timeout=timeout)
 
     async def request(
@@ -286,6 +333,8 @@ class AsyncTransport:
         base = self._platform_base_url if platform else self._base_url
         url = f"{base}{path}"
         headers = {**self._headers, **(extra_headers or {})}
+        extra_auth_headers: dict[str, str] = {}
+        payment_attempted = False
 
         last_exc: Exception | None = None
         for attempt in range(self._max_retries + 1):
@@ -295,7 +344,7 @@ class AsyncTransport:
                     url,
                     json=json,
                     params=params,
-                    headers=headers,
+                    headers={**headers, **extra_auth_headers},
                     timeout=timeout or self._timeout,
                 )
             except httpx.TimeoutException as exc:
@@ -314,6 +363,33 @@ class AsyncTransport:
                     await asyncio.sleep(_backoff_delay(attempt))
                     continue
                 raise last_exc from exc
+
+            if (
+                resp.status_code == 402
+                and self._payment_handler is not None
+                and not payment_attempted
+            ):
+                try:
+                    body = resp.json()
+                except Exception as exc:
+                    raise _map_error(
+                        402,
+                        {"error": {"code": "invalid_402", "message": resp.text}},
+                    ) from exc
+                accepts = body.get("accepts") or []
+                if not accepts:
+                    raise _map_error(
+                        402,
+                        {"error": {"code": "invalid_402", "message": "No payment requirements"}},
+                    )
+                handler_result = self._payment_handler(
+                    {"url": url, "method": method, "body": json, "accepts": accepts}
+                )
+                if inspect.isawaitable(handler_result):
+                    handler_result = await handler_result
+                extra_auth_headers.update(handler_result.get("headers", {}))
+                payment_attempted = True
+                continue
 
             if resp.status_code >= 400:
                 try:

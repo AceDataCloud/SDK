@@ -18,6 +18,14 @@ export {
 
 export { TaskHandle, TaskHandleOptions } from './runtime/tasks';
 
+export type {
+  PaymentHandler,
+  PaymentHandlerContext,
+  PaymentHandlerResult,
+  PaymentRequirement,
+  PaymentRequiredBody,
+} from './runtime/payment';
+
 export type { ImageProvider } from './resources/images';
 export type { VideoProvider } from './resources/video';
 export type { AudioProvider } from './resources/audio';

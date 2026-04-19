@@ -1,6 +1,7 @@
 /** Top-level AceDataCloud client for TypeScript. */
 
 import { Transport, TransportOptions } from './runtime/transport';
+import type { PaymentHandler } from './runtime/payment';
 import { Chat } from './resources/chat';
 import { Images } from './resources/images';
 import { Audio } from './resources/audio';
@@ -18,6 +19,12 @@ export interface AceDataCloudOptions {
   timeout?: number;
   maxRetries?: number;
   headers?: Record<string, string>;
+  /**
+   * Optional payment handler invoked when the API returns `402 Payment
+   * Required`. Use `createX402PaymentHandler` from
+   * `@acedatacloud/x402-client` to enable on-chain payments via X402.
+   */
+  paymentHandler?: PaymentHandler;
 }
 
 export class AceDataCloud {
@@ -41,6 +48,7 @@ export class AceDataCloud {
       timeout: opts.timeout,
       maxRetries: opts.maxRetries,
       headers: opts.headers,
+      paymentHandler: opts.paymentHandler,
     });
 
     this.chat = new Chat(this.transport);
