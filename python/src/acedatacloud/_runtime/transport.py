@@ -42,12 +42,12 @@ _ERROR_CODE_MAP = {
 _RETRY_STATUS_CODES = {408, 409, 429, 500, 502, 503, 504}
 
 
-def _map_error(status_code: int, body: dict[str, Any]) -> APIError:
+def _map_error(status_code: int, body: Any) -> APIError:
     """Map an API error response to the appropriate exception class."""
-    error_data = body.get("error", {})
+    error_data = (body or {}).get("error", {}) if isinstance(body, dict) else {}
     code = error_data.get("code", "")
     message = error_data.get("message", "")
-    trace_id = body.get("trace_id")
+    trace_id = (body or {}).get("trace_id") if isinstance(body, dict) else None
 
     exc_class = _ERROR_CODE_MAP.get(code)
     if exc_class is None:
