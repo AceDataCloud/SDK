@@ -30,11 +30,22 @@ const ERROR_CODE_MAP: Record<string, typeof APIError> = {
 
 const RETRY_STATUS_CODES = new Set([408, 409, 429, 500, 502, 503, 504]);
 
-export function mapError(statusCode: number, body: any): APIError {
-  const errorData = (body && typeof body === "object" ? (body.error ?? {}) : {}) as Record<string, unknown>;
+export function mapError(statusCode: number, body: Record<string, unknown>): APIError {
+  // The server occasionally returns ``error`` as a bare string (e.g. x402
+  // facilitator diagnostics) or omits/nulls it entirely. Normalize to an
+  // object so downstream property access is always safe and the message
+  // is preserved verbatim.
+  let errorData: Record<string, unknown>;
+  if (typeof body.error === 'string') {
+    errorData = { message: body.error };
+  } else if (body.error && typeof body.error === 'object' && !Array.isArray(body.error)) {
+    errorData = body.error as Record<string, unknown>;
+  } else {
+    errorData = {};
+  }
   const code = (errorData.code ?? '') as string;
   const message = (errorData.message ?? '') as string;
-  const traceId = (body && typeof body === "object" ? body.trace_id : undefined) as string | undefined;
+  const traceId = body.trace_id as string | undefined;
 
   let ErrorClass = ERROR_CODE_MAP[code];
   if (!ErrorClass) {
