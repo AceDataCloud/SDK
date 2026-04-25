@@ -2,6 +2,7 @@
 
 import { Transport, TransportOptions } from './runtime/transport';
 import type { PaymentHandler } from './runtime/payment';
+import { AiChat } from './resources/aichat';
 import { Chat } from './resources/chat';
 import { Images } from './resources/images';
 import { Audio } from './resources/audio';
@@ -28,6 +29,7 @@ export interface AceDataCloudOptions {
 }
 
 export class AceDataCloud {
+  readonly aichat: AiChat;
   readonly chat: Chat;
   readonly images: Images;
   readonly audio: Audio;
@@ -51,6 +53,7 @@ export class AceDataCloud {
       paymentHandler: opts.paymentHandler,
     });
 
+    this.aichat = new AiChat(this.transport);
     this.chat = new Chat(this.transport);
     this.images = new Images(this.transport);
     this.audio = new Audio(this.transport);

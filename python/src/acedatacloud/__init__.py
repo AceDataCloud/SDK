@@ -24,6 +24,7 @@ from acedatacloud._runtime.payment import (
     PaymentRequirement,
     SyncPaymentHandler,
 )
+from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.video import VideoProvider
@@ -31,6 +32,7 @@ from acedatacloud.resources.video import VideoProvider
 __all__ = [
     "AceDataCloud",
     "AsyncAceDataCloud",
+    "AiChatModel",
     "AudioProvider",
     "ImageProvider",
     "VideoProvider",
