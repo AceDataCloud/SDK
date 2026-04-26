@@ -26,6 +26,7 @@ export type {
   PaymentRequiredBody,
 } from './runtime/payment';
 
+export type { AiChatModel } from './resources/aichat';
 export type { ImageProvider } from './resources/images';
 export type { VideoProvider } from './resources/video';
 export type { AudioProvider } from './resources/audio';
