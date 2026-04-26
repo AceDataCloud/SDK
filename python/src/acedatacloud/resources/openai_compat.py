@@ -25,10 +25,10 @@ class _Completions:
         if stream:
             body["stream"] = True
             return self._stream(body)
-        return self._transport.request("POST", "/v1/chat/completions", json=body)
+        return self._transport.request("POST", "/openai/chat/completions", json=body)
 
     def _stream(self, body: dict[str, Any]) -> Iterator[dict[str, Any]]:
-        for chunk in self._transport.request_stream("POST", "/v1/chat/completions", json=body):
+        for chunk in self._transport.request_stream("POST", "/openai/chat/completions", json=body):
             yield _json.loads(chunk)
 
 
@@ -48,10 +48,10 @@ class _AsyncCompletions:
         if stream:
             body["stream"] = True
             return self._stream(body)
-        return await self._transport.request("POST", "/v1/chat/completions", json=body)
+        return await self._transport.request("POST", "/openai/chat/completions", json=body)
 
     async def _stream(self, body: dict[str, Any]):
-        async for chunk in self._transport.request_stream("POST", "/v1/chat/completions", json=body):
+        async for chunk in self._transport.request_stream("POST", "/openai/chat/completions", json=body):
             yield _json.loads(chunk)
 
 
