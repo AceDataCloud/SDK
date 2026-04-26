@@ -111,12 +111,232 @@ class _AsyncResponses:
             yield _json.loads(chunk)
 
 
+class _Images:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def generate(
+        self,
+        *,
+        prompt: str,
+        model: str,
+        background: str | None = None,
+        moderation: str | None = None,
+        n: int | None = None,
+        output_compression: int | None = None,
+        output_format: str | None = None,
+        partial_images: int | None = None,
+        size: str | None = None,
+        quality: str | None = None,
+        response_format: str | None = None,
+        style: str | None = None,
+        callback_url: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"prompt": prompt, "model": model, **kwargs}
+        if background is not None:
+            body["background"] = background
+        if moderation is not None:
+            body["moderation"] = moderation
+        if n is not None:
+            body["n"] = n
+        if output_compression is not None:
+            body["output_compression"] = output_compression
+        if output_format is not None:
+            body["output_format"] = output_format
+        if partial_images is not None:
+            body["partial_images"] = partial_images
+        if size is not None:
+            body["size"] = size
+        if quality is not None:
+            body["quality"] = quality
+        if response_format is not None:
+            body["response_format"] = response_format
+        if style is not None:
+            body["style"] = style
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return self._transport.request("POST", "/openai/images/generations", json=body)
+
+    def edit(
+        self,
+        *,
+        image: str | list[str],
+        prompt: str,
+        model: str | None = None,
+        n: int | None = None,
+        background: str | None = None,
+        input_fidelity: str | None = None,
+        output_format: str | None = None,
+        output_compression: int | None = None,
+        quality: str | None = None,
+        size: str | None = None,
+        response_format: str | None = None,
+        callback_url: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"image": image, "prompt": prompt, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if n is not None:
+            body["n"] = n
+        if background is not None:
+            body["background"] = background
+        if input_fidelity is not None:
+            body["input_fidelity"] = input_fidelity
+        if output_format is not None:
+            body["output_format"] = output_format
+        if output_compression is not None:
+            body["output_compression"] = output_compression
+        if quality is not None:
+            body["quality"] = quality
+        if size is not None:
+            body["size"] = size
+        if response_format is not None:
+            body["response_format"] = response_format
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return self._transport.request("POST", "/openai/images/edits", json=body)
+
+
+class _AsyncImages:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def generate(
+        self,
+        *,
+        prompt: str,
+        model: str,
+        background: str | None = None,
+        moderation: str | None = None,
+        n: int | None = None,
+        output_compression: int | None = None,
+        output_format: str | None = None,
+        partial_images: int | None = None,
+        size: str | None = None,
+        quality: str | None = None,
+        response_format: str | None = None,
+        style: str | None = None,
+        callback_url: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"prompt": prompt, "model": model, **kwargs}
+        if background is not None:
+            body["background"] = background
+        if moderation is not None:
+            body["moderation"] = moderation
+        if n is not None:
+            body["n"] = n
+        if output_compression is not None:
+            body["output_compression"] = output_compression
+        if output_format is not None:
+            body["output_format"] = output_format
+        if partial_images is not None:
+            body["partial_images"] = partial_images
+        if size is not None:
+            body["size"] = size
+        if quality is not None:
+            body["quality"] = quality
+        if response_format is not None:
+            body["response_format"] = response_format
+        if style is not None:
+            body["style"] = style
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return await self._transport.request("POST", "/openai/images/generations", json=body)
+
+    async def edit(
+        self,
+        *,
+        image: str | list[str],
+        prompt: str,
+        model: str | None = None,
+        n: int | None = None,
+        background: str | None = None,
+        input_fidelity: str | None = None,
+        output_format: str | None = None,
+        output_compression: int | None = None,
+        quality: str | None = None,
+        size: str | None = None,
+        response_format: str | None = None,
+        callback_url: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"image": image, "prompt": prompt, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if n is not None:
+            body["n"] = n
+        if background is not None:
+            body["background"] = background
+        if input_fidelity is not None:
+            body["input_fidelity"] = input_fidelity
+        if output_format is not None:
+            body["output_format"] = output_format
+        if output_compression is not None:
+            body["output_compression"] = output_compression
+        if quality is not None:
+            body["quality"] = quality
+        if size is not None:
+            body["size"] = size
+        if response_format is not None:
+            body["response_format"] = response_format
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return await self._transport.request("POST", "/openai/images/edits", json=body)
+
+
+class _Embeddings:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        model: str,
+        input: str | list[str],
+        encoding_format: str | None = None,
+        dimensions: int | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if encoding_format is not None:
+            body["encoding_format"] = encoding_format
+        if dimensions is not None:
+            body["dimensions"] = dimensions
+        return self._transport.request("POST", "/openai/embeddings", json=body)
+
+
+class _AsyncEmbeddings:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        model: str,
+        input: str | list[str],
+        encoding_format: str | None = None,
+        dimensions: int | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if encoding_format is not None:
+            body["encoding_format"] = encoding_format
+        if dimensions is not None:
+            body["dimensions"] = dimensions
+        return await self._transport.request("POST", "/openai/embeddings", json=body)
+
+
 class OpenAI:
     """Synchronous OpenAI-compatible facade."""
 
     def __init__(self, transport: Any) -> None:
         self.chat = _ChatNamespace(transport)
         self.responses = _Responses(transport)
+        self.images = _Images(transport)
+        self.embeddings = _Embeddings(transport)
 
 
 class AsyncOpenAI:
@@ -125,3 +345,5 @@ class AsyncOpenAI:
     def __init__(self, transport: Any) -> None:
         self.chat = _AsyncChatNamespace(transport)
         self.responses = _AsyncResponses(transport)
+        self.images = _AsyncImages(transport)
+        self.embeddings = _AsyncEmbeddings(transport)
