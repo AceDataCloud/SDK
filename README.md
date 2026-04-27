@@ -8,6 +8,7 @@ Official SDK clients for the [AceDataCloud API](https://platform.acedata.cloud).
 |----------|-----------|---------|
 | Python | [python](python/) | `acedatacloud` |
 | TypeScript | [typescript](typescript/) | `@acedatacloud/sdk` |
+| Go | [go](go/) | `github.com/AceDataCloud/SDK/go` |
 
 ## Architecture
 
