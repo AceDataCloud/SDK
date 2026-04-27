@@ -47,6 +47,33 @@ class Audio:
             return handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
+    def voices(
+        self,
+        *,
+        audio_url: str,
+        name: str | None = None,
+        description: str | None = None,
+        wait: bool = False,
+        poll_interval: float = 5.0,
+        max_wait: float = 600.0,
+    ) -> dict[str, Any] | TaskHandle:
+        body: dict[str, Any] = {"audio_url": audio_url}
+        if name is not None:
+            body["name"] = name
+        if description is not None:
+            body["description"] = description
+
+        result = self._transport.request("POST", "/suno/voices", json=body)
+        task_id = result.get("task_id")
+
+        if not task_id or (result.get("data") and not wait):
+            return result
+
+        handle = TaskHandle(task_id, "/suno/tasks", self._transport)
+        if wait:
+            return handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
 
 class AsyncAudio:
     """Async audio generation client."""
@@ -82,6 +109,33 @@ class AsyncAudio:
             return result
 
         handle = AsyncTaskHandle(task_id, f"/{provider}/tasks", self._transport)
+        if wait:
+            return await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
+    async def voices(
+        self,
+        *,
+        audio_url: str,
+        name: str | None = None,
+        description: str | None = None,
+        wait: bool = False,
+        poll_interval: float = 5.0,
+        max_wait: float = 600.0,
+    ) -> dict[str, Any] | AsyncTaskHandle:
+        body: dict[str, Any] = {"audio_url": audio_url}
+        if name is not None:
+            body["name"] = name
+        if description is not None:
+            body["description"] = description
+
+        result = await self._transport.request("POST", "/suno/voices", json=body)
+        task_id = result.get("task_id")
+
+        if not task_id or (result.get("data") and not wait):
+            return result
+
+        handle = AsyncTaskHandle(task_id, "/suno/tasks", self._transport)
         if wait:
             return await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle

@@ -143,6 +143,19 @@ def test_audio_generate(client):
     assert result["data"][0]["title"] == "My Song"
 
 
+@respx.mock
+def test_audio_voices(client):
+    mock_response = {
+        "success": True,
+        "task_id": "task-voices",
+        "data": {"persona_id": "persona-123", "name": "My Voice", "is_public": False},
+    }
+    respx.post("https://api.acedata.cloud/suno/voices").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.audio.voices(audio_url="https://example.com/voice.mp3", name="My Voice")
+    assert result["data"]["persona_id"] == "persona-123"
+
+
 # ── Video Generation ──────────────────────────────────────────────────
 
 

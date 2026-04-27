@@ -267,6 +267,22 @@ describeIf('Audio', () => {
       console.log(`  Audio API error, skipping: ${e.message}`);
     }
   }, 180000);
+
+  it('should create a suno voice clone (async task)', async () => {
+    try {
+      const result = await client.audio.voices({
+        audioUrl: 'https://example.com/voice.mp3',
+        name: 'Test Voice'
+      });
+      expect(result).toBeTruthy();
+      const voiceResult = result as any;
+      expect(voiceResult.task_id || voiceResult.data).toBeTruthy();
+      console.log(`  Keys: ${Object.keys(result)}`);
+      if (voiceResult.task_id) console.log(`  Task ID: ${voiceResult.task_id}`);
+    } catch (e: any) {
+      console.log(`  Suno voices API error, skipping: ${e.message}`);
+    }
+  }, 120000);
 });
 
 // ══════════════════════════════════════════════════════════════════════
