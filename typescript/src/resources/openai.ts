@@ -121,19 +121,23 @@ class Images {
     n?: number;
     background?: string;
     inputFidelity?: string;
+    mask?: string;
     outputFormat?: string;
     outputCompression?: number;
+    partialImages?: number;
     quality?: string;
     size?: string;
     responseFormat?: string;
     callbackUrl?: string;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
-    const { image, prompt, inputFidelity, outputFormat, outputCompression, responseFormat, callbackUrl, ...rest } = opts;
+    const { image, prompt, inputFidelity, mask, outputFormat, outputCompression, partialImages, responseFormat, callbackUrl, ...rest } = opts;
     const body: Record<string, unknown> = { image, prompt, ...rest };
     if (inputFidelity !== undefined) body.input_fidelity = inputFidelity;
+    if (mask !== undefined) body.mask = mask;
     if (outputFormat !== undefined) body.output_format = outputFormat;
     if (outputCompression !== undefined) body.output_compression = outputCompression;
+    if (partialImages !== undefined) body.partial_images = partialImages;
     if (responseFormat !== undefined) body.response_format = responseFormat;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     return this.transport.request('POST', '/openai/images/edits', { json: body });
