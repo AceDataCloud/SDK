@@ -79,6 +79,9 @@ await client.video.generate({ prompt: 'Ocean waves', provider: 'luma' });
 
 // Audio — default is 'suno'
 await client.audio.generate({ prompt: 'A jazz song', provider: 'producer' });
+
+// Suno Voice Clone
+await client.audio.voices({ audioUrl: 'https://example.com/voice.mp3', name: 'My Voice' });
 ```
 
 Available providers:

@@ -83,6 +83,9 @@ client.video.generate(prompt="Ocean waves", provider="luma")
 
 # Audio — default is 'suno'
 client.audio.generate(prompt="A jazz song", provider="producer")
+
+# Suno Voice Clone
+client.audio.voices(audio_url="https://example.com/voice.mp3", name="My Voice")
 ```
 
 Available providers:
