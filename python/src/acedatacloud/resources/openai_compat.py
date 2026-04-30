@@ -167,8 +167,10 @@ class _Images:
         n: int | None = None,
         background: str | None = None,
         input_fidelity: str | None = None,
+        mask: str | None = None,
         output_format: str | None = None,
         output_compression: int | None = None,
+        partial_images: int | None = None,
         quality: str | None = None,
         size: str | None = None,
         response_format: str | None = None,
@@ -184,10 +186,14 @@ class _Images:
             body["background"] = background
         if input_fidelity is not None:
             body["input_fidelity"] = input_fidelity
+        if mask is not None:
+            body["mask"] = mask
         if output_format is not None:
             body["output_format"] = output_format
         if output_compression is not None:
             body["output_compression"] = output_compression
+        if partial_images is not None:
+            body["partial_images"] = partial_images
         if quality is not None:
             body["quality"] = quality
         if size is not None:
@@ -255,8 +261,10 @@ class _AsyncImages:
         n: int | None = None,
         background: str | None = None,
         input_fidelity: str | None = None,
+        mask: str | None = None,
         output_format: str | None = None,
         output_compression: int | None = None,
+        partial_images: int | None = None,
         quality: str | None = None,
         size: str | None = None,
         response_format: str | None = None,
@@ -272,10 +280,14 @@ class _AsyncImages:
             body["background"] = background
         if input_fidelity is not None:
             body["input_fidelity"] = input_fidelity
+        if mask is not None:
+            body["mask"] = mask
         if output_format is not None:
             body["output_format"] = output_format
         if output_compression is not None:
             body["output_compression"] = output_compression
+        if partial_images is not None:
+            body["partial_images"] = partial_images
         if quality is not None:
             body["quality"] = quality
         if size is not None:
