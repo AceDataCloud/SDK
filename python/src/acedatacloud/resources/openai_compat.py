@@ -341,6 +341,114 @@ class _AsyncEmbeddings:
         return await self._transport.request("POST", "/openai/embeddings", json=body)
 
 
+class _Tasks:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def retrieve(
+        self,
+        *,
+        id: str | None = None,
+        trace_id: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve", **kwargs}
+        if id is not None:
+            body["id"] = id
+        if trace_id is not None:
+            body["trace_id"] = trace_id
+        return self._transport.request("POST", "/openai/tasks", json=body)
+
+    def retrieve_batch(
+        self,
+        *,
+        ids: list[str] | None = None,
+        trace_ids: list[str] | None = None,
+        application_id: str | None = None,
+        user_id: str | None = None,
+        type: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        created_at_min: float | None = None,
+        created_at_max: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve_batch", **kwargs}
+        if ids is not None:
+            body["ids"] = ids
+        if trace_ids is not None:
+            body["trace_ids"] = trace_ids
+        if application_id is not None:
+            body["application_id"] = application_id
+        if user_id is not None:
+            body["user_id"] = user_id
+        if type is not None:
+            body["type"] = type
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        if created_at_min is not None:
+            body["created_at_min"] = created_at_min
+        if created_at_max is not None:
+            body["created_at_max"] = created_at_max
+        return self._transport.request("POST", "/openai/tasks", json=body)
+
+
+class _AsyncTasks:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def retrieve(
+        self,
+        *,
+        id: str | None = None,
+        trace_id: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve", **kwargs}
+        if id is not None:
+            body["id"] = id
+        if trace_id is not None:
+            body["trace_id"] = trace_id
+        return await self._transport.request("POST", "/openai/tasks", json=body)
+
+    async def retrieve_batch(
+        self,
+        *,
+        ids: list[str] | None = None,
+        trace_ids: list[str] | None = None,
+        application_id: str | None = None,
+        user_id: str | None = None,
+        type: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        created_at_min: float | None = None,
+        created_at_max: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve_batch", **kwargs}
+        if ids is not None:
+            body["ids"] = ids
+        if trace_ids is not None:
+            body["trace_ids"] = trace_ids
+        if application_id is not None:
+            body["application_id"] = application_id
+        if user_id is not None:
+            body["user_id"] = user_id
+        if type is not None:
+            body["type"] = type
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        if created_at_min is not None:
+            body["created_at_min"] = created_at_min
+        if created_at_max is not None:
+            body["created_at_max"] = created_at_max
+        return await self._transport.request("POST", "/openai/tasks", json=body)
+
+
 class OpenAI:
     """Synchronous OpenAI-compatible facade."""
 
@@ -349,6 +457,7 @@ class OpenAI:
         self.responses = _Responses(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
+        self.tasks = _Tasks(transport)
 
 
 class AsyncOpenAI:
@@ -359,3 +468,4 @@ class AsyncOpenAI:
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
+        self.tasks = _AsyncTasks(transport)

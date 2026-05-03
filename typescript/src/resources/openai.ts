@@ -162,16 +162,60 @@ class Embeddings {
   }
 }
 
+class Tasks {
+  constructor(private transport: Transport) {}
+
+  async retrieve(opts: {
+    id?: string;
+    traceId?: string;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { id, traceId, ...rest } = opts;
+    const body: Record<string, unknown> = { action: 'retrieve', ...rest };
+    if (id !== undefined) body.id = id;
+    if (traceId !== undefined) body.trace_id = traceId;
+    return this.transport.request('POST', '/openai/tasks', { json: body });
+  }
+
+  async retrieveBatch(opts: {
+    ids?: string[];
+    traceIds?: string[];
+    applicationId?: string;
+    userId?: string;
+    type?: string;
+    offset?: number;
+    limit?: number;
+    createdAtMin?: number;
+    createdAtMax?: number;
+    [key: string]: unknown;
+  } = {}): Promise<Record<string, unknown>> {
+    const { ids, traceIds, applicationId, userId, type, offset, limit, createdAtMin, createdAtMax, ...rest } = opts;
+    const body: Record<string, unknown> = { action: 'retrieve_batch', ...rest };
+    if (ids !== undefined) body.ids = ids;
+    if (traceIds !== undefined) body.trace_ids = traceIds;
+    if (applicationId !== undefined) body.application_id = applicationId;
+    if (userId !== undefined) body.user_id = userId;
+    if (type !== undefined) body.type = type;
+    if (offset !== undefined) body.offset = offset;
+    if (limit !== undefined) body.limit = limit;
+    if (createdAtMin !== undefined) body.created_at_min = createdAtMin;
+    if (createdAtMax !== undefined) body.created_at_max = createdAtMax;
+    return this.transport.request('POST', '/openai/tasks', { json: body });
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly tasks: Tasks;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.tasks = new Tasks(transport);
   }
 }
