@@ -14,6 +14,7 @@ import { Platform } from './resources/platform';
 import { OpenAI } from './resources/openai';
 import { Glm } from './resources/glm';
 import { Veo } from './resources/veo';
+import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
 
 export interface AceDataCloudOptions {
@@ -44,6 +45,7 @@ export class AceDataCloud {
   readonly openai: OpenAI;
   readonly glm: Glm;
   readonly veo: Veo;
+  readonly kling: Kling;
   readonly webextrator: WebExtrator;
 
   private transport: Transport;
@@ -71,6 +73,7 @@ export class AceDataCloud {
     this.openai = new OpenAI(this.transport);
     this.glm = new Glm(this.transport);
     this.veo = new Veo(this.transport);
+    this.kling = new Kling(this.transport);
     this.webextrator = new WebExtrator(this.transport);
   }
 }
