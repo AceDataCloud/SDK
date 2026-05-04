@@ -23,6 +23,7 @@ _SERVICE_TASK_ENDPOINTS = {
     "wan": "/wan/tasks",
     "pika": "/pika/tasks",
     "pixverse": "/pixverse/tasks",
+    "webextrator": "/webextrator/tasks",
 }
 
 
