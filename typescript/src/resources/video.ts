@@ -3,7 +3,7 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
-export type VideoProvider = 'sora' | 'luma' | 'veo' | 'kling' | 'hailuo' | 'seedance' | 'wan' | 'pika' | 'pixverse' | (string & {});
+export type VideoProvider = 'sora' | 'luma' | 'veo' | 'kling' | 'hailuo' | 'seedance' | 'wan' | 'pika' | 'pixverse' | 'midjourney' | (string & {});
 
 export class Video {
   constructor(private transport: Transport) {}
