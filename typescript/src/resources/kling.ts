@@ -25,7 +25,7 @@ export class Kling {
     duration?: 5 | 10;
     generateAudio?: boolean;
     videoId?: string;
-    cfgScale?: string;
+    cfgScale?: number;
     aspectRatio?: '16:9' | '9:16' | '1:1';
     callbackUrl?: string;
     endImageUrl?: string;
