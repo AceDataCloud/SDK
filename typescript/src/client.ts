@@ -12,6 +12,9 @@ import { Tasks } from './resources/tasks';
 import { Files } from './resources/files';
 import { Platform } from './resources/platform';
 import { OpenAI } from './resources/openai';
+import { Glm } from './resources/glm';
+import { Veo } from './resources/veo';
+import { WebExtrator } from './resources/webextrator';
 
 export interface AceDataCloudOptions {
   apiToken?: string;
@@ -39,6 +42,9 @@ export class AceDataCloud {
   readonly files: Files;
   readonly platform: Platform;
   readonly openai: OpenAI;
+  readonly glm: Glm;
+  readonly veo: Veo;
+  readonly webextrator: WebExtrator;
 
   private transport: Transport;
 
@@ -63,5 +69,8 @@ export class AceDataCloud {
     this.files = new Files(this.transport);
     this.platform = new Platform(this.transport);
     this.openai = new OpenAI(this.transport);
+    this.glm = new Glm(this.transport);
+    this.veo = new Veo(this.transport);
+    this.webextrator = new WebExtrator(this.transport);
   }
 }

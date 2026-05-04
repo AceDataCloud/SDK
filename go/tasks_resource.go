@@ -22,6 +22,7 @@ var serviceTaskEndpoints = map[string]string{
 	"wan":         "/wan/tasks",
 	"pika":        "/pika/tasks",
 	"pixverse":    "/pixverse/tasks",
+	"webextrator": "/webextrator/tasks",
 }
 
 // TasksResource groups cross-service task retrieval operations.

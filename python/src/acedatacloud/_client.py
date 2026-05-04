@@ -13,12 +13,15 @@ from acedatacloud.resources.aichat import AiChat, AsyncAiChat
 from acedatacloud.resources.audio import AsyncAudio, Audio
 from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.files import AsyncFiles, Files
+from acedatacloud.resources.glm import AsyncGlm, Glm
 from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
 from acedatacloud.resources.search import AsyncSearch, Search
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
+from acedatacloud.resources.veo import AsyncVeo, Veo
 from acedatacloud.resources.video import AsyncVideo, Video
+from acedatacloud.resources.webextrator import AsyncWebExtrator, WebExtrator
 
 _API_BASE = "https://api.acedata.cloud"
 _PLATFORM_BASE = "https://platform.acedata.cloud"
@@ -57,6 +60,9 @@ class AceDataCloud:
         self.files = Files(self._transport)
         self.platform = Platform(self._transport)
         self.openai = OpenAI(self._transport)
+        self.glm = Glm(self._transport)
+        self.veo = Veo(self._transport)
+        self.webextrator = WebExtrator(self._transport)
 
     def close(self) -> None:
         self._transport.close()
@@ -101,6 +107,9 @@ class AsyncAceDataCloud:
         self.files = AsyncFiles(self._transport)
         self.platform = AsyncPlatform(self._transport)
         self.openai = AsyncOpenAI(self._transport)
+        self.glm = AsyncGlm(self._transport)
+        self.veo = AsyncVeo(self._transport)
+        self.webextrator = AsyncWebExtrator(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()
