@@ -16,6 +16,7 @@ import { Glm } from './resources/glm';
 import { Veo } from './resources/veo';
 import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
+import { Suno } from './resources/suno';
 
 export interface AceDataCloudOptions {
   apiToken?: string;
@@ -47,6 +48,7 @@ export class AceDataCloud {
   readonly veo: Veo;
   readonly kling: Kling;
   readonly webextrator: WebExtrator;
+  readonly suno: Suno;
 
   private transport: Transport;
 
@@ -75,5 +77,6 @@ export class AceDataCloud {
     this.veo = new Veo(this.transport);
     this.kling = new Kling(this.transport);
     this.webextrator = new WebExtrator(this.transport);
+    this.suno = new Suno(this.transport);
   }
 }

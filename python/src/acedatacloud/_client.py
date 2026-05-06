@@ -19,6 +19,7 @@ from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
 from acedatacloud.resources.search import AsyncSearch, Search
+from acedatacloud.resources.suno import AsyncSuno, Suno
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
 from acedatacloud.resources.veo import AsyncVeo, Veo
 from acedatacloud.resources.video import AsyncVideo, Video
@@ -65,6 +66,7 @@ class AceDataCloud:
         self.veo = Veo(self._transport)
         self.kling = Kling(self._transport)
         self.webextrator = WebExtrator(self._transport)
+        self.suno = Suno(self._transport)
 
     def close(self) -> None:
         self._transport.close()
@@ -113,6 +115,7 @@ class AsyncAceDataCloud:
         self.veo = AsyncVeo(self._transport)
         self.kling = AsyncKling(self._transport)
         self.webextrator = AsyncWebExtrator(self._transport)
+        self.suno = AsyncSuno(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()

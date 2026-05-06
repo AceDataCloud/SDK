@@ -33,3 +33,4 @@ export type { VideoProvider } from './resources/video';
 export type { VeoModel } from './resources/veo';
 export type { KlingModel } from './resources/kling';
 export type { AudioProvider } from './resources/audio';
+export { Suno } from './resources/suno';
