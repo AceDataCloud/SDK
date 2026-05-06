@@ -21,7 +21,7 @@ class Audio:
         prompt: str,
         provider: AudioProvider | str = "suno",
         model: str | None = None,
-        tags: str | None = None,
+        style: str | None = None,
         callback_url: str | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
@@ -31,8 +31,8 @@ class Audio:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
         if model is not None:
             body["model"] = model
-        if tags is not None:
-            body["tags"] = tags
+        if style is not None:
+            body["style"] = style
         if callback_url is not None:
             body["callback_url"] = callback_url
 
@@ -60,7 +60,7 @@ class AsyncAudio:
         prompt: str,
         provider: AudioProvider | str = "suno",
         model: str | None = None,
-        tags: str | None = None,
+        style: str | None = None,
         callback_url: str | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
@@ -70,8 +70,8 @@ class AsyncAudio:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
         if model is not None:
             body["model"] = model
-        if tags is not None:
-            body["tags"] = tags
+        if style is not None:
+            body["style"] = style
         if callback_url is not None:
             body["callback_url"] = callback_url
 

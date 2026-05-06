@@ -12,17 +12,17 @@ export class Audio {
     prompt: string;
     provider?: AudioProvider;
     model?: string;
-    tags?: string;
+    style?: string;
     callbackUrl?: string;
     wait?: boolean;
     pollInterval?: number;
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, provider = 'suno', model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'suno', model, style, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (model !== undefined) body.model = model;
-    if (tags !== undefined) body.tags = tags;
+    if (style !== undefined) body.style = style;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
     const result = await this.transport.request('POST', `/${provider}/audios`, { json: body });
