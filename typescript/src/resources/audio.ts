@@ -12,6 +12,7 @@ export class Audio {
     prompt: string;
     provider?: AudioProvider;
     model?: string;
+    style?: string;
     tags?: string;
     callbackUrl?: string;
     wait?: boolean;
@@ -19,9 +20,10 @@ export class Audio {
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, provider = 'suno', model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'suno', model, style, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (model !== undefined) body.model = model;
+    if (style !== undefined) body.style = style;
     if (tags !== undefined) body.tags = tags;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
