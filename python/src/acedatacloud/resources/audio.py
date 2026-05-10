@@ -31,7 +31,10 @@ class Audio:
     ) -> dict[str, Any] | TaskHandle:
         is_fish = provider == "fish"
         body: dict[str, Any] = {**kwargs}
-        body["text" if is_fish else "prompt"] = text or prompt
+        if is_fish:
+            body["text"] = text or prompt
+        else:
+            body["prompt"] = prompt
         extra_headers: dict[str, str] = {}
         if model is not None:
             if is_fish:
@@ -78,7 +81,10 @@ class AsyncAudio:
     ) -> dict[str, Any] | AsyncTaskHandle:
         is_fish = provider == "fish"
         body: dict[str, Any] = {**kwargs}
-        body["text" if is_fish else "prompt"] = text or prompt
+        if is_fish:
+            body["text"] = text or prompt
+        else:
+            body["prompt"] = prompt
         extra_headers: dict[str, str] = {}
         if model is not None:
             if is_fish:
