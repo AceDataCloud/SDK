@@ -25,6 +25,7 @@ from acedatacloud._runtime.payment import (
     SyncPaymentHandler,
 )
 from acedatacloud.resources.aichat import AiChatModel
+from acedatacloud.resources.aichat2 import AiChat2Action, AiChat2Model, AiChat2ModelGroup
 from acedatacloud.resources.audio import AudioProvider
 from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
@@ -35,6 +36,9 @@ __all__ = [
     "AceDataCloud",
     "AsyncAceDataCloud",
     "AiChatModel",
+    "AiChat2Model",
+    "AiChat2Action",
+    "AiChat2ModelGroup",
     "AudioProvider",
     "GlmModel",
     "ImageProvider",
