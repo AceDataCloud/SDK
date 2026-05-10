@@ -1,5 +1,7 @@
 """Tests for AceDataCloud Python SDK."""
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -157,6 +159,51 @@ def test_video_generate(client):
 
     result = client.video.generate(prompt="A sunset timelapse")
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
+
+
+@respx.mock
+def test_seedance_video_generate_content_payload(client):
+    observed_json = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        observed_json.update(json.loads(request.content.decode()))
+        return httpx.Response(200, json={"success": True, "task_id": "task-seedance"})
+
+    respx.post("https://api.acedata.cloud/seedance/videos").mock(side_effect=handler)
+
+    client.video.generate(
+        provider="seedance",
+        model="doubao-seedance-1-0-pro-fast-251015",
+        content=[{"type": "text", "text": "A fox running in snow"}],
+        resolution="720p",
+        ratio="16:9",
+        duration=5,
+        frames=29,
+        seed=11,
+        camera_fixed=True,
+        watermark=False,
+        generate_audio=True,
+        callback_url="https://example.com/callback",
+        return_last_frame=True,
+        service_tier="default",
+        execution_expires_after=3600,
+    )
+
+    assert observed_json["model"] == "doubao-seedance-1-0-pro-fast-251015"
+    assert observed_json["content"] == [{"type": "text", "text": "A fox running in snow"}]
+    assert observed_json["resolution"] == "720p"
+    assert observed_json["ratio"] == "16:9"
+    assert observed_json["duration"] == 5
+    assert observed_json["frames"] == 29
+    assert observed_json["seed"] == 11
+    assert observed_json["camerafixed"] is True
+    assert observed_json["watermark"] is False
+    assert observed_json["generate_audio"] is True
+    assert observed_json["callback_url"] == "https://example.com/callback"
+    assert observed_json["return_last_frame"] is True
+    assert observed_json["service_tier"] == "default"
+    assert observed_json["execution_expires_after"] == 3600
+    assert "prompt" not in observed_json
 
 
 # ── Search ────────────────────────────────────────────────────────────
