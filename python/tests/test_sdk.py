@@ -1,5 +1,7 @@
 """Tests for AceDataCloud Python SDK."""
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -141,6 +143,32 @@ def test_audio_generate(client):
 
     result = client.audio.generate(prompt="A happy song")
     assert result["data"][0]["title"] == "My Song"
+
+
+@respx.mock
+def test_audio_generate_fish_params(client):
+    mock_response = {
+        "success": True,
+        "task_id": "task-fish",
+        "data": [{"audio_url": "https://cdn.acedata.cloud/fish.mp3"}],
+    }
+    route = respx.post("https://api.acedata.cloud/fish/audios").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.audio.generate(
+        provider="fish",
+        prompt="Hello world",
+        model="fish-tts",
+        action="speech",
+        voice_id="voice-123",
+    )
+    assert result["task_id"] == "task-fish"
+    payload = json.loads(route.calls.last.request.content)
+    assert payload["prompt"] == "Hello world"
+    assert payload["model"] == "fish-tts"
+    assert payload["action"] == "speech"
+    assert payload["voice_id"] == "voice-123"
 
 
 # ── Video Generation ──────────────────────────────────────────────────
