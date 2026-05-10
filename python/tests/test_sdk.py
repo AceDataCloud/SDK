@@ -143,6 +143,56 @@ def test_audio_generate(client):
     assert result["data"][0]["title"] == "My Song"
 
 
+@respx.mock
+def test_audio_generate_fish_tts(client):
+    mock_response = {"audio_url": "https://platform.r2.fish.audio/task/abc123.mp3"}
+    route = respx.post("https://api.acedata.cloud/fish/tts").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.audio.generate(prompt="Hello world", provider="fish")
+    assert result["audio_url"] == "https://platform.r2.fish.audio/task/abc123.mp3"
+    # Verify the request body used 'text', not 'prompt'
+    assert route.calls[0].request.content
+    import json
+    body = json.loads(route.calls[0].request.content)
+    assert body.get("text") == "Hello world"
+    assert "prompt" not in body
+
+
+@respx.mock
+def test_audio_generate_fish_tts_with_model_header(client):
+    mock_response = {"audio_url": "https://platform.r2.fish.audio/task/abc456.mp3"}
+    route = respx.post("https://api.acedata.cloud/fish/tts").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.audio.generate(prompt="Test speech", provider="fish", model="s1")
+    assert result["audio_url"] == "https://platform.r2.fish.audio/task/abc456.mp3"
+    # Verify model is sent as a header, not in the body
+    request = route.calls[0].request
+    assert request.headers.get("model") == "s1"
+    import json
+    body = json.loads(request.content)
+    assert "model" not in body
+
+
+@respx.mock
+def test_audio_list_fish_models(client):
+    mock_response = {
+        "total": 2,
+        "items": [
+            {"_id": "d7900c21663f485ab63ebdb7e5905036", "title": "Marcus Aurelius"},
+            {"_id": "abc123", "title": "Another Voice"},
+        ],
+    }
+    respx.get("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.audio.list_fish_models(page_size=10, language="en")
+    assert result["total"] == 2
+    assert result["items"][0]["title"] == "Marcus Aurelius"
+
+
 # ── Video Generation ──────────────────────────────────────────────────
 
 
