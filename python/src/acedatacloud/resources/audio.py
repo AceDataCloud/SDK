@@ -19,6 +19,7 @@ class Audio:
         self,
         *,
         prompt: str,
+        text: str | None = None,
         provider: AudioProvider | str = "suno",
         model: str | None = None,
         tags: str | None = None,
@@ -28,15 +29,22 @@ class Audio:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
-        body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        is_fish = provider == "fish"
+        body: dict[str, Any] = {**kwargs}
+        body["text" if is_fish else "prompt"] = text or prompt
+        extra_headers: dict[str, str] = {}
         if model is not None:
-            body["model"] = model
+            if is_fish:
+                extra_headers["model"] = model
+            else:
+                body["model"] = model
         if tags is not None:
             body["tags"] = tags
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        result = self._transport.request("POST", f"/{provider}/audios", json=body)
+        endpoint = "/fish/tts" if is_fish else f"/{provider}/audios"
+        result = self._transport.request("POST", endpoint, json=body, extra_headers=extra_headers)
         task_id = result.get("task_id")
 
         if not task_id or (result.get("data") and not wait):
@@ -58,6 +66,7 @@ class AsyncAudio:
         self,
         *,
         prompt: str,
+        text: str | None = None,
         provider: AudioProvider | str = "suno",
         model: str | None = None,
         tags: str | None = None,
@@ -67,15 +76,22 @@ class AsyncAudio:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
-        body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        is_fish = provider == "fish"
+        body: dict[str, Any] = {**kwargs}
+        body["text" if is_fish else "prompt"] = text or prompt
+        extra_headers: dict[str, str] = {}
         if model is not None:
-            body["model"] = model
+            if is_fish:
+                extra_headers["model"] = model
+            else:
+                body["model"] = model
         if tags is not None:
             body["tags"] = tags
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        result = await self._transport.request("POST", f"/{provider}/audios", json=body)
+        endpoint = "/fish/tts" if is_fish else f"/{provider}/audios"
+        result = await self._transport.request("POST", endpoint, json=body, extra_headers=extra_headers)
         task_id = result.get("task_id")
 
         if not task_id or (result.get("data") and not wait):

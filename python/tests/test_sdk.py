@@ -143,6 +143,26 @@ def test_audio_generate(client):
     assert result["data"][0]["title"] == "My Song"
 
 
+@respx.mock
+def test_audio_generate_fish_uses_tts_endpoint(client):
+    route = respx.post("https://api.acedata.cloud/fish/tts").mock(
+        return_value=httpx.Response(200, json={"audio_url": "https://cdn.acedata.cloud/fish.mp3"})
+    )
+
+    result = client.audio.generate(
+        provider="fish",
+        prompt="fallback prompt",
+        text="Hello fish",
+        model="s2-pro",
+    )
+
+    assert result["audio_url"] == "https://cdn.acedata.cloud/fish.mp3"
+    assert route.called
+    request = route.calls[0].request
+    assert request.headers["model"] == "s2-pro"
+    assert request.content == b'{"text":"Hello fish"}'
+
+
 # ── Video Generation ──────────────────────────────────────────────────
 
 
@@ -330,6 +350,28 @@ async def test_async_images(async_client):
 
     result = await async_client.images.generate(prompt="Test async")
     assert result["data"][0]["image_url"] == "https://cdn.acedata.cloud/async.png"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_audio_generate_fish_uses_tts_endpoint(async_client):
+    route = respx.post("https://api.acedata.cloud/fish/tts").mock(
+        return_value=httpx.Response(200, json={"audio_url": "https://cdn.acedata.cloud/fish-async.mp3"})
+    )
+
+    result = await async_client.audio.generate(
+        provider="fish",
+        prompt="fallback prompt",
+        text="Hello fish async",
+        model="s1",
+    )
+
+    assert result["audio_url"] == "https://cdn.acedata.cloud/fish-async.mp3"
+    assert route.called
+    request = route.calls[0].request
+    assert request.headers["model"] == "s1"
+    assert request.content == b'{"text":"Hello fish async"}'
     await async_client.close()
 
 
