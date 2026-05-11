@@ -1,5 +1,7 @@
 """Tests for AceDataCloud Python SDK."""
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -141,6 +143,51 @@ def test_audio_generate(client):
 
     result = client.audio.generate(prompt="A happy song")
     assert result["data"][0]["title"] == "My Song"
+
+
+@respx.mock
+def test_audio_generate_fish_tts(client):
+    mock_response = {"audio_url": "https://platform.r2.fish.audio/task/example.mp3"}
+    route = respx.post("https://api.acedata.cloud/fish/tts").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.audio.generate(
+        provider="fish",
+        prompt="Hello world",
+        model="s2-pro",
+        reference_id="voice-id",
+        format="mp3",
+        sample_rate=44100,
+    )
+    assert result["audio_url"] == "https://platform.r2.fish.audio/task/example.mp3"
+    sent = route.calls[0].request
+    assert sent.headers["model"] == "s2-pro"
+    assert json.loads(sent.content) == {
+        "text": "Hello world",
+        "reference_id": "voice-id",
+        "format": "mp3",
+        "sample_rate": 44100,
+    }
+
+
+@respx.mock
+def test_audio_list_fish_models(client):
+    mock_response = {"total": 1, "items": [{"_id": "voice-1"}]}
+    route = respx.get("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.audio.list_fish_models(page_size=20, page_number=1)
+    assert result["total"] == 1
+    sent = route.calls[0].request
+    assert sent.url.params["page_size"] == "20"
+    assert sent.url.params["page_number"] == "1"
+
+
+@respx.mock
+def test_audio_get_fish_model(client):
+    mock_response = {"_id": "voice-1", "title": "Voice"}
+    respx.get("https://api.acedata.cloud/fish/model/voice-1").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.audio.get_fish_model("voice-1")
+    assert result["_id"] == "voice-1"
 
 
 # ── Video Generation ──────────────────────────────────────────────────
