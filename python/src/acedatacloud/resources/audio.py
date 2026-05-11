@@ -44,7 +44,8 @@ class Audio:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
-        body: dict[str, Any]
+        """Generate audio; for Fish TTS, ``prompt`` is a backward-compatible alias of ``text``."""
+        body: dict[str, Any] = {}
         endpoint = f"/{provider}/audios"
         extra_headers: dict[str, str] | None = None
         if provider == "fish":
@@ -148,7 +149,8 @@ class AsyncAudio:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
-        body: dict[str, Any]
+        """Generate audio; for Fish TTS, ``prompt`` is a backward-compatible alias of ``text``."""
+        body: dict[str, Any] = {}
         endpoint = f"/{provider}/audios"
         extra_headers: dict[str, str] | None = None
         if provider == "fish":

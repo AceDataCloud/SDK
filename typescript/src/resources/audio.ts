@@ -12,6 +12,7 @@ export class Audio {
     prompt: string;
     provider?: AudioProvider;
     model?: string;
+    /** Fish TTS text; `prompt` remains supported as a backward-compatible alias. */
     text?: string;
     referenceId?: string;
     format?: 'mp3' | 'wav' | 'pcm' | 'opus' | (string & {});
@@ -65,7 +66,7 @@ export class Audio {
 
     let endpoint = `/${provider}/audios`;
     let headers: Record<string, string> | undefined;
-    let body: Record<string, unknown>;
+    let body: Record<string, unknown> = {};
     if (provider === 'fish') {
       endpoint = '/fish/tts';
       body = { text: text ?? prompt, ...rest };
