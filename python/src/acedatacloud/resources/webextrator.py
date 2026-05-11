@@ -83,6 +83,33 @@ class WebExtrator:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/webextrator/render", json=body)
 
+    def tasks(
+        self,
+        *,
+        action: Literal["retrieve", "retrieve_batch"],
+        id: str | None = None,
+        trace_id: str | None = None,
+        ids: list[str] | None = None,
+        trace_ids: list[str] | None = None,
+        offset: float | None = None,
+        limit: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": action, **kwargs}
+        if id is not None:
+            body["id"] = id
+        if trace_id is not None:
+            body["trace_id"] = trace_id
+        if ids is not None:
+            body["ids"] = ids
+        if trace_ids is not None:
+            body["trace_ids"] = trace_ids
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        return self._transport.request("POST", "/webextrator/tasks", json=body)
+
 
 class AsyncWebExtrator:
     """Async WebExtrator client."""
@@ -161,3 +188,30 @@ class AsyncWebExtrator:
         if callback_url is not None:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/webextrator/render", json=body)
+
+    async def tasks(
+        self,
+        *,
+        action: Literal["retrieve", "retrieve_batch"],
+        id: str | None = None,
+        trace_id: str | None = None,
+        ids: list[str] | None = None,
+        trace_ids: list[str] | None = None,
+        offset: float | None = None,
+        limit: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": action, **kwargs}
+        if id is not None:
+            body["id"] = id
+        if trace_id is not None:
+            body["trace_id"] = trace_id
+        if ids is not None:
+            body["ids"] = ids
+        if trace_ids is not None:
+            body["trace_ids"] = trace_ids
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        return await self._transport.request("POST", "/webextrator/tasks", json=body)

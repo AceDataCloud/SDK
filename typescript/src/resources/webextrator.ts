@@ -58,4 +58,25 @@ export class WebExtrator {
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     return this.transport.request('POST', '/webextrator/render', { json: body });
   }
+
+  async tasks(opts: {
+    action: 'retrieve' | 'retrieve_batch';
+    id?: string;
+    traceId?: string;
+    ids?: string[];
+    traceIds?: string[];
+    offset?: number;
+    limit?: number;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { action, id, traceId, ids, traceIds, offset, limit, ...rest } = opts;
+    const body: Record<string, unknown> = { action, ...rest };
+    if (id !== undefined) body.id = id;
+    if (traceId !== undefined) body.trace_id = traceId;
+    if (ids !== undefined) body.ids = ids;
+    if (traceIds !== undefined) body.trace_ids = traceIds;
+    if (offset !== undefined) body.offset = offset;
+    if (limit !== undefined) body.limit = limit;
+    return this.transport.request('POST', '/webextrator/tasks', { json: body });
+  }
 }
