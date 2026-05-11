@@ -10,6 +10,7 @@ from acedatacloud._runtime.payment import (
 )
 from acedatacloud._runtime.transport import AsyncTransport, SyncTransport
 from acedatacloud.resources.aichat import AiChat, AsyncAiChat
+from acedatacloud.resources.aichat2 import AiChat2, AsyncAiChat2
 from acedatacloud.resources.audio import AsyncAudio, Audio
 from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.files import AsyncFiles, Files
@@ -52,6 +53,7 @@ class AceDataCloud:
             payment_handler=payment_handler,
         )
         self.aichat = AiChat(self._transport)
+        self.aichat2 = AiChat2(self._transport)
         self.chat = Chat(self._transport)
         self.images = Images(self._transport)
         self.audio = Audio(self._transport)
@@ -100,6 +102,7 @@ class AsyncAceDataCloud:
             payment_handler=payment_handler,
         )
         self.aichat = AsyncAiChat(self._transport)
+        self.aichat2 = AsyncAiChat2(self._transport)
         self.chat = AsyncChat(self._transport)
         self.images = AsyncImages(self._transport)
         self.audio = AsyncAudio(self._transport)
