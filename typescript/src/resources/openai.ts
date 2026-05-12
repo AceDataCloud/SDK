@@ -30,11 +30,11 @@ class Completions {
       body.stream = true;
       return this.streamResponse(body);
     }
-    return this.transport.request('POST', '/openai/chat/completions', { json: body });
+    return this.transport.request('POST', '/v1/chat/completions', { json: body });
   }
 
   private async *streamResponse(body: Record<string, unknown>): AsyncGenerator<Record<string, unknown>> {
-    for await (const chunk of this.transport.requestStream('POST', '/openai/chat/completions', { json: body })) {
+    for await (const chunk of this.transport.requestStream('POST', '/v1/chat/completions', { json: body })) {
       yield JSON.parse(chunk);
     }
   }
