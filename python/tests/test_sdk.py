@@ -1,5 +1,7 @@
 """Tests for AceDataCloud Python SDK."""
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -43,7 +45,7 @@ def test_openai_chat_completions(client):
         ],
         "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
     }
-    respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+    respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
@@ -71,6 +73,26 @@ def test_openai_responses(client):
         input="Hello",
     )
     assert result["id"] == "resp-123"
+
+
+@respx.mock
+def test_openai_responses_background(client):
+    route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+        return_value=httpx.Response(200, json={"id": "resp-456"})
+    )
+
+    result = client.openai.responses.create(
+        model="gpt-4o",
+        input=[{"role": "user", "content": "Hello"}],
+        background=True,
+    )
+
+    assert result["id"] == "resp-456"
+    assert json.loads(route.calls.last.request.content) == {
+        "model": "gpt-4o",
+        "input": [{"role": "user", "content": "Hello"}],
+        "background": True,
+    }
 
 
 # ── Chat Messages (Claude Native) ────────────────────────────────────
@@ -238,7 +260,7 @@ def test_platform_config_get(client):
 
 @respx.mock
 def test_auth_error(client):
-    respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+    respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
         return_value=httpx.Response(
             401, json={"error": {"code": "invalid_token", "message": "Bad token"}, "trace_id": "t-1"}
         )
@@ -251,7 +273,7 @@ def test_auth_error(client):
 
 @respx.mock
 def test_balance_error(client):
-    respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+    respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
         return_value=httpx.Response(
             403, json={"error": {"code": "used_up", "message": "Balance insufficient"}, "trace_id": "t-2"}
         )
@@ -262,7 +284,7 @@ def test_balance_error(client):
 
 @respx.mock
 def test_rate_limit_error(client):
-    respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+    respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
         return_value=httpx.Response(
             429, json={"error": {"code": "too_many_requests", "message": "Slow down"}, "trace_id": "t-3"}
         )
@@ -273,7 +295,7 @@ def test_rate_limit_error(client):
 
 @respx.mock
 def test_validation_error(client):
-    respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+    respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
         return_value=httpx.Response(
             400, json={"error": {"code": "bad_request", "message": "Invalid model"}, "trace_id": "t-4"}
         )
@@ -293,7 +315,7 @@ async def test_async_openai_completions(async_client):
         "choices": [{"index": 0, "message": {"role": "assistant", "content": "Async!"}, "finish_reason": "stop"}],
         "usage": {"prompt_tokens": 5, "completion_tokens": 3, "total_tokens": 8},
     }
-    respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+    respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 

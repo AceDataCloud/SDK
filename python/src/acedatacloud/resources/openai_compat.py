@@ -74,10 +74,13 @@ class _Responses:
         *,
         model: str,
         input: str | list[dict[str, Any]],
+        background: bool | None = None,
         stream: bool = False,
         **kwargs: Any,
     ) -> dict[str, Any] | Iterator[dict[str, Any]]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if background is not None:
+            body["background"] = background
         if stream:
             body["stream"] = True
             return self._stream(body)
@@ -97,10 +100,13 @@ class _AsyncResponses:
         *,
         model: str,
         input: str | list[dict[str, Any]],
+        background: bool | None = None,
         stream: bool = False,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if background is not None:
+            body["background"] = background
         if stream:
             body["stream"] = True
             return self._stream(body)

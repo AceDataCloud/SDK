@@ -53,23 +53,27 @@ class Responses {
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
+    background?: boolean;
     stream?: false;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
+    background?: boolean;
     stream: true;
     [key: string]: unknown;
   }): Promise<AsyncGenerator<Record<string, unknown>>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
+    background?: boolean;
     stream?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
-    const { model, input, stream, ...rest } = opts;
+    const { model, input, background, stream, ...rest } = opts;
     const body: Record<string, unknown> = { model, input, ...rest };
+    if (background !== undefined) body.background = background;
 
     if (stream) {
       body.stream = true;
