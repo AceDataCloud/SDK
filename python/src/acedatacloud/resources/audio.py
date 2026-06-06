@@ -73,7 +73,7 @@ class Audio:
                 "POST",
                 "/fish/tts",
                 json=body,
-                extra_headers={"model": model} if model is not None else None,
+                extra_headers={"model": model} if model is not None else {},
             )
         else:
             body = {"prompt": prompt, **kwargs}
@@ -159,7 +159,7 @@ class AsyncAudio:
                 "POST",
                 "/fish/tts",
                 json=body,
-                extra_headers={"model": model} if model is not None else None,
+                extra_headers={"model": model} if model is not None else {},
             )
         else:
             body = {"prompt": prompt, **kwargs}

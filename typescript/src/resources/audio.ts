@@ -13,19 +13,19 @@ export class Audio {
     pageNumber?: number;
     title?: string;
     tag?: string;
-    self?: boolean;
+    selfOnly?: boolean;
     authorId?: string;
     language?: string;
     titleLanguage?: string;
     sortBy?: string;
   } = {}): Promise<Record<string, unknown>> {
-    const { pageSize, pageNumber, title, tag, self, authorId, language, titleLanguage, sortBy } = opts;
+    const { pageSize, pageNumber, title, tag, selfOnly, authorId, language, titleLanguage, sortBy } = opts;
     const params: Record<string, string> = {};
     if (pageSize !== undefined) params.page_size = String(pageSize);
     if (pageNumber !== undefined) params.page_number = String(pageNumber);
     if (title !== undefined) params.title = title;
     if (tag !== undefined) params.tag = tag;
-    if (self !== undefined) params.self = String(self);
+    if (selfOnly !== undefined) params.self = String(selfOnly);
     if (authorId !== undefined) params.author_id = authorId;
     if (language !== undefined) params.language = language;
     if (titleLanguage !== undefined) params.title_language = titleLanguage;

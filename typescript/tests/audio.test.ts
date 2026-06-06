@@ -43,7 +43,7 @@ describe('Audio resource', () => {
     const request = jest.fn().mockResolvedValue({ data: [] });
     const audio = new Audio({ request } as any);
 
-    await audio.listFishModels({ pageSize: 10, pageNumber: 2, self: true });
+    await audio.listFishModels({ pageSize: 10, pageNumber: 2, selfOnly: true });
     await audio.getFishModel('voice-1');
 
     expect(request).toHaveBeenNthCalledWith(1, 'GET', '/fish/model', {
