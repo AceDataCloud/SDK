@@ -20,9 +20,13 @@ class Images:
         *,
         prompt: str,
         provider: ImageProvider | str = "nano-banana",
+        action: Literal["generate", "edit"] | None = None,
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
+        image_urls: list[str] | None = None,
+        aspect_ratio: str | None = None,
+        resolution: str | None = None,
         callback_url: str | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -30,12 +34,20 @@ class Images:
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        if action is not None:
+            body["action"] = action
         if model is not None:
             body["model"] = model
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
         if image_url is not None:
             body["image_url"] = image_url
+        if image_urls is not None:
+            body["image_urls"] = image_urls
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
+        if resolution is not None:
+            body["resolution"] = resolution
         if callback_url is not None:
             body["callback_url"] = callback_url
 
@@ -63,9 +75,13 @@ class AsyncImages:
         *,
         prompt: str,
         provider: ImageProvider | str = "nano-banana",
+        action: Literal["generate", "edit"] | None = None,
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
+        image_urls: list[str] | None = None,
+        aspect_ratio: str | None = None,
+        resolution: str | None = None,
         callback_url: str | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -73,12 +89,20 @@ class AsyncImages:
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        if action is not None:
+            body["action"] = action
         if model is not None:
             body["model"] = model
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
         if image_url is not None:
             body["image_url"] = image_url
+        if image_urls is not None:
+            body["image_urls"] = image_urls
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
+        if resolution is not None:
+            body["resolution"] = resolution
         if callback_url is not None:
             body["callback_url"] = callback_url
 
