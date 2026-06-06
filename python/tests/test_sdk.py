@@ -1,5 +1,7 @@
 """Tests for AceDataCloud Python SDK."""
 
+import json
+
 import httpx
 import pytest
 import respx
@@ -141,6 +143,35 @@ def test_audio_generate(client):
 
     result = client.audio.generate(prompt="A happy song")
     assert result["data"][0]["title"] == "My Song"
+
+
+@respx.mock
+def test_audio_generate_fish_uses_tts_endpoint(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["text"] == "Hello fish"
+        assert "prompt" not in payload
+        assert request.headers["model"] == "speech-1"
+        return httpx.Response(200, json={"success": True, "task_id": "task-fish"})
+
+    respx.post("https://api.acedata.cloud/fish/tts").mock(side_effect=_handler)
+
+    result = client.audio.generate(prompt="Hello fish", provider="fish", model="speech-1")
+    assert hasattr(result, "wait")
+
+
+@respx.mock
+def test_audio_fish_model_endpoints(client):
+    respx.get("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(200, json={"data": []}))
+    respx.get("https://api.acedata.cloud/fish/model/model-1").mock(
+        return_value=httpx.Response(200, json={"id": "model-1"})
+    )
+
+    model_list = client.audio.list_fish_models(page_size=10, page_number=2, self_only=True)
+    model_detail = client.audio.get_fish_model("model-1")
+
+    assert model_list["data"] == []
+    assert model_detail["id"] == "model-1"
 
 
 # ── Video Generation ──────────────────────────────────────────────────

@@ -6,7 +6,7 @@ import json as _json
 from collections.abc import AsyncIterator, Iterator
 from typing import Any, Literal
 
-GlmModel = Literal["glm-5.1", "glm-4.7", "glm-4.6", "glm-4.5-air", "glm-3-turbo"]
+GlmModel = Literal["glm-5.1", "glm-4.7", "glm-4.6", "glm-3-turbo"]
 
 
 class _Completions:
