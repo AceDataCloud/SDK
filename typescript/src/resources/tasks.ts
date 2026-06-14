@@ -21,6 +21,9 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   pika: '/pika/tasks',
   pixverse: '/pixverse/tasks',
   webextrator: '/webextrator/tasks',
+  qrart: '/qrart/tasks',
+  publisher: '/publisher/tasks',
+  dreamina: '/dreamina/tasks',
 };
 
 export class Tasks {
