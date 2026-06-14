@@ -19,6 +19,8 @@ class Search:
         country: str | None = None,
         language: str | None = None,
         page: int | None = None,
+        range: str | None = None,
+        number: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"query": query, "type": type, **kwargs}
@@ -28,6 +30,10 @@ class Search:
             body["language"] = language
         if page is not None:
             body["page"] = page
+        if range is not None:
+            body["range"] = range
+        if number is not None:
+            body["number"] = number
         return self._transport.request("POST", "/serp/google", json=body)
 
 
@@ -45,6 +51,8 @@ class AsyncSearch:
         country: str | None = None,
         language: str | None = None,
         page: int | None = None,
+        range: str | None = None,
+        number: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"query": query, "type": type, **kwargs}
@@ -54,4 +62,8 @@ class AsyncSearch:
             body["language"] = language
         if page is not None:
             body["page"] = page
+        if range is not None:
+            body["range"] = range
+        if number is not None:
+            body["number"] = number
         return await self._transport.request("POST", "/serp/google", json=body)

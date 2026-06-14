@@ -11,13 +11,17 @@ export class Search {
     country?: string;
     language?: string;
     page?: number;
+    range?: string;
+    number?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
-    const { query, type = 'search', country, language, page, ...rest } = opts;
+    const { query, type = 'search', country, language, page, range, number, ...rest } = opts;
     const body: Record<string, unknown> = { query, type, ...rest };
     if (country !== undefined) body.country = country;
     if (language !== undefined) body.language = language;
     if (page !== undefined) body.page = page;
+    if (range !== undefined) body.range = range;
+    if (number !== undefined) body.number = number;
     return this.transport.request('POST', '/serp/google', { json: body });
   }
 }
