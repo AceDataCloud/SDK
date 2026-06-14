@@ -23,6 +23,9 @@ _SERVICE_TASK_ENDPOINTS = {
     "wan": "/wan/tasks",
     "pika": "/pika/tasks",
     "pixverse": "/pixverse/tasks",
+    "grok": "/grok/tasks",
+    "dreamina": "/dreamina/tasks",
+    "gemini": "/gemini/tasks",
     "webextrator": "/webextrator/tasks",
 }
 

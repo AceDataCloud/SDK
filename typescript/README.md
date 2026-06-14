@@ -86,7 +86,7 @@ Available providers:
 | Resource | Providers |
 |----------|-----------|
 | `client.images` | `nano-banana` (default), `midjourney`, `flux`, `seedream` |
-| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse`, `midjourney` |
+| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse`, `midjourney`, `grok`, `dreamina`, `gemini` |
 | `client.audio` | `suno` (default), `producer`, `fish` |
 
 ## Error Handling
