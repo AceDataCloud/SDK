@@ -190,6 +190,27 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_kling_lip_sync(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["mode"] == "text2video"
+        assert payload["video_url"] == "https://cdn.acedata.cloud/video.mp4"
+        assert payload["text"] == "Hello from Kling"
+        assert payload["voice_language"] == "en"
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-lipsync"})
+
+    respx.post("https://api.acedata.cloud/kling/lip-sync").mock(side_effect=_handler)
+
+    result = client.kling.lip_sync(
+        mode="text2video",
+        video_url="https://cdn.acedata.cloud/video.mp4",
+        text="Hello from Kling",
+        voice_language="en",
+    )
+    assert result["task_id"] == "task-kling-lipsync"
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
@@ -361,6 +382,29 @@ async def test_async_images(async_client):
 
     result = await async_client.images.generate(prompt="Test async")
     assert result["data"][0]["image_url"] == "https://cdn.acedata.cloud/async.png"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_kling_lip_sync(async_client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["mode"] == "audio2video"
+        assert payload["video_id"] == "video-123"
+        assert payload["audio_url"] == "https://cdn.acedata.cloud/audio.mp3"
+        assert payload["audio_type"] == "url"
+        return httpx.Response(200, json={"success": True, "task_id": "task-async-kling-lipsync"})
+
+    respx.post("https://api.acedata.cloud/kling/lip-sync").mock(side_effect=_handler)
+
+    result = await async_client.kling.lip_sync(
+        mode="audio2video",
+        video_id="video-123",
+        audio_url="https://cdn.acedata.cloud/audio.mp3",
+        audio_type="url",
+    )
+    assert result["task_id"] == "task-async-kling-lipsync"
     await async_client.close()
 
 
