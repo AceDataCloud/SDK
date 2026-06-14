@@ -6,7 +6,9 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-VideoProvider = Literal["sora", "luma", "veo", "kling", "hailuo", "seedance", "wan", "pika", "pixverse", "midjourney"]
+VideoProvider = Literal[
+    "sora", "luma", "veo", "kling", "hailuo", "seedance", "wan", "pika", "pixverse", "midjourney", "dreamina"
+]
 
 
 class Video:
@@ -18,10 +20,11 @@ class Video:
     def generate(
         self,
         *,
-        prompt: str,
+        prompt: str | None = None,
         provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
+        audio_url: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -29,11 +32,15 @@ class Video:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
-        body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        body: dict[str, Any] = {**kwargs}
+        if prompt is not None:
+            body["prompt"] = prompt
         if model is not None:
             body["model"] = model
         if image_url is not None:
             body["image_url"] = image_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
         if callback_url is not None:
             body["callback_url"] = callback_url
         if async_ is not None:
@@ -60,10 +67,11 @@ class AsyncVideo:
     async def generate(
         self,
         *,
-        prompt: str,
+        prompt: str | None = None,
         provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
+        audio_url: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -71,11 +79,15 @@ class AsyncVideo:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
-        body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        body: dict[str, Any] = {**kwargs}
+        if prompt is not None:
+            body["prompt"] = prompt
         if model is not None:
             body["model"] = model
         if image_url is not None:
             body["image_url"] = image_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
         if callback_url is not None:
             body["callback_url"] = callback_url
         if async_ is not None:
