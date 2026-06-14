@@ -75,6 +75,31 @@ export class Kling {
     return this.transport.request('POST', '/kling/videos', { json: body });
   }
 
+  async lipSync(opts: {
+    mode: 'audio2video' | 'text2video';
+    videoId?: string;
+    videoUrl?: string;
+    audioUrl?: string;
+    audioType?: 'url' | 'file';
+    text?: string;
+    voiceId?: string;
+    voiceLanguage?: string;
+    callbackUrl?: string;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { mode, videoId, videoUrl, audioUrl, audioType, text, voiceId, voiceLanguage, callbackUrl, ...rest } = opts;
+    const body: Record<string, unknown> = { mode, ...rest };
+    if (videoId !== undefined) body.video_id = videoId;
+    if (videoUrl !== undefined) body.video_url = videoUrl;
+    if (audioUrl !== undefined) body.audio_url = audioUrl;
+    if (audioType !== undefined) body.audio_type = audioType;
+    if (text !== undefined) body.text = text;
+    if (voiceId !== undefined) body.voice_id = voiceId;
+    if (voiceLanguage !== undefined) body.voice_language = voiceLanguage;
+    if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    return this.transport.request('POST', '/kling/lip-sync', { json: body });
+  }
+
   async motion(opts: {
     mode: 'std' | 'pro';
     imageUrl: string;

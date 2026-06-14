@@ -80,6 +80,39 @@ class Kling:
             body["start_image_url"] = start_image_url
         return self._transport.request("POST", "/kling/videos", json=body)
 
+    def lip_sync(
+        self,
+        *,
+        mode: Literal["audio2video", "text2video"],
+        video_id: str | None = None,
+        video_url: str | None = None,
+        audio_url: str | None = None,
+        audio_type: Literal["url", "file"] | None = None,
+        text: str | None = None,
+        voice_id: str | None = None,
+        voice_language: str | None = None,
+        callback_url: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"mode": mode, **kwargs}
+        if video_id is not None:
+            body["video_id"] = video_id
+        if video_url is not None:
+            body["video_url"] = video_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if audio_type is not None:
+            body["audio_type"] = audio_type
+        if text is not None:
+            body["text"] = text
+        if voice_id is not None:
+            body["voice_id"] = voice_id
+        if voice_language is not None:
+            body["voice_language"] = voice_language
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return self._transport.request("POST", "/kling/lip-sync", json=body)
+
     def motion(
         self,
         *,
@@ -173,6 +206,39 @@ class AsyncKling:
         if start_image_url is not None:
             body["start_image_url"] = start_image_url
         return await self._transport.request("POST", "/kling/videos", json=body)
+
+    async def lip_sync(
+        self,
+        *,
+        mode: Literal["audio2video", "text2video"],
+        video_id: str | None = None,
+        video_url: str | None = None,
+        audio_url: str | None = None,
+        audio_type: Literal["url", "file"] | None = None,
+        text: str | None = None,
+        voice_id: str | None = None,
+        voice_language: str | None = None,
+        callback_url: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"mode": mode, **kwargs}
+        if video_id is not None:
+            body["video_id"] = video_id
+        if video_url is not None:
+            body["video_url"] = video_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if audio_type is not None:
+            body["audio_type"] = audio_type
+        if text is not None:
+            body["text"] = text
+        if voice_id is not None:
+            body["voice_id"] = voice_id
+        if voice_language is not None:
+            body["voice_language"] = voice_language
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return await self._transport.request("POST", "/kling/lip-sync", json=body)
 
     async def motion(
         self,
