@@ -27,6 +27,12 @@ class Images:
         image_urls: list[str] | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
+        seed: int | None = None,
+        guidance_scale: float | None = None,
+        watermark: bool | None = None,
+        output_format: Literal["jpeg", "png"] | None = None,
+        size: str | None = None,
+        async_mode: bool | None = None,
         callback_url: str | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -48,6 +54,18 @@ class Images:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
             body["resolution"] = resolution
+        if seed is not None:
+            body["seed"] = seed
+        if guidance_scale is not None:
+            body["guidance_scale"] = guidance_scale
+        if watermark is not None:
+            body["watermark"] = watermark
+        if output_format is not None:
+            body["output_format"] = output_format
+        if size is not None:
+            body["size"] = size
+        if async_mode is not None:
+            body["async"] = async_mode
         if callback_url is not None:
             body["callback_url"] = callback_url
 
@@ -82,6 +100,12 @@ class AsyncImages:
         image_urls: list[str] | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
+        seed: int | None = None,
+        guidance_scale: float | None = None,
+        watermark: bool | None = None,
+        output_format: Literal["jpeg", "png"] | None = None,
+        size: str | None = None,
+        async_mode: bool | None = None,
         callback_url: str | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -103,6 +127,18 @@ class AsyncImages:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
             body["resolution"] = resolution
+        if seed is not None:
+            body["seed"] = seed
+        if guidance_scale is not None:
+            body["guidance_scale"] = guidance_scale
+        if watermark is not None:
+            body["watermark"] = watermark
+        if output_format is not None:
+            body["output_format"] = output_format
+        if size is not None:
+            body["size"] = size
+        if async_mode is not None:
+            body["async"] = async_mode
         if callback_url is not None:
             body["callback_url"] = callback_url
 

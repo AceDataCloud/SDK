@@ -18,13 +18,19 @@ export class Images {
     imageUrls?: string[];
     aspectRatio?: string;
     resolution?: string;
+    seed?: number;
+    guidanceScale?: number;
+    watermark?: boolean;
+    outputFormat?: 'jpeg' | 'png';
+    size?: string;
+    async?: boolean;
     callbackUrl?: string;
     wait?: boolean;
     pollInterval?: number;
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, provider = 'nano-banana', action, model, negativePrompt, imageUrl, imageUrls, aspectRatio, resolution, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'nano-banana', action, model, negativePrompt, imageUrl, imageUrls, aspectRatio, resolution, seed, guidanceScale, watermark, outputFormat, size, async: asyncMode, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (action !== undefined) body.action = action;
     if (model !== undefined) body.model = model;
@@ -33,6 +39,12 @@ export class Images {
     if (imageUrls !== undefined) body.image_urls = imageUrls;
     if (aspectRatio !== undefined) body.aspect_ratio = aspectRatio;
     if (resolution !== undefined) body.resolution = resolution;
+    if (seed !== undefined) body.seed = seed;
+    if (guidanceScale !== undefined) body.guidance_scale = guidanceScale;
+    if (watermark !== undefined) body.watermark = watermark;
+    if (outputFormat !== undefined) body.output_format = outputFormat;
+    if (size !== undefined) body.size = size;
+    if (asyncMode !== undefined) body['async'] = asyncMode;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
     const endpoint = provider === 'midjourney' ? '/midjourney/imagine' : `/${provider}/images`;
