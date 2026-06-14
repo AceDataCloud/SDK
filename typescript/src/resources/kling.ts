@@ -115,7 +115,7 @@ export class Kling {
     async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
-    const { mode, videoId, videoUrl, audioUrl, audioType, audioFile, text, voiceId, voiceLanguage, voiceSpeed, callbackUrl, ...rest } = opts;
+    const { mode, videoId, videoUrl, audioUrl, audioType, audioFile, text, voiceId, voiceLanguage, voiceSpeed, callbackUrl, async: asyncVal, ...rest } = opts;
     const body: Record<string, unknown> = { mode, ...rest };
     if (videoId !== undefined) body.video_id = videoId;
     if (videoUrl !== undefined) body.video_url = videoUrl;
@@ -127,6 +127,7 @@ export class Kling {
     if (voiceLanguage !== undefined) body.voice_language = voiceLanguage;
     if (voiceSpeed !== undefined) body.voice_speed = voiceSpeed;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    if (asyncVal !== undefined) body.async = asyncVal;
     return this.transport.request('POST', '/kling/lip-sync', { json: body });
   }
 }
