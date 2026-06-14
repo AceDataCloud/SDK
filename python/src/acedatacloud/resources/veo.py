@@ -25,6 +25,7 @@ class Veo:
         aspect_ratio: Literal["9:16", "1:1", "3:4", "4:3", "16:9"] | None = None,
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"action": action, **kwargs}
@@ -44,6 +45,8 @@ class Veo:
             body["image_urls"] = image_urls
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/veo/videos", json=body)
 
     def upsample(
@@ -52,11 +55,14 @@ class Veo:
         video_id: str,
         action: Literal["1080p", "4k", "gif"],
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "action": action, **kwargs}
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/veo/upsample", json=body)
 
     def extend(
@@ -66,6 +72,7 @@ class Veo:
         model: str,
         prompt: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "model": model, **kwargs}
@@ -73,6 +80,8 @@ class Veo:
             body["prompt"] = prompt
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/veo/extend", json=body)
 
     def reshoot(
@@ -81,11 +90,14 @@ class Veo:
         video_id: str,
         motion_type: str,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "motion_type": motion_type, **kwargs}
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/veo/reshoot", json=body)
 
     def objects(
@@ -96,6 +108,7 @@ class Veo:
         prompt: str | None = None,
         image_mask: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "action": action, **kwargs}
@@ -105,6 +118,8 @@ class Veo:
             body["image_mask"] = image_mask
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/veo/objects", json=body)
 
 
@@ -126,6 +141,7 @@ class AsyncVeo:
         aspect_ratio: Literal["9:16", "1:1", "3:4", "4:3", "16:9"] | None = None,
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"action": action, **kwargs}
@@ -145,6 +161,8 @@ class AsyncVeo:
             body["image_urls"] = image_urls
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/veo/videos", json=body)
 
     async def upsample(
@@ -153,11 +171,14 @@ class AsyncVeo:
         video_id: str,
         action: Literal["1080p", "4k", "gif"],
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "action": action, **kwargs}
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/veo/upsample", json=body)
 
     async def extend(
@@ -167,6 +188,7 @@ class AsyncVeo:
         model: str,
         prompt: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "model": model, **kwargs}
@@ -174,6 +196,8 @@ class AsyncVeo:
             body["prompt"] = prompt
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/veo/extend", json=body)
 
     async def reshoot(
@@ -182,11 +206,14 @@ class AsyncVeo:
         video_id: str,
         motion_type: str,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "motion_type": motion_type, **kwargs}
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/veo/reshoot", json=body)
 
     async def objects(
@@ -197,6 +224,7 @@ class AsyncVeo:
         prompt: str | None = None,
         image_mask: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"video_id": video_id, "action": action, **kwargs}
@@ -206,4 +234,6 @@ class AsyncVeo:
             body["image_mask"] = image_mask
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/veo/objects", json=body)

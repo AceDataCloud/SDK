@@ -60,6 +60,7 @@ class Audio:
         model: str | None = None,
         tags: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
         max_wait: float = 600.0,
@@ -69,6 +70,8 @@ class Audio:
             body: dict[str, Any] = {"text": prompt, **kwargs}
             if callback_url is not None:
                 body["callback_url"] = callback_url
+            if async_ is not None:
+                body["async"] = async_
             result = self._transport.request(
                 "POST",
                 "/fish/tts",
@@ -83,6 +86,8 @@ class Audio:
                 body["tags"] = tags
             if callback_url is not None:
                 body["callback_url"] = callback_url
+            if async_ is not None:
+                body["async"] = async_
             result = self._transport.request("POST", f"/{provider}/audios", json=body)
         task_id = result.get("task_id")
 
@@ -146,6 +151,7 @@ class AsyncAudio:
         model: str | None = None,
         tags: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
         max_wait: float = 600.0,
@@ -155,6 +161,8 @@ class AsyncAudio:
             body: dict[str, Any] = {"text": prompt, **kwargs}
             if callback_url is not None:
                 body["callback_url"] = callback_url
+            if async_ is not None:
+                body["async"] = async_
             result = await self._transport.request(
                 "POST",
                 "/fish/tts",
@@ -169,6 +177,8 @@ class AsyncAudio:
                 body["tags"] = tags
             if callback_url is not None:
                 body["callback_url"] = callback_url
+            if async_ is not None:
+                body["async"] = async_
             result = await self._transport.request("POST", f"/{provider}/audios", json=body)
         task_id = result.get("task_id")
 

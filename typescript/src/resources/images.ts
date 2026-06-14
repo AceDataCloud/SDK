@@ -19,6 +19,7 @@ export class Images {
     aspectRatio?: string;
     resolution?: string;
     callbackUrl?: string;
+    async?: boolean;
     wait?: boolean;
     pollInterval?: number;
     maxWait?: number;

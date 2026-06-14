@@ -43,6 +43,7 @@ export class Audio {
     model?: string;
     tags?: string;
     callbackUrl?: string;
+    async?: boolean;
     wait?: boolean;
     pollInterval?: number;
     maxWait?: number;

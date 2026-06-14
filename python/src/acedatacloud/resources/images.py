@@ -28,6 +28,7 @@ class Images:
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
         max_wait: float = 600.0,
@@ -50,6 +51,8 @@ class Images:
             body["resolution"] = resolution
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
 
         endpoint = "/midjourney/imagine" if provider == "midjourney" else f"/{provider}/images"
         result = self._transport.request("POST", endpoint, json=body)
@@ -83,6 +86,7 @@ class AsyncImages:
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
         max_wait: float = 600.0,
@@ -105,6 +109,8 @@ class AsyncImages:
             body["resolution"] = resolution
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
 
         endpoint = "/midjourney/imagine" if provider == "midjourney" else f"/{provider}/images"
         result = await self._transport.request("POST", endpoint, json=body)

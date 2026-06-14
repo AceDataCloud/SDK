@@ -17,6 +17,7 @@ export class WebExtrator {
     headers?: Record<string, string>;
     userAgent?: string;
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { url, expectedType, enableLlm, waitUntil, timeout, delay, waitForSelector, blockResources, headers, userAgent, callbackUrl, ...rest } = opts;
@@ -44,6 +45,7 @@ export class WebExtrator {
     headers?: Record<string, string>;
     userAgent?: string;
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { url, waitUntil, timeout, delay, waitForSelector, blockResources, headers, userAgent, callbackUrl, ...rest } = opts;

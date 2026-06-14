@@ -102,6 +102,7 @@ class Images {
     responseFormat?: string;
     style?: string;
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { prompt, model, outputCompression, outputFormat, partialImages, responseFormat, callbackUrl, ...rest } = opts;
@@ -129,6 +130,7 @@ class Images {
     size?: string;
     responseFormat?: string;
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { image, prompt, inputFidelity, mask, outputFormat, outputCompression, partialImages, responseFormat, callbackUrl, ...rest } = opts;

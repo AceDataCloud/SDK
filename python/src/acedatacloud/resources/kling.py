@@ -36,6 +36,7 @@ class Kling:
         cfg_scale: float | None = None,
         aspect_ratio: Literal["16:9", "9:16", "1:1"] | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         end_image_url: str | None = None,
         camera_control: str | None = None,
         element_list: list[Any] | None = None,
@@ -63,6 +64,8 @@ class Kling:
             body["aspect_ratio"] = aspect_ratio
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         if end_image_url is not None:
             body["end_image_url"] = end_image_url
         if camera_control is not None:
@@ -87,6 +90,7 @@ class Kling:
         keep_original_sound: Literal["yes", "no"] | None = None,
         prompt: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
@@ -102,6 +106,8 @@ class Kling:
             body["prompt"] = prompt
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/kling/motion", json=body)
 
 
@@ -124,6 +130,7 @@ class AsyncKling:
         cfg_scale: float | None = None,
         aspect_ratio: Literal["16:9", "9:16", "1:1"] | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         end_image_url: str | None = None,
         camera_control: str | None = None,
         element_list: list[Any] | None = None,
@@ -151,6 +158,8 @@ class AsyncKling:
             body["aspect_ratio"] = aspect_ratio
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         if end_image_url is not None:
             body["end_image_url"] = end_image_url
         if camera_control is not None:
@@ -175,6 +184,7 @@ class AsyncKling:
         keep_original_sound: Literal["yes", "no"] | None = None,
         prompt: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
@@ -190,4 +200,6 @@ class AsyncKling:
             body["prompt"] = prompt
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/kling/motion", json=body)
