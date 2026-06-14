@@ -17,6 +17,7 @@ export class Veo {
     aspectRatio?: '9:16' | '1:1' | '3:4' | '4:3' | '16:9';
     imageUrls?: string[];
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { action, prompt, model, resolution, videoId, translation, aspectRatio, imageUrls, callbackUrl, ...rest } = opts;
@@ -36,6 +37,7 @@ export class Veo {
     videoId: string;
     action: '1080p' | '4k' | 'gif';
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { videoId, action, callbackUrl, ...rest } = opts;
@@ -49,6 +51,7 @@ export class Veo {
     model: 'veo31-fast' | 'veo31' | (string & {});
     prompt?: string;
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { videoId, model, prompt, callbackUrl, ...rest } = opts;
@@ -62,6 +65,7 @@ export class Veo {
     videoId: string;
     motionType: 'STATIONARY' | 'STATIONARY_UP' | 'STATIONARY_DOWN' | 'STATIONARY_LEFT' | 'STATIONARY_RIGHT' | 'STATIONARY_DOLLY_IN_ZOOM_OUT' | 'STATIONARY_DOLLY_OUT_ZOOM_IN' | 'UP' | 'DOWN' | 'LEFT_TO_RIGHT' | 'RIGHT_TO_LEFT' | 'FORWARD' | 'BACKWARD' | 'DOLLY_IN_ZOOM_OUT' | 'DOLLY_OUT_ZOOM_IN' | (string & {});
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { videoId, motionType, callbackUrl, ...rest } = opts;
@@ -76,6 +80,7 @@ export class Veo {
     prompt?: string;
     imageMask?: string;
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { videoId, action, prompt, imageMask, callbackUrl, ...rest } = opts;

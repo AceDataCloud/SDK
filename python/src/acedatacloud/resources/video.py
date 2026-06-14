@@ -23,6 +23,7 @@ class Video:
         model: str | None = None,
         image_url: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
         max_wait: float = 600.0,
@@ -35,6 +36,8 @@ class Video:
             body["image_url"] = image_url
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
 
         result = self._transport.request("POST", f"/{provider}/videos", json=body)
         task_id = result.get("task_id")
@@ -62,6 +65,7 @@ class AsyncVideo:
         model: str | None = None,
         image_url: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
         max_wait: float = 600.0,
@@ -74,6 +78,8 @@ class AsyncVideo:
             body["image_url"] = image_url
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
 
         result = await self._transport.request("POST", f"/{provider}/videos", json=body)
         task_id = result.get("task_id")

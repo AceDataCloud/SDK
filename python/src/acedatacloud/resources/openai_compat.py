@@ -131,6 +131,7 @@ class _Images:
         response_format: str | None = None,
         style: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"prompt": prompt, "model": model, **kwargs}
@@ -156,6 +157,8 @@ class _Images:
             body["style"] = style
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/openai/images/generations", json=body)
 
     def edit(
@@ -175,6 +178,7 @@ class _Images:
         size: str | None = None,
         response_format: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"image": image, "prompt": prompt, **kwargs}
@@ -202,6 +206,8 @@ class _Images:
             body["response_format"] = response_format
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/openai/images/edits", json=body)
 
 
@@ -225,6 +231,7 @@ class _AsyncImages:
         response_format: str | None = None,
         style: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"prompt": prompt, "model": model, **kwargs}
@@ -250,6 +257,8 @@ class _AsyncImages:
             body["style"] = style
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/openai/images/generations", json=body)
 
     async def edit(
@@ -269,6 +278,7 @@ class _AsyncImages:
         size: str | None = None,
         response_format: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"image": image, "prompt": prompt, **kwargs}
@@ -296,6 +306,8 @@ class _AsyncImages:
             body["response_format"] = response_format
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/openai/images/edits", json=body)
 
 

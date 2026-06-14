@@ -28,6 +28,7 @@ export class Kling {
     cfgScale?: number;
     aspectRatio?: '16:9' | '9:16' | '1:1';
     callbackUrl?: string;
+    async?: boolean;
     endImageUrl?: string;
     cameraControl?: string;
     elementList?: unknown[];
@@ -82,6 +83,7 @@ export class Kling {
     keepOriginalSound?: 'yes' | 'no';
     prompt?: string;
     callbackUrl?: string;
+    async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
     const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, prompt, callbackUrl, ...rest } = opts;

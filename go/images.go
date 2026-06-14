@@ -17,6 +17,9 @@ type ImageGenerateRequest struct {
 	ImageURL string
 	// CallbackURL optionally receives the task completion webhook.
 	CallbackURL string
+	// Async, when true, returns a task_id without requiring a CallbackURL;
+	// poll the tasks endpoint for the result.
+	Async bool
 	// Extra fields merged into the request body.
 	Extra map[string]any
 }
@@ -34,6 +37,9 @@ func (r ImageGenerateRequest) toBody() map[string]any {
 	}
 	if r.CallbackURL != "" {
 		body["callback_url"] = r.CallbackURL
+	}
+	if r.Async {
+		body["async"] = true
 	}
 	for k, v := range r.Extra {
 		if _, exists := body[k]; !exists {

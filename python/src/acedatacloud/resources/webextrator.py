@@ -25,6 +25,7 @@ class WebExtrator:
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -48,6 +49,8 @@ class WebExtrator:
             body["user_agent"] = user_agent
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/webextrator/extract", json=body)
 
     def render(
@@ -62,6 +65,7 @@ class WebExtrator:
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -81,6 +85,8 @@ class WebExtrator:
             body["user_agent"] = user_agent
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/webextrator/render", json=body)
 
 
@@ -104,6 +110,7 @@ class AsyncWebExtrator:
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -127,6 +134,8 @@ class AsyncWebExtrator:
             body["user_agent"] = user_agent
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/webextrator/extract", json=body)
 
     async def render(
@@ -141,6 +150,7 @@ class AsyncWebExtrator:
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -160,4 +170,6 @@ class AsyncWebExtrator:
             body["user_agent"] = user_agent
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/webextrator/render", json=body)

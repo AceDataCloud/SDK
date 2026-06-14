@@ -14,6 +14,7 @@ export class Video {
     model?: string;
     imageUrl?: string;
     callbackUrl?: string;
+    async?: boolean;
     wait?: boolean;
     pollInterval?: number;
     maxWait?: number;
