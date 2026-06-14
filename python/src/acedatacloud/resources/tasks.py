@@ -24,6 +24,11 @@ _SERVICE_TASK_ENDPOINTS = {
     "pika": "/pika/tasks",
     "pixverse": "/pixverse/tasks",
     "webextrator": "/webextrator/tasks",
+    "grok": "/grok/tasks",
+    "dreamina": "/dreamina/tasks",
+    "headshots": "/headshots/tasks",
+    "qrart": "/qrart/tasks",
+    "publisher": "/publisher/tasks",
 }
 
 

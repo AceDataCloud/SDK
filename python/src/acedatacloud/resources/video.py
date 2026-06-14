@@ -6,7 +6,10 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-VideoProvider = Literal["sora", "luma", "veo", "kling", "hailuo", "seedance", "wan", "pika", "pixverse", "midjourney"]
+VideoProvider = Literal[
+    "sora", "luma", "veo", "kling", "hailuo", "seedance", "wan",
+    "pika", "pixverse", "midjourney", "grok", "dreamina",
+]
 
 
 class Video:

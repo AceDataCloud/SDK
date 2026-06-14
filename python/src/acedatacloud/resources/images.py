@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-ImageProvider = Literal["nano-banana", "midjourney", "flux", "seedream"]
+ImageProvider = Literal["nano-banana", "midjourney", "flux", "seedream", "headshots", "qrart"]
 
 
 class Images:
@@ -51,7 +51,12 @@ class Images:
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        endpoint = "/midjourney/imagine" if provider == "midjourney" else f"/{provider}/images"
+        _IMAGE_ENDPOINTS = {
+            "midjourney": "/midjourney/imagine",
+            "headshots": "/headshots/generate",
+            "qrart": "/qrart/generate",
+        }
+        endpoint = _IMAGE_ENDPOINTS.get(provider, f"/{provider}/images")
         result = self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 
@@ -106,7 +111,12 @@ class AsyncImages:
         if callback_url is not None:
             body["callback_url"] = callback_url
 
-        endpoint = "/midjourney/imagine" if provider == "midjourney" else f"/{provider}/images"
+        _IMAGE_ENDPOINTS = {
+            "midjourney": "/midjourney/imagine",
+            "headshots": "/headshots/generate",
+            "qrart": "/qrart/generate",
+        }
+        endpoint = _IMAGE_ENDPOINTS.get(provider, f"/{provider}/images")
         result = await self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 
