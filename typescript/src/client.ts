@@ -16,6 +16,10 @@ import { Glm } from './resources/glm';
 import { Veo } from './resources/veo';
 import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
+import { Adsl } from './resources/adsl';
+import { DrawAI } from './resources/drawai';
+import { Dreamina } from './resources/dreamina';
+import { ShortUrl } from './resources/shorturl';
 
 export interface AceDataCloudOptions {
   apiToken?: string;
@@ -47,6 +51,10 @@ export class AceDataCloud {
   readonly veo: Veo;
   readonly kling: Kling;
   readonly webextrator: WebExtrator;
+  readonly adsl: Adsl;
+  readonly drawai: DrawAI;
+  readonly dreamina: Dreamina;
+  readonly shorturl: ShortUrl;
 
   private transport: Transport;
 
@@ -75,5 +83,9 @@ export class AceDataCloud {
     this.veo = new Veo(this.transport);
     this.kling = new Kling(this.transport);
     this.webextrator = new WebExtrator(this.transport);
+    this.adsl = new Adsl(this.transport);
+    this.drawai = new DrawAI(this.transport);
+    this.dreamina = new Dreamina(this.transport);
+    this.shorturl = new ShortUrl(this.transport);
   }
 }
