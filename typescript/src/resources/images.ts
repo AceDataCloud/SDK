@@ -5,6 +5,12 @@ import { TaskHandle } from '../runtime/tasks';
 
 export type ImageProvider = 'nano-banana' | 'midjourney' | 'flux' | 'seedream' | 'headshots' | 'qrart' | (string & {});
 
+const IMAGE_ENDPOINTS: Record<string, string> = {
+  midjourney: '/midjourney/imagine',
+  headshots: '/headshots/generate',
+  qrart: '/qrart/generate',
+};
+
 export class Images {
   constructor(private transport: Transport) {}
 
@@ -35,12 +41,7 @@ export class Images {
     if (resolution !== undefined) body.resolution = resolution;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
-    const endpointMap: Record<string, string> = {
-      midjourney: '/midjourney/imagine',
-      headshots: '/headshots/generate',
-      qrart: '/qrart/generate',
-    };
-    const endpoint = endpointMap[provider] ?? `/${provider}/images`;
+    const endpoint = IMAGE_ENDPOINTS[provider] ?? `/${provider}/images`;
     const result = await this.transport.request('POST', endpoint, { json: body });
     const taskId = result.task_id as string | undefined;
 
