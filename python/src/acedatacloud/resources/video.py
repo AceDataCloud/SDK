@@ -6,7 +6,20 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-VideoProvider = Literal["sora", "luma", "veo", "kling", "hailuo", "seedance", "wan", "pika", "pixverse", "midjourney"]
+VideoProvider = Literal[
+    "sora",
+    "luma",
+    "veo",
+    "kling",
+    "hailuo",
+    "seedance",
+    "wan",
+    "pika",
+    "pixverse",
+    "midjourney",
+    "dreamina",
+    "grok",
+]
 
 
 class Video:
@@ -22,7 +35,11 @@ class Video:
         provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
+        audio_url: str | None = None,
+        mask_url: list[str] | None = None,
+        reference_image_urls: list[str] | None = None,
         callback_url: str | None = None,
+        duration: int | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
@@ -34,8 +51,16 @@ class Video:
             body["model"] = model
         if image_url is not None:
             body["image_url"] = image_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if mask_url is not None:
+            body["mask_url"] = mask_url
+        if reference_image_urls is not None:
+            body["reference_image_urls"] = reference_image_urls
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if duration is not None:
+            body["duration"] = duration
         if async_ is not None:
             body["async"] = async_
 
@@ -64,7 +89,11 @@ class AsyncVideo:
         provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
+        audio_url: str | None = None,
+        mask_url: list[str] | None = None,
+        reference_image_urls: list[str] | None = None,
         callback_url: str | None = None,
+        duration: int | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 5.0,
@@ -76,8 +105,16 @@ class AsyncVideo:
             body["model"] = model
         if image_url is not None:
             body["image_url"] = image_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if mask_url is not None:
+            body["mask_url"] = mask_url
+        if reference_image_urls is not None:
+            body["reference_image_urls"] = reference_image_urls
         if callback_url is not None:
             body["callback_url"] = callback_url
+        if duration is not None:
+            body["duration"] = duration
         if async_ is not None:
             body["async"] = async_
 

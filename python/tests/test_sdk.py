@@ -190,6 +190,29 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_video_generate_dreamina_params(client):
+    mock_response = {"success": True, "task_id": "task-dreamina", "data": [{"video_url": "https://cdn.acedata.cloud/video.mp4"}]}
+    route = respx.post("https://api.acedata.cloud/dreamina/videos").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.video.generate(
+        prompt="Animate this portrait",
+        provider="dreamina",
+        model="omnihuman-1.5",
+        image_url="https://cdn.acedata.cloud/image.jpg",
+        audio_url="https://cdn.acedata.cloud/audio.mp3",
+        mask_url=["https://cdn.acedata.cloud/mask.png"],
+    )
+
+    assert result["task_id"] == "task-dreamina"
+    assert route.called
+    request_data = json.loads(route.calls.last.request.content.decode())
+    assert request_data["audio_url"] == "https://cdn.acedata.cloud/audio.mp3"
+    assert request_data["mask_url"] == ["https://cdn.acedata.cloud/mask.png"]
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
@@ -217,6 +240,18 @@ def test_tasks_get(client):
 
     result = client.tasks.get("task-abc", service="nano-banana")
     assert result["response"]["status"] == "succeeded"
+
+
+@respx.mock
+def test_tasks_get_grok(client):
+    mock_response = {"id": "task-grok", "response": {"status": "processing"}}
+    route = respx.post("https://api.acedata.cloud/grok/tasks").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.tasks.get("task-grok", service="grok")
+    assert result["response"]["status"] == "processing"
+    assert route.called
 
 
 # ── Platform Management ───────────────────────────────────────────────

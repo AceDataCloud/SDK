@@ -20,6 +20,8 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   wan: '/wan/tasks',
   pika: '/pika/tasks',
   pixverse: '/pixverse/tasks',
+  dreamina: '/dreamina/tasks',
+  grok: '/grok/tasks',
   webextrator: '/webextrator/tasks',
 };
 
