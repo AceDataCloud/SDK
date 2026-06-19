@@ -8,16 +8,44 @@ describe('Audio resource', () => {
     await audio.generate({
       provider: 'fish',
       prompt: 'hello',
-      model: 'speech-1',
+      model: 's1',
       callbackUrl: 'https://example.com/callback',
+      referenceId: 'voice-ref',
+      format: 'mp3',
+      sampleRate: 44100,
+      mp3Bitrate: 128,
+      latency: 'balanced',
+      chunkLength: 200,
+      minChunkLength: 100,
+      temperature: 0.7,
+      topP: 0.9,
+      repetitionPenalty: 1.1,
+      maxNewTokens: 512,
+      normalize: true,
+      prosody: { speed: 1.2 },
+      references: [{ audio: 'https://example.com/ref.mp3' }],
     });
 
     expect(request).toHaveBeenCalledWith('POST', '/fish/tts', {
       json: {
         text: 'hello',
         callback_url: 'https://example.com/callback',
+        reference_id: 'voice-ref',
+        format: 'mp3',
+        sample_rate: 44100,
+        mp3_bitrate: 128,
+        latency: 'balanced',
+        chunk_length: 200,
+        min_chunk_length: 100,
+        temperature: 0.7,
+        top_p: 0.9,
+        repetition_penalty: 1.1,
+        max_new_tokens: 512,
+        normalize: true,
+        prosody: { speed: 1.2 },
+        references: [{ audio: 'https://example.com/ref.mp3' }],
       },
-      headers: { model: 'speech-1' },
+      headers: { model: 's1' },
     });
   });
 

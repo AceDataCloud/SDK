@@ -151,12 +151,44 @@ def test_audio_generate_fish_uses_tts_endpoint(client):
         payload = json.loads(request.content.decode("utf-8"))
         assert payload["text"] == "Hello fish"
         assert "prompt" not in payload
-        assert request.headers["model"] == "speech-1"
+        assert payload["reference_id"] == "voice-ref"
+        assert payload["format"] == "mp3"
+        assert payload["sample_rate"] == 44100
+        assert payload["mp3_bitrate"] == 128
+        assert payload["latency"] == "balanced"
+        assert payload["chunk_length"] == 200
+        assert payload["min_chunk_length"] == 100
+        assert payload["temperature"] == 0.7
+        assert payload["top_p"] == 0.9
+        assert payload["repetition_penalty"] == 1.1
+        assert payload["max_new_tokens"] == 512
+        assert payload["normalize"] is True
+        assert payload["prosody"] == {"speed": 1.2}
+        assert payload["references"] == [{"audio": "https://example.com/ref.mp3"}]
+        assert request.headers["model"] == "s1"
         return httpx.Response(200, json={"success": True, "task_id": "task-fish"})
 
     respx.post("https://api.acedata.cloud/fish/tts").mock(side_effect=_handler)
 
-    result = client.audio.generate(prompt="Hello fish", provider="fish", model="speech-1")
+    result = client.audio.generate(
+        prompt="Hello fish",
+        provider="fish",
+        model="s1",
+        reference_id="voice-ref",
+        format="mp3",
+        sample_rate=44100,
+        mp3_bitrate=128,
+        latency="balanced",
+        chunk_length=200,
+        min_chunk_length=100,
+        temperature=0.7,
+        top_p=0.9,
+        repetition_penalty=1.1,
+        max_new_tokens=512,
+        normalize=True,
+        prosody={"speed": 1.2},
+        references=[{"audio": "https://example.com/ref.mp3"}],
+    )
     assert hasattr(result, "wait")
 
 
