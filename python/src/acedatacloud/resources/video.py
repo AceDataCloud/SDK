@@ -6,7 +6,19 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-VideoProvider = Literal["sora", "luma", "veo", "kling", "hailuo", "seedance", "wan", "pika", "pixverse", "midjourney"]
+VideoProvider = Literal[
+    "sora",
+    "luma",
+    "veo",
+    "kling",
+    "hailuo",
+    "seedance",
+    "wan",
+    "pika",
+    "pixverse",
+    "midjourney",
+    "gemini",
+]
 
 
 class Video:
@@ -22,6 +34,8 @@ class Video:
         provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
+        image_urls: list[str] | None = None,
+        aspect_ratio: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -34,6 +48,10 @@ class Video:
             body["model"] = model
         if image_url is not None:
             body["image_url"] = image_url
+        if image_urls is not None:
+            body["image_urls"] = image_urls
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
         if callback_url is not None:
             body["callback_url"] = callback_url
         if async_ is not None:
@@ -64,6 +82,8 @@ class AsyncVideo:
         provider: VideoProvider | str = "sora",
         model: str | None = None,
         image_url: str | None = None,
+        image_urls: list[str] | None = None,
+        aspect_ratio: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -76,6 +96,10 @@ class AsyncVideo:
             body["model"] = model
         if image_url is not None:
             body["image_url"] = image_url
+        if image_urls is not None:
+            body["image_urls"] = image_urls
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
         if callback_url is not None:
             body["callback_url"] = callback_url
         if async_ is not None:

@@ -190,6 +190,28 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_video_generate_gemini_with_gemini_params(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["prompt"] == "A sunset timelapse"
+        assert payload["model"] == "veo-3.0-generate-preview"
+        assert payload["image_urls"] == ["https://example.com/input.png"]
+        assert payload["aspect_ratio"] == "16:9"
+        return httpx.Response(200, json={"success": True, "task_id": "task-gemini"})
+
+    respx.post("https://api.acedata.cloud/gemini/videos").mock(side_effect=_handler)
+
+    result = client.video.generate(
+        prompt="A sunset timelapse",
+        provider="gemini",
+        model="veo-3.0-generate-preview",
+        image_urls=["https://example.com/input.png"],
+        aspect_ratio="16:9",
+    )
+    assert hasattr(result, "wait")
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
@@ -217,6 +239,15 @@ def test_tasks_get(client):
 
     result = client.tasks.get("task-abc", service="nano-banana")
     assert result["response"]["status"] == "succeeded"
+
+
+@respx.mock
+def test_tasks_get_gemini(client):
+    mock_response = {"id": "task-gemini", "response": {"status": "queued"}}
+    respx.post("https://api.acedata.cloud/gemini/tasks").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.tasks.get("task-gemini", service="gemini")
+    assert result["response"]["status"] == "queued"
 
 
 # ── Platform Management ───────────────────────────────────────────────
