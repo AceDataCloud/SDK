@@ -21,6 +21,8 @@ class Images:
         prompt: str,
         provider: ImageProvider | str = "nano-banana",
         action: Literal["generate", "edit"] | None = None,
+        size: str | None = None,
+        count: int | float | None = None,
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
@@ -37,6 +39,10 @@ class Images:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
         if action is not None:
             body["action"] = action
+        if size is not None:
+            body["size"] = size
+        if count is not None:
+            body["count"] = count
         if model is not None:
             body["model"] = model
         if negative_prompt is not None:
@@ -79,6 +85,8 @@ class AsyncImages:
         prompt: str,
         provider: ImageProvider | str = "nano-banana",
         action: Literal["generate", "edit"] | None = None,
+        size: str | None = None,
+        count: int | float | None = None,
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
@@ -95,6 +103,10 @@ class AsyncImages:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
         if action is not None:
             body["action"] = action
+        if size is not None:
+            body["size"] = size
+        if count is not None:
+            body["count"] = count
         if model is not None:
             body["model"] = model
         if negative_prompt is not None:

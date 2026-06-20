@@ -129,6 +129,31 @@ def test_images_generate(client):
     assert result["data"][0]["image_url"] == "https://cdn.acedata.cloud/cat.png"
 
 
+@respx.mock
+def test_images_generate_flux_size_count(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["prompt"] == "A white siamese cat"
+        assert payload["action"] == "generate"
+        assert payload["size"] == "1024x1024"
+        assert payload["count"] == 2
+        return httpx.Response(
+            200,
+            json={"success": True, "data": [{"image_url": "https://cdn.acedata.cloud/flux.png"}]},
+        )
+
+    respx.post("https://api.acedata.cloud/flux/images").mock(side_effect=_handler)
+
+    result = client.images.generate(
+        prompt="A white siamese cat",
+        provider="flux",
+        action="generate",
+        size="1024x1024",
+        count=2,
+    )
+    assert result["data"][0]["image_url"] == "https://cdn.acedata.cloud/flux.png"
+
+
 # ── Audio Generation ──────────────────────────────────────────────────
 
 

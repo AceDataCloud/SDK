@@ -12,6 +12,8 @@ export class Images {
     prompt: string;
     provider?: ImageProvider;
     action?: 'generate' | 'edit';
+    size?: string;
+    count?: number;
     model?: string;
     negativePrompt?: string;
     imageUrl?: string;
@@ -25,9 +27,11 @@ export class Images {
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, provider = 'nano-banana', action, model, negativePrompt, imageUrl, imageUrls, aspectRatio, resolution, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'nano-banana', action, size, count, model, negativePrompt, imageUrl, imageUrls, aspectRatio, resolution, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (action !== undefined) body.action = action;
+    if (size !== undefined) body.size = size;
+    if (count !== undefined) body.count = count;
     if (model !== undefined) body.model = model;
     if (negativePrompt !== undefined) body.negative_prompt = negativePrompt;
     if (imageUrl !== undefined) body.image_url = imageUrl;
