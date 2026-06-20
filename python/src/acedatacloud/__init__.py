@@ -28,6 +28,7 @@ from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
 from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
+from acedatacloud.resources.oauth import AsyncOAuth, OAuth
 from acedatacloud.resources.veo import VeoModel
 from acedatacloud.resources.video import VideoProvider
 
@@ -38,6 +39,8 @@ __all__ = [
     "AudioProvider",
     "GlmModel",
     "ImageProvider",
+    "OAuth",
+    "AsyncOAuth",
     "VideoProvider",
     "VeoModel",
     "AceDataCloudError",

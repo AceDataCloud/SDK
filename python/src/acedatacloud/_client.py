@@ -16,6 +16,7 @@ from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
 from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
+from acedatacloud.resources.oauth import AsyncOAuth, OAuth
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
 from acedatacloud.resources.search import AsyncSearch, Search
@@ -26,6 +27,7 @@ from acedatacloud.resources.webextrator import AsyncWebExtrator, WebExtrator
 
 _API_BASE = "https://api.acedata.cloud"
 _PLATFORM_BASE = "https://platform.acedata.cloud"
+_AUTH_BASE = "https://auth.acedata.cloud"
 
 
 class AceDataCloud:
@@ -37,6 +39,7 @@ class AceDataCloud:
         *,
         base_url: str = _API_BASE,
         platform_base_url: str = _PLATFORM_BASE,
+        auth_base_url: str = _AUTH_BASE,
         timeout: float = 300.0,
         max_retries: int = 2,
         headers: dict[str, str] | None = None,
@@ -65,6 +68,7 @@ class AceDataCloud:
         self.veo = Veo(self._transport)
         self.kling = Kling(self._transport)
         self.webextrator = WebExtrator(self._transport)
+        self.oauth = OAuth(auth_base_url)
 
     def close(self) -> None:
         self._transport.close()
@@ -85,6 +89,7 @@ class AsyncAceDataCloud:
         *,
         base_url: str = _API_BASE,
         platform_base_url: str = _PLATFORM_BASE,
+        auth_base_url: str = _AUTH_BASE,
         timeout: float = 300.0,
         max_retries: int = 2,
         headers: dict[str, str] | None = None,
@@ -113,6 +118,7 @@ class AsyncAceDataCloud:
         self.veo = AsyncVeo(self._transport)
         self.kling = AsyncKling(self._transport)
         self.webextrator = AsyncWebExtrator(self._transport)
+        self.oauth = AsyncOAuth(auth_base_url)
 
     async def close(self) -> None:
         await self._transport.close()

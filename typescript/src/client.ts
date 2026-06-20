@@ -16,11 +16,13 @@ import { Glm } from './resources/glm';
 import { Veo } from './resources/veo';
 import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
+import { OAuth } from './resources/oauth';
 
 export interface AceDataCloudOptions {
   apiToken?: string;
   baseURL?: string;
   platformBaseURL?: string;
+  authBaseURL?: string;
   timeout?: number;
   maxRetries?: number;
   headers?: Record<string, string>;
@@ -47,6 +49,7 @@ export class AceDataCloud {
   readonly veo: Veo;
   readonly kling: Kling;
   readonly webextrator: WebExtrator;
+  readonly oauth: OAuth;
 
   private transport: Transport;
 
@@ -75,5 +78,6 @@ export class AceDataCloud {
     this.veo = new Veo(this.transport);
     this.kling = new Kling(this.transport);
     this.webextrator = new WebExtrator(this.transport);
+    this.oauth = new OAuth(opts.authBaseURL);
   }
 }
