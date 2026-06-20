@@ -3,7 +3,7 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
-export type VideoProvider = 'sora' | 'luma' | 'veo' | 'kling' | 'hailuo' | 'seedance' | 'wan' | 'pika' | 'pixverse' | 'midjourney' | (string & {});
+export type VideoProvider = 'sora' | 'luma' | 'veo' | 'gemini' | 'kling' | 'hailuo' | 'seedance' | 'wan' | 'pika' | 'pixverse' | 'midjourney' | (string & {});
 
 export class Video {
   constructor(private transport: Transport) {}
@@ -13,6 +13,8 @@ export class Video {
     provider?: VideoProvider;
     model?: string;
     imageUrl?: string;
+    imageUrls?: string[];
+    aspectRatio?: string;
     callbackUrl?: string;
     async?: boolean;
     wait?: boolean;
@@ -20,10 +22,12 @@ export class Video {
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, provider = 'sora', model, imageUrl, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'sora', model, imageUrl, imageUrls, aspectRatio, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (model !== undefined) body.model = model;
     if (imageUrl !== undefined) body.image_url = imageUrl;
+    if (imageUrls !== undefined) body.image_urls = imageUrls;
+    if (aspectRatio !== undefined) body.aspect_ratio = aspectRatio;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
     const result = await this.transport.request('POST', `/${provider}/videos`, { json: body });

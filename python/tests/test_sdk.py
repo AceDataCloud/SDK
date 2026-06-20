@@ -190,6 +190,31 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_video_generate_gemini(client):
+    route = respx.post("https://api.acedata.cloud/gemini/videos").mock(
+        return_value=httpx.Response(200, json={"task_id": "task-gemini"})
+    )
+
+    client.video.generate(
+        provider="gemini",
+        prompt="A cinematic kitten in a garden",
+        model="omni-flash",
+        aspect_ratio="16:9",
+        image_urls=["https://example.com/reference.png"],
+        callback_url="https://example.com/callback",
+    )
+
+    assert route.called
+    assert json.loads(route.calls[0].request.content.decode()) == {
+        "prompt": "A cinematic kitten in a garden",
+        "model": "omni-flash",
+        "aspect_ratio": "16:9",
+        "image_urls": ["https://example.com/reference.png"],
+        "callback_url": "https://example.com/callback",
+    }
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
@@ -217,6 +242,23 @@ def test_tasks_get(client):
 
     result = client.tasks.get("task-abc", service="nano-banana")
     assert result["response"]["status"] == "succeeded"
+
+
+@respx.mock
+def test_tasks_get_gemini(client):
+    mock_response = {
+        "id": "task-gemini",
+        "response": {"status": "processing"},
+    }
+    route = respx.post("https://api.acedata.cloud/gemini/tasks").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.tasks.get("task-gemini", service="gemini")
+
+    assert route.called
+    assert json.loads(route.calls[0].request.content.decode()) == {"id": "task-gemini", "action": "retrieve"}
+    assert result["response"]["status"] == "processing"
 
 
 # ── Platform Management ───────────────────────────────────────────────
