@@ -111,6 +111,35 @@ def test_chat_count_tokens(client):
     assert result["input_tokens"] == 42
 
 
+# ── AI Chat ───────────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_aichat_create(client):
+    mock_response = {"id": "conv-123", "answer": "Hi!"}
+    route = respx.post("https://api.acedata.cloud/aichat/conversations").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.aichat.create(
+        model="glm-5.2",
+        question="Hello",
+        preset="general",
+        stateful=True,
+        references=["doc-1"],
+    )
+
+    assert result["id"] == "conv-123"
+    assert route.calls.last is not None
+    assert json.loads(route.calls.last.request.content) == {
+        "model": "glm-5.2",
+        "question": "Hello",
+        "preset": "general",
+        "stateful": True,
+        "references": ["doc-1"],
+    }
+
+
 # ── Image Generation ──────────────────────────────────────────────────
 
 
