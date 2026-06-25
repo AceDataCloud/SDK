@@ -190,6 +190,28 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_video_generate_gemini_params(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["prompt"] == "A cinematic mountain scene"
+        assert payload["model"] == "gemini-2.5-flash-image-preview"
+        assert payload["image_urls"] == ["https://example.com/input.png"]
+        assert payload["aspect_ratio"] == "16:9"
+        return httpx.Response(200, json={"success": True, "task_id": "task-gemini-video"})
+
+    respx.post("https://api.acedata.cloud/gemini/videos").mock(side_effect=_handler)
+
+    result = client.video.generate(
+        provider="gemini",
+        prompt="A cinematic mountain scene",
+        model="gemini-2.5-flash-image-preview",
+        image_urls=["https://example.com/input.png"],
+        aspect_ratio="16:9",
+    )
+    assert hasattr(result, "wait")
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
