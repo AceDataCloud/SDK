@@ -10,12 +10,24 @@ describe('Audio resource', () => {
       prompt: 'hello',
       model: 'speech-1',
       callbackUrl: 'https://example.com/callback',
+      referenceId: 'voice-1',
+      sampleRate: 44100,
+      topP: 0.8,
+      normalize: true,
+      prosody: { speed: 1.1 },
+      references: [{ audio_url: 'https://example.com/reference.mp3' }],
     });
 
     expect(request).toHaveBeenCalledWith('POST', '/fish/tts', {
       json: {
         text: 'hello',
         callback_url: 'https://example.com/callback',
+        reference_id: 'voice-1',
+        sample_rate: 44100,
+        top_p: 0.8,
+        normalize: true,
+        prosody: { speed: 1.1 },
+        references: [{ audio_url: 'https://example.com/reference.mp3' }],
       },
       headers: { model: 'speech-1' },
     });

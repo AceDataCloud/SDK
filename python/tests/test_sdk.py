@@ -151,12 +151,28 @@ def test_audio_generate_fish_uses_tts_endpoint(client):
         payload = json.loads(request.content.decode("utf-8"))
         assert payload["text"] == "Hello fish"
         assert "prompt" not in payload
+        assert payload["reference_id"] == "voice-1"
+        assert payload["sample_rate"] == 44100
+        assert payload["top_p"] == 0.8
+        assert payload["normalize"] is True
+        assert payload["prosody"] == {"speed": 1.1}
+        assert payload["references"] == [{"audio_url": "https://example.com/reference.mp3"}]
         assert request.headers["model"] == "speech-1"
         return httpx.Response(200, json={"success": True, "task_id": "task-fish"})
 
     respx.post("https://api.acedata.cloud/fish/tts").mock(side_effect=_handler)
 
-    result = client.audio.generate(prompt="Hello fish", provider="fish", model="speech-1")
+    result = client.audio.generate(
+        prompt="Hello fish",
+        provider="fish",
+        model="speech-1",
+        reference_id="voice-1",
+        sample_rate=44100,
+        top_p=0.8,
+        normalize=True,
+        prosody={"speed": 1.1},
+        references=[{"audio_url": "https://example.com/reference.mp3"}],
+    )
     assert hasattr(result, "wait")
 
 

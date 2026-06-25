@@ -43,16 +43,71 @@ export class Audio {
     model?: string;
     tags?: string;
     callbackUrl?: string;
+    referenceId?: string;
+    format?: 'mp3' | 'wav' | 'pcm' | 'opus';
+    sampleRate?: number;
+    mp3Bitrate?: 64 | 128 | 192;
+    opusBitrate?: number;
+    latency?: 'normal' | 'balanced';
+    chunkLength?: number;
+    minChunkLength?: number;
+    temperature?: number;
+    topP?: number;
+    repetitionPenalty?: number;
+    maxNewTokens?: number;
+    normalize?: boolean;
+    prosody?: Record<string, unknown>;
+    references?: Record<string, unknown>[];
     async?: boolean;
     wait?: boolean;
     pollInterval?: number;
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, provider = 'suno', model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const {
+      prompt,
+      provider = 'suno',
+      model,
+      tags,
+      callbackUrl,
+      referenceId,
+      format,
+      sampleRate,
+      mp3Bitrate,
+      opusBitrate,
+      latency,
+      chunkLength,
+      minChunkLength,
+      temperature,
+      topP,
+      repetitionPenalty,
+      maxNewTokens,
+      normalize,
+      prosody,
+      references,
+      wait: shouldWait,
+      pollInterval,
+      maxWait,
+      ...rest
+    } = opts;
     let result: Record<string, unknown>;
     if (provider === 'fish') {
       const body: Record<string, unknown> = { text: prompt, ...rest };
+      if (referenceId !== undefined) body.reference_id = referenceId;
+      if (format !== undefined) body.format = format;
+      if (sampleRate !== undefined) body.sample_rate = sampleRate;
+      if (mp3Bitrate !== undefined) body.mp3_bitrate = mp3Bitrate;
+      if (opusBitrate !== undefined) body.opus_bitrate = opusBitrate;
+      if (latency !== undefined) body.latency = latency;
+      if (chunkLength !== undefined) body.chunk_length = chunkLength;
+      if (minChunkLength !== undefined) body.min_chunk_length = minChunkLength;
+      if (temperature !== undefined) body.temperature = temperature;
+      if (topP !== undefined) body.top_p = topP;
+      if (repetitionPenalty !== undefined) body.repetition_penalty = repetitionPenalty;
+      if (maxNewTokens !== undefined) body.max_new_tokens = maxNewTokens;
+      if (normalize !== undefined) body.normalize = normalize;
+      if (prosody !== undefined) body.prosody = prosody;
+      if (references !== undefined) body.references = references;
       if (callbackUrl !== undefined) body.callback_url = callbackUrl;
       result = await this.transport.request('POST', '/fish/tts', {
         json: body,
