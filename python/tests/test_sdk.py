@@ -146,6 +146,77 @@ def test_audio_generate(client):
 
 
 @respx.mock
+def test_audio_generate_maps_documented_suno_fields(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload == {
+            "prompt": "A happy song",
+            "lyric": "verse",
+            "style": "pop",
+            "variation_category": "remix",
+            "title": "Song",
+            "action": "extend",
+            "custom": True,
+            "lyric_prompt": {"text": "extra lyrics"},
+            "audio_id": "audio-1",
+            "mashup_audio_ids": ["audio-1", "audio-2"],
+            "audio_urls": ["https://cdn.example/song.mp3"],
+            "weirdness": 0.5,
+            "persona_id": "persona-1",
+            "overpainting_start": 1.0,
+            "overpainting_end": 2.0,
+            "samples_start": 3.0,
+            "samples_end": 4.0,
+            "underpainting_start": 5.0,
+            "underpainting_end": 6.0,
+            "continue_at": 7.0,
+            "callback_url": "https://example.com/callback",
+            "instrumental": True,
+            "vocal_gender": "female",
+            "style_negative": "noise",
+            "style_influence": 0.2,
+            "audio_weight": 0.8,
+            "replace_section_end": 8.0,
+            "replace_section_start": 9.0,
+        }
+        return httpx.Response(200, json={"success": True, "task_id": "task-audio"})
+
+    respx.post("https://api.acedata.cloud/suno/audios").mock(side_effect=_handler)
+
+    result = client.audio.generate(
+        prompt="A happy song",
+        lyric="verse",
+        style="pop",
+        variation_category="remix",
+        title="Song",
+        action="extend",
+        custom=True,
+        lyric_prompt={"text": "extra lyrics"},
+        audio_id="audio-1",
+        mashup_audio_ids=["audio-1", "audio-2"],
+        audio_urls=["https://cdn.example/song.mp3"],
+        weirdness=0.5,
+        persona_id="persona-1",
+        overpainting_start=1.0,
+        overpainting_end=2.0,
+        samples_start=3.0,
+        samples_end=4.0,
+        underpainting_start=5.0,
+        underpainting_end=6.0,
+        continue_at=7.0,
+        callback_url="https://example.com/callback",
+        instrumental=True,
+        vocal_gender="female",
+        style_negative="noise",
+        style_influence=0.2,
+        audio_weight=0.8,
+        replace_section_end=8.0,
+        replace_section_start=9.0,
+    )
+    assert hasattr(result, "wait")
+
+
+@respx.mock
 def test_audio_generate_fish_uses_tts_endpoint(client):
     def _handler(request: httpx.Request) -> httpx.Response:
         payload = json.loads(request.content.decode("utf-8"))
