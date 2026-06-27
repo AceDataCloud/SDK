@@ -21,6 +21,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   pika: '/pika/tasks',
   pixverse: '/pixverse/tasks',
   webextrator: '/webextrator/tasks',
+  grok: '/grok/tasks',
 };
 
 export class Tasks {
