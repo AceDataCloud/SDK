@@ -35,7 +35,7 @@ When the Docs repo changes, compare the OpenAPI specs against the SDK code and u
 
 4. **API paths** in resource files:
    - Verify endpoint paths match the OpenAPI `paths` section
-   - Special cases (e.g., midjourney uses `/midjourney/imagine` not `/midjourney/images`)
+   - Account for provider-specific path shapes when OpenAPI specs differ
 
 ### Python (`python/src/acedatacloud/`)
 

@@ -122,7 +122,6 @@ Examples:
 - Nano Banana
 - Seedream
 - Flux
-- Midjourney image flows in later phases
 
 ### `audio`
 

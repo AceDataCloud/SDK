@@ -14,7 +14,6 @@ _SERVICE_TASK_ENDPOINTS = {
     "seedream": "/seedream/tasks",
     "seedance": "/seedance/tasks",
     "sora": "/sora/tasks",
-    "midjourney": "/midjourney/tasks",
     "luma": "/luma/tasks",
     "veo": "/veo/tasks",
     "flux": "/flux/tasks",

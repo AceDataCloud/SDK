@@ -6,8 +6,7 @@ import "context"
 type ImageGenerateRequest struct {
 	// Prompt is the required text prompt.
 	Prompt string
-	// Provider selects the backend. Common values: "nano-banana",
-	// "midjourney", "flux", "seedream".
+	// Provider selects the backend. Common values: "nano-banana", "flux", "seedream".
 	Provider string
 	// Model is optional — provider-specific model identifier.
 	Model string
@@ -65,9 +64,6 @@ func (i *ImagesResource) Generate(ctx context.Context, req ImageGenerateRequest)
 		provider = "nano-banana"
 	}
 	endpoint := "/" + provider + "/images"
-	if provider == "midjourney" {
-		endpoint = "/midjourney/imagine"
-	}
 	body := req.toBody()
 	result, err := i.t.do(ctx, requestOpts{Method: "POST", Path: endpoint, Body: body})
 	if err != nil {

@@ -52,7 +52,7 @@ asyncio.run(main())
 |----------|-------------|
 | `client.openai` | OpenAI-compatible chat completions and responses |
 | `client.chat` | Native chat messages |
-| `client.images` | Image generation (Midjourney, Flux, etc.) |
+| `client.images` | Image generation (Flux, Seedream, Nano Banana, etc.) |
 | `client.audio` | Music generation (Suno) |
 | `client.video` | Video generation (Luma, Sora, Veo, etc.) |
 | `client.search` | Web search (Google SERP) |
@@ -69,7 +69,7 @@ result = task.wait()  # polls until complete
 print(result["image_url"])
 
 # Use a specific provider
-mj_task = client.images.generate(prompt="A sunset over mountains", provider="midjourney")
+flux_task = client.images.generate(prompt="A sunset over mountains", provider="flux")
 ```
 
 ## Multi-Provider Support
@@ -89,8 +89,8 @@ Available providers:
 
 | Resource | Providers |
 |----------|-----------|
-| `client.images` | `nano-banana` (default), `midjourney`, `flux`, `seedream` |
-| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse`, `midjourney` |
+| `client.images` | `nano-banana` (default), `flux`, `seedream` |
+| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
 | `client.audio` | `suno` (default), `producer`, `fish` |
 
 ## Error Handling

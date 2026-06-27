@@ -45,7 +45,7 @@ for await (const chunk of stream) {
 |----------|-------------|
 | `client.openai` | OpenAI-compatible chat completions and responses |
 | `client.chat` | Native chat messages |
-| `client.images` | Image generation (Midjourney, Flux, etc.) |
+| `client.images` | Image generation (Flux, Seedream, Nano Banana, etc.) |
 | `client.audio` | Music generation (Suno) |
 | `client.video` | Video generation (Luma, Sora, Veo, etc.) |
 | `client.search` | Web search (Google SERP) |
@@ -62,9 +62,9 @@ const result = await task.wait();
 console.log(result.image_url);
 
 // Use a specific provider
-const mjTask = await client.images.generate({
+const fluxTask = await client.images.generate({
   prompt: 'A sunset over mountains',
-  provider: 'midjourney',
+  provider: 'flux',
 });
 ```
 
@@ -85,8 +85,8 @@ Available providers:
 
 | Resource | Providers |
 |----------|-----------|
-| `client.images` | `nano-banana` (default), `midjourney`, `flux`, `seedream` |
-| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse`, `midjourney` |
+| `client.images` | `nano-banana` (default), `flux`, `seedream` |
+| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
 | `client.audio` | `suno` (default), `producer`, `fish` |
 
 ## Error Handling
