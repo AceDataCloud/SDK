@@ -11,7 +11,6 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   seedream: '/seedream/tasks',
   seedance: '/seedance/tasks',
   sora: '/sora/tasks',
-  midjourney: '/midjourney/tasks',
   luma: '/luma/tasks',
   veo: '/veo/tasks',
   flux: '/flux/tasks',

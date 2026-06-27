@@ -3,7 +3,7 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
-export type ImageProvider = 'nano-banana' | 'midjourney' | 'flux' | 'seedream' | (string & {});
+export type ImageProvider = 'nano-banana' | 'flux' | 'seedream' | (string & {});
 
 export class Images {
   constructor(private transport: Transport) {}
@@ -36,7 +36,7 @@ export class Images {
     if (resolution !== undefined) body.resolution = resolution;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
-    const endpoint = provider === 'midjourney' ? '/midjourney/imagine' : `/${provider}/images`;
+    const endpoint = `/${provider}/images`;
     const result = await this.transport.request('POST', endpoint, { json: body });
     const taskId = result.task_id as string | undefined;
 
