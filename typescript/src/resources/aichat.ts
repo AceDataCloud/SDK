@@ -77,6 +77,7 @@ export type AiChatModel =
   | 'deepseek-v4-flash'
   | 'grok-3'
   | 'glm-5.1'
+  | 'glm-5.2'
   | 'glm-4.7'
   | 'glm-4.6'
   | 'glm-3-turbo'
