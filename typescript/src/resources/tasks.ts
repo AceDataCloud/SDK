@@ -7,6 +7,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   suno: '/suno/tasks',
   producer: '/producer/tasks',
   fish: '/fish/tasks',
+  openai: '/openai/tasks',
   'nano-banana': '/nano-banana/tasks',
   seedream: '/seedream/tasks',
   seedance: '/seedance/tasks',

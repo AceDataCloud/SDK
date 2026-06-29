@@ -10,6 +10,7 @@ _SERVICE_TASK_ENDPOINTS = {
     "suno": "/suno/tasks",
     "producer": "/producer/tasks",
     "fish": "/fish/tasks",
+    "openai": "/openai/tasks",
     "nano-banana": "/nano-banana/tasks",
     "seedream": "/seedream/tasks",
     "seedance": "/seedance/tasks",

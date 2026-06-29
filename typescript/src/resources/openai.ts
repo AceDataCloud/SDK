@@ -54,18 +54,36 @@ class Responses {
     model: string;
     input: string | Array<Record<string, unknown>>;
     stream?: false;
+    n?: number;
+    background?: string;
+    tools?: Array<Record<string, unknown>>;
+    max_tokens?: number;
+    temperature?: number;
+    response_format?: unknown;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
     stream: true;
+    n?: number;
+    background?: string;
+    tools?: Array<Record<string, unknown>>;
+    max_tokens?: number;
+    temperature?: number;
+    response_format?: unknown;
     [key: string]: unknown;
   }): Promise<AsyncGenerator<Record<string, unknown>>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
     stream?: boolean;
+    n?: number;
+    background?: string;
+    tools?: Array<Record<string, unknown>>;
+    max_tokens?: number;
+    temperature?: number;
+    response_format?: unknown;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
     const { model, input, stream, ...rest } = opts;

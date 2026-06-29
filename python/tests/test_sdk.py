@@ -75,6 +75,33 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_responses_with_schema_options(client):
+    route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+        return_value=httpx.Response(200, json={"id": "resp-opts", "output": []})
+    )
+
+    result = client.openai.responses.create(
+        model="gpt-4o",
+        input="Hello",
+        n=2,
+        background="auto",
+        tools=[{"type": "web_search_preview"}],
+        max_tokens=128,
+        temperature=0.2,
+        response_format={"type": "json_object"},
+    )
+
+    assert result["id"] == "resp-opts"
+    sent_body = json.loads(route.calls[0].request.content.decode())
+    assert sent_body["n"] == 2
+    assert sent_body["background"] == "auto"
+    assert sent_body["tools"] == [{"type": "web_search_preview"}]
+    assert sent_body["max_tokens"] == 128
+    assert sent_body["temperature"] == 0.2
+    assert sent_body["response_format"] == {"type": "json_object"}
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

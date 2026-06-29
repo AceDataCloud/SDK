@@ -75,9 +75,27 @@ class _Responses:
         model: str,
         input: str | list[dict[str, Any]],
         stream: bool = False,
+        n: int | None = None,
+        background: str | None = None,
+        tools: list[dict[str, Any]] | None = None,
+        max_tokens: int | None = None,
+        temperature: float | None = None,
+        response_format: Any | None = None,
         **kwargs: Any,
     ) -> dict[str, Any] | Iterator[dict[str, Any]]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if n is not None:
+            body["n"] = n
+        if background is not None:
+            body["background"] = background
+        if tools is not None:
+            body["tools"] = tools
+        if max_tokens is not None:
+            body["max_tokens"] = max_tokens
+        if temperature is not None:
+            body["temperature"] = temperature
+        if response_format is not None:
+            body["response_format"] = response_format
         if stream:
             body["stream"] = True
             return self._stream(body)
@@ -98,9 +116,27 @@ class _AsyncResponses:
         model: str,
         input: str | list[dict[str, Any]],
         stream: bool = False,
+        n: int | None = None,
+        background: str | None = None,
+        tools: list[dict[str, Any]] | None = None,
+        max_tokens: int | None = None,
+        temperature: float | None = None,
+        response_format: Any | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if n is not None:
+            body["n"] = n
+        if background is not None:
+            body["background"] = background
+        if tools is not None:
+            body["tools"] = tools
+        if max_tokens is not None:
+            body["max_tokens"] = max_tokens
+        if temperature is not None:
+            body["temperature"] = temperature
+        if response_format is not None:
+            body["response_format"] = response_format
         if stream:
             body["stream"] = True
             return self._stream(body)
