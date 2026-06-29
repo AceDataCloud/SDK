@@ -75,6 +75,48 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_images_edit(client):
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload == {
+            "image": "https://example.com/input.png",
+            "prompt": "Turn this into a watercolor",
+            "model": "gpt-image-1",
+            "n": 2,
+            "background": "auto",
+            "input_fidelity": "high",
+            "output_format": "webp",
+            "output_compression": 80,
+            "quality": "high",
+            "size": "1024x1024",
+            "response_format": "b64_json",
+            "callback_url": "https://example.com/callback",
+            "async": True,
+        }
+        return httpx.Response(200, json={"data": []})
+
+    respx.post("https://api.acedata.cloud/openai/images/edits").mock(side_effect=handler)
+
+    result = client.openai.images.edit(
+        image="https://example.com/input.png",
+        prompt="Turn this into a watercolor",
+        model="gpt-image-1",
+        n=2,
+        background="auto",
+        input_fidelity="high",
+        output_format="webp",
+        output_compression=80,
+        quality="high",
+        size="1024x1024",
+        response_format="b64_json",
+        callback_url="https://example.com/callback",
+        async_=True,
+    )
+
+    assert result["data"] == []
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
