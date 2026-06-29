@@ -74,6 +74,19 @@ handle, _, err := client.Images().Generate(ctx, acedatacloud.ImageGenerateReques
 res, err := handle.Wait(ctx, 3*time.Second, 5*time.Minute)
 ```
 
+## More resources
+
+```go
+// Video / audio task-based generation (sora|luma|veo|kling|hailuo|seedance|wan|pixverse, suno|producer|fish)
+vh, _, _ := client.Video().Generate(ctx, acedatacloud.VideoGenerateRequest{Prompt: "a cat", Provider: "kling"})
+ah, _, _ := client.Audio().Generate(ctx, acedatacloud.AudioGenerateRequest{Prompt: "lofi beat", Provider: "suno"})
+
+// Web search, face transforms, short URLs
+client.Search().Google(ctx, acedatacloud.SearchRequest{Query: "AceDataCloud"})
+client.Face().Swap(ctx, "https://a.png", "https://b.png", nil)
+client.ShortURL().Create(ctx, "https://acedata.cloud", "", nil)
+```
+
 ## Paying per request with x402
 
 ```go

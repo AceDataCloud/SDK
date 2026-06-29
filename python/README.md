@@ -56,6 +56,8 @@ asyncio.run(main())
 | `client.audio` | Music generation (Suno) |
 | `client.video` | Video generation (Luma, Sora, Veo, etc.) |
 | `client.search` | Web search (Google SERP) |
+| `client.face` | Face analysis & transformation (swap, beautify, age, cartoon) |
+| `client.shorturl` | Short URL creation |
 | `client.tasks` | Cross-service async task polling |
 | `client.files` | File uploads |
 | `client.platform` | Applications, credentials, models management |
