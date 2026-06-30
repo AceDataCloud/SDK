@@ -2,7 +2,7 @@
 
 import { Transport } from '../runtime/transport';
 
-export type GlmModel = 'glm-5.1' | 'glm-4.7' | 'glm-4.6' | 'glm-3-turbo' | (string & {});
+export type GlmModel = 'glm-5.2' | 'glm-5.1' | 'glm-4.7' | 'glm-4.6' | 'glm-3-turbo' | (string & {});
 
 class Completions {
   constructor(private transport: Transport) {}
