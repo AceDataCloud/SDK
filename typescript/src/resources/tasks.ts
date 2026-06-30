@@ -4,6 +4,7 @@ import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
 const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
+  openai: '/openai/tasks',
   suno: '/suno/tasks',
   producer: '/producer/tasks',
   fish: '/fish/tasks',
