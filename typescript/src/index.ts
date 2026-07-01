@@ -27,6 +27,7 @@ export type {
 } from './runtime/payment';
 
 export type { AiChatModel } from './resources/aichat';
+export type { GeminiModel, GeminiVideoModel } from './resources/gemini';
 export type { GlmModel } from './resources/glm';
 export type { ImageProvider } from './resources/images';
 export type { VideoProvider } from './resources/video';

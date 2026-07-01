@@ -15,6 +15,7 @@ import { OpenAI } from './resources/openai';
 import { Glm } from './resources/glm';
 import { Veo } from './resources/veo';
 import { Kling } from './resources/kling';
+import { Gemini } from './resources/gemini';
 import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
 import { ShortUrl } from './resources/shorturl';
@@ -48,6 +49,7 @@ export class AceDataCloud {
   readonly glm: Glm;
   readonly veo: Veo;
   readonly kling: Kling;
+  readonly gemini: Gemini;
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
@@ -78,6 +80,7 @@ export class AceDataCloud {
     this.glm = new Glm(this.transport);
     this.veo = new Veo(this.transport);
     this.kling = new Kling(this.transport);
+    this.gemini = new Gemini(this.transport);
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);

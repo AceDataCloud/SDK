@@ -26,6 +26,7 @@ from acedatacloud._runtime.payment import (
 )
 from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
+from acedatacloud.resources.gemini import GeminiModel, GeminiVideoModel
 from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.veo import VeoModel
@@ -36,6 +37,8 @@ __all__ = [
     "AsyncAceDataCloud",
     "AiChatModel",
     "AudioProvider",
+    "GeminiModel",
+    "GeminiVideoModel",
     "GlmModel",
     "ImageProvider",
     "VideoProvider",
