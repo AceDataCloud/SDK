@@ -75,6 +75,19 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_models_list(client):
+    mock_response = {
+        "object": "list",
+        "data": [{"id": "gpt-4o-mini", "object": "model", "created": 1714500000, "owned_by": "system"}],
+    }
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.openai.models.list()
+    assert result["object"] == "list"
+    assert result["data"][0]["id"] == "gpt-4o-mini"
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
@@ -333,6 +346,21 @@ async def test_async_openai_completions(async_client):
         messages=[{"role": "user", "content": "Hi"}],
     )
     assert result["choices"][0]["message"]["content"] == "Async!"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_openai_models_list(async_client):
+    mock_response = {
+        "object": "list",
+        "data": [{"id": "gpt-4o-mini", "object": "model", "created": 1714500000, "owned_by": "system"}],
+    }
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = await async_client.openai.models.list()
+    assert result["object"] == "list"
+    assert result["data"][0]["id"] == "gpt-4o-mini"
     await async_client.close()
 
 
