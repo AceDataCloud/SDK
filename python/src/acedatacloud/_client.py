@@ -14,6 +14,7 @@ from acedatacloud.resources.audio import AsyncAudio, Audio
 from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
+from acedatacloud.resources.gemini import AsyncGemini, Gemini
 from acedatacloud.resources.glm import AsyncGlm, Glm
 from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
@@ -69,6 +70,7 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
+        self.gemini = Gemini(self._transport)
 
     def close(self) -> None:
         self._transport.close()
@@ -119,6 +121,7 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        self.gemini = AsyncGemini(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()
