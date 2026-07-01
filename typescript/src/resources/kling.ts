@@ -99,4 +99,59 @@ export class Kling {
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     return this.transport.request('POST', '/kling/motion', { json: body });
   }
+
+  async lipSync(opts: {
+    mode: 'std' | 'pro';
+    videoId?: string;
+    videoUrl?: string;
+    audioType?: string;
+    audioFile?: string;
+    audioUrl?: string;
+    text?: string;
+    voiceId?: string;
+    voiceLanguage?: string;
+    voiceSpeed?: number;
+    callbackUrl?: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { mode, videoId, videoUrl, audioType, audioFile, audioUrl, text, voiceId, voiceLanguage, voiceSpeed, callbackUrl, ...rest } = opts;
+    const body: Record<string, unknown> = { mode, ...rest };
+    if (videoId !== undefined) body.video_id = videoId;
+    if (videoUrl !== undefined) body.video_url = videoUrl;
+    if (audioType !== undefined) body.audio_type = audioType;
+    if (audioFile !== undefined) body.audio_file = audioFile;
+    if (audioUrl !== undefined) body.audio_url = audioUrl;
+    if (text !== undefined) body.text = text;
+    if (voiceId !== undefined) body.voice_id = voiceId;
+    if (voiceLanguage !== undefined) body.voice_language = voiceLanguage;
+    if (voiceSpeed !== undefined) body.voice_speed = voiceSpeed;
+    if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    return this.transport.request('POST', '/kling/lip-sync', { json: body });
+  }
+
+  async talkingPhoto(opts: {
+    imageUrl: string;
+    audioUrl: string;
+    mode?: 'std' | 'pro';
+    model?: KlingModel;
+    prompt?: string;
+    duration?: 5 | 10;
+    callbackUrl?: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { imageUrl, audioUrl, mode, model, prompt, duration, callbackUrl, ...rest } = opts;
+    const body: Record<string, unknown> = {
+      image_url: imageUrl,
+      audio_url: audioUrl,
+      ...rest,
+    };
+    if (mode !== undefined) body.mode = mode;
+    if (model !== undefined) body.model = model;
+    if (prompt !== undefined) body.prompt = prompt;
+    if (duration !== undefined) body.duration = duration;
+    if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    return this.transport.request('POST', '/kling/talking-photo', { json: body });
+  }
 }

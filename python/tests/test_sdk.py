@@ -190,6 +190,34 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_video_generate_dreamina_without_prompt(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["image_url"] == "https://cdn.acedata.cloud/image.jpg"
+        assert payload["audio_url"] == "https://cdn.acedata.cloud/audio.wav"
+        assert "prompt" not in payload
+        return httpx.Response(200, json={"success": True, "task_id": "task-dreamina"})
+
+    respx.post("https://api.acedata.cloud/dreamina/videos").mock(side_effect=_handler)
+
+    result = client.video.generate(
+        provider="dreamina",
+        image_url="https://cdn.acedata.cloud/image.jpg",
+        audio_url="https://cdn.acedata.cloud/audio.wav",
+    )
+    assert hasattr(result, "wait")
+
+
+@respx.mock
+def test_kling_lip_sync(client):
+    mock_response = {"success": True, "task_id": "task-kling-lip-sync"}
+    respx.post("https://api.acedata.cloud/kling/lip-sync").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.kling.lip_sync(mode="std", video_url="https://cdn.acedata.cloud/video.mp4")
+    assert result["task_id"] == "task-kling-lip-sync"
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
