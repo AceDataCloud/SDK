@@ -1,10 +1,68 @@
-"""Chat resources — native provider APIs (Claude Messages, etc.)."""
+"""Chat resources — native provider APIs (Claude Messages)."""
 
 from __future__ import annotations
 
 import json as _json
 from collections.abc import Iterator
 from typing import Any
+
+
+class _Completions:
+    """Namespace for chat.chat.completions (OpenAI-compatible Claude endpoint)."""
+
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        model: str,
+        messages: list[dict[str, Any]],
+        stream: bool = False,
+        **kwargs: Any,
+    ) -> dict[str, Any] | Iterator[dict[str, Any]]:
+        body = {"model": model, "messages": messages, **kwargs}
+        if stream:
+            body["stream"] = True
+            return self._stream(body)
+        return self._transport.request("POST", "/v1/chat/completions", json=body)
+
+    def _stream(self, body: dict[str, Any]) -> Iterator[dict[str, Any]]:
+        for chunk in self._transport.request_stream("POST", "/v1/chat/completions", json=body):
+            yield _json.loads(chunk)
+
+
+class _AsyncCompletions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        model: str,
+        messages: list[dict[str, Any]],
+        stream: bool = False,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body = {"model": model, "messages": messages, **kwargs}
+        if stream:
+            body["stream"] = True
+            return self._stream(body)
+        return await self._transport.request("POST", "/v1/chat/completions", json=body)
+
+    async def _stream(self, body: dict[str, Any]):
+        async for chunk in self._transport.request_stream("POST", "/v1/chat/completions", json=body):
+            yield _json.loads(chunk)
+
+
+class _ChatCompletionsNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.completions = _Completions(transport)
+
+
+class _AsyncChatCompletionsNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.completions = _AsyncCompletions(transport)
 
 
 class _Messages:
@@ -92,6 +150,7 @@ class Chat:
 
     def __init__(self, transport: Any) -> None:
         self.messages = _Messages(transport)
+        self.chat = _ChatCompletionsNamespace(transport)
 
 
 class AsyncChat:
@@ -99,3 +158,4 @@ class AsyncChat:
 
     def __init__(self, transport: Any) -> None:
         self.messages = _AsyncMessages(transport)
+        self.chat = _AsyncChatCompletionsNamespace(transport)

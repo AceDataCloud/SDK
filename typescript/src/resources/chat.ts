@@ -2,6 +2,51 @@
 
 import { Transport } from '../runtime/transport';
 
+class Completions {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    model: string;
+    messages: Array<Record<string, unknown>>;
+    stream?: false;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>>;
+  async create(opts: {
+    model: string;
+    messages: Array<Record<string, unknown>>;
+    stream: true;
+    [key: string]: unknown;
+  }): Promise<AsyncGenerator<Record<string, unknown>>>;
+  async create(opts: {
+    model: string;
+    messages: Array<Record<string, unknown>>;
+    stream?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
+    const { model, messages, stream, ...rest } = opts;
+    const body: Record<string, unknown> = { model, messages, ...rest };
+
+    if (stream) {
+      body.stream = true;
+      return this.streamResponse(body);
+    }
+    return this.transport.request('POST', '/v1/chat/completions', { json: body });
+  }
+
+  private async *streamResponse(body: Record<string, unknown>): AsyncGenerator<Record<string, unknown>> {
+    for await (const chunk of this.transport.requestStream('POST', '/v1/chat/completions', { json: body })) {
+      yield JSON.parse(chunk);
+    }
+  }
+}
+
+class ChatCompletionsNamespace {
+  readonly completions: Completions;
+  constructor(transport: Transport) {
+    this.completions = new Completions(transport);
+  }
+}
+
 export class Messages {
   constructor(private transport: Transport) {}
 
@@ -56,8 +101,10 @@ export class Messages {
 
 export class Chat {
   readonly messages: Messages;
+  readonly chat: ChatCompletionsNamespace;
 
   constructor(transport: Transport) {
     this.messages = new Messages(transport);
+    this.chat = new ChatCompletionsNamespace(transport);
   }
 }
