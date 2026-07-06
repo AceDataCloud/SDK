@@ -15,6 +15,7 @@ from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
+from acedatacloud.resources.grok import AsyncGrok, Grok
 from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
@@ -69,8 +70,7 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
-
-    def close(self) -> None:
+        self.grok = Grok(self._transport)
         self._transport.close()
 
     def __enter__(self) -> AceDataCloud:
@@ -119,6 +119,7 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        self.grok = AsyncGrok(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()
