@@ -71,6 +71,8 @@ class AceDataCloud:
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
         self.grok = Grok(self._transport)
+
+    def close(self) -> None:
         self._transport.close()
 
     def __enter__(self) -> AceDataCloud:
