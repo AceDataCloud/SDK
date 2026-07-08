@@ -206,12 +206,21 @@ class Tasks {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly models: Models;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
@@ -219,5 +228,6 @@ export class OpenAI {
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.models = new Models(transport);
   }
 }
