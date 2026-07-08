@@ -190,6 +190,85 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_kling_motion_forwards_new_optional_fields(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["model_name"] == "kling-v3"
+        assert payload["watermark_info"] == {"enabled": True}
+        assert payload["async"] is True
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-motion"})
+
+    respx.post("https://api.acedata.cloud/kling/motion").mock(side_effect=_handler)
+
+    result = client.kling.motion(
+        model_name="kling-v3",
+        mode="pro",
+        watermark_info={"enabled": True},
+        image_url="https://example.com/image.png",
+        video_url="https://example.com/video.mp4",
+        character_orientation="image",
+        async_=True,
+    )
+    assert result["task_id"] == "task-kling-motion"
+
+
+@respx.mock
+def test_kling_lip_sync_and_talking_photo(client):
+    def _lip_sync_handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload == {
+            "mode": "text2video",
+            "video_url": "https://example.com/source.mp4",
+            "text": "Hello world",
+            "voice_language": "en",
+            "voice_speed": 1.2,
+            "callback_url": "https://example.com/lip-sync",
+            "async": True,
+        }
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-lip-sync"})
+
+    def _talking_photo_handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload == {
+            "image_url": "https://example.com/portrait.png",
+            "audio_url": "https://example.com/audio.mp3",
+            "prompt": "Speak naturally",
+            "model": "kling-v2-6",
+            "duration": 10,
+            "mode": "pro",
+            "callback_url": "https://example.com/talking-photo",
+            "async": True,
+        }
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-talking-photo"})
+
+    respx.post("https://api.acedata.cloud/kling/lip-sync").mock(side_effect=_lip_sync_handler)
+    respx.post("https://api.acedata.cloud/kling/talking-photo").mock(side_effect=_talking_photo_handler)
+
+    lip_sync_result = client.kling.lip_sync(
+        mode="text2video",
+        video_url="https://example.com/source.mp4",
+        text="Hello world",
+        voice_language="en",
+        voice_speed=1.2,
+        callback_url="https://example.com/lip-sync",
+        async_=True,
+    )
+    talking_photo_result = client.kling.talking_photo(
+        image_url="https://example.com/portrait.png",
+        audio_url="https://example.com/audio.mp3",
+        prompt="Speak naturally",
+        model="kling-v2-6",
+        duration=10,
+        mode="pro",
+        callback_url="https://example.com/talking-photo",
+        async_=True,
+    )
+
+    assert lip_sync_result["task_id"] == "task-kling-lip-sync"
+    assert talking_photo_result["task_id"] == "task-kling-talking-photo"
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
