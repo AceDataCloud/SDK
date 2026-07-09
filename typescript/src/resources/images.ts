@@ -19,14 +19,14 @@ export class Images {
     imageUrls?: string[];
     aspectRatio?: string;
     resolution?: string;
-    size?: string;
+    size?: '1K' | '2K' | '3K' | '4K' | 'adaptive' | (string & {});
     seed?: number;
     guidanceScale?: number;
     responseFormat?: string;
     watermark?: boolean;
-    outputFormat?: string;
+    outputFormat?: 'jpeg' | 'png' | (string & {});
     stream?: boolean;
-    sequentialImageGeneration?: string;
+    sequentialImageGeneration?: 'auto' | 'disabled' | (string & {});
     sequentialImageGenerationOptions?: Record<string, unknown>;
     tools?: unknown[];
     optimizePromptOptions?: Record<string, unknown>;
