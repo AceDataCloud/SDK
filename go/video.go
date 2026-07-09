@@ -7,7 +7,7 @@ type VideoGenerateRequest struct {
 	// Prompt is the required text prompt.
 	Prompt string
 	// Provider selects the backend: "sora", "luma", "veo", "kling",
-	// "hailuo", "seedance", "wan", "pika", "pixverse".
+	// "hailuo", "seedance", "wan", "pika", "pixverse", "happyhorse".
 	Provider string
 	// Model is optional — provider-specific model identifier.
 	Model string

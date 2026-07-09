@@ -19,6 +19,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   wan: '/wan/tasks',
   pika: '/pika/tasks',
   pixverse: '/pixverse/tasks',
+  happyhorse: '/happyhorse/tasks',
   webextrator: '/webextrator/tasks',
 };
 

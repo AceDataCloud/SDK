@@ -21,6 +21,7 @@ var serviceTaskEndpoints = map[string]string{
 	"wan":         "/wan/tasks",
 	"pika":        "/pika/tasks",
 	"pixverse":    "/pixverse/tasks",
+	"happyhorse":  "/happyhorse/tasks",
 	"webextrator": "/webextrator/tasks",
 }
 
