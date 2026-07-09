@@ -12,8 +12,32 @@ type ImageGenerateRequest struct {
 	Model string
 	// NegativePrompt is optional.
 	NegativePrompt string
+	// Image is an optional list of reference images (e.g. for seedream image-to-image).
+	Image []any
 	// ImageURL is optional reference image.
 	ImageURL string
+	// Size is the optional output size (e.g. "1K", "2K", "4K", "adaptive" for seedream).
+	Size string
+	// Seed is an optional integer seed for reproducibility.
+	Seed *int
+	// GuidanceScale is an optional guidance scale parameter.
+	GuidanceScale *float64
+	// ResponseFormat is optional (e.g. "url", "b64_json").
+	ResponseFormat string
+	// Watermark controls whether a watermark is applied.
+	Watermark *bool
+	// OutputFormat is the optional output file format (e.g. "jpeg", "png").
+	OutputFormat string
+	// Stream controls streaming mode (seedream-specific).
+	Stream *bool
+	// SequentialImageGeneration controls sequential image generation mode.
+	SequentialImageGeneration string
+	// SequentialImageGenerationOptions holds options for sequential generation.
+	SequentialImageGenerationOptions map[string]any
+	// Tools is an optional list of tools (seedream-specific).
+	Tools []any
+	// OptimizePromptOptions holds prompt optimization options.
+	OptimizePromptOptions map[string]any
 	// CallbackURL optionally receives the task completion webhook.
 	CallbackURL string
 	// Async, when true, returns a task_id without requiring a CallbackURL;
@@ -31,8 +55,44 @@ func (r ImageGenerateRequest) toBody() map[string]any {
 	if r.NegativePrompt != "" {
 		body["negative_prompt"] = r.NegativePrompt
 	}
+	if len(r.Image) > 0 {
+		body["image"] = r.Image
+	}
 	if r.ImageURL != "" {
 		body["image_url"] = r.ImageURL
+	}
+	if r.Size != "" {
+		body["size"] = r.Size
+	}
+	if r.Seed != nil {
+		body["seed"] = *r.Seed
+	}
+	if r.GuidanceScale != nil {
+		body["guidance_scale"] = *r.GuidanceScale
+	}
+	if r.ResponseFormat != "" {
+		body["response_format"] = r.ResponseFormat
+	}
+	if r.Watermark != nil {
+		body["watermark"] = *r.Watermark
+	}
+	if r.OutputFormat != "" {
+		body["output_format"] = r.OutputFormat
+	}
+	if r.Stream != nil {
+		body["stream"] = *r.Stream
+	}
+	if r.SequentialImageGeneration != "" {
+		body["sequential_image_generation"] = r.SequentialImageGeneration
+	}
+	if len(r.SequentialImageGenerationOptions) > 0 {
+		body["sequential_image_generation_options"] = r.SequentialImageGenerationOptions
+	}
+	if len(r.Tools) > 0 {
+		body["tools"] = r.Tools
+	}
+	if len(r.OptimizePromptOptions) > 0 {
+		body["optimize_prompt_options"] = r.OptimizePromptOptions
 	}
 	if r.CallbackURL != "" {
 		body["callback_url"] = r.CallbackURL
