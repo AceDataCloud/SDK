@@ -190,6 +190,19 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_veo_generate_translation_boolean(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["translation"] is True
+        return httpx.Response(200, json={"success": True, "task_id": "task-veo"})
+
+    respx.post("https://api.acedata.cloud/veo/videos").mock(side_effect=_handler)
+
+    result = client.veo.generate(action="text2video", prompt="A quick demo", translation=True)
+    assert result["task_id"] == "task-veo"
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 

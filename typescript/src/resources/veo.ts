@@ -13,7 +13,7 @@ export class Veo {
     model?: VeoModel;
     resolution?: '4k' | '1080p' | 'gif';
     videoId?: string;
-    translation?: string;
+    translation?: boolean;
     aspectRatio?: '9:16' | '1:1' | '3:4' | '4:3' | '16:9';
     imageUrls?: string[];
     callbackUrl?: string;
