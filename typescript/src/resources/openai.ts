@@ -151,7 +151,7 @@ class Embeddings {
 
   async create(opts: {
     model: string;
-    input: string | string[];
+    input: string | string[] | number[] | number[][];
     encodingFormat?: string;
     dimensions?: number;
     [key: string]: unknown;
