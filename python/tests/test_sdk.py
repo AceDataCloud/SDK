@@ -190,6 +190,61 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_kling_generate_motion_and_extra_endpoints(client):
+    def _videos_handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["image_list"] == [{"image_url": "https://example.com/start.png", "type": "first_frame"}]
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-videos"})
+
+    def _motion_handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["model_name"] == "kling-v3"
+        assert payload["watermark_info"] == {"text": "demo"}
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-motion"})
+
+    def _lip_sync_handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["mode"] == "text2video"
+        assert payload["video_id"] == "vid-1"
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-lip-sync"})
+
+    def _talking_photo_handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["image_url"] == "https://example.com/photo.png"
+        assert payload["audio_url"] == "https://example.com/audio.mp3"
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-talking-photo"})
+
+    respx.post("https://api.acedata.cloud/kling/videos").mock(side_effect=_videos_handler)
+    respx.post("https://api.acedata.cloud/kling/motion").mock(side_effect=_motion_handler)
+    respx.post("https://api.acedata.cloud/kling/lip-sync").mock(side_effect=_lip_sync_handler)
+    respx.post("https://api.acedata.cloud/kling/talking-photo").mock(side_effect=_talking_photo_handler)
+
+    videos_result = client.kling.generate(
+        action="image2video",
+        image_list=[{"image_url": "https://example.com/start.png", "type": "first_frame"}],
+    )
+    motion_result = client.kling.motion(
+        mode="std",
+        image_url="https://example.com/image.png",
+        video_url="https://example.com/video.mp4",
+        character_orientation="image",
+        model_name="kling-v3",
+        watermark_info={"text": "demo"},
+    )
+    lip_sync_result = client.kling.lip_sync(mode="text2video", video_id="vid-1", text="hello")
+    talking_photo_result = client.kling.talking_photo(
+        image_url="https://example.com/photo.png",
+        audio_url="https://example.com/audio.mp3",
+        model="kling-v2-6",
+    )
+
+    assert videos_result["task_id"] == "task-kling-videos"
+    assert motion_result["task_id"] == "task-kling-motion"
+    assert lip_sync_result["task_id"] == "task-kling-lip-sync"
+    assert talking_photo_result["task_id"] == "task-kling-talking-photo"
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
