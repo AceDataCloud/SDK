@@ -80,13 +80,15 @@ export class Kling {
     imageUrl: string;
     videoUrl: string;
     characterOrientation: 'image' | 'video';
+    modelName?: 'kling-v2-6' | 'kling-v3';
     keepOriginalSound?: 'yes' | 'no';
+    watermarkInfo?: Record<string, unknown>;
     prompt?: string;
     callbackUrl?: string;
     async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
-    const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, prompt, callbackUrl, ...rest } = opts;
+    const { mode, imageUrl, videoUrl, characterOrientation, modelName, keepOriginalSound, watermarkInfo, prompt, callbackUrl, ...rest } = opts;
     const body: Record<string, unknown> = {
       mode,
       image_url: imageUrl,
@@ -94,9 +96,66 @@ export class Kling {
       character_orientation: characterOrientation,
       ...rest,
     };
+    if (modelName !== undefined) body.model_name = modelName;
     if (keepOriginalSound !== undefined) body.keep_original_sound = keepOriginalSound;
+    if (watermarkInfo !== undefined) body.watermark_info = watermarkInfo;
     if (prompt !== undefined) body.prompt = prompt;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     return this.transport.request('POST', '/kling/motion', { json: body });
+  }
+
+  async lipSync(opts: {
+    mode: 'audio2video' | 'text2video';
+    videoId?: string;
+    videoUrl?: string;
+    audioUrl?: string;
+    audioType?: 'url' | 'file';
+    audioFile?: string;
+    text?: string;
+    voiceId?: string;
+    voiceLanguage?: 'zh' | 'en';
+    voiceSpeed?: number;
+    callbackUrl?: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { mode, videoId, videoUrl, audioUrl, audioType, audioFile, text, voiceId, voiceLanguage, voiceSpeed, callbackUrl, ...rest } = opts;
+    const body: Record<string, unknown> = { mode, ...rest };
+    if (videoId !== undefined) body.video_id = videoId;
+    if (videoUrl !== undefined) body.video_url = videoUrl;
+    if (audioUrl !== undefined) body.audio_url = audioUrl;
+    if (audioType !== undefined) body.audio_type = audioType;
+    if (audioFile !== undefined) body.audio_file = audioFile;
+    if (text !== undefined) body.text = text;
+    if (voiceId !== undefined) body.voice_id = voiceId;
+    if (voiceLanguage !== undefined) body.voice_language = voiceLanguage;
+    if (voiceSpeed !== undefined) body.voice_speed = voiceSpeed;
+    if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    return this.transport.request('POST', '/kling/lip-sync', { json: body });
+  }
+
+  async talkingPhoto(opts: {
+    imageUrl: string;
+    audioUrl: string;
+    prompt?: string;
+    model?: 'kling-v1' | 'kling-v1-6' | 'kling-v2-master' | 'kling-v2-1-master' | 'kling-v2-5-turbo' | 'kling-v2-6';
+    duration?: 5 | 10;
+    mode?: 'std' | 'pro';
+    callbackUrl?: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { imageUrl, audioUrl, prompt, model, duration, mode, callbackUrl, ...rest } = opts;
+    const body: Record<string, unknown> = {
+      image_url: imageUrl,
+      audio_url: audioUrl,
+      ...rest,
+    };
+    if (prompt !== undefined) body.prompt = prompt;
+    if (model !== undefined) body.model = model;
+    if (duration !== undefined) body.duration = duration;
+    if (mode !== undefined) body.mode = mode;
+    if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    return this.transport.request('POST', '/kling/talking-photo', { json: body });
   }
 }
