@@ -5,9 +5,14 @@ from __future__ import annotations
 from typing import Any, Literal
 
 AiChatModel = Literal[
+    "gpt-5.6-luna",
+    "gpt-5.6-terra",
+    "gpt-5.6-sol",
     "gpt-5.5",
     "gpt-5.5-pro",
     "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
     "gpt-5.4-pro",
     "gpt-5.2",
     "gpt-5.1",
@@ -78,6 +83,9 @@ AiChatModel = Literal[
     "deepseek-v3-250324",
     "deepseek-v4-flash",
     "grok-3",
+    "glm-5.2",
+    "glm-5",
+    "glm-5-turbo",
     "glm-5.1",
     "glm-4.7",
     "glm-4.6",
