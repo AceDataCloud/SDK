@@ -97,8 +97,8 @@ export class Veo {
     ids?: string[];
     [key: string]: unknown;
   } = {}): Promise<Record<string, unknown>> {
-    const { action, id, ids, ...rest } = opts;
-    const body: Record<string, unknown> = { action: action ?? 'retrieve', ...rest };
+    const { action = 'retrieve', id, ids, ...rest } = opts;
+    const body: Record<string, unknown> = { action, ...rest };
     if (id !== undefined) body.id = id;
     if (ids !== undefined) body.ids = ids;
     return this.transport.request('POST', '/veo/tasks', { json: body });
