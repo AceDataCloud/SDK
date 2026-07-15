@@ -13,7 +13,7 @@ export class Veo {
     model?: VeoModel;
     resolution?: '4k' | '1080p' | 'gif';
     videoId?: string;
-    translation?: string;
+    translation?: boolean;
     aspectRatio?: '9:16' | '1:1' | '3:4' | '4:3' | '16:9';
     imageUrls?: string[];
     callbackUrl?: string;
@@ -89,5 +89,18 @@ export class Veo {
     if (imageMask !== undefined) body.image_mask = imageMask;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     return this.transport.request('POST', '/veo/objects', { json: body });
+  }
+
+  async tasks(opts: {
+    action?: 'retrieve' | 'retrieve_batch';
+    id?: string;
+    ids?: string[];
+    [key: string]: unknown;
+  } = {}): Promise<Record<string, unknown>> {
+    const { action, id, ids, ...rest } = opts;
+    const body: Record<string, unknown> = { action: action ?? 'retrieve', ...rest };
+    if (id !== undefined) body.id = id;
+    if (ids !== undefined) body.ids = ids;
+    return this.transport.request('POST', '/veo/tasks', { json: body });
   }
 }

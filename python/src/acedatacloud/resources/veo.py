@@ -21,7 +21,7 @@ class Veo:
         model: str | None = None,
         resolution: Literal["4k", "1080p", "gif"] | None = None,
         video_id: str | None = None,
-        translation: str | None = None,
+        translation: bool | None = None,
         aspect_ratio: Literal["9:16", "1:1", "3:4", "4:3", "16:9"] | None = None,
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
@@ -122,6 +122,21 @@ class Veo:
             body["async"] = async_
         return self._transport.request("POST", "/veo/objects", json=body)
 
+    def tasks(
+        self,
+        *,
+        action: Literal["retrieve", "retrieve_batch"] = "retrieve",
+        id: str | None = None,
+        ids: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": action, **kwargs}
+        if id is not None:
+            body["id"] = id
+        if ids is not None:
+            body["ids"] = ids
+        return self._transport.request("POST", "/veo/tasks", json=body)
+
 
 class AsyncVeo:
     """Async Veo video client."""
@@ -137,7 +152,7 @@ class AsyncVeo:
         model: str | None = None,
         resolution: Literal["4k", "1080p", "gif"] | None = None,
         video_id: str | None = None,
-        translation: str | None = None,
+        translation: bool | None = None,
         aspect_ratio: Literal["9:16", "1:1", "3:4", "4:3", "16:9"] | None = None,
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
@@ -237,3 +252,18 @@ class AsyncVeo:
         if async_ is not None:
             body["async"] = async_
         return await self._transport.request("POST", "/veo/objects", json=body)
+
+    async def tasks(
+        self,
+        *,
+        action: Literal["retrieve", "retrieve_batch"] = "retrieve",
+        id: str | None = None,
+        ids: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": action, **kwargs}
+        if id is not None:
+            body["id"] = id
+        if ids is not None:
+            body["ids"] = ids
+        return await self._transport.request("POST", "/veo/tasks", json=body)
