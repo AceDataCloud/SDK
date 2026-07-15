@@ -28,6 +28,7 @@ export type {
 
 export type { AiChatModel } from './resources/aichat';
 export type { GlmModel } from './resources/glm';
+export type { GrokChatModel, GrokVideoModel } from './resources/grok';
 export type { ImageProvider } from './resources/images';
 export type { VideoProvider } from './resources/video';
 export type { VeoModel } from './resources/veo';

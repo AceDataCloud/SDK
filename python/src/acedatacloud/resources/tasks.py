@@ -23,6 +23,10 @@ _SERVICE_TASK_ENDPOINTS = {
     "pika": "/pika/tasks",
     "pixverse": "/pixverse/tasks",
     "webextrator": "/webextrator/tasks",
+    "gemini": "/gemini/tasks",
+    "grok": "/grok/tasks",
+    "happyhorse": "/happyhorse/tasks",
+    "midjourney": "/midjourney/tasks",
 }
 
 
