@@ -13,6 +13,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   sora: '/sora/tasks',
   luma: '/luma/tasks',
   veo: '/veo/tasks',
+  gemini: '/gemini/tasks',
   flux: '/flux/tasks',
   kling: '/kling/tasks',
   hailuo: '/hailuo/tasks',

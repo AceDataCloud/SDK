@@ -190,6 +190,75 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_kling_motion_supports_model_and_watermark(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["mode"] == "std"
+        assert payload["image_url"] == "https://example.com/image.png"
+        assert payload["video_url"] == "https://example.com/video.mp4"
+        assert payload["character_orientation"] == "image"
+        assert payload["model_name"] == "kling-v3"
+        assert payload["watermark_info"] == {"text": "ace"}
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-motion"})
+
+    respx.post("https://api.acedata.cloud/kling/motion").mock(side_effect=_handler)
+
+    result = client.kling.motion(
+        mode="std",
+        image_url="https://example.com/image.png",
+        video_url="https://example.com/video.mp4",
+        character_orientation="image",
+        model_name="kling-v3",
+        watermark_info={"text": "ace"},
+    )
+    assert result["task_id"] == "task-kling-motion"
+
+
+@respx.mock
+def test_kling_lip_sync(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["mode"] == "text2video"
+        assert payload["video_id"] == "video-1"
+        assert payload["text"] == "hello"
+        assert payload["voice_language"] == "en"
+        assert payload["voice_speed"] == 1.2
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-lipsync"})
+
+    respx.post("https://api.acedata.cloud/kling/lip-sync").mock(side_effect=_handler)
+
+    result = client.kling.lip_sync(
+        mode="text2video",
+        video_id="video-1",
+        text="hello",
+        voice_language="en",
+        voice_speed=1.2,
+    )
+    assert result["task_id"] == "task-kling-lipsync"
+
+
+@respx.mock
+def test_kling_talking_photo(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["image_url"] == "https://example.com/image.png"
+        assert payload["audio_url"] == "https://example.com/audio.mp3"
+        assert payload["mode"] == "pro"
+        assert payload["duration"] == 10
+        return httpx.Response(200, json={"success": True, "task_id": "task-kling-talking-photo"})
+
+    respx.post("https://api.acedata.cloud/kling/talking-photo").mock(side_effect=_handler)
+
+    result = client.kling.talking_photo(
+        image_url="https://example.com/image.png",
+        audio_url="https://example.com/audio.mp3",
+        mode="pro",
+        duration=10,
+    )
+    assert result["task_id"] == "task-kling-talking-photo"
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
@@ -217,6 +286,16 @@ def test_tasks_get(client):
 
     result = client.tasks.get("task-abc", service="nano-banana")
     assert result["response"]["status"] == "succeeded"
+
+
+@respx.mock
+def test_tasks_get_gemini(client):
+    respx.post("https://api.acedata.cloud/gemini/tasks").mock(
+        return_value=httpx.Response(200, json={"id": "task-gemini", "response": {"status": "processing"}})
+    )
+
+    result = client.tasks.get("task-gemini", service="gemini")
+    assert result["id"] == "task-gemini"
 
 
 # ── Platform Management ───────────────────────────────────────────────
