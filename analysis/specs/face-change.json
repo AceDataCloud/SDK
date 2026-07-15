@@ -1,0 +1,2516 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Face Transformation",
+    "version": "1.0.0",
+    "description": "API reference for Face Transformation on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/face/analyze": {
+      "post": {
+        "summary": "Analyze",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "image_width": 904,
+                    "image_height": 602,
+                    "face_shape_set": [
+                      {
+                        "nose": [
+                          {
+                            "x": 561,
+                            "y": 312
+                          },
+                          {
+                            "x": 559,
+                            "y": 250
+                          },
+                          {
+                            "x": 551,
+                            "y": 267
+                          },
+                          {
+                            "x": 544,
+                            "y": 283
+                          },
+                          {
+                            "x": 536,
+                            "y": 300
+                          },
+                          {
+                            "x": 527,
+                            "y": 317
+                          },
+                          {
+                            "x": 544,
+                            "y": 326
+                          },
+                          {
+                            "x": 560,
+                            "y": 329
+                          },
+                          {
+                            "x": 574,
+                            "y": 326
+                          },
+                          {
+                            "x": 589,
+                            "y": 317
+                          },
+                          {
+                            "x": 582,
+                            "y": 300
+                          },
+                          {
+                            "x": 574,
+                            "y": 284
+                          },
+                          {
+                            "x": 566,
+                            "y": 267
+                          }
+                        ],
+                        "mouth": [
+                          {
+                            "x": 513,
+                            "y": 363
+                          },
+                          {
+                            "x": 526,
+                            "y": 375
+                          },
+                          {
+                            "x": 541,
+                            "y": 383
+                          },
+                          {
+                            "x": 558,
+                            "y": 386
+                          },
+                          {
+                            "x": 574,
+                            "y": 383
+                          },
+                          {
+                            "x": 589,
+                            "y": 375
+                          },
+                          {
+                            "x": 600,
+                            "y": 363
+                          },
+                          {
+                            "x": 586,
+                            "y": 356
+                          },
+                          {
+                            "x": 572,
+                            "y": 350
+                          },
+                          {
+                            "x": 559,
+                            "y": 354
+                          },
+                          {
+                            "x": 545,
+                            "y": 350
+                          },
+                          {
+                            "x": 529,
+                            "y": 356
+                          },
+                          {
+                            "x": 528,
+                            "y": 364
+                          },
+                          {
+                            "x": 543,
+                            "y": 366
+                          },
+                          {
+                            "x": 558,
+                            "y": 367
+                          },
+                          {
+                            "x": 572,
+                            "y": 365
+                          },
+                          {
+                            "x": 586,
+                            "y": 364
+                          },
+                          {
+                            "x": 586,
+                            "y": 363
+                          },
+                          {
+                            "x": 572,
+                            "y": 364
+                          },
+                          {
+                            "x": 558,
+                            "y": 365
+                          },
+                          {
+                            "x": 543,
+                            "y": 364
+                          },
+                          {
+                            "x": 528,
+                            "y": 363
+                          }
+                        ],
+                        "left_eye": [
+                          {
+                            "x": 470,
+                            "y": 242
+                          },
+                          {
+                            "x": 481,
+                            "y": 247
+                          },
+                          {
+                            "x": 492,
+                            "y": 249
+                          },
+                          {
+                            "x": 504,
+                            "y": 248
+                          },
+                          {
+                            "x": 516,
+                            "y": 245
+                          },
+                          {
+                            "x": 506,
+                            "y": 237
+                          },
+                          {
+                            "x": 494,
+                            "y": 233
+                          },
+                          {
+                            "x": 481,
+                            "y": 235
+                          }
+                        ],
+                        "right_eye": [
+                          {
+                            "x": 641,
+                            "y": 245
+                          },
+                          {
+                            "x": 630,
+                            "y": 250
+                          },
+                          {
+                            "x": 618,
+                            "y": 251
+                          },
+                          {
+                            "x": 606,
+                            "y": 251
+                          },
+                          {
+                            "x": 594,
+                            "y": 248
+                          },
+                          {
+                            "x": 604,
+                            "y": 238
+                          },
+                          {
+                            "x": 617,
+                            "y": 235
+                          },
+                          {
+                            "x": 630,
+                            "y": 236
+                          }
+                        ],
+                        "left_pupil": [
+                          {
+                            "x": 494,
+                            "y": 239
+                          }
+                        ],
+                        "right_pupil": [
+                          {
+                            "x": 618,
+                            "y": 242
+                          }
+                        ],
+                        "face_profile": [
+                          {
+                            "x": 432,
+                            "y": 240
+                          },
+                          {
+                            "x": 432,
+                            "y": 266
+                          },
+                          {
+                            "x": 434,
+                            "y": 291
+                          },
+                          {
+                            "x": 439,
+                            "y": 316
+                          },
+                          {
+                            "x": 445,
+                            "y": 341
+                          },
+                          {
+                            "x": 456,
+                            "y": 364
+                          },
+                          {
+                            "X": 470,
+                            "Y": 385
+                          },
+                          {
+                            "X": 488,
+                            "Y": 403
+                          },
+                          {
+                            "X": 508,
+                            "Y": 418
+                          },
+                          {
+                            "X": 531,
+                            "Y": 430
+                          },
+                          {
+                            "X": 556,
+                            "Y": 434
+                          },
+                          {
+                            "X": 580,
+                            "Y": 429
+                          },
+                          {
+                            "X": 602,
+                            "Y": 417
+                          },
+                          {
+                            "X": 621,
+                            "Y": 402
+                          },
+                          {
+                            "X": 638,
+                            "Y": 384
+                          },
+                          {
+                            "X": 652,
+                            "Y": 364
+                          },
+                          {
+                            "X": 662,
+                            "Y": 341
+                          },
+                          {
+                            "X": 669,
+                            "Y": 318
+                          },
+                          {
+                            "X": 673,
+                            "Y": 293
+                          },
+                          {
+                            "X": 676,
+                            "Y": 269
+                          },
+                          {
+                            "X": 676,
+                            "Y": 244
+                          }
+                        ],
+                        "left_eye_brow": [
+                          {
+                            "x": 447,
+                            "y": 217
+                          },
+                          {
+                            "x": 466,
+                            "y": 219
+                          },
+                          {
+                            "x": 485,
+                            "y": 221
+                          },
+                          {
+                            "x": 504,
+                            "y": 224
+                          },
+                          {
+                            "x": 523,
+                            "y": 226
+                          },
+                          {
+                            "x": 507,
+                            "y": 214
+                          },
+                          {
+                            "x": 486,
+                            "y": 209
+                          },
+                          {
+                            "x": 466,
+                            "y": 208
+                          }
+                        ],
+                        "right_eye_brow": [
+                          {
+                            "x": 662,
+                            "y": 223
+                          },
+                          {
+                            "x": 644,
+                            "y": 224
+                          },
+                          {
+                            "x": 626,
+                            "y": 225
+                          },
+                          {
+                            "x": 608,
+                            "y": 227
+                          },
+                          {
+                            "x": 590,
+                            "y": 227
+                          },
+                          {
+                            "x": 606,
+                            "y": 217
+                          },
+                          {
+                            "x": 626,
+                            "y": 213
+                          },
+                          {
+                            "x": 646,
+                            "y": 212
+                          }
+                        ]
+                      }
+                    ],
+                    "face_model_version": "3.0"
+                  },
+                  "properties": {
+                    "image_width": {
+                      "type": "number",
+                      "description": "Face Analyze Response 200 Image Width"
+                    },
+                    "image_height": {
+                      "type": "number",
+                      "description": "Face Analyze Response 200 Image Height"
+                    },
+                    "face_shape_set": {
+                      "type": "string",
+                      "description": "Face Analyze Response 200 Face Shape Set"
+                    },
+                    "face_model_version": {
+                      "type": "string",
+                      "description": "Face Analyze Response 200 Face Model Version"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Face Analyze Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Face Analyze Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Face Analyze Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Analyze Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Face Analyze Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Face Analyze Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Analyze Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Analyze Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Face Analyze Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Face Analyze Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Analyze Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Analyze Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Face Analyze Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Face Analyze Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Analyze Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Analyze Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Face Analyze Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Face Analyze Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Analyze Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Analyze Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Face Analyze Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url"
+                ],
+                "properties": {
+                  "mode": {
+                    "type": "number",
+                    "description": "Face Analyze Mode"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "description": "Face Analyze Image Url"
+                  },
+                  "face_model_version": {
+                    "type": "string",
+                    "description": "Face Analyze Face Model Version"
+                  },
+                  "need_rotate_detection": {
+                    "type": "number",
+                    "description": "Face Analyze Need Rotate Detection"
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/4hfydw.jpg"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "The requested image is located on the five features (also known as face key point positioning), calculating 90 points that constitute the outline of the face, including eyebrows (8 points on the left and right sides), eyes (8 points on the left and right sides), nose (13 points), mouth (22 points), face contour (21 points), and eye [or pupil] (2 points)."
+      }
+    },
+    "/face/beautify": {
+      "post": {
+        "summary": "Beautify",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "image_url": "https://faceeffect-1254418846.cos.ap-guangzhou.myqcloud.com/fmu/BeautifyPic/1256437459/4027c868-60e9-40e0-b929-0fdb69dcf3c1"
+                  },
+                  "properties": {
+                    "image_url": {
+                      "type": "string",
+                      "description": "Face Beautify Response 200 Image Url"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Face Beautify Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Face Beautify Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Face Beautify Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Beautify Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Face Beautify Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Face Beautify Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Beautify Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Beautify Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Face Beautify Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Face Beautify Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Beautify Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Beautify Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Face Beautify Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Face Beautify Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Beautify Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Beautify Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Face Beautify Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Face Beautify Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Beautify Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Beautify Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Face Beautify Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url"
+                ],
+                "properties": {
+                  "image_url": {
+                    "type": "string",
+                    "description": "Face Beautify Image Url"
+                  },
+                  "smoothing": {
+                    "type": "number",
+                    "description": "Face Beautify Smoothing"
+                  },
+                  "whitening": {
+                    "type": "number",
+                    "description": "Face Beautify Whitening"
+                  },
+                  "face_lifting": {
+                    "type": "number",
+                    "description": "Face Beautify Face Lifting"
+                  },
+                  "eye_enlarging": {
+                    "type": "number",
+                    "description": "Face Beautify Eye Enlarging"
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/4hfydw.jpg"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Users upload a face picture (up to the largest five face information in a picture can be processed), accurately locate the five features, to achieve beauty, skin brightening, acne and other beauty functions."
+      }
+    },
+    "/face/change-age": {
+      "post": {
+        "summary": "Change Age",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "image_url": "https://faceeffect-1254418846.cos.ap-guangzhou.myqcloud.com/ft/ChangeAgePic/1256437459/f522c681-7e82-46d5-a68f-4c89e91e4df2"
+                  },
+                  "properties": {
+                    "image_url": {
+                      "type": "string",
+                      "description": "Face Change Age Response 200 Image Url"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Face Change Age Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Face Change Age Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Face Change Age Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Age Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Face Change Age Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Face Change Age Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Age Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Age Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Face Change Age Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Face Change Age Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Age Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Age Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Face Change Age Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Face Change Age Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Age Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Age Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Face Change Age Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Face Change Age Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Age Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Age Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Face Change Age Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url",
+                  "age_infos"
+                ],
+                "properties": {
+                  "age_infos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "age"
+                      ],
+                      "properties": {
+                        "age": {
+                          "type": "number",
+                          "description": "Face Change Age Age Infos Age"
+                        }
+                      },
+                      "description": "Face Change Age Age Infos"
+                    }
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "description": "Face Change Age Image Url"
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/4hfydw.jpg",
+                "age_infos": [
+                  {
+                    "age": 30
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "The user uploads a face picture, based on the face editing and generation algorithm, outputs a picture of the face getting older or younger, and supports the change of the face at different ages."
+      }
+    },
+    "/face/change-gender": {
+      "post": {
+        "summary": "Change Gender",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "image_url": "https://faceeffect-1254418846.cos.ap-guangzhou.myqcloud.com/ft/SwapGenderPic/1256437459/022636b0-e682-4be6-88c4-461bffa77aae"
+                  },
+                  "properties": {
+                    "image_url": {
+                      "type": "string",
+                      "description": "Face Change Gender Response 200 Image Url"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Face Change Gender Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Face Change Gender Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Face Change Gender Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Gender Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Face Change Gender Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Face Change Gender Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Gender Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Gender Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Face Change Gender Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Face Change Gender Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Gender Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Gender Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Face Change Gender Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Face Change Gender Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Gender Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Gender Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Face Change Gender Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Face Change Gender Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Change Gender Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Change Gender Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Face Change Gender Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url",
+                  "gender_infos"
+                ],
+                "properties": {
+                  "image_url": {
+                    "type": "string",
+                    "description": "Face Change Gender Image Url"
+                  },
+                  "gender_infos": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "gender": {
+                          "type": "number",
+                          "description": "Face Change Gender Gender Infos Gender"
+                        },
+                        "face_rect": {
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "description": "Face Change Gender Gender Infos Face Rect X"
+                            },
+                            "y": {
+                              "type": "number",
+                              "description": "Face Change Gender Gender Infos Face Rect Y"
+                            },
+                            "width": {
+                              "type": "number",
+                              "description": "Face Change Gender Gender Infos Face Rect Width"
+                            },
+                            "height": {
+                              "type": "number",
+                              "description": "Face Change Gender Gender Infos Face Rect Height"
+                            }
+                          },
+                          "description": "Face Change Gender Gender Infos Face Rect"
+                        }
+                      },
+                      "description": "Face Change Gender Gender Infos"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/4hfydw.jpg",
+                "gender_infos": [
+                  {
+                    "gender": 1,
+                    "face_rect": {
+                      "x": 784,
+                      "y": 503,
+                      "width": 274,
+                      "height": 228
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Users upload a face picture, based on the face editing and generation algorithm, output a face gender conversion picture. Male to female can achieve beauty, light makeup, add bangs and long hair effect; Female to male can achieve the effect of adding a beard and changing short hair."
+      }
+    },
+    "/face/detect-live": {
+      "post": {
+        "summary": "Detect Live",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "score": 6,
+                    "face_model_version": "3.0"
+                  },
+                  "properties": {
+                    "score": {
+                      "type": "string",
+                      "description": "Face Detect Live Response 200 Score"
+                    },
+                    "face_model_version": {
+                      "type": "string",
+                      "description": "Face Detect Live Response 200 Face Model Version"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Face Detect Live Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Face Detect Live Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Face Detect Live Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Detect Live Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Face Detect Live Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Face Detect Live Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Detect Live Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Detect Live Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Face Detect Live Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Face Detect Live Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Detect Live Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Detect Live Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Face Detect Live Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Face Detect Live Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Detect Live Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Detect Live Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Face Detect Live Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Face Detect Live Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Detect Live Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Detect Live Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Face Detect Live Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url"
+                ],
+                "properties": {
+                  "image_url": {
+                    "type": "string",
+                    "description": "Face Detect Live Image Url"
+                  },
+                  "face_model_version": {
+                    "type": "number",
+                    "description": "Face Detect Live Face Model Version"
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/4hfydw.jpg"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Face static living detection (high-precision version) can be used to perform anti-reproduction living detection on static pictures uploaded by users to determine whether it is a reproduction picture."
+      }
+    },
+    "/face/swap": {
+      "post": {
+        "summary": "Face swap based on the provided image.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Face Swap Response 200 Success"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "Face Swap Response 200 Task Id"
+                    },
+                    "image_url": {
+                      "type": "string",
+                      "description": "Face Swap Response 200 Image Url"
+                    },
+                    "image_width": {
+                      "type": "string",
+                      "description": "Face Swap Response 200 Image Width"
+                    },
+                    "image_height": {
+                      "type": "string",
+                      "description": "Face Swap Response 200 Image Height"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Face Swap Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Face Swap Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Face Swap Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Swap Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Face Swap Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Face Swap Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Swap Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Swap Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Face Swap Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Face Swap Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Swap Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Swap Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "forbidden",
+                          "message": "Sorry! Our Al moderators feel your prompt might be against our community standards."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "forbidden",
+                              "description": "Face Swap Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Sorry! Our Al moderators feel your prompt might be against our community standards.",
+                              "description": "Face Swap Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Swap Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Swap Response 403"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Face Swap Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Face Swap Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Swap Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Swap Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Face Swap Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Face Swap Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Swap Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Swap Response 500"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "timeout",
+                          "message": "Timeout to generate the image."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "timeout",
+                              "description": "Face Swap Response 504 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Timeout to generate the image.",
+                              "description": "Face Swap Response 504 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Swap Response 504 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Swap Response 504"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Face Swap Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "timeout": {
+                    "type": "number",
+                    "description": "Face Swap Timeout"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "description": "Face Swap Callback Url"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "description": "Face Swap Async"
+                  },
+                  "source_image_url": {
+                    "type": "string",
+                    "example": "https://i.ibb.co/m9BFL9J/ad61a39afd9079e57a5908c0bd9dd995.jpg",
+                    "description": "Face Swap Source Image Url"
+                  },
+                  "target_image_url": {
+                    "type": "string",
+                    "example": "https://i.ibb.co/LnLYwhR/66f41e64b1922.jpg",
+                    "description": "Face Swap Target Image Url"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/face/cartoon": {
+      "post": {
+        "summary": "Cartoon",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "image_url": "https://faceeffect-1254418846.cos.ap-guangzhou.myqcloud.com/ft/FaceCartoonPic/1256437459/b41fc806-d45c-4974-8efb-fd7b7b1dfd8e"
+                  },
+                  "properties": {
+                    "image_url": {
+                      "type": "string",
+                      "description": "Face Cartoon Response 200 Image Url"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Face Cartoon Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Face Cartoon Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Face Cartoon Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Cartoon Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Face Cartoon Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Face Cartoon Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Cartoon Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Cartoon Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Face Cartoon Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Face Cartoon Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Cartoon Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Cartoon Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Face Cartoon Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Face Cartoon Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Cartoon Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Cartoon Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Face Cartoon Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Face Cartoon Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Face Cartoon Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Face Cartoon Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Face Cartoon Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url"
+                ],
+                "properties": {
+                  "image_url": {
+                    "type": "string",
+                    "description": "Face Cartoon Image Url"
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/4hfydw.jpg"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Input a face photo to generate a personalized two-dimensional animation image, which can be used to create personalized avatars, fun activities, special effects applications and other scenes to enhance the experience of social entertainment."
+      }
+    }
+  }
+}

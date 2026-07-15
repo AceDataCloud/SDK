@@ -1,0 +1,2937 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Midjourney generation",
+    "version": "1.0.0",
+    "description": "API reference for Midjourney generation on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/midjourney/imagine": {
+      "post": {
+        "summary": "Midjourney Imagine",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "actions": [
+                      "upscale1",
+                      "upscale2",
+                      "upscale3",
+                      "upscale4",
+                      "reroll",
+                      "variation1",
+                      "variation2",
+                      "variation3",
+                      "variation4"
+                    ],
+                    "success": true,
+                    "task_id": "27a1128f-14b5-440e-a82d-510c81e6fcd4",
+                    "image_id": "1211290228438868029",
+                    "progress": 100,
+                    "image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                    "image_width": 1024,
+                    "image_height": 1024,
+                    "raw_image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                    "raw_image_width": 2048,
+                    "raw_image_height": 2048
+                  },
+                  "properties": {
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Midjourney Imagine Response 200 Actions"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "description": "Midjourney Imagine Response 200 Success"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Task Id"
+                    },
+                    "image_id": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Image Id"
+                    },
+                    "progress": {
+                      "type": "number",
+                      "description": "Midjourney Imagine Response 200 Progress"
+                    },
+                    "image_url": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Image Url"
+                    },
+                    "image_width": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Image Width"
+                    },
+                    "image_height": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Image Height"
+                    },
+                    "raw_image_url": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Raw Image Url"
+                    },
+                    "raw_image_width": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Raw Image Width"
+                    },
+                    "raw_image_height": {
+                      "type": "string",
+                      "description": "Midjourney Imagine Response 200 Raw Image Height"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Imagine Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "The json payload is not valid to request the API"
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Midjourney Imagine Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "prompt is required",
+                              "description": "Midjourney Imagine Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Imagine Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Imagine Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 400 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Imagine Response 400 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Imagine Response 400 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 400 Trace Id 3"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Imagine Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Imagine Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Imagine Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Imagine Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "forbidden",
+                          "message": "Sorry! Our Al moderators feel your prompt might be against our community standards."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "forbidden",
+                              "description": "Midjourney Imagine Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Sorry! Our Al moderators feel your prompt might be against our community standards.",
+                              "description": "Midjourney Imagine Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Imagine Response 403"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Imagine Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Imagine Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Imagine Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Imagine Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Imagine Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Imagine Response 500"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "timeout",
+                          "message": "Timeout to generate the image."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "timeout",
+                              "description": "Midjourney Imagine Response 504 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Timeout to generate the image.",
+                              "description": "Midjourney Imagine Response 504 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Imagine Response 504 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Imagine Response 504"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Imagine Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mask": {
+                    "type": "string",
+                    "description": "Midjourney Imagine Mask"
+                  },
+                  "mode": {
+                    "enum": [
+                      "fast",
+                      "relax",
+                      "turbo"
+                    ],
+                    "type": "string",
+                    "default": "fast",
+                    "description": "Midjourney Imagine Mode"
+                  },
+                  "action": {
+                    "type": "string",
+                    "default": "generate",
+                    "description": "Midjourney Imagine Action"
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "example": "A cat sitting on a table",
+                    "description": "Midjourney Imagine Prompt"
+                  },
+                  "timeout": {
+                    "type": "number",
+                    "default": 480,
+                    "description": "Midjourney Imagine Timeout"
+                  },
+                  "image_id": {
+                    "type": "string",
+                    "description": "Midjourney Imagine Image Id"
+                  },
+                  "translation": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Midjourney Imagine Translation"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "description": "Midjourney Imagine Callback Url"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "description": "Midjourney Imagine Async"
+                  },
+                  "split_images": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Midjourney Imagine Split Images"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Midjourney Imagine Version"
+                  },
+                  "hd": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Midjourney Imagine Hd"
+                  },
+                  "quality": {
+                    "type": "string",
+                    "default": "1",
+                    "description": "Midjourney Imagine Quality"
+                  },
+                  "style_reference": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Midjourney Imagine Style Reference"
+                  },
+                  "moodboard": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Midjourney Imagine Moodboard"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/midjourney/seed": {
+      "post": {
+        "summary": "Midjourney Seed",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "seed": {
+                      "type": "string",
+                      "description": "Midjourney Seed Response 200 Seed"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Seed Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Seed Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Seed Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Seed Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Seed Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Seed Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Seed Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Seed Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Seed Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Seed Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Seed Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Seed Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Seed Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Seed Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Seed Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Seed Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Seed Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Seed Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Seed Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Seed Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Seed Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_id"
+                ],
+                "properties": {
+                  "image_id": {
+                    "type": "string",
+                    "description": "Midjourney Seed Image Id"
+                  }
+                }
+              },
+              "example": {
+                "image_id": "1515630083539206144"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/midjourney/edits": {
+      "post": {
+        "summary": "Midjourney Edits",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "actions": [
+                      "upscale1",
+                      "upscale2",
+                      "upscale3",
+                      "upscale4",
+                      "reroll",
+                      "variation1",
+                      "variation2",
+                      "variation3",
+                      "variation4"
+                    ],
+                    "success": true,
+                    "task_id": "27a1128f-14b5-440e-a82d-510c81e6fcd4",
+                    "image_id": "1211290228438868029",
+                    "progress": 100,
+                    "image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                    "image_width": 1024,
+                    "image_height": 1024,
+                    "raw_image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                    "raw_image_width": 2048,
+                    "raw_image_height": 2048
+                  },
+                  "properties": {
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Midjourney Edits Response 200 Actions"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "description": "Midjourney Edits Response 200 Success"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Task Id"
+                    },
+                    "image_id": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Image Id"
+                    },
+                    "progress": {
+                      "type": "number",
+                      "description": "Midjourney Edits Response 200 Progress"
+                    },
+                    "image_url": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Image Url"
+                    },
+                    "image_width": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Image Width"
+                    },
+                    "image_height": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Image Height"
+                    },
+                    "raw_image_url": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Raw Image Url"
+                    },
+                    "raw_image_width": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Raw Image Width"
+                    },
+                    "raw_image_height": {
+                      "type": "string",
+                      "description": "Midjourney Edits Response 200 Raw Image Height"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Edits Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "The json payload is not valid to request the API"
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Midjourney Edits Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "prompt is required",
+                              "description": "Midjourney Edits Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Edits Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Edits Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 400 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Edits Response 400 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Edits Response 400 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 400 Trace Id 3"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Edits Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Edits Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Edits Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Edits Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "forbidden",
+                          "message": "Sorry! Our Al moderators feel your prompt might be against our community standards."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "forbidden",
+                              "description": "Midjourney Edits Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Sorry! Our Al moderators feel your prompt might be against our community standards.",
+                              "description": "Midjourney Edits Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Edits Response 403"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Edits Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Edits Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Edits Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Edits Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Edits Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Edits Response 500"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "timeout",
+                          "message": "Timeout to generate the image."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "timeout",
+                              "description": "Midjourney Edits Response 504 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Timeout to generate the image.",
+                              "description": "Midjourney Edits Response 504 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Edits Response 504 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Edits Response 504"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Edits Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mask": {
+                    "type": "string",
+                    "description": "Midjourney Edits Mask"
+                  },
+                  "mode": {
+                    "enum": [
+                      "fast",
+                      "relax",
+                      "turbo"
+                    ],
+                    "type": "string",
+                    "description": "Midjourney Edits Mode"
+                  },
+                  "action": {
+                    "type": "string",
+                    "default": "generate",
+                    "description": "Midjourney Edits Action"
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "example": "A cat sitting on a table",
+                    "description": "Midjourney Edits Prompt"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "description": "Midjourney Edits Image Url"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "description": "Midjourney Edits Callback Url"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "description": "Midjourney Edits Async"
+                  },
+                  "split_images": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Midjourney Edits Split Images"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/midjourney/videos": {
+      "post": {
+        "summary": "Midjourney Videos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "actions": [
+                      "upscale1",
+                      "upscale2",
+                      "upscale3",
+                      "upscale4",
+                      "reroll",
+                      "variation1",
+                      "variation2",
+                      "variation3",
+                      "variation4"
+                    ],
+                    "success": true,
+                    "task_id": "27a1128f-14b5-440e-a82d-510c81e6fcd4",
+                    "image_id": "1211290228438868029",
+                    "progress": 100,
+                    "image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                    "image_width": 1024,
+                    "image_height": 1024,
+                    "raw_image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                    "raw_image_width": 2048,
+                    "raw_image_height": 2048
+                  },
+                  "properties": {
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Midjourney Videos Response 200 Actions"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "description": "Midjourney Videos Response 200 Success"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Task Id"
+                    },
+                    "image_id": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Image Id"
+                    },
+                    "progress": {
+                      "type": "number",
+                      "description": "Midjourney Videos Response 200 Progress"
+                    },
+                    "image_url": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Image Url"
+                    },
+                    "image_width": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Image Width"
+                    },
+                    "image_height": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Image Height"
+                    },
+                    "raw_image_url": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Raw Image Url"
+                    },
+                    "raw_image_width": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Raw Image Width"
+                    },
+                    "raw_image_height": {
+                      "type": "string",
+                      "description": "Midjourney Videos Response 200 Raw Image Height"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Videos Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "The json payload is not valid to request the API"
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Midjourney Videos Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "prompt is required",
+                              "description": "Midjourney Videos Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Videos Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Videos Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 400 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Videos Response 400 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Videos Response 400 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 400 Trace Id 3"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Videos Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Videos Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Videos Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Videos Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "forbidden",
+                          "message": "Sorry! Our Al moderators feel your prompt might be against our community standards."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "forbidden",
+                              "description": "Midjourney Videos Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Sorry! Our Al moderators feel your prompt might be against our community standards.",
+                              "description": "Midjourney Videos Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Videos Response 403"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Videos Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Videos Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Videos Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Videos Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Videos Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Videos Response 500"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "timeout",
+                          "message": "Timeout to generate the image."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "timeout",
+                              "description": "Midjourney Videos Response 504 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Timeout to generate the image.",
+                              "description": "Midjourney Videos Response 504 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Videos Response 504 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Videos Response 504"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Videos Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "generate",
+                      "extend"
+                    ],
+                    "type": "string",
+                    "description": "Midjourney Videos Action"
+                  },
+                  "mode": {
+                    "enum": [
+                      "fast",
+                      "turbo"
+                    ],
+                    "type": "string",
+                    "description": "Midjourney Videos Mode"
+                  },
+                  "resolution": {
+                    "enum": [
+                      "480p",
+                      "720p"
+                    ],
+                    "type": "string",
+                    "description": "Midjourney Videos Resolution"
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "example": "A cat sitting on a table",
+                    "description": "Midjourney Videos Prompt"
+                  },
+                  "video_id": {
+                    "type": "string",
+                    "description": "Midjourney Videos Video Id"
+                  },
+                  "video_index": {
+                    "type": "number",
+                    "description": "Midjourney Videos Video Index"
+                  },
+                  "loop": {
+                    "type": "boolean",
+                    "description": "Midjourney Videos Loop"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "description": "Midjourney Videos Image Url"
+                  },
+                  "end_image_url": {
+                    "type": "string",
+                    "description": "Midjourney Videos End Image Url"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "description": "Midjourney Videos Callback Url"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "description": "Midjourney Videos Async"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/midjourney/describe": {
+      "post": {
+        "summary": "Midjourney Describe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "descriptions": [
+                      "a gold sailboat on the ocean with lots of coins on it, in the style of stark visuals, animated gifs, flowing silhouettes, provia, personal iconography, ramses younan, firecore --ar 75:3",
+                      "the sailboat sails through a cluster of gold coins, in the style of chillwave, flowing silhouettes, tenebrism mastery, narrative-driven visual storytelling, sketchfab, havencore, creative commons attribution --ar 75:3",
+                      "an image of a boat sailing through gold coins, in the style of sketchfab, flowing silhouettes, 32k uhd, martiros saryan, reefwave, personal iconography, animated gifs --ar 75:3",
+                      "a boat floating in waters of gold coin bubbles, in the style of stark visuals, hand-drawn animation, scoutcore, hurufiyya, sketchfab, luminous shadows, money themed --ar 75:3"
+                    ]
+                  },
+                  "properties": {
+                    "descriptions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Midjourney Describe Response 200 Descriptions"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Describe Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Describe Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Describe Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Describe Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Describe Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Describe Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Describe Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Describe Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Describe Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Describe Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Describe Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Describe Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Describe Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Describe Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Describe Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Describe Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Describe Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Describe Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Describe Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Describe Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Describe Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url"
+                ],
+                "properties": {
+                  "image_url": {
+                    "type": "string",
+                    "description": "Midjourney Describe Image Url"
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/0iad3k.png"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/midjourney/shorten": {
+      "post": {
+        "summary": "Midjourney Shorten",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "prompts": [
+                      "a serene mountain lake at sunrise, mist rising from the water, golden hour lighting --ar 16:9",
+                      "mountain lake sunrise with mist, golden light --ar 16:9 --v 6",
+                      "tranquil alpine lake, dawn mist, warm golden tones, cinematic --ar 16:9",
+                      "sunrise over a misty mountain lake, rich golden hour photography --ar 16:9 --style raw",
+                      "misty lake at dawn, mountains in background, golden sunrise --ar 16:9"
+                    ]
+                  },
+                  "properties": {
+                    "prompts": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Midjourney Shorten Response 200 Prompts"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Shorten Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Shorten Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Shorten Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Shorten Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Shorten Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Shorten Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Shorten Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Shorten Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Shorten Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Shorten Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Shorten Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Shorten Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Shorten Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Shorten Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Shorten Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Shorten Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Shorten Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Shorten Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Shorten Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Shorten Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Shorten Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "Midjourney Shorten Prompt"
+                  }
+                }
+              },
+              "example": {
+                "prompt": "A cute cat playing piano"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/midjourney/translate": {
+      "post": {
+        "summary": "Midjourney Translate",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "content": "Exquisite, flawless, pure white angel."
+                  },
+                  "properties": {
+                    "content": {
+                      "type": "string",
+                      "description": "Midjourney Translate Response 200"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Translate Response 200 2"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Translate Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Translate Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Translate Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Translate Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Translate Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Translate Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Translate Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Translate Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Translate Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Translate Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Translate Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Translate Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Translate Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Translate Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Translate Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Translate Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Translate Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Translate Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Translate Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Translate Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "default": "generate",
+                    "example": "精致，无暇，洁白的天使",
+                    "description": "Midjourney Translate 2"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/midjourney/tasks": {
+      "post": {
+        "summary": "Operate the tasks on the generated image.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "id": "42b2ab0f-5676-453b-bd23-9ee001b888ae",
+                    "_id": "65ede215550a4144a5fcebac",
+                    "mode": "turbo",
+                    "email": "melbamohammadz@hotmail.com",
+                    "request": {
+                      "mode": "turbo",
+                      "action": null,
+                      "prompt": "A cat sitting on a table",
+                      "stream": false,
+                      "timeout": null,
+                      "version": "1.0",
+                      "image_id": null,
+                      "trace_id": "b0a683a4-aecc-450d-849e-c9f0730826a2",
+                      "check_image": null,
+                      "retry_times": null,
+                      "translation": null,
+                      "callback_url": null,
+                      "check_prompt": null,
+                      "image_origin": null,
+                      "application_id": "e2ee38ba-19ea-4da9-9f3f-4f8567d19feb"
+                    },
+                    "duration": 15.029000043869019,
+                    "response": {
+                      "actions": [
+                        "upscale1",
+                        "upscale2",
+                        "upscale3",
+                        "upscale4",
+                        "reroll",
+                        "variation1",
+                        "variation2",
+                        "variation3",
+                        "variation4"
+                      ],
+                      "success": true,
+                      "task_id": "42b2ab0f-5676-453b-bd23-9ee001b888ae",
+                      "image_id": "1216425082772131840",
+                      "progress": 100,
+                      "image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                      "image_width": 1024,
+                      "image_height": 1024,
+                      "raw_image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png",
+                      "raw_image_width": 2048,
+                      "raw_image_height": 2048
+                    },
+                    "created_at": 1710088725.063,
+                    "started_at": 1710088725.069,
+                    "finished_at": 1710088740.098,
+                    "application_id": "e2ee38ba-19ea-4da9-9f3f-4f8567d19feb"
+                  },
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Midjourney Tasks Response 200 Id"
+                    },
+                    "request": {
+                      "type": "object",
+                      "description": "Midjourney Tasks Response 200 Request"
+                    },
+                    "response": {
+                      "type": "object",
+                      "description": "Midjourney Tasks Response 200 Response"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Midjourney Tasks Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Midjourney Tasks Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Midjourney Tasks Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Tasks Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Midjourney Tasks Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Midjourney Tasks Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Tasks Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Tasks Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Midjourney Tasks Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Midjourney Tasks Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Tasks Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Tasks Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Midjourney Tasks Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Midjourney Tasks Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Tasks Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Tasks Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Midjourney Tasks Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Midjourney Tasks Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Midjourney Tasks Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Midjourney Tasks Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Midjourney Tasks Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "retrieve",
+                      "retrieve_batch"
+                    ],
+                    "type": "string",
+                    "default": "retrieve",
+                    "description": "Midjourney Tasks Action"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Midjourney Tasks Id"
+                  },
+                  "trace_id": {
+                    "type": "string",
+                    "description": "Midjourney Tasks Trace Id"
+                  },
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Midjourney Tasks Ids"
+                  },
+                  "trace_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Midjourney Tasks Trace Ids"
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Midjourney Tasks Offset"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 12,
+                    "description": "Midjourney Tasks Limit"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    }
+  }
+}

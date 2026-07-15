@@ -1,0 +1,1617 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Recaptcha verification code recognition service",
+    "version": "1.0.0",
+    "description": "API reference for Recaptcha verification code recognition service on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/captcha/recognition/recaptcha2": {
+      "post": {
+        "summary": "Recognition Recaptcha2",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "solution": {
+                      "size": 300,
+                      "type": "multi",
+                      "label": "/m/0k4j",
+                      "objects": [
+                        1,
+                        2,
+                        7
+                      ],
+                      "confidences": [
+                        0.998,
+                        0.9997,
+                        0.9988,
+                        0,
+                        0.1885,
+                        0.0002,
+                        0.9898,
+                        0.9993,
+                        0.0535
+                      ]
+                    }
+                  },
+                  "properties": {
+                    "solution": {
+                      "type": "object",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "size": {
+                            "type": "number",
+                            "description": "Captcha Recognition Recaptcha2 Response 200 Solution Size"
+                          },
+                          "type": {
+                            "type": "string",
+                            "description": "Captcha Recognition Recaptcha2 Response 200 Solution Type"
+                          },
+                          "label": {
+                            "type": "string",
+                            "description": "Captcha Recognition Recaptcha2 Response 200 Solution Label"
+                          },
+                          "object": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "description": "Captcha Recognition Recaptcha2 Response 200 Solution Object"
+                          },
+                          "confidence": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "description": "Captcha Recognition Recaptcha2 Response 200 Solution Confidence"
+                          }
+                        }
+                      },
+                      "description": "Captcha Recognition Recaptcha2 Response 200 Solution"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Captcha Recognition Recaptcha2 Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 400 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "disabled",
+                          "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "disabled",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 400 Trace Id 3"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "model is invalid."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Code 4"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "model is invalid.",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Message 4"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 400 Trace Id 4"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_token",
+                          "message": "No token specified for the request."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_token",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Code 5"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "No token specified for the request.",
+                              "description": "Captcha Recognition Recaptcha2 Response 400 Error Message 5"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 400 Trace Id 5"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Recognition Recaptcha2 Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Captcha Recognition Recaptcha2 Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Captcha Recognition Recaptcha2 Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 401 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_expired",
+                          "message": "token expired."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_expired",
+                              "description": "Captcha Recognition Recaptcha2 Response 401 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token expired.",
+                              "description": "Captcha Recognition Recaptcha2 Response 401 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 401 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "token and api does not match."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Captcha Recognition Recaptcha2 Response 401 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token and api does not match.",
+                              "description": "Captcha Recognition Recaptcha2 Response 401 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 401 Trace Id 3"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Recognition Recaptcha2 Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "used_up",
+                          "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "used_up",
+                              "description": "Captcha Recognition Recaptcha2 Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
+                              "description": "Captcha Recognition Recaptcha2 Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Recognition Recaptcha2 Response 403"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_api",
+                          "message": "API does not exist, please make sure url is correct."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_api",
+                              "description": "Captcha Recognition Recaptcha2 Response 404 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "API does not exist, please make sure url is correct.",
+                              "description": "Captcha Recognition Recaptcha2 Response 404 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 404 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Recognition Recaptcha2 Response 404"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Captcha Recognition Recaptcha2 Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Captcha Recognition Recaptcha2 Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Recognition Recaptcha2 Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Captcha Recognition Recaptcha2 Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Captcha Recognition Recaptcha2 Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Recognition Recaptcha2 Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Recognition Recaptcha2 Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Captcha Recognition Recaptcha2 Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image",
+                  "question"
+                ],
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "example": "/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8KCwkMEQ8SEhEP↵ERATFhwXExQaFRARGCEYGhwdHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4e↵Hh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEsASwDASIA↵AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA↵AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3↵ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm↵p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA↵AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx↵BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK↵U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3↵uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDoPHnx↵Djs9YvLjTBb3ahysE0UqgHnOSu0kjLAcEZwa83n1i7F9NcyQ4NxlyuOAzd8DGBnt0rMntraSf7NC↵4t4w2d0smceuSBz0qxafYYJ/+JtdCRZDnCNy2eAeP614U5p62PQimN8VXd8ttD525S46Nxn04/Gu↵VnuHCAyY+bnBzXX65rC6hDPZ2cYjtbVAZXZT5pXIGAa427eIwMht2jkGSucjr6++K2w0pctmjKsl↵fRlWOZFGX2EN+FMjZi5VAioW6gc/nTVjMjF2AXJ+6OgqeKAD5jzg12pI5rll5JiNj7cdF+UcU63v↵b61tZYLe4MUUrAyKgAzg5H6809UYoNgXnoDySakltJoXCyxFCVzgnqD3z6VGmw9TIudUuFYKD8o4↵YDA3D04qO4mlaKQl1RWw20Dgc8Aewp1zARIRtAyaimdTFIjlAF4GOa0aXQNSkbvZIGWeR1z0JIAP↵r+lWbeaeaQQJHLKZCSFUEk++Kyp9ofEbfkMV1XgrRp5NStL+N42CP84k3Lt4PTHU8f41liJxpQcm↵XTi5Ox0njvwPrvjbx0LXQrCS9i03TrGKUqyqqE2sXUsQBkq35Vk/FnRZ/Cvh7SPCktvDFeQxebeL↵CVbEsjscFl6nYkQ/PHWvoj4W2E1r478bOyKkTSWkUYXjIjSRScdBzXoItbdboXQtofPBz5uwb84x↵169OK7cFUToRaOXE0m6zdzyb9l7StPsvhRDd2V7cXMl/cPLcrJwsUinbtUfQAk98+2K9KePmrVtZ↵21napa2VtDbW6Z2xQoEVcnJwBx1JNDRV0uV2Z8pRaKomi9q0DH7VG0dHMHKZ7Re1RNHWi8ftULpV↵KRNjPeMelQvHWg8dRNHVJktGZJFVeWH2rUeP2qB4qtMhox57WKVGjliWRGGGVhkEehFeN+LNSkvF↵t5NOvI3Is2kh3yAKhJB5B4DfL09QPSvdJIvavAtK8Lf2lqLWd+11YK1oJ0KbQ/3sDIOdoPXkc/jX↵FjpNcvz/AEOzBW5Zq172/Ut+AviZqWj6Sui3kXnwi5a5jccSRMyMuQc8rznGO3Wuy8d/G++bS5bL↵w7od1YwMBGmozZ3EDg7QBhTnIzk/gejPBfwr0q71VL97m7nt4GB3yFQHYH7owoz75r0zTbLStP1S↵6uILUpcKvllo5GUNHx1UHBII64zjjNY0pSa1KnC2mx4z4c+Nvj6E7pbSLVIvJ2Istvwp4w+VwT+J↵PX8aoReMfFOrXtzcatquqQ7vn2h5FjBJ4CLnAXnsOgr2fUvC+m6vhr3VdQuBueSLzBC6puzxjy+Q↵M8bielZeseCNJ+Sew0mG7/fRiWNMIPL3ncSBtIIDZGP7q++W3JbBGC7nIH42+KNKtbexTRNOlS3j↵EXmyCR3kC4AbhhyQP1pmu/G3WbzT5fsnmaRPLGqxRrFHKgPRzuPz5Pb09+taVn4X0dpb+CLRrpF/↵tILK0srfNEFUllJBOcjGQSOvfNUfC/gzwvd6WNRttS1CJr0MzeYizqPvD5dxDCs1OVy3TaRC3xC1↵82cSW/i65nwh84MI1bC4IIYLkc5BJOcCsKLxF4ottTm1u21mWK6lBLyxyA7hx279B9cCtdfhvbXU↵99YadrECxxbSJry3ZFkLZ3BSAeQRz9awfEHwh1jT7CTUX1PQ5LWHAZY5XYjcwUEDaMkZ6VsqkbXI↵dOV7EWofELxJGs9nc+Jp7iO8dfNUzLIpOcj12jPYY7egqCDWNYhT7Nb6gU8uUyhY5lDK5wCQQcjo↵Bx6Cqw+CnjK0vUnEVpfMp3Oh3CMHp1ZcNwah1b4VeINNvGuIGd4VTLmQhEBPGN2cf1pOdtehPJJ6↵W1Og1fxX4p1i6sZ9XuJLxrOYTIchScEHHHAGfQD9Bi7B4j1LYWSXWbcsdzrbuwQn1+uMDJyTjNcV↵D8PvFtnbXCyaSkk7A+Xm4UgHAx1PSqdl4N8aRxFbjSryF93SJwwI9ch6qckvhFGL3kaN3eJIZFaI↵xyOSSAcbee1Zst2E+6NzRknk/lVJriUuWLAcfWomcrKZMEk8jnHPrXn04JKx0yqNsnlvri5uVkyd↵6jJ5pRLKzMGYOAcnJJIqlGzG8LhsFutXRtPOMEjtWui2J3LECZT5VBq0seFXkHNVLHcHxztP97ir↵iJ8xRRlsik5FKJqaXc3enalFdWbfvUHyZAPUYPX2zVfVHLXbzMrozkkhue/vVxWt7C3mlaVDPgAK↵WyV5/Ss3xHqAkFmqyxS7YFLbc5UnsSRye/GRzWEG5z0WhcoqMddypeeWYwAm4A8Vl36IY84wvp0q↵a8k8yNGjyCBzz0NUZHJJVjng/wAq6oox1ZRkiDzxiNsBmxnrXqfgS7hje102OzVwriHe0gDsxY84↵HXqOvpXnNlNb7SU3GQcHHy/kQa6rwFeJb+INNIBeFJ1lYN83RsnJ5PQVwY+HtEk+h0UJcrPbtJ8f↵6P4X8T6/cX8N9NFqNxI6KiriJ0ZyBzjht+M5ONtes+G71da8OWGrxptF1AshXBG1ujDn0II/Cvjl↵r+7v186VpJNpZm3c7QSOfXHT866zwT4717QGt4bPU7j+zEuVnktAwKsAcsoz0DZIIHB69a6cvk6d↵CMZef5mdePPNtH1I0ftTDHUela/oWsJbGw1SzkmuIw62wuEaVPlDFWVScMAeR2q88eK9G5z2KTR0↵xo/arhWmFBTuKxRaKoni9q0THUbx+1UmS0ZjRe1Z0cWqi5nE0dk9vn9yyOyvj0III/HI+lbzRGoz↵EfSqTIaMN5Y0fZOkkBJwDIPlP/AhkfgTmmai0VnatcTvHGgIAZ3CrknAyT0Famr3FlpunS3moyLH↵boPm3DO70UDuT6V4T8Wbt9Ut5obiNlsoHaOOGOdESJfVmfC7jgH1xj1yVOuoadSqdBz12R6dZTaA↵J5za61p88077pAt4jktgDgZ46dKwdI0zwxd6hJfaOlxqEqRhJCWZABkkZBC5yfrXgmhWemQ6tEYg↵VbJX5r6Fx8ykdAMnr2r6m0PT7LR7KPTtOQBV++/G527sT3zXNUm6rSa0RvGHsm7O5JYSPDboIYCi↵ov3MsNv0A4rIa5li1lySPmijJ75+ZwfxzXT3JeCxkf7zEYVRjJrktVeRtSzK2XWyjLY9TKfUZ6dq↵ewmW1vWhuSjHCMcjjoaumYlw+7a2OHU1zmqynIbceOlWtIuxNF5Ltzjg0wNqaZJVKX0AmBGPMQYb↵FY1xpdvovhxx4ft1uYrSJngst2XYDLMFJOSepx1q19oKkROAQOM1yvxDv7nTLvRJbacRxyzSBiDh↵i4UFOfz/ADpJXYXsiPQ9S+G9zYyazqyarBPcykFbS/niyy8ktiReu8YzngdalutS+Ed3aS2inxGE↵kwWE1286MQQRlZJGB6Dpj2IpvhfQfBHi0NHrWqTLfJKEa1F7sP3cjDOD8xBzgnnA6c56KH4XfCQS↵FBrrrID8ySanGrDB6FWHtWqjC2qMnKd7plHTtXtbxDLp16zIDgb/AJWx2z1HSsDXtWufEdtf6DBM↵8E1tMr75kZkbYw7g+vpXfHwd8O9IcxQ+JPKuXwIo2v0IznIGxAMr14PHWvOdH8N67pXjvVr2WK2k↵0y6DNBdWkgP3m3DIHJGO/fg1z1Y6q2x1YeaUW5fEtvU6aXV1mkDXNpFnH3o3KH81wa4L4ja1rMOv↵RrpFveR25t1JENt5ylstk7th56cZrsriOXncsc4+m0/mKps8akjdcR/7O3NOUFJWKo1fZy5rXPKf↵iJpmnadrqW9vbRwwtGPlTPXc2T/KuQSPErKXLEEjkcD6V12oW88+qTz3Lzyt5gVd7ZwofPX6ZqZ0↵tv7k9eZGqore4Ts2clHCFiMvG/0A5HXr+VTWkqFZA0bM3G0g4xXRyQ2MmR5dyqnt3P1waLWxsYST↵FFccnoeg/WtVVXUl2MyGB8AeXIx77RmrCNcLnyrCVB7gkmtuKQAhV84k9BgVYWVYm3ENI3bJ4FOC↵lPsNSS2M4aJDFZq1wYZWusMJGcIY2xllOT2yKybvQ7qN2KwmVQTtIbKsPrW3Ncay1kbKJLdoPPM6↵+ZErMHIwfmxnGMcZxxVjTr/UYrXyLkKdg2oEQKAvpx+NbQpyXUuXJy36nHrYz28Vx5wUBkCg+h3A↵/wAgaypoxHKDkn1rrtUt9QuZiXjknXAK49PpWdN4f1K4TK2NxgdMLS9o09TJxfRHLWJb544FQlj9↵5h0rofDJurjVljtEYm3t5Zcj5TlY2LHJx060y28OXlvfRm8t7hIN37zMRBKjrzinywx2VxfyWpka↵I2j7ZGQgsGIHcD19KxrPmuVCLVi3biaHTnUFpDINilZAQRkZ5HX6VordWE5uHu2ltrmYtLFyByzc↵IRnnkjp09ay9GVW0xXN6iMjqoQRgKAc5J55+6e4/wuwqbmGORoN8fDF+MA5Hr9R0zWmHco0opq61↵BqLk7Oz0L/hbV9U0i6g13TZXt5oXPlToittJBBDDkcgkYPrX0Z8KviPp/iWKw0K8af8AtvyWEkjA↵bJigzkHjLFRnGOxr5i0O8mi0eCGKSN8N5iB+enQHB5HSrtlfpDNcaiS1rei6V0S3BVEBUklT2wSu↵Oa3g+XRMJLm1aPtB4yD0qMpXEfAjxfdeK/Dl4uozxzvp3lhbjPzujBiN49QF69+/PJ7iK906UBhe↵RKpfYhc7BIePu5+8OeoyK6FqYPQYUxSFAaxfCw8VmXXf7VgglQavMLHzZDHtttqbAuI/mGd3zd81↵rF9TXrp0Lf7lzn+ainYjRjjFVTVrqz0nT5b+/lEUEfU4yWPZQO5PYVNPqFzZ2011daHemGGNpJDF↵LCcKBk/ecdhXzrrvj/XNatLZdXijl1WNCqW8IXyI2zjdhWO44xx/IZDTOpyK5pSp88rGv8QfFi3V↵yL7UXaOFI3ksbNDhztUkkZyN2QQZCCo/hDHOOI8dvqF5c6lY2cAkgstSaGCBVASKN7cqx+pLE5PJ↵NNvrGO5u4r/VXuGn+zqkqFDtIKDOSBwOW6Y6jBFbfj3xPpMEDCEzXjLdLm38r7NGrHJBJ+85yASS↵B6CuKM253W56FSmlSs9EeZaHY63DrNu1xaTNE08JkcpnhSAfyFfYEUcbnJgP145r5E0dZLe8tnSw↵gRbcRzg/aGJCzYX05OB0r68mmVIW8tmBA4znj3rsvJ/EjzrQjpB3KGoTJ9tWKNGCIRkBh2PXr0yP↵0rkL25F1qep3IbKJNFbofpnP6qa6Saf7LYXmpNwkUZYe4A4HTvx+JrirFmTQrZnJL3Nw8ze+AB/M↵mpWrKeiLN/JlBk1WtLkRTg+hpt7JmMc1RZ8bTTJOxd1mhWRDzXmv7QNhrWreErWXTzvWwuDNMqLh↵9uBhhjsOc455z2rtdGut8exjU9wRuIIGDwcigD5u8IeL3024uLq61E2lzeY3zGMyAtHgAMBzgqcc↵Vf8AFvii11C8zFbeH9UsyN6GSHMiOfvjBkQ8nngd66Dx18GLnUDNqvhSaOaXcXnsnKxFQT1Tou32↵4xXn8/wv8dQ53aBM3+5LG38mrTmtsRy33Ldr4le1vY7q1ttF06VTg3ItwZI1PUrmR2PU8Ad6+ifC↵8l7d+GrPU7mS7Fxchpg0wKyFSxK5Gcj5cfhivmq1+GfjOd9p0doRnlpZUUD8zXvXw/bWtL8OQabr↵l5FcywfLEUYsQmOFJOMkfyxUylzIpKzOka9kBIuIo5x6uuGH/AhzTfN0pvmZLqM91Uqw/Oo5HSQc↵YFU5VXcNoYcc855qORdC+dlpvBemSRiYvKSw3E/ZZSOffdTV8D6eyZVWYk/8+ko/9mqnJ4xt1VFW↵XUyiqBjzUH9KSHxZY3M6RGPVpnJwFS5JJ/AV+er6y3pc9W9IuP4HtVfH2dycdPs7D/0JxiqP/CMQ↵SI/kQXFq0cmC8lrvVx3xgnJqf7TpEd4bl59QVxwsMMp2D3Yk8n2HHuelSya3YnG6bVHwMAedgAe2↵OlezhMBXdpVW/Qlun5FP/hFoBu8uO6VWOSRbct+bdPakTwvEz4WO9P8A2wQf+zVLJrFi3T+0D9bk↵1JBqmnL8xW/z6i4Ne0vaRVkRak2ObwxbooX7PqB9f3cf/wAVTj4RhKkrDqAz6xRn/wBmqvJqOm7w↵QNQH/bxTjqOlMBl9VH0uaX7xB+7LVt4dhgtJpGbUka3UyALaodyj7w+/+P51J/Yl3NEskUGrOjjK↵NAtvjH4saowarptvOkiXGsKVbP8ArxzU90vhqK6QQXerWsE482FjOAoHde/IORXFjY1+VOLZUHDY↵z9d8AnUyk1zP4g+VSuzyYjg9z8rVTtfhfAsbr9o1JlZAuyWJD0OenmVtSalp1oA8Gsa9Iu7kJKCp↵/SiHxPaKpzqWptn1jTNeNUqYtaNs2Sprc8o+IPgi18KT6Y5vriSS+dwv7vyihTaezEdG/SsqMTxq↵sENx5cXyB1I5YKTxnrzXTfHDVzqkuj2+nP58xiuixu4h8gHlOSuM4OEI9cHHevNmvI42SKRv3rBf↵uK2Dn0r6PL/aSw8JTeuv5s4arhztJaaHUeHNRltdJtYGt0niV0lCOeCQTuByOhwo/P1pVvAsdzI9↵oBIZwzKvCKCo+XHPfGPYVyTXZhVCkk0ce1gI0HIK5zkE1Pa63OJXaPzUjkiLFXH3iADk8+hFd7Ur↵GScUdXpXiCxtba5tiNQhtbhIne2gPyOw3Abh7ZI7dT9DZvfG0U9pb2trBBp8FtzHHCTuPcszn5iS↵STjPGeK5aa6Zp/Lu/tHns4iBgIXeGJIBGemMVYj8AeLZNRAfS57eFjgzTDy0C9zlsZwPTNHK2ZVF↵roe5/s+/FWSLVbXwlrEsEljdSMttdHIeOQj5Vb2OMf5NfRssYjIZ32KpGenJPAGT718MaB4E8QT3↵JMbRyQKwVJlDMj5BIKHHzD3HTNd/400zx8bm2trvxBJe2tva7bVDcPGGKgAAAn75baOeScY6VUZy↵jo1cSjc2PEfxh8YT6xqWjpHYw6fJI9uwFufNSJjtOGz1weuK4UXwEyW2k2Lyu0Yw+zczYVew69R/↵hUcCzWniu7mutMkdSjOm9GUKUYMSQevCkc9Swrpz4lvjoqTWyW9vaTrcWqQNGScxpE/zc4wNw6Yr↵nlepud9OpGleyOe1DRtbvb2N7p4Agt40ffcxqI2CjOVJG05B6+lM+Jun6bDPBbT63Cq6lcqzSwxN↵L5PlRk/MuBndkD5Sfeur0vWdCsPD97e3EMmpatcPbw29o9uzRL5mwh93I3E5QZxjIz1rmfG99ceI↵dG0a4s4Y9LvtOaQ3EiRoWkLJsY9BjG08Zwd3tUQjJNMc6sJxseeadFbR3EAi1q2Yjy1YGCTLhWyM↵HHXtX2NezJcXSWYYqJfveyDqfxPFfKy2FkkuX8vPJVSE5/H8ulfTWhzR3F3d3GJPPIVefuovO1fr↵jk/Wt6Nf2l0+hyVKMYNcpjfFK8Sz0SCwgVd91Lzgc7F5P64rC1BhA9nZAYNvbKGH+02Sf5ik8Vzn↵WPiHFZg7orbbGQORx8z/AOH4VRvrkXGp3U6nKtIQD7DgfoK3SMWPupNy9apsxK9ehomfORmq+/34↵oA1NNmMcg5rZeXfGDmuXil+ZSD0rZtpt0e3tQBctrma0nS4gOJFPQ9GHcGrt+YSiXdowEMwz5ZPz↵Rt3U/wBDWRI20dcGmJKQc96Bj7ok5ZTWdNw25TzWhM6bvkfeCByBjHtVK5A5IFAiOO6ZTgmpxdrj↵rWZPzkiq5lcVSEZ1hpM12nnystvajgytnn2UfxH6fjitNDbWkJt7CMxo3DuxzJJ/vH09hx9etRXd↵1NdS7pWGAMKqjCqPQDsKhd8dTXHRwsKOy1OhyuTM4pA1QKfWngjrXRYVyVTk1ZneP5Vj4AUDPqaq↵LQ7UnC7uPmshxbnrShvc1AW55pQ1DQkySY9Oau2q/b9Jms9qvPb/AOkW4Izn+8v5c4rMZsjrT7C8↵eyvYrpOsbZPuO4/KhwurBzWYsVzHcQmHayk9MAKBWdLC0Z3KGPvWj4jtU06/+0Wqqba4AliPoD1/↵KoSl69sbp7VhDtyHJGCK8mrRmnZq5spXRwPxEuntLvTJlDMwjn4HPUIP61yRke4ureeON32qm7av↵QjqK7Tx3HHI9k7xbmUyYJz/s1hrNIAAI4tvptr18DSfsY38/zOCvUtNowY4JLibyGdY2RWXHYAk/↵rzU21LQ2/wC8uZ2XjbEvAGAD/wCgitYLGSSIFVz3UAD8hXsnw/8Ag7DrugWusalcXOmrKNyxeWjG↵Rc9Qd2Rn3A/GuqUVDciLc3oeb+GPHGn6Qu6/8Ny3M6RsLeSa9e3KDPPzAFuOcAED5jwa6Dwh4p8P↵an450qVklt7cSKZ0luJbpB1YjLE8fKOnXjI9PffC/hLQPC9hJaafplrOJGLGa7iWSY/8CAHA7Crh↵aK2iMcFlaIx6yJFtb6ccVzTqcx0QhymJ8QW1LVPC15beHL2OyuggeOR9yjA5IwFJ5HQYrzSx1eW3↵8ES6L4l1PztQnLzRXLTKhhOcJsBGcjbuBO373bFesXeZ4WjWKOIlSu4ZOcjGSM/4V8x/EXw74vsv↵Fd9dReHb1rZpi0UsIMqMP72VzjPXB5GazhLW1jojGm03J2Z30Xiy6jgiXQtAkvEggWGaaBYrgseR↵hsSZ2kKOMdQ3JJJrurrwp4a1wQ6hBZXelS3Nu5kES+XgttHKHKg4z9fwrx74I6pqHh/VNQGreHL9↵oLyNIxIsLt5ZDE529+v/ANavcrfUVNuj2sahOu5Vf5vqD0/IVNVSbvsJOC0i7nJ3HgO+t5rSGznj↵urZb62lfIMbrHHt5xnDEbc9fwrjNfiFvd3enz3rlzdSN9kIAkC5cq2Cc9COvFexJq95HIWDPj08s↵/wCFc9qOhaRe+J5PEbwOuoyoEkJhaRJFwQQUbK4Py9v4Riog3F3BpdDxbWG0kWudITbcbQYdybFC↵EjGT3P8AP8c19R3Jh0TQby+lSMFA80ny8sx7c/gB+Fec6p4Z8K6m8cUmj6PFcuQoC2kkefT/AFXl↵4OfUkVu/GTUfI0aDTkkw88m5xn+Ff/r4/Kup1FPXUwaaOZ8Gli2p63MCTFE7Z9XbJ/n/ADqnBlEG↵avSf8S3wHbwZxLfTB2H+yOf6CsmOQCPqTg1WyILEr1GG54/Co3fj600OP73FICaJscd61LCfp1wR↵WIhAJ+9kVdtJMUhm3IwYZ6VXLkHnmljlJiwSTn361BI2Ov8AKgCXzCDkE8013BHFVWkUnkZI6Gk8↵znFADbjjmqTEE8/pVuVgc1Sk3bqpCIiQvemkc5zSKrE5yTTm6dKndmwuR9aUZ3YpgOcVo2UMSWUt↵3Mm7+GMH1qKtRU1djpwc3oVelMZqVmORTGbmrsS2B7UZx7UwnJzRnikO45jxUR608k4xUb9eK0RD↵Ny1Qav4Zmssb7myzJCO7Ieo/z7UnhrVFjsI7RhzETz7ZyDVDQr06fqcVzk7AcOPVTwf8+1P8S2Da↵brvmW+3yJx5kXHBB6jP+eorKpG5cJWMD4xmFm0qRMbm87dj/AIBiuY0Dw/qWsavZ6ZbWlwZLpwF/↵dkfL3bnsBzXsvgfwxpGv6oL/AFiFbmPT1DRQH7js/dh3xs6dOa9Ul1KUIoH3U4Vf7o9quNfkiooy↵nR55uTMXwp4I8NeDoSNMt/Mu2XEl1MN0jewOMKPYVoXPnPLkzDHYDOc1Y+3TxyBWUtIRk8cL7fX1↵p013heUUE+1Yt31ZstFZGZKGDH95x0HNUZ2K8lmY/WtSa6Ug/KvP+zWfcOCMlVB9lqWO5S81RnMl↵JFcZLBW6cZzTmK7TlF/EZqMMAx+VcHpgUmK46WZs43VVkk5+9+lTPJ3GKgdySaQyMzD6/hTGuQP4↵c0kjDPWoScnB/nSC45rjkOsWSPbpXJ+M79/EPjdoY+YxIIEx6A4JH6mupIHQ1x3w1thda893ICVt↵1yD/ALR4/wAa1orUyqPQ0PHk6HVLewjI8u0hC49Cf/rAVkmTCKo9Kr6ne/bNavbrhhJIdp54AOB+↵gqPzCRkkV0MyTLbvjAwKQOcHnn0qu78jihXbnnK96kaZYEmG6ip7eTB4OP0qgZNxwM4qWKQgcDsO↵/FIZt28+4c8k+hqWY5Unnrjms22mw4Py546jNWPNJU56HqKYCM3XHFRs3Ge9MlfnrURc55OfxoAu↵SmD7PFJHLlzkSIeCpH8wR+uapOw3c5/Or1trMtrpsljFa2imQktceXmbB/h3en+JrN3/AEP4ZqkB↵kz6wYbXzHgHm5GIg/JBx7e/6Gi41ZoYGlltv7oGHP3iMkE44xVLS7Q+aki75BHKBLIy/cyGJP5r/↵ACpL+ZVCWhbMLSBnkbkrznjpuJ4/T0rzFXqXtc9D2UexrNeTDTIb1bZXEtx9nVfNAw3J9O4B7dqb↵eeKhJPDpsVhhozt2rNuB9TnFV7pmFoWiVlVrtmiVsLtITgA/UY5rLso2S6M6yIkrHLkpwcZ79/xq↵JVZSak3sWoRiuVdTotUvvslil5GizozYK7wrDp/U1Qt9cEqktbbCOcNJ0GOvTP6VZvtQsxZqktm8↵kKff2PwORyce/p/Ss2ytEae4kRvKjeTD7ycA4yMt9BSWKq21f5EexhfYvTatGjFBE2/GeTgH9M/p↵WPL4tmSTYukmRe7ifj89tLqACuJ1I3ufmVefwA+mK5u5uVnufLgAAQ5cngYz39SetaxrVHrcmVOK↵Oj/4S2YxCRdILKTgnz+AO5+7/nFR3ni/yY97aeSckYEvcdf4f85rJa2u70gb0WFUG6MEBjyCDjOe↵RVK4WNXuLVmY3Nsd6rgjzEYD5l9egq/rMl1J9jc6V/FLpKqSacVzg587oD3Py9Ov5V1X/CSxar4S↵nje2BfTXhEcvmdQ7EY6dgP8AOK8ymuTdzI7zbYvMD4wMDGePrXU6QB/wi2sunli3k+zugTnA8xx+↵NP2s+rCNOLvodb4G8f8A9gWt6jWP2hpJFVUE+3bjJ645+9XVv8T9sPnDRWZyQB/pOMHH+5+R/wAj↵xrRv3J3mMOoQNHvHOef/AK35VoQ3DPIkaQylANzxlRtz7V59XEVlN2enyJkkmeuWHxJtDcIl3pzW↵6sDlkl8wqfptH86dd+P4mlP2SwM0ROFdpthJ+mDXm8YF7JHsQptAywGW/wAmq82opp8I8sBpNxDA↵4Az9B0PWs1jKrVrkPQ9CufH84uUgt9E84vMI+bsKcHq2CvOPQUl74zuIZHT+x3JUE8zYJ59NtcJp↵+rtM5ugwRkOSVTLEDvwc+v51aj1RpwbjGPnAO4GPbz1Pr0pvGVRqzN1/iCrRo40hyrMQf3/3f/Hf↵0q5c+LkhkGLXzBgHibsfwrlnvIlv1DOpEnII5KuMfN+lQazbMbg3kdz5gfMhK/Ljjpj1qlip2sDR↵2A8XRMSDaZyPlKy5z+lVdQ8aWtttX7NIzsOMN8v4nt+VcOk7+UZAg35xuKn+dYGs6rNcOUDKi/Tk↵+9aU61SXUzcrHpieMmmceXpTumAQ4mzk/TbWja635uwXFm9szDcN7HG3sc4/lXnPhG+SBQzSNGwO↵5nHUjnrWvc6kdRlknWaQAElkLZHbmlLFOO4+Y9r0Hw5p2p2yOniK1MxxujjTeAScAZyOufQV514X↵aTSfDF75Nv5808bMro3KnbxxjGRySM8VzOm6jeWssdxHdyQzxnfE6NghugP1p1tqjW1s832hYpPO↵AYjcAyNkuGCjkE47celE8dLT2enfz+8FFS+Iv6Jo0d2YlfUY4VkCFXI43FsbeSOmCfy9aydauo9O↵1eawGZfKIBcjackA9OfWtnwtfwGbzLlAXhB8nYwPI4CsAMYIGBgHBIJzisTXtOvdS8TX5k2xCFWy↵8aZ8zHyrg+5xk+9WsZVnBpS964/ZLoOF3CbRbiXcqmQocLnBxkV1XhDw3H4h01723vpYVRyh3W2R↵ng9d3vXFaIjS2xtpbE3VtbytM5G5QxwFA3jp0/ya928BRabaeGLEWEciW9zKIogSNzSYYsTnrwo/↵p2rbC4mcqnJNkyglsc2nw4LAn+2sY7fZs/8As9Oj+HJzxrQ49LX/AOzrv5Ldoi2R8x6ii3hYyAHg↵HrXqWRkcPH8PGA/5C+cf9O3/ANlUv/CBsFCnVMDPH+j/AP2VegwQHdjORUskKggdTU6DsefJ8NjK↵P+Qyc9T/AKL/APZ1y3inw8ujnbDqMd5JNtW1VImXzHJwQzcqmOe5Jx0HWvVvED3dtZM1vazzoUbz↵GgcrInHG3AzuJPGO9eZeFNX13UtSitbWzYNaypDEt1krERkhXbGRuzkkHLFfoDyVq7jLlitR2MCe↵xupNTh0zTVN/d7GNxGo2GNlzuVc/f2jqR0/Wt7WPAWuW96Y9GMeqWu0fv2jkhO7uu3Y3T1zXQ+F7↵IWXi3xJrFnA+nwiN44I5XkjWSQrjzShHyAuCF7nJwOKXwXfXugadcWMM9/AftTtJHbWH28BxhWLT↵DAYkrnGBgFRThUmnaTHZHiwfYondNuXKkcDoD+GfmPrRqDx3MsFyIyJGGSuRt3Dqeegx6elV7iOU↵y2aRRFUEbM289sk/yHbtRdSL9pRADsLfKioA2AOckc569zXEtz0mrli9YyyBJPLwoIRUOcEn7x75↵4qNrQwoiSOzIT1z1JzVd7pUjJMhUqSUG7Jbtz6U+3vGeFiAmXCoVU88en6fpU6ji0byarZw6KYEN↵zHcRMqIgVcNnqf06c1mwlJAxvTGssh5UnocnH0571XWSJ4xE1ukhYHawYlvc4zippRZoVFoN2CN/↵HGRUciTBorTQyyXCR+YzQKpXKnrz68Vjm0VXl4S3HmfKcEl856AfUe3FdA0jpGqogVmJZgO+axjZ↵6m9xNdNKVwNxL9EFXG6FJEdhaSyxTXwSYCKYQeWuTlsZbPpjCj3pjW3/ABMDqMxkZ/KWGJSuPLAI↵J57knvVtCpt7e3aKQzyjfI8jZO4k/dB6DAX8jSLA4AkmnDR54BPPI9B2qnaTuwV0tCs9pujVAiPM↵WLENhsBscdPYfrXR6ZCbLwNrDTAoW+zqsecsP3zHn9ayHRUSGMZDCPsTlvmPXn0qzeTIdL1uGMh1↵We1GVHG1Sw/PJHHX1p82tgSsRxho5GafC5IdQvdSK2dLtmF1buJFQTQyEMDzkbeCK56WQ20QtIvK↵khRGV3dMkDOeCfTOK0vC+oBphJJMbd7eMhNxyHBI+XaOe1cVTRtnLOS5iK6ubiO9li3+Wy8K+CCe↵nbtVPXTHGyzzOSjYJYA5J75Hauv1C1sfs5mhw8m0LvI5UdSCe9cUWjmljtWmM0Jk+cbflc/XtWMZ↵J6mbjrYSy1IWEAlijLvIuRn+HJ4Fbn2bWNRht7u3WOOVh/q2bAkA/hx68d6NO07SrSVbkeXIu0o0↵EjBwM/UCtS31G3M6whdmTwB90+nFYzq3fuo1p07fEZ0CXcVw5uLcxSNkyKqjao9Bip18+JftfktL↵E/ybsZ4xgZ98DpWvdXViQVnXzPM5dVJ4PTt7V0Vh8QdS0DS4dO07StBFsi/IzWgdmHTJOeTx3rpw↵q9vKz0K9k3scLam5u2hSMBTJwiFGy4J6cn3rD1jTJdRlni0zT5ZZol3NsRiQAMtx+der2vxd8UuC↵La30eE7ioWOwTJ57VXT4oeMLDULmYT29pPOQzsbRAWwAOhFelTwsYPc0+qSZ5Zb6RrgtDFBo97K7↵j76W79ADx057VdTRvEOjRY1HTbyBWAwJFK7sjPHrivSP+Fy+NDcBZfERgQ4HmiCMAEnGPu1x/wAW↵PGniLW9Ps/7V1eW7CSnblVGDjrwBSq0IOLSepjVw7px5jn4r9o7WaWQMkq4WNWGCK6y1snlREWZW↵u3m3sq4AYscknp3xx2x+XnEcss1xF55LbT2PU16CL22iurawmNnNb+cwnlj+8Y8/dIXr0wMHOAOl↵eViqbSSiYw1Re0Szisr2KGS2jntQjC6YR5MYKkq3AyGyMdMYJB4zU9myHWHi1S7js/MDeZNJwocA↵BRx91jtz16d6bBev/aM09u8XkTeXDHGP3au4xjccZBJOSD3PJ71Qu7TZPdSzW8InkkJWLzMwxLkF↵iz5ySCDwSTnj6zCUpWit/uubrbQs6nJDPO9vayPHEqbbmOCTAfooB6cZ9+c9B1On4AmuE1ezuYTe↵xWS3MYaSN8xBt4BypOAdnAzkgHHNcXDdtreoyRwQys0YG6NWLEBACx98AE9umeK07PUbK41H5ZJr↵FWhHmpDKzKqDb94Ny53E59OTWtPni+ab1RDPqaWzjnXzo2V0cZVlOQR9aqPbeXwVyfWvLvgt4oc6↵uLF7m6vLKaDzFcR4EbHqjKM8jBx9DjivbniidNyYII4NfQUqvPG5lKNjHhgyAx4GKm8pOcjrwKnZ↵FjwD1oaDc4ZRnitLkkc9tEbWaORjHE0ZDsG2lRjkg9vrXFW/ha1uLGGG21W507TxFJGY7aL7O1w2↵8BZXY8s21ApyOeSMA4r0JFbbyMGoJbCK4LefGvPccE/iKlxTd2B4b4j0J9K1Von8S3t1bTMqyJIr↵MVBUmNXIwGAIJI7ccc1yupW3ijQbn+zruO5JUboxa3ZCBSenA5Od2TXs/wAR9Bg1HSv7E04zxXrk↵S2qBnCEqSxAboDhW4/GuTOg614fP2FLiK7LBZHkdRMd5UBgGZCcAjpx9PXz6tBqTtsVfQ8kubm5g↵s5Unu3mXbHGpdzsBVRnCrheBt59PXJrG+1kszg7tuODEp6kH0/WtDUrglEWcRhVRhG7PhnY8kkc5↵wOM+uOe1VUiiSeM7t6yKGB6456H8qlaanpMwtWnuGRztVyDuwECkd88D3qDS7uU2yL5nzEfMhGNu↵P5df51f1GULM5k4yTjA5PtWUtu1vumZSm48EjP8AStltqYNNO50MN6IoHVpGUsBwV4xx6dKYlxvd↵Ut5BljknrnPqevasNrq53NHCWGQcADJFXLTLoF+YuSFCqME5PpUShYtSNzzdsYDuWIO1VHXH061Y↵0m5VlZ2kY4JyX7Hv1pq6JeW1mZb5Gsldch7iVUduP7hO79Kn0++0vSyGW4n1Sckkx+QBEM4zy2Se↵g7Cp9jKSK9qkMn8mUq1uNhxt3KMEnn149PyqrPaXqbYnmeNt2WYsAOf4skjkcd6mvNXvJ4Wkj0+2↵s0ZiVEaDjJ6A+ntR/Yd3c2zXV1OWbGQM1pClGOsmRKpKSskZc7Itz5892r4UKI41MmcDnJ4AOeeC↵avQfajAJINIkaCd1iR7gkIWzkYAwCcnPJNbskHh6LQxbStFDcOozIwyVNQ3/AIjk16S1sdL037ab↵ZldRbWuwkqMBmIHA/EitLp/DEhq3xSMDxlaanoNxZDUVsXFyHby4dpUDIyCF71btNQV5o7w2qRAQ↵ncgTIxnqM+/HFaet6Reai0Wo6vJbxSw/Nbw25E3ORkEjIz0x9DXOKGluYmt0mMcKOCZTxwxJAH6V↵5uIalNp7oxnH3m0WPEOpTxafiFRCkw2AK5JwOu7tz6e1Ymg3aWkvmT28MpUbo2cldp9sd6Nav/tD↵xxLbSLGuQvBz19Kw5Xfykyr5zx/hSo0k4WfUyUmnc6OfVri8vpTvEUec7Y1GPpWzp17FJaJLMu2J↵UIaRvlz+PTNcVDFJChebcM8Y7j60+9vN1rNDEzFZByOuT61o8NF2UTVTfU6O61z7JrZQp+6IX7KQ↵QVk9VJzgGoRr6Wck0V6JbRGEskbMpnG/GVjwCMZPfPHpXMxeZ/YCbwQI5AcH/e/+vWl4os7eC4tD↵BMZTOTI/zbgCFA4/OuyjQgpWiCrOGpZi8eXWm3CSaXYx/aImDRXgaSGQHHIwHPvT9Q+IHiHVnSXV↵rVJ0JCmaTdJKFHUKXJA/LvXNSRxja2MHvipX2yQgISEVs7frXoeyRH12rblubd54yjEFtZwWK4Ku↵tw1zDG+SWyrLtAOQMDk0/wAQXUjaaLia4jnjimUNGNqkFgccZJxwa5LVECiJwOhIJq81q9wM8k3C↵ptwM9gOn1zWU4RghuvKqtTqPC9k+pyb7dWKqAVVuM5HTj+dbfgu0hmma3Njc3hiTITHRAc9V7k8f↵Q9+K6T4b6QunaDbuxRZHXcxfhvp7Vy+jTNp7tEVke1lVm3vxye+0dT25PTNePOomp8vQ1hGMVc6X↵UvsMs8ht4p3RVaSR1Q55IxnkegGeO1UpZpodGkht4IVtowRI8iBxKpbIDnt94EDtnPB5p1xZGSKV↵7BHSQYZ3mYIQD82AM4OAOn8qSa5tP7DigghuDJJH5+AzYJwmT05XCN0Axnt0rignPWP/AA39dBpN↵6oTQoo1uDZ2FoLaWaNpysLnA+QEckkgZHAPPOO9XPDYim1WbStYiUx3ttLFCVBJhORIPlbnGCDn0↵YHtWVa6gfsh1KQssJBg2gBcYA4GB16cn1HoaztQ+3jxHJr0W8wJOhWZCJBEcfKCB90YXA9AMV10K↵KjJS6+Ypxsj6R8LeHotBkuXSCOMyMjKVGBwuM/mM/ia7ux1CKRB+8Bz2rJ8MXcGt+FLG5WSN2kt4↵8ug4J2AnuehOOvaoYLO5guGG3cAcjFe9FRaujnd07HS3apIFKjmnKwhjaSU7ERclj0AFZAvpIiPN↵U/KetacGoQGEyksyhSxCgluPYdaTTEYNt430/wC3Xsd39lWytrY3QvLe485Nm/YFcbQUc5Hy89+T↵itzRdUtNb0q31bTJGltJ13KSpBI+nsRXiXhbV5PFfii61XT7dNM062uBHd2UwBSQs2VURhCd5YZL↵4wgJI55r0/4c2kdvp72tlDfmx8x3ivPPUwycldsYDEhRjgYyPX1xhKV9WBX8f2N95ttc2XigaVcX↵SCwEErARSlmLEgno21W5xnpjng4njXWdfj1xxPq+j6ShUGG3e9bdsyRuOFHJINHxL8G6+des9d0S↵SXUttzGkVjK5ZbZch2kVmbg5TGOmDjvirvhvwr4mvdDtrrUPFuq2FzIGL28Xlt5fzHAZtp3NjGT+↵nFRPmd0kNOx8s3Fo0t9EolRXlYkh+dwz056d6ZfGSENbq6KF5G0Z9/TI962buyFpEv266tLbdHhT↵G3mSIfoOh6d6yGubG3QfZ4rm7mzud5n+Vv8AgOOnsazp0JS1Z2zqxWxQsrXU9VvBBZ2N3cOvG2OM↵yYH4D6VvR6HHDazR6vew2MsfIjYhnY56ALkfmRUh1PxLqsQhjlkit1AUJCBGgHpxxWfo+k3+qajc↵W1tYz3MluwEwQgt1IPt265q2oRWrIvJ7Ilhfw7Yyl4LS61K5U/K7uYk+oVfm/wDHqkudS1fUWj8q↵CG2ROEFvCFIz7jkn8c1vXfhS/WwMa6dLYmQ4DSOhBHXDYyRjHYfWtzRYNT0PTLe3LaHKYYyjSS3D↵xkpnP9wdPfPfpU+1091Fqlr7zOCsdC1LUteOlKha6WPzH858ccfX+93rp18DXsBsJbe7hkVZi8yi↵VNygEHAAxk8HGR9TVTUfHouNRNofD2n392xCA2uZPNPbDdc9uh44qxd+A/G+qNFfa1psXh+ykIYw↵QoouSvr5ed3T+8VFXyTesnYlOC+HUf4jvNGsbh7fU5PNmBGI0ZWf8QvA/E1c07w34k1yGO4g02fT↵NMYfJcXSlAw/2R1b8M1p6VZeEvDkUf2PwZqYuFI/4mM8hnm3eqgLsT8M/Wr0niHTLx3kn1LW4nzg↵tcSgE/i7VLslorlq73ILPwH4ZtGEmpTtfTDkrKjiMn6Dkj8RVi70yySAW1nLZSRg5W1RHgUfQDjP↵vjNINQsCcxeIL8ADvbiYfmBiqzXVpMSYtWhmf0ktNh/QVDcnuO0VsivLZJYKrSwm3Mh+UF2fp9fr↵VaVow6Ii7iT1C8D61JqKyMsZeWF+TgI2cdKqqZFYqv3euSMivKxGtR3MpO0i60ULYLQx5IwcKMZq↵vPZWrkFrWJsdjGP8KiillZCCevcdqkge55xICMVz6Etogl03T3BQ2UIO3j5OlQP4e0gqAbCAgHOd↵gq+zTyMy70zxyRSebcxYJTcg4/GleS6g9TzP4jy22jXy2NvpsDwNCHbdu6kn0PtXKaEt94g8RWtl↵bR+ZMwKqAeAoGfyFdN8aJ5DqVuI3ZUltxvX1IY9a5rwD4ln8LavJqVtbQXDmPyyJR0BPOCOh4r6L↵BX9gmtyKapuqvafD1PWdN+H2jQsttqEF1eShgHlR9kY+g6mrdx8PdIktnS20i9tJsHZKZd4z7jNc↵1H8ZL+chIdFtUIOcmQ8fpWlafEnXbwSoy2tudmVZASw/PP8AKjkq3u5HvfWsvjHlUFb8TyzxHA8E↵TxOuGilKn6jIr2r4I/Dy18afD1dSfUrW3u7G7RIIw2Zny2T8pYDHHp29q8c8WXRub66hQNNcPOWk↵Kr36k4/Gug8C3t5YLBD80If5cmNo0GfUkfrXTOUXHXU8XCxhKq09Eei6XNP/AGpJpdtcrcvNO6w4↵PBA7jP0rl5NdtX8kyW7mXP7uPaW3KOuASTnlcc13Pwx8C2XiC7Gnz30KfY4EmbY/mFw4OcHPPv25↵FeVq1rLqFxb3oYTKpFtKGOQUXO3HQg7cdQc4ryXhoSbbRTjZvQ6TWNTW2itI9PUeXLGZJY2i+Y5H↵8WeRzu79/pjf8PJY3EAtIWncrHMwiYHMLHgNuwfl24J78Z45zyzE3Ory2c4VXnUGSR+p3DccEDIJ↵PfP866PRLEy6+LfTJri4kbpCVG2QIu7DZxuBC9Oh4HesqkYQait9/Up22RsWukabfw3eg3k3zuFF↵rJwqM+QAMDpncOeBWz4U0C0svF0mmSQbVf8A0d24ZW+YFcevzLg5yOxGDXO+I7i2jvYprDT1sxEQ↵77HZ+CAPlUncBlc8cgkjkVBpfiC48MeImE8F0lxNi4V7xRnzCAwzzyQTk9DntWVKt78VbZ9NjKTP↵oXwrZLYWSw+T5EQVdiAcLjIwPYDA/CtyZTIFZWxjr71k+DtRefRLGPWdStptYuYhPMoKptDcoAvH↵YgdOua25Imi5yDnsK+hi01oc7Ip7eGSD97H16mudvnNnJI0JIVVJGPpXQvcIISGUjHesHWtN03Wb↵ZraeFZ0LBijdMg5H61pEiR5Xp+ptqevOdEhvXjnumlvrnUIFmRZ0+47ZUDaApATcMcY6V33w1tbm↵Gc6pfeLZNQSGHyreO4RbdVViNylBnGCo57nsMcx38ekQNLpT3lnaXHkF/KM3lttPOfUdD0571y1j↵4KFxe77+6WbS55kurS0T5/mw3G4j5lIIOO+eemTl7FdNRKTW565J4m08vJa29xI92vOyC2e6K4PO↵RGDx269x0NcxN4zt3fzrUC2835poyLecCTo2D5vAyOnHOT3rCXx5Dodlqd69nMk9u6okPlgExcBC↵B/cGcnoMscZq14a8YafZ6WkGl2MAT5XmCTBEEjKrHb3KnIOTzzzyKl1I81ky0z5vs/D+qXd40clj↵eOVBMhVQSPrkj9aXwcEk1u8065tUlkjXiNgoKFWxjk4zkjua6i7t7BA7Wl3cXSHkvDEGXGOM+Znd↵zzmsHXNTsrS4YSalKz7TtiKh1B+gxj6cVzrnqXTO1qEGmjuop721tYZbbTrLKnKtOQwBz0wF9vX9↵a5K91GTSZ7y7tbu00+e6YtM0Dupc5JOQQeck9K4y2fWNYuRa6RYXEso6fZomL4z7E4ratfCDW8hm↵8UTT7l/5dbaRWuPod3C1pDDRhuyJYhz2RNY+KPFmr3kem6G19eXbPiOOKFJNwz/d2Z/Ouug+FXia↵eRbvx/qE9tEfmFhbyLLcMfQqDtj/AB59qoWXiF9JthaeH/7Y8PQNwXjiXe3+9KqAn860rG68UhRL↵beIpp++GtUkP6Mf5U5Pl+FJBFX+J3Oh0oReGY3h8MeHH0oHINz5m66Ye8rDI+i4plzqd8qmSW1vi↵WOWPmCRm9zzn9Kxr7UvHDpiK6ilbv+6Kk/UYqBdQ8a2ibptPeRcZzGdp/Pyzj8axcW9W0a8yWiRt↵XmtxoiyqpgkHTdCHY/yxVZdXv7kFzDKFPH/Hv1H1zxXM3nibXp5lg1C1aE7vkaaSIgfX5KsSXOrl↵TIhWZD97ZKhH6D+lPksLnubMrXVwMPBJgHgSEYP55qKHTHuVYqlgD6ykIR/46KrWBu5jn7BM4xyY↵nkDf+gir5tZ5IjC+l615Y55mIH6gVOo7jNQtJIIIkmW3U4ba0M/mBunvxWe7KkYxIdrHpUmsM6eS↵nk3EIXI2y59vWqkIDELJyc5FeNi3+9aMZrW5MinaShOTVi3leNTHuHPfHSomt5MgpkAcn3ojRd53↵uQM8YrnSEhs93dpKH2Iy9AB3NWre4uXDO0DKegDYApoyGyjLgc8mnCNpiwckj0FO/cLHnOpXOq6j↵rE81xNpTQRPIiO1qk7Kqk4yuSR+VcjHBqnivWJ4bWG0aWOP5RFElspUNjOAAM803X72f7dcR7ijb↵2TKjaSuTwcdaxraS4hnZrdnRiuCUOK+poxtBWMJM7fT/AIU+M5yGjgtIzx965XIycds1u+GvAF9Y↵XZGoahpdvGUIZ1m8w57DAGetcKmsS+UqNbxlwoDMzuWJx1PzVTvpproRPFFHGVY52DGenX16Vr6k↵3tsa10ZYvHF9b/b7qBElYNLbZ3EADnGRxxXbafLcf2VG1t4tvLe4YkRBr+QmXBx9wA4/4FivPrmy↵aWe71FbyJZVwfIy28jC5YEDHU9M1qeDdTkg1NU+2i08z5Xcx7mI/u/Q1nJdUaRfQ+g/2ebCS68Qa↵n4hvXjR4LGG3JhIETMchsAd/kH45rxe+0zzNStpopVx5hYtzkNkkcDmvbv2c9PvLqyvNQtrm3ttL↵iuPKubeSJi7sobkNnAHzZ6HNeU3kcb2jz2syFoQNzP8AMTyOBn39vWsGrHVKTbVxRp8sllFcSRLP↵DK4WOYAMzMp7nnB+U4B44z9b7XzQaesMEby+QcxTEFTGx68jGTk9Txj61maVqs09vDBJLd3IyF3O↵CdoxgqT06dOD19quR2enyalAkusJbRTxnay7i0b7QQpUkdeOfQj6V5ta6T5lsRKWliS3uNT1q+a+↵QuUZ3EhiTe/m5ORgHk4I4HWuQnuDLqKSSb18t1EkUmSI2A+fjt06Yziuk1ErpUN60y3UCFl2CV2j↵LSjBIHPzYODkgE/y5hbWO6u5HmaS5e7LkzF8YckEuTzkdevrVYRK0mZns/wg8RXtx4xbVIJdLvTM↵iKPtSkPngYXj5W7D/CvpbYksSyqQAwBwDkV8T+CdIt/tiul3JA8IZrg7/lKhsAr9Mj2r6B8F+NbK↵wa10e2hur6AocfZIi6ow2gDexGScjgAAZ/Cu7Cy5LxexM02rnp13BuiYKAfrWFaWz/a3ZVbG78K3↵LaZLq1SZfMVZVDBZF2suexHY1PBAF4UV6CZicZeeDNDOr6lr2qwvcz3KoxaYgrbhAPuAD/ZB5zyK↵57RLfVI/ENjqEGp3txoDx73mUoI22I2W2bPl3nbxkHIbp8tdtqHinTbbxZ/wj96ktqzRKVuJfljd↵mICqvcn72T0G38uI8X+OtH8Nah/Y8V3BfW8szrOqsS9qOAwI24PJJAzz61jKpCK1Cx091e+G4bKy↵/taCCaX7Msf7+INtDAHa2eByB19KxT4j0HTT9n06zh8k/Ptikjj2k+qkjBIwfoRXD/GGb/hJRcXG↵jPJcGwCHyC4E8qsgdmEY6gZx0zkHnGK8OGpibL+fx0AYkke3XisKtaafuIrlTGW9jqfijWhF4Z0K↵43lvlS33SMM/3m//AFV6n4d+B504i88fXUsTv8wsLORXmb/eIPy1naT8Tf7Ns/7P8J2w8M2mMFoV↵YvL7s+SfyqzB4x1tiJE1S2uHJ5DXakt+DDP61tUlUWkVY3hGDd3qdjBdw6FH9g0GF9DsmG0pHbtv↵k/35jHk/gRWbc6W90xllu9MlhY5KyyNn68EH9KqQeI/EtzF82jfaV/vJDn+TGq9z4jaykEt7pjQs↵vQPayDH0Irm5ZXOnmiWTpAiDfZ4bR27CC+kUH/vqqkmiSzHzPsSpJ6yzu35HAqRfFFve4kiQMvdX↵jZlP5j+tTJrFgG5srUbuuy3kB/QCj3kJcrIv7HvlUbrfywO63coB/ACq9xb3qKQrrgcYW7z+jrVx↵L6xjh2wl0yegWZcf+PVWN9C7fM+rQjpuiWQ/qc1N2x2Qy0t7xCGMM0jHsJIP14FWxbXzEN/Zzsx7↵fKc/k9SQNZyrlNZ1It/dmtQf/ZBUkFgjv5jXt84HaGBkpagRqurxAk2EkSjnGx1P6ZpsV9rasFGl↵zyrnu0gP6itGVJUwYbrUYl7btx/mB/OlF7qMcW2JprsnqTyB+Tj+VO6Cxk6yzy+T9tsmtyNxAccs↵eO59P61nSfZFJKjkelT6/LcX5hEyrCYt2QCc87fUn0qnHFbxqvLH1YnNeRiX+9ehDauOlY5UKAQw↵pfKUMpxlQM4qpLeJC5wm4dKy7rXdkojc+Wp6HacfTNc/KpPQxcl0NZI44WYNJJLnsxqzYi9u7hLe↵3VuSAAoqrZDTElSbVtYjhjYbsJGzsw9uK6mw+I/hHw/bH+yNHuLq5BwHmwmfcnk/hXZQwVab2sha↵LdnzZ4rtns/EF/ayud0NzIjA+oY1jM7I5ZDjIxxW/wDEXVP7V8a6pqRgS3+1XDTeWpyF3c4rnsNK↵wCAsa+hhFpJMwbXQ9V8A/B7xN408Fx+ItFltJC9w0JhlcR4C4y24/wAsVsW37PvxDawa6lh0y3RV↵Zyr3XzDbn0B64qD4U/GLU/Avgr/hHbPSjdSmV5EZ2G1WbHYDJ6DjNaCftCePI7jbdrG0RyDGIljI↵Hsdv+NZWnq7m/NCysjO+JPwcuPAXw6sPEOrao02rXFwsE1pGo2RKVYj5geT8v615x4euHt9YtnjM↵JPmqMzLleTjkV2XxQ+KPiDxto8djdwLBaxOrlFO4uwyAxOOvPavP9Jhvbi9iFtaTzPuG1UjLZ/Km↵lZailq1ZH03+zza6tb/2/cTaq82nSz+X9mYk7ZEYgEe22vOdViWPw8ixeUsdwAzbJFTrJkgk9+Oh↵zXs3wx8Nz+GdCuFuLkyz3832p127RFuGdn4c5NeMapHM9lbnfbqGeKNUC5BwvQ547DOa53PVXZq1↵YgWW3t7rThY7o9iIJEVjtkPv7cdOcdAao6tps15rq3ly4tIgyovmscuVwihR15AHXHfHAFX5rGWL↵VAyRiOPeM9cpgnIye27p9D6Vj6sZ31fyEmbL3GxeMcZGKFC+zImza8aXlnc6Pa6XcSRxXMAeQSYG↵5iABtYDB57E57+lcbay3cShopWXJJH5YxVrW7iO+v2dlAZICOvRsnH160trd29nN5VxFuYAEHGMc↵Z/PpShRVKNkOLO80YWFpp0kepJLam8RmthAvmHeYtwU4bK5JXHHUnPStb4Z+LvEGl38f2HQbO5gM↵gSUzIzGDDZG4gjaPlB69hmuJ8Naub8zS3DbZ7UebEFGQSo/njn8K6XwRdaoGuZLASx3h3tGYlwWV↵iTsPqM5wKiPuaIc48zPr3ST9q06G6kiEUsqBnQHIU98VyHirxFdSaZqejy6TqGn3NxIbSxmEyRmY↵kD5w7YVeTxgk4U9MV1Hgq01CHwdpUWqLtvFtUEwzn5sc85OapeLfCA1qaHUbDUbjTdWttvkXKEuu↵0HJVoywVgeevAJz616TTaORs8fvNR8SR67rmh6m13rMdvAkVpfW88kW9449iCFckPIzMSVyx/wBZ↵gMa4/wASaVZ+B7i0vLmKW41iW2WV4rtdpt7jG4nAODjcODnpkjsO106WDQtaPhnxp4dto10ZbWWw↵lt96x5bEZeWQn7u6Y4IyEcnr1rd1vQPBPj3WHe6vLyzvY5pYZvs0RdGeJAzCMnK4IBIc5yBzjpXJ↵Ommt9fMaZ4nqvj+9uIXudQWe8a4diZWlYhX27dw54ADHj1Ofr5te3DG4Z0jLCT5yS5OSa9C8ZaFb↵22t3Nlb3ccqtHmNRF5uCw+YDBIz8uMH64HQc8LWys4oop9MmD+WrZllILDHBGWHH4VxKs6Ss1cq5↵62+ieHHcIuoxwsf+Weo2wjf8Thc/rUM3hFGUhdMtbqDHD2V4Rn/gD5H614bqlq6QzAhlIQGup8Eo↵ERSBgmIf0rphKTN3Vja9jsr3w3pVnCWnsdXsWHSQRqQPxTNUre2gZ/8AR9Zuph/t+Yp/Rx/KnDr1↵rjPEvy+KIj/ufzroUG9Lmarp9Dqr/Q9QMpksdWlifuTkfzHNZ0th4ojbZLqizZ/vIf51j3kEj7mS↵PqDW20yxW9o0jKn7tSdxxVqEu/4Eusu34iRW+rRjErBveNsj/wBAP861LA6ginzLRnx0IOD/AOhj↵+VcV4gkilV2idGwFzhgcct/jXYeHjnQ7M/8ATIUOloCxFugy7d5ZP3mn3xXPO15P/r1YilsIFHm3↵upWjdkO4fzFWs02bBhfoflPal7MPrHkLHq2mqNq6ldF+zO6n9DioN9vy891cPu53RxoB/wCOyCvP↵NAlaAXTLE0gLhSFOMdea6u1EiaqBJHsZ7IsBk8ZwcEEfypSgou1yliG1exqxzwQ5lWXzwfug4yv1↵+Y0xria4YqkbtnoqDpXpHwjV0028tpEhj/eWLIEfO/dMdxz3xwOK9Ve2YdM1531FYiXtea1/L5Ey↵nd7HgOieCNU1eLMn+ixEgHd976ivS/DHgXT9LhUAlnC4MropY+/TiuvaFwOp/OozGw9a6KWBp0+p↵arW2Rxes/C7wzqlwJ57jUhJzk/aN+f8AvoHH4Vh33wU0OSXdb6vdwx4+4yK5+ueK9RUOvQ4/Ckke↵bAAcjJx0rqUWtmQ5p7o8cl+Anhq7n+fULiWXuzRKABWjZfs9+CYlzJdXrN3ICLn9K9TG5ehA9TTl↵lmB4c/nScW+o1US6Hnen/CvwXo8paxiuJJOhaVlYfgNtaumfDrwgb5buTQbaWUnIEi5BPqR0rsvO↵m9SaPOlI6UvZ+ZXtfIxNT0nwxaxta2uh6UG6TOLVP++RxUFtHbQKBBbwwjsEjC4/KuhMzZwVxnof↵WkYjGWAAp+yQvbMwJWznJr511mYRWcVsFImMgVTIMKBnv9Oe4xj0NfU4WNhkYINTeV7VccIqvXYz↵nieVrQ+UVvRJrz281nbT2ZleSKXad75b5Ty3QggY4rNg0DUZdaF2baZrMXDfvcY2gAsG57EDIPSv↵sDyvanCIAEnp3rVYLl+GX4f8Eyli7/ZPhbUrZ21idVY7o5dpPqC2P61pLp0c1pqbSMkD2kzIWkOT↵uVXG0Y65IIr6p8UeK4bSE/YCX2EF3A4I7jmuc1DxNqMs1rMly8JdSVEYyCB04PU8GpqU4x3kaU6k↵pfZPBfhpbeT4htNRktjc2trMss8e3Kuq5YqfrtIruPC0DeML/UbbRkjtJB5zLArYMUQbO3A5zgde↵mSPoPY9A1q6ul8m8Lv52Nh2Y5xz+H/164vQbgWcKalCYY0eySIhT85YAAkjHHI96zlRirXejK9tJ↵3Vtjc+FfifxRfeM7jQ/Dmt2epaZYMfOtbp28yZAdpkVmQnJwDgNjJr37y2ODt25HT0ryD+3ll0qC↵aOaNJGHK7gScY7Vn3Pi20gV7WWF5Z4VLFV+8P/rYrojThTjrI5/aSk/hPTvGXg3RvEzw3OuRS3Fv↵aQyAW6IPnLYwSwG/jHAUgc85r5V+Ifji28M6tqOm+EoLnTVnTyp1xJEOGGF2OS2MAjrnk884r0M+↵Lorm3u5o4xE5XKHrj05/GudbWb+JYwJ2AViFbOe1YVvZaO5tCE30seC+IdWvdVv3vJWWN3AysYIA↵x3Gc1t6f8QNettPtrVpYZlgjCRmVSpC9cfL15J5PNewwXzf2e0I4Lt8ykdAOeD+VOjn2xIDJyF5y↵RxWMXFL3SnBo8K1PWJruL95FEDOpzgenpXWeEcfZoT6xf0rzWV/NgdGkAZmbaEyQoPQV0vgvW2t7↵q009keQuRHuPAGa05EtiW3ynouRXG+K+PEUDZ/hX+ddezEGsHW9JkvtRiuFkVQigY9ea0WjMU9TB↵nRdr7nc9erE1sXwhewsGlVW/cjG7ntVwaDZnJdSSeuXNXDp9q0ccckSOsa7UBGcCr6iucXfvF5Uw↵jCrwv3frXbeGGzoNp/uY/WmS6ZYPF5bWybfQDbn8qt2ypBAkMSqiLwAO1N6h0L8Dx7XSTjd0OO9W↵bXS57y1kcSwxY4USNjce+Ky94HU4/CugudTin0pdlgspiUKr7gpBA5IA4964sXUlSinHqy42e5wZ↵8E6lpOpXC/bLaWLy95kXcFDZ4Q5HBPauk03RzcXLX19dSzRW9vskYN90sARxjpuzmtlb2PU5JoJy↵AzDdmXO5D1JAHU4454qGRJDDLFZxSCJNpbOFZsA8/wA64YYidWNpO0jVJLZGel7qWkp9ptb0F7eG↵WSCUxA+V5ZTYUzx359eKitPjT4r0LxcY9TuTqtrbjE0Eu2PfleoKjjkgjg9KTWfOXQUlmdSHsbrY↵hPC4aLOSD715d4ntrqfxJe3McQZZygRYyWydq12Uotw0/rUblpofRejftB+G73y49Q0i6tJpJFRf↵LkV15xliTjAGT+Vet28trd2y3VpPHPA4ysiHKn8a+C4tI1dZfmsZUjSTa25f4sbu/XjB79a9O0nx↵L4gnjsdJtPEs2j2kKBiZBKI1AAyPlOMYHTB60588Olyqa5tz6Z1Z1hntipRpVc/JkbiNpzxVuYIk↵sKOyKzsdqk4J4PQV8qGe+1fxFNdw6hIl1I0ksUyXJjfJVyrEqM9eTxVC4/t66Dz3uvahdzyxhM+U↵z7SGVuGLeo9BWSrSa1VjRxSPrW3KyjO9JCGboQcYbA6U5tqY3bRubaO3P+RXzd4L1vxB4fkvimWF↵1H8kkiFWPOSQQT06dD9K27PxlqMMzNd3txLNL92GQHYvJ+7z15POKcas39kr2ce57u+2NCzHaoGS↵aG+5nccDnNeNah411GWSM2P2m1CxCNg0G7JAILZKnrnoffn0jtfFesXN4q3+rzxW5/1o8k599uI/↵l/l16U/aStew/Y+Z7NO5EDsGG4LuHH5UkVyHhBVQ8m1eDwMn+leb6Vrd5fqdglmKFm8wWZ2JgcAk↵Y7nPrV6HXtTRdvnQkBAgzCeo6H73WueWPpwfvXRawsnsd5ZMn2WFcAkIF49QKnstQ06+QvZ3IuAr↵bW8tS20+h44PB615Rql3qN5EkJ1i5hRVIYQLszxz0rgfDnjSfRJHns7S0klX5UM2PJBK4zt2g544↵JPrXdl+NhV5rdLfqcWLoShY+nHaKNCziQAf9Mm/wrj9Y+IGlW3mwQ280rjjcVIBHqK86u/G1/qkO↵JYrIHB3LGMr1zjOKwjevJJumtYXTeOE4/DO3iuypiUtEYww7avI6CW5eW6luLd12svzRvESrr3PT↵r/WoNHnIgmluJgpjLCF5c7m7beB25qjHayQ4urSaF41AJxKw+q9PwrOvJgUXMU6hxvB85jnJzj27↵1zyqcurN1Dm0R2fneXc7mvYxOjKGCSbh/wABJ59a5uBgmlRMxdW2kBkPYE9aZYiYXCA+fHhgfvhj↵nPvWOtxqCQlZrotbAFfKaAFlIJ/iB6fhXJWrc/kXCnyo62cJPZRvZzpuhgaQkKRwD27557gVz90x↵WYXKTmXuSDg9ORWTb30lmJUibIIwyYZPx/8Ar1NZ3/noEYuAzZBADHg++D71Lqqe+5VKPK2i9FcR↵tIVbeC65A7Z/Cp2k/cCN+QMc5xWZLJKkw34Q5zyCo/DNTRXgc+U44AOWXBGR3/DH60rmzsXJHChY↵+c7jt4/nV1JbFhiaN968EhgN3vWNJcqzFEABR8cgjPBwaUXMDliiLLg4JDHrTjLlM2rniuQM8Va0↵R9muWTD/AJ7L/Ou60/4MeLLogSy2UAxzmUtj8hXfeBfhppXhO5/tLVbuxvL9SPJM7hI4T/eCnlm9↵CeldSqReqHOhOGk1YraXoiyPG2qTy2scnKpFF5kpHrtyMCtTXrDwR4eeCLUNYuZrqaMSraKg85U/↵vOuQF/E+9bviya00DTZ/EEgnbdzvhRpGjB/iG8ZLZ6EjaOvPSuI0WH4e3Swausd19ruppPtNzezr↵LIY27sOCXz26Y781Ubzd76eRhy+zVmrPzKGueOfBmkwpJF4e1C5STIjdpUAcj0wT+dO07xdpupWN↵ncWnhNp3uDJmGOUl1C9+Ae2T+FWtY0H4Qf2GbP7Tql7qAkLLdblhWMY4CoAwIz6muT0m30HSwLey↵8Q3pChk8yODZ977w5OcfhTVG41WS06eh3lhB4e1+x87T3mspgdrRudxVvQr1P1FYfinSfEGg20Es↵enjUDLv3LBIWZAvOSNuSMc8dO9YyvplvfR/YJ7m5nQkmZpNq49OnNdFffEl7O2W0sHtWYfMwchyG↵9B7VapzitGZynCb2+45bRdR1u71qzt7nRZLe2lmVZHdGGFJAPPArrNBudNktLpriOUMm9XxyMKec↵flVHRfHGs+Jdd07R7ucNayXCkxgbVJB3Dp2yBXPxSXMmu67odvYpdvFLPKpaUxiJA7FmPIz1HBrz↵MZ7Sc/Z36H0WW08NHDOrKCer39DtdO8Q6DfJdQ6QZTdvaPJ5k0QJwAcc+vy/kKq+GtalvH1G0jSH↵7RJDuVpXJVSQBtAHAJz1rD8LaVLaeL5IbZjLb7XWcRqGRHaHJAZeMZ4rR07S5tJ1e1bKTiQS/Zo2↵diqOgBGeec8D8a4HS5ZNRRtWhSr4X2iiotPp1/pEzQ/YNCWymtFiuJdNneTed7KwkTPPvj9MVx2m↵XTW9+bFpLj7KZfmCMSrdMnjpxj8q9PR4Z4pobzTGnu0tHhtgoJCsWyc8EbTgZB/rVq20mdbbfJb2↵WmxKM/IBkfoMfrXXTxNRQtGN/meH7Hm1ucTrM5vvD1rZWVtJI0UztmbIAUgYPHTpVHS/C2pam6Ms↵F5KnOBEFEY46bifeu1m1Xw/YShYLRtZu1PDSODGp9emPyFQ3viLWb/KXlwtvbngQWxCDHoTnJq4q↵rbV2K9nGTuyDQfh0kpvzHfR291Z23mthxOIxnHzAexPH58VQtJTYXct7NqayW8A3tHc2KBF54GA3↵Xj8j71NdLHPaG1Vmt4GPzpDLs8wY+63HzDnofSsibw1p9zK7zRzupKliZsl8DAByOR7VtTmo7oJU↵exvyStdy3CJ4aniikfKyTai0rYzwfmdsH6epqvqWm3d3apbQwraKjB1ddjOD/vkE468ZxzUC6PAC↵Wka9LdArzudo9OnWpF0uzJwUlOPV3pyqX1v/AF95UYW0t/X3F+300vnzLS0wDyd54/Q1bXRoBg4i↵UH+63/1qx4dNsPtAUwBuO5f/AB+tX4dMs43BWyi46Egn+bVjKVnv/X3msY3W39fcWW0ryWEkRY45↵GGII/EVIt5dxSq8s8zsvQTv5q/TDZFKltCf+XWLP/XEH+tSfZExhbdUz3WNV/rWblffU05OyL1nr↵qJF5UukWkicn9zI8T5PXuR+leMXryG8jSBykR2jYZAxyAM+meefxr0+fTp1/1RI9uK8+0GwF3DFc↵2sLTXjLnG0kjt0HatsPywu4rc5cTFycbnSWFyvkoHQnoM54q1bNHJcMXDHjjYcdPWo4dE1mRV3ab↵dHAxhbdxk/lVq20jU0b97pd9EgHLNEwB/HFXeyM5alpbu1itDGVILZIbPzc9R71UccExvtjAyAer↵U+9tI7e3i8+WJdwLEA9BngN6HjpWYmpw+W8LupG3aoxnPoBWbcpIzTSJn1eKMjy5CSJAXA54zS3d↵1ax3ElrKCAjuGbt949RXOjUVt53MSNuEgyW7YGCMHpxmk8V3UL69qNiR5Ti4ch923PzHgZ69ajl0↵DmNh7uzNzLHGWjgmVCCM5yCaozzRQTSK7Def9WCo+b6+1c1594bgJNKxiVQqtwCB+FbOno11HBHM↵rlpPlRiMFu3GOTzxUKk0zSHvLV2NXS3MrqrM0gUElufyGOKS4V7mRwkigFmBBjBYLnuajv7a6t4F↵iS6FqiyMjbD1I6Dj/P51P9nuoYvNnuFxnLeZncfQ4rW+o35FbW4ri2lnFvJmQYJODwCOmMnPU1l2↵yX0qF2WUEnu+M/hxWw8sMqsqPJJINoLKDzxjgf571NappqxYmAlfJyQRx7VVyLXO0sLnxJqOsTaf↵ZtZRyKmWKFpVGegP3RVzTD/YuoTX2q+TdX64CJJGFSIg9Qnc/WsrTo7vwN4gtobTVDd22pXqmb94↵GYHkZHpU/j9YY/Epvlh22krKZsnjcAf54rnday90+knJVpJTWp0uvaimsafcm5UzNMrbgOAwPpXg↵9v4b1Wa/uraztyywNh2MiqFzyOvtXrFnq0dxploLSLzJ5XYRorZbg46dh/hWP4ms/Ddtq0EuqalJ↵HqAh2myspf3kg6nfjt164rXDV6kdEc+Nw1CUU57o4K+8Ja9FF5iJBKMcATjP61zeppqenH/SrAQ4↵7scj869JtvEdtLKwsfCnlWyKzfaLy5znA9Bk8/Wso69d6wrJP4OtLmzwS7R3ZA2j/eBweD2rtVWt↵1R5c6WFtaLsyh4e8BeL/ABBa2lzKlrpmnXZyHlk2PKgOPlQZYjPfGK0fin8Mbfwz4eS9kezEpjZ4↵3glJbKjJyp55z1IHtXYeEvFHgbxd4m0/S9LOreH1ghPm2l3qAImdRkKrkYA6jqK3/F2g6KZ728js↵dFu2QIILGW+Nw87YwQFEjexPI70vaSctUYOlFRumjxb4PausXifSIPtLLM8u1xtDbgRjvn1x7dua↵reLLmbTviHqckSLn7W5IfoQTn+td0LfRVaz13T9F0+LUILyJLhLePbHEd4A24OCSCcgcdD168F8V↵B9m+ImqLgk/aAx79UU1x1pc9Zeh7uXr2eFkvP9DqbA3emfEPRr6WSCaPX4FlIRSFj3DkDJ5I6Zre↵upL6z8QaTeM8RgLhIVYZ2u0S5JH1OfwrjT4gi1bXvAtskLxnT4o4XdmzuPmHp7YAFdB42vJo7i3t↵m2hIWSQcc52Bf/ZazqqMJu3b9TrwqqYjDWl3f4p/5nRTeIL7TLiZ7a2tp57mVlzkkLt4PAOcc/zr↵JvpNT1SUS6rdmZevkg7UX8BxWX4m1FdQis7uJYYw6EEQDajEbRn6nGT71jCRs/eb866qFO9NNHy/↵PyvlZ1wMcIEUSBB/s9T/AJ9akLBF3YJP1rk4rkRnIBJ781KNUkRwsUYZjyST0FU6LNVXidOh3sMn↵BPGNpqyrMCCoHynI+tcymuTKNqQxj1JyaG1+7PSOEfgf8ah0Js09vBHSM5JJwKdET3xXLNrl5jhY↵v++T/jSjXL7HWMf8Bp/V5i9vA6O5Z1MbBsHdjcegrRRyUznpXFHWr45+dP8AvkVFb6xqCtIyTBQx↵GAFHalLDSaHHERTO+jfHOT+dWEk9fyrz86vqIP8Ax9Pg9OBS/wBqagcf6ZNj/eqFh5PW5TxMV0PR↵EORwMj0Ir3L4afDyw8O2cS2DDT4sDzblyv2i4x6n+Ff9np9etfJS6hfdftc//fZqLxB8TbiNdmnW↵GoRgqCzXk27Gf9lQP51tSocruzmxFfntY+nvF/i++0+48b2enahHc3OhTW0sCSKsfmJcbQIww67W↵zzjpgH1ryXVPFnjqUtp2qX+lQrJIzP5yvMynOduF4JFeYJLqepa3ol+ZJm/tCKJpxGp2nDsoz/3z↵+ldi4urnUJLCZJWktBu2rH8wxycY5P1q+VSPPqu0jg/sIvry7W71mUkTusLBDh9rEZIPToD+NQXW↵m/2VfLPFfLdohBDbCAD/AD4pmsXEkepT3QYiETnORjGeaZeapayWU7KxZAxVcY54+tdMYK25jJvn↵vYfe6kNQ1S71K8mBklkaUFXwXLHJz9MmtbxDdWR8SXH2v7PIr3Tvt4WXG4/xdR7VyunRCO4m1F/3↵VowYRqT8wJHp6dvxq94oTPiuK53DHlpIR65Un+tcLhra56MXeNzoda/sK3s7a6sLy4wkqk2sxBfa↵W5+bo3GOcDntW74a1Xwxodwmr6d4ljtNTAxte08xQGBDDByO/BxXAXfl3s8sqxgLHatGoJyd29f/↵AK9Y0gKth1Kkc89/elGD7lWR6f4y8R6TqviS3nV0uLeWaF53UksGAw5XgcYUcH171pX8ng6HUrRb↵rVNRjjn+WV2gyMYwWUDPAPb+VcD4I0r+29VsrOWVLaB7giS6dSyxLtG4nkZwPcda77T9A8I2ni6U↵6xq9reWNtDKyyPueOZyDsICuMDJ3D5x93vnFN2bsxcul0Z2oyaRDoCrEJv7RfUDFvXKo0OMBxnkH↵ac4965bWNZvob94rLyfJTgEjk+/Wr/imXTv+EmS10p4byx8+FYpYonjUhgNyhdzEdMHkkkcVF4h0↵OW/1e4u9PtrwxSOSywxsqo+TlQMcYpuArt7FvWNZ1FBa3LXUEkdrMj7IowBwc4B6k1t6j4lu/Fen↵yN5EkVrJII1yQWkbsqjuRkfn+fkGpalqN9Kdy+SACFC/Ko5HI/I12PhrWpbDwhqepLbRIdMtwkMm↵7cTPIxVSM9OrNx/dFcvsLJX3PdjXTbk1sbP9syaRer4Q8Js8+ok/8TTUtwJi9Yoz0GOmfXpWPb3u↵m6RDdC4sTDdS7hJNI5kkfPqxqpov9s6BokF2nkwRXMPmSvj53JP8RPJJzXNXVzPq129xcShYxlmJ↵6AV6dOnGmjwatWVaRoHxC0QeC3RzGelFl4imgiMIVog4IJB9RWZHcxlM2cClRxvkySfwp4uIZ38m↵4jRH7Feh/DtR7XUr6vpe5pL/AGU2gXslygmuguLeQcMhznOfar3hfxXqLacdLaNvtrLtScD5pE78↵+uM1ytyrxb7flQTit7w9e3d7rGjabYmNXtn2wGRtoLk7iWI6eg9KKtuVsmnpI7S1vhazyWckG3c8↵dxI5wW+Rc4yPTHT0qt8S7ybT/ifqE9qIwJ4oyQ6BgQYwO/0rW1nw55upR2avbrcOysQGJA3KOC5w↵B1Y8+orF+MUZi8exk9WsoicHIyMj+leRKSm012Z9TlvL7N+qNTw7qFzJ43023fyI4ruzEr+XCoyQ↵GOM44+bPSnfEnEepRdOY2/SRx/SsCwtc+JvDZW6kj+0wsN4PK4duB/nvW98UFBu4CvUJIP8AyK5/↵9mrB6SXoe9BKz06sx5NR0280+zs7C0aF7RSLh2bO9zjp7fL+tV8k8Dj3rJ0VClzeJu4JU5/OtNMt↵0OF6Z9a9vDK1NHwGYw5MTKK/rQUklwqZYZ+Y5xip1UAhUX5m7DqaYoCLxwKsW0iQxvNnMx+VOPu+↵9bnItBbpY4sQrguv32Hr6fhVbJJoYmmg96AuOJ5pyniosnIp2eOtAJj85yM0xZCsqpjIPejNQufL↵l8xuV9fShBcvg7kK9xyv9RQpx94dRkVDG2QGU+4qdhlcD03L9O4rFvkl5M1XvIeGrodZ1LwpDM7R↵adavIRgveMbhyB/0zX5PwJrmVNef2k19d3X2eyG1mP8AEcfU+mKJ03LY5sQpOyR6VqXiy2e3Fv5l↵88KjasEJW1hA5ONiZwOT371yjeIGtNZjm0+D7GrIyyLHKxZhkckk9eTVOeJoz5b3UEkgznY2QenQ↵9DWBcu/9ollHIAXBqKdFqV2csVLms1Y6qER3OtwrA5MM5UYYkrySM/pSePdLuvDc1pZTCPzr22S9↵jyACsL5MbMBwCVAOPesdGlUZVGWUt8zFuMYAGAOnfv6VW1a8utS1SWW5uGnndliDls/KoCqPoAAK↵2S97yL/iSUeiIbdp3nDi4lJB5O8iup1XW5b26W4e3gi2xJGFAJGFXb6+1ddHY6V4e+ERvNPjWXUb↵+Typ7sopZOeYhu5AAHJUclsZwKl8O6RZafp0SyRq15MgaRzyUzyFH0rmxOKhThzctzuo0HKVrmB4↵XS01c3MEs0dvMYwI8KW3ZYZPHTt+dak/w8s5SA3iS3tWVcLH5Dvn8ce9Z2vWkek65ZanGohjacJc↵BNwA5zn5SD09DXrEvhm31opaz3bTosaPFMbxw5U7sDJyf8iuV100prRM6Y0o6xl0OB0jw5p1tYPY↵zeJrO2MVw7iZ4ZA75ULwAcY470v9m6XDK5j8SLcrt+46yQ/huwwNc14uu/7L11tPsd8U2nSNFPI2↵GEkiu3I4+7jHB96968JeHPDeueG7HV5Y7edrm3jc+XbxqsbYw44Byc5H4UVVy2k+olGL2PE32NeX↵DmBPKLJsILHDKeqnHI+oq7HqSIuEkYZ5Ox2Az/3xXt0ngLwmwB8q3Xn+4op6/D3wiVGEH4W4NTzO↵XQXJbqfL/wBkh85gV3LgYrT1BoLTwBHHFAJPtOtx+ZHn7+yI7R9MtX1Z4eg0W08Nf2bf6Bpt3a7C↵0zfZkjBJAzhtowPQZzXg/i/wlBY6Hc32n2F7JY2moNegHG0EcAYPO3De/TtzVQvGauehXxEalNxi↵rHmviS/1ie2VdUlkGDtSI/KAB7VlPgW0MSj5ZSS3vjjFWdeurzUfM1C+lMjuwAOMD6AVVBL2Mbp9↵+Inj2NenU2PIoWuaekaesxaKMiNVAPTqTVDU4RF5jcb1bbkd8UtpeMkasZdsmMMVOM1Fl7qURoCV↵z1rmipcx6M5w9mklqW7xlltLclT5rJyfpVz4WSRQePNLlmQuouAAoXduY8Afmaq6lCI7YuWwEXYo↵9T3/AMK0/hJZaVP4vt5tdvXtLOANMXQsOV6ZZeVGecjnitpRvTcWee3+8ufYOs+LvhHpHgsW93p0↵Gq6lDIQ1tHDtn88cMd5GVAIxnnjsa+ZPjpILrX9M1WztpIo7i1+WIfN5Y3Ehc4GcbsdB0qv/AGfL↵Dud7qR5p3by1Vy6hNpIO49fWs7UvE97BFbmOCF0YKu5xlidoJI/OvPkm5LTY9TB1vZ05OL3/AEZK↵JbmKbwrcPERJBLIrgDOMOD/Wuj+IEqTyxTDOCzfgCqN/U1b0Lwz458Sa0yeE9Ek1KPYjSuwAjj4/↵vkgZ9s13LfALxvqElu+vapomiqoO5JLoyMcgdFUH0Pes5UJSs0j16ObKm2qj3PC7b93cXBH3nVQo↵9Tz/AI1pRLtUD0Fdz8VPh5YeBF0r7Lr/APa896JvNItmiWLZsxgk/Nnefyrhyew616lBNU0mfNY+↵pGpiJTjsxwwx9hQzUE7VxUbNWxyATk0Z49qZmkoC48HmnAg0wUA4pAPzUdwf3MhP92nZpsoLRso4↵yMZpoBNOf/RlHpkfrV6JiQVH3h8y/wCFY+nyNHI8DjBzkVpIxUhh1BqakOZNFQlZkjMpbK9DXBad↵JPb24eKR0mkG3K5VsHtkV3kwAYOPutyK4m1uII/7OkDAiNlZ1A4GD69z1+nFKEvcuhVF72p0KeGI↵lsQZ5D9oz8zK+QhIzjFclqUEkN60cp/fRsUY5646V6W91HLp/wBnVQX84uHz1Byf6/pXHtoupeKN↵S1OXR9Pub1ImBLQIXK9hkD1wa48HWnKTcnobVoRskjAlhB+byZJDkABDjHH0NQQN5F6hcMAkuSCO↵nNLd2t/p0jW9/aXVu27lZEMbcfUVXmcMQQP4QOTmu+1zlWjPTfFet2uq+H7IxG1HlyY2sxeccHOW↵xjGeTnua6aw02dNautQa4MlvPtaJeyjFeK2V/LGHhMp8uTG8ZwDjoTXoPh7xtHbaUllqEcjNCuyO↵RAGJXsDzXDicPKUVbU6adVJu5ofEBTPBBAjIHnvFRCzbQOOpJ6D3r1NPhF4HjUeZdXqTFV3G2u24↵YAbj0OcnJ/GvDW8QPf8AiW1v9rxQWTb4VG1iG6gncCCcgdq9Sh+Icwtg7XizvkAqVTJH4EfoKqlh↵5QppMUqqciS/+Cvhx7xZbbxFqywkfvkkt1kZz6hyVx+INSXHw3vYoo4dM8e65bQxDEaN/D9NrDA9↵quHxxKvleXpsl5uHPlQyrtOR1yvTnPHpWrbeL7VYN95pUkUn/PMXCOxHrgcj8QKtxl1EpIl8F23i↵fQpLlNU8RjWreZRs86Eq8bDuDu5BB5z6CuhOo3pPBUfSIVnQa7aTRLLDYXIVsHd5DOOfcZFRyeJd↵LjcpLfQQuOqMpBFQo+Q7nU6tYzrKHa5OoWan5Yw5Zz+JGABTIj4TcXMF7pF/tkjIcz8hhnBA29c5↵65rwW5+LvjIsYreeytFGcCG1Xj8Tmun+E+qa3461a6tdf1zUHjdEi/cusZAd1UkcdcE4qFSk9bmk↵qqS0PFPGlokGvzQWccqaakrraNJGV3oDjdz39ayLFQzf6zy36YPQ10XiixjXxq9p5sxiF60ABbPy↵b8Yr6I+MXwj8E2upaJpunWEunrGhVpbeTEkuEjOXJBBOWJyAOv0rp9pypJ6mMYOXvLQ+bv8AhHL5↵vLL2nlmVQ6FmADKe4z24NXbfTbXToXlupkRl/hU5Y/T0+ta/iO2ZfEL6WLy68jTdJcwEuC3yM7DJ↵x6k+lcWoe4kJmlkbnuaJTS3KjOckn3ItYuVvZQE/dxL0qtLPPaQfZ7TIkYZlbuB2X+p/+tXrnw3+↵H2ha34Z1fUr57wzWiwmIK6hQXkVScbeeDVzR/D+kWt/e2dpYxQG3jLicLvlc+7PnH/AcVnPEKKvY↵1pYV1JctzjPDE/ifUby0vNVt7e30+CLyxI6iFW+UjOTwxra+H2mXGs+KNG8HW+nQ3EmoXABnePBi↵Q8sxBHIUA/lWtocUWoWt9e3Kbmts7U3HD4/vMTvP0DCuu/ZS1i71T43x28qQQW9vYTvHDBGEUHaB↵yercE9Sa5qUnVmrKyO2pThhqbi9WfWWnWOmeEfCosdLgWG0sLdmCjq21ckn1Jxya43T9Wivblmu2↵DsfmJJ6muz8SAPoOpK3Q2kuf++DXh9vmORyjMu08YNdeIlytJbHnUFz3b3ML9r1bdYvCskCqN/2v↵OO/+prwAccnqa9i/aOuJbiw8L+a27abvH/kGvHG+8a3g7xTMZqzsDtUeaQnikHUCmA4HrSZ55pOx↵pAeTQBIDzS596ZmgHmgQ/OaM8U0dKUdPwoQFTUQUKzr95TzV23kWSJXXoRVe7GbaQH+6ai0ZmNrg↵ngMQP0qugtjVi/eRtF3HzLXFalo/2Jljsr+DUudu22jl/Mb1FdeGKyKQahMzqAUOzB42jH8qVGle↵UtQqT0RzDDxIlt9je3vIoiMYkTYcemTziul8FeJfFXhexaz02eCGB5DK6PCr5bAHXGew711fgbxD↵rp1a3sP7WuTbStho3IkGPYMDj8K9hl0rTbklbiwtZQeTvhU/0pT5abs0Eby1TPmHWoZ9Z1CS91CS↵PzZOSI4wi/kKqJoNsx2hXcnsBX1XB4f0OLBj0iwU+ot1H9KuJDBBkQ28MfP8KAfyo+sRWiiHspdW↵fMGmfDzVdSXdY6Jdup/jKbV/M8V0Om/BLX5gDcPBaJ6Sz7j/AOOg/wA695lupuSGAx6CoGlkbqxr↵OVeT2RSppHkyfBa6gQbNYscgcgq3/wBemn4Uaqn3dR01/wDgbj/2WvWlG4nOeK0bGzhlhLtu47A8↵VLxM4K9ylRjJ2PFE+GOtrgrc6f8A9/H4/wDHakl+H/i9MeTcRSemy4b+or1t7t0kZY44kwcZC5J/↵PNMeWaf5ZZXK56Z4/Ks1i5y2K+rRW55hafD3xXKnl3eswW6Hqj3LMfyArRi+GESLh/Ekm7v5ducf↵qa9GtbSEckFsHua1obKAxqcHkUnXqPr+BXsoLof/2Q==",
+                    "description": "Captcha Recognition Recaptcha2 Image"
+                  },
+                  "question": {
+                    "type": "string",
+                    "example": "/m/0k4j",
+                    "description": "Captcha Recognition Recaptcha2 Question"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Google Recaptcha2 image recognition API, input the content to be recognized and the Recapcha2 image, and return the coordinates of the small image that needs to be clicked."
+      }
+    },
+    "/captcha/token/recaptcha2": {
+      "post": {
+        "summary": "Token Recaptcha2",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "token": "03AGdBq25SxXT-pmSeBXjzScW-EiocHwwpwqtk1QXlJnGnU......"
+                  },
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Captcha Token Recaptcha2 Response 200 Token"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha2 Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 400 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "disabled",
+                          "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "disabled",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 400 Trace Id 3"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "model is invalid."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Code 4"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "model is invalid.",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Message 4"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 400 Trace Id 4"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_token",
+                          "message": "No token specified for the request."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_token",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Code 5"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "No token specified for the request.",
+                              "description": "Captcha Token Recaptcha2 Response 400 Error Message 5"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 400 Trace Id 5"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha2 Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Captcha Token Recaptcha2 Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Captcha Token Recaptcha2 Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 401 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_expired",
+                          "message": "token expired."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_expired",
+                              "description": "Captcha Token Recaptcha2 Response 401 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token expired.",
+                              "description": "Captcha Token Recaptcha2 Response 401 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 401 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "token and api does not match."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Captcha Token Recaptcha2 Response 401 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token and api does not match.",
+                              "description": "Captcha Token Recaptcha2 Response 401 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 401 Trace Id 3"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha2 Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "used_up",
+                          "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "used_up",
+                              "description": "Captcha Token Recaptcha2 Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
+                              "description": "Captcha Token Recaptcha2 Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha2 Response 403"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_api",
+                          "message": "API does not exist, please make sure url is correct."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_api",
+                              "description": "Captcha Token Recaptcha2 Response 404 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "API does not exist, please make sure url is correct.",
+                              "description": "Captcha Token Recaptcha2 Response 404 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 404 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha2 Response 404"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Captcha Token Recaptcha2 Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Captcha Token Recaptcha2 Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha2 Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Captcha Token Recaptcha2 Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Captcha Token Recaptcha2 Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha2 Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha2 Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Captcha Token Recaptcha2 Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "website_key",
+                  "website_url"
+                ],
+                "properties": {
+                  "website_key": {
+                    "type": "string",
+                    "example": "6Le-wvkSAAAAAPBMRTvw0Q4Muexq9bi0DJwx_mJ-",
+                    "description": "Captcha Token Recaptcha2 Website Key"
+                  },
+                  "website_url": {
+                    "type": "string",
+                    "example": "https://www.google.com/recaptcha/api2/demo",
+                    "description": "Captcha Token Recaptcha2 Website Url"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Google Recaptcha2 verification code recognition api, using this api users do not need to identify and click the recaptcha verification code picture, only by submitting the website key can achieve the background automatic decoding, complete the verification."
+      }
+    },
+    "/captcha/token/recaptcha3": {
+      "post": {
+        "summary": "Token Recaptcha3",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "token": "03AGdBq25SxXT-pmSeBXjzScW-EiocHwwpwqtk1QXlJnGnU......"
+                  },
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Captcha Token Recaptcha3 Response 200 Token"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha3 Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 400 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "disabled",
+                          "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "disabled",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 400 Trace Id 3"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "model is invalid."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Code 4"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "model is invalid.",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Message 4"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 400 Trace Id 4"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_token",
+                          "message": "No token specified for the request."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_token",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Code 5"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "No token specified for the request.",
+                              "description": "Captcha Token Recaptcha3 Response 400 Error Message 5"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 400 Trace Id 5"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha3 Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Captcha Token Recaptcha3 Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Captcha Token Recaptcha3 Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 401 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_expired",
+                          "message": "token expired."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_expired",
+                              "description": "Captcha Token Recaptcha3 Response 401 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token expired.",
+                              "description": "Captcha Token Recaptcha3 Response 401 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 401 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "token and api does not match."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Captcha Token Recaptcha3 Response 401 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token and api does not match.",
+                              "description": "Captcha Token Recaptcha3 Response 401 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 401 Trace Id 3"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha3 Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "used_up",
+                          "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "used_up",
+                              "description": "Captcha Token Recaptcha3 Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
+                              "description": "Captcha Token Recaptcha3 Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha3 Response 403"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_api",
+                          "message": "API does not exist, please make sure url is correct."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_api",
+                              "description": "Captcha Token Recaptcha3 Response 404 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "API does not exist, please make sure url is correct.",
+                              "description": "Captcha Token Recaptcha3 Response 404 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 404 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha3 Response 404"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Captcha Token Recaptcha3 Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Captcha Token Recaptcha3 Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha3 Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Captcha Token Recaptcha3 Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Captcha Token Recaptcha3 Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Captcha Token Recaptcha3 Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Captcha Token Recaptcha3 Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Captcha Token Recaptcha3 Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "website_key",
+                  "website_url",
+                  "page_action"
+                ],
+                "properties": {
+                  "page_action": {
+                    "type": "string",
+                    "example": "examples/v3scores",
+                    "description": "Captcha Token Recaptcha3 Page Action"
+                  },
+                  "website_key": {
+                    "type": "string",
+                    "example": "6LdKlZEpAAAAAAOQjzC2v_d36tWxCl6dWsozdSy9",
+                    "description": "Captcha Token Recaptcha3 Website Key"
+                  },
+                  "website_url": {
+                    "type": "string",
+                    "example": "https://recaptcha-demo.appspot.com/recaptcha-v3-request-scores.php",
+                    "description": "Captcha Token Recaptcha3 Website Url"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Google Recaptcha3 verification code recognition api, using this api users do not need to identify and click the recaptcha verification code picture, only by submitting the website key can achieve the background automatic decoding, complete the verification."
+      }
+    }
+  }
+}

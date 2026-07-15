@@ -1,0 +1,1163 @@
+### adsl-http-proxy
+POST /adsl/extract
+  - isp: string enum=电信,联通,移动
+  - city: string
+  - type: string enum=http,socks
+  - dedup: boolean
+  - number: number
+  - duration: number enum=60,180,300
+  - province: string
+  params:
+   header - accept: string enum=application/json
+POST /adsl/whitelist
+  - ip: string
+  - action: string enum=add,delete
+  params:
+   header - accept: string enum=application/json
+
+### aichat
+POST /aichat2/conversations
+  - action: string enum=chat,retrieve,retrieve_batch,update,delete
+  - id: string
+  * model: string enum=gpt-4,gpt-4.1,gpt-4.1-mini,gpt-4.1-nano,gpt-4o,gpt-4o-2024-05-13,gpt-4o-all,gpt-4o-image,gpt-4o-mini,gpt-5-all,gpt-5.1-all,gpt-5.2-pro,gpt-5.4-mini,gpt-5.4-nano,gpt-image-1,claude-3-5-haiku-20241022,claude-3-5-sonnet-20240620,claude-3-5-sonnet-20241022,claude-3-7-sonnet-20250219,claude-3-haiku-20240307...
+  - question: string
+  - message: None
+  - stateful: boolean
+  - references: array[string]
+  - preset: string
+  - max_turns: integer
+  - async: boolean
+  - callback_url: string
+  - allowed_skills: array[string]
+  - allowed_mcp_servers: array[string]
+  - unattended_policy: object
+  - tool_results: array[object]
+  - messages: array[object]
+  - title: string
+  - user_id: string
+  - application_id: string
+  - model_group: string enum=chatgpt,claude,gemini,grok,kimi,glm,deepseek
+  - offset: integer
+  - limit: integer
+  params:
+   header - accept: string enum=application/json,application/x-ndjson,text/event-stream
+POST /aichat/conversations
+  - id: string
+  * model: string enum=gpt-5.6-luna,gpt-5.6-terra,gpt-5.6-sol,gpt-5.5,gpt-5.5-pro,gpt-5.4,gpt-5.4-mini,gpt-5.4-nano,gpt-5.4-pro,gpt-5.2,gpt-5.1,gpt-5.1-all,gpt-5,gpt-5-mini,gpt-5-nano,gpt-5-all,gpt-4,gpt-4-all,gpt-4-turbo,gpt-4-turbo-preview...
+  - preset: string
+  * question: string
+  - stateful: boolean
+  - references: array[string]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+
+### deepseek
+POST /deepseek/chat/completions
+  - n: number
+  * model: string enum=deepseek-r1,deepseek-r1-0528,deepseek-v3,deepseek-v3-250324,deepseek-v3.2-exp,deepseek-v4-flash
+  - stream: boolean
+  * messages: array[object]
+  - max_tokens: number
+  - temperature: number
+  - response_format: None
+  - top_p: number
+  - frequency_penalty: number
+  - presence_penalty: number
+  - seed: integer
+  - stop: None
+  - max_completion_tokens: integer
+  - logprobs: boolean
+  - top_logprobs: integer
+  - stream_options: object
+  - parallel_tool_calls: boolean
+  - user: string
+  - reasoning_effort: string enum=minimal,low,medium,high
+  - service_tier: string enum=auto,default,flex,scale,priority
+  - store: boolean
+  - metadata: object
+  - logit_bias: object
+  - modalities: array[string]
+  - audio: object
+  - prediction: object
+  - web_search_options: object
+  - tools: array[object]
+  - tool_choice: None
+  params:
+   header - accept: string enum=application/json
+
+### face-change
+POST /face/analyze
+  - mode: number
+  * image_url: string
+  - face_model_version: string
+  - need_rotate_detection: number
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /face/beautify
+  * image_url: string
+  - smoothing: number
+  - whitening: number
+  - face_lifting: number
+  - eye_enlarging: number
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /face/change-age
+  * age_infos: array[object]
+  * image_url: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /face/change-gender
+  * image_url: string
+  * gender_infos: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /face/detect-live
+  * image_url: string
+  - face_model_version: number
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /face/swap
+  - timeout: number
+  - callback_url: string
+  - async: boolean
+  - source_image_url: string
+  - target_image_url: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /face/cartoon
+  * image_url: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+
+### fish
+POST /fish/tts
+  * text: string
+  - reference_id: string
+  - format: string enum=mp3,wav,pcm,opus
+  - sample_rate: integer
+  - mp3_bitrate: integer enum=64,128,192
+  - opus_bitrate: integer
+  - latency: string enum=normal,balanced
+  - chunk_length: integer
+  - min_chunk_length: integer
+  - temperature: number
+  - top_p: number
+  - repetition_penalty: number
+  - max_new_tokens: integer
+  - normalize: boolean
+  - prosody: object
+  - references: array[object]
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+   header - model: string enum=s1,s2-pro
+GET /fish/model
+  params:
+   query - page_size: integer
+   query - page_number: integer
+   query - title: string
+   query - tag: string
+   query - self: boolean
+   query - author_id: string
+   query - language: string
+   query - title_language: string
+   query - sort_by: string
+   header - accept: string enum=application/json
+GET /fish/model/{id}
+  params:
+   path * id: string
+   header - accept: string enum=application/json
+POST /fish/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### flux
+POST /flux/images
+  - size: string
+  - count: number
+  - model: string enum=flux-dev,flux-pro,flux-kontext-pro,flux-kontext-max,flux-2-flex,flux-2-pro,flux-2-max,flux-2-klein
+  * action: string enum=generate,edit
+  * prompt: string
+  - image_url: string
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /flux/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### gemini
+POST /gemini/chat/completions
+  - n: number
+  * model: string enum=gemini-3.1-pro,gemini-3.0-pro,gemini-3.5-flash,gemini-3-flash-preview,gemini-2.5-pro,gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash,gemini-3.1-flash-lite-preview,gemini-3.1-flash-image,gemini-2.5-flash-image,gemini-3-pro-image
+  - stream: boolean
+  * messages: array[object]
+  - max_tokens: number
+  - temperature: number
+  - response_format: None
+  - top_p: number
+  - frequency_penalty: number
+  - presence_penalty: number
+  - seed: integer
+  - stop: None
+  - max_completion_tokens: integer
+  - logprobs: boolean
+  - top_logprobs: integer
+  - stream_options: object
+  - parallel_tool_calls: boolean
+  - user: string
+  - reasoning_effort: string enum=minimal,low,medium,high
+  - service_tier: string enum=auto,default,flex,scale,priority
+  - store: boolean
+  - metadata: object
+  - logit_bias: object
+  - modalities: array[string]
+  - audio: object
+  - prediction: object
+  - web_search_options: object
+  - tools: array[object]
+  - tool_choice: None
+  params:
+   header - accept: string enum=application/json
+POST /v1beta/models/{model}:generateContent
+  * contents: array[object]
+  - systemInstruction: object
+  - generationConfig: object
+  - tools: array[object]
+  - toolConfig: object
+  - safetySettings: array[object]
+  - cachedContent: string
+  params:
+   path * model: string enum=gemini-2.0-flash,gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.5-pro,gemini-3-flash-preview,gemini-3.5-flash,gemini-3.0-pro,gemini-3.1-pro,gemini-3.1-flash-lite-preview,gemini-3.1-flash-image,gemini-2.5-flash-image,gemini-3-pro-image
+POST /v1beta/models/{model}:streamGenerateContent
+  * contents: array[object]
+  - systemInstruction: object
+  - generationConfig: object
+  - tools: array[object]
+  - toolConfig: object
+  - safetySettings: array[object]
+  - cachedContent: string
+  params:
+   path * model: string enum=gemini-2.0-flash,gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.5-pro,gemini-3-flash-preview,gemini-3.5-flash,gemini-3.0-pro,gemini-3.1-pro,gemini-3.1-flash-lite-preview,gemini-3.1-flash-image,gemini-2.5-flash-image,gemini-3-pro-image
+   query - alt: string enum=sse
+POST /gemini/videos
+  * prompt: string
+  - model: string enum=omni-flash
+  - aspect_ratio: string enum=16:9,9:16
+  - resolution: string enum=720p,1080p
+  - image_urls: array[string]
+  - video_urls: array[string]
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /gemini/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### glm
+POST /glm/chat/completions
+  - n: number
+  * model: string enum=glm-5.2,glm-5,glm-5-turbo,glm-5.1,glm-4.7,glm-4.6,glm-3-turbo
+  - stream: boolean
+  * messages: array[object]
+  - max_tokens: number
+  - temperature: number
+  - response_format: None
+  - top_p: number
+  - frequency_penalty: number
+  - presence_penalty: number
+  - seed: integer
+  - stop: None
+  - max_completion_tokens: integer
+  - logprobs: boolean
+  - top_logprobs: integer
+  - stream_options: object
+  - parallel_tool_calls: boolean
+  - user: string
+  - reasoning_effort: string enum=minimal,low,medium,high
+  - service_tier: string enum=auto,default,flex,scale,priority
+  - store: boolean
+  - metadata: object
+  - logit_bias: object
+  - modalities: array[string]
+  - audio: object
+  - prediction: object
+  - web_search_options: object
+  - tools: array[object]
+  - tool_choice: None
+  params:
+   header - accept: string enum=application/json
+
+### grok
+POST /grok/chat/completions
+  - n: number
+  * model: string enum=grok-4.5,grok-4,grok-3
+  - stream: boolean
+  * messages: array[object]
+  - max_tokens: number
+  - temperature: number
+  - top_p: number
+  - frequency_penalty: number
+  - presence_penalty: number
+  - seed: integer
+  - stop: None
+  - max_completion_tokens: integer
+  - logprobs: boolean
+  - top_logprobs: integer
+  - stream_options: object
+  - parallel_tool_calls: boolean
+  - user: string
+  - reasoning_effort: string enum=minimal,low,medium,high
+  - service_tier: string enum=auto,default,flex,scale,priority
+  - store: boolean
+  - metadata: object
+  - logit_bias: object
+  - modalities: array[string]
+  - audio: object
+  - prediction: object
+  - web_search_options: object
+  - tools: array[object]
+  - tool_choice: None
+  - response_format: None
+  params:
+   header - accept: string enum=application/json
+POST /grok/videos
+  - prompt: string
+  - model: string enum=grok-imagine-video-1.5-fast,grok-imagine-video-1.5
+  - image_url: string
+  - reference_image_urls: array[string]
+  - aspect_ratio: string enum=1:1,16:9,9:16,4:3,3:4,3:2,2:3
+  - resolution: string enum=480p,720p,1080p
+  - duration: integer
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /grok/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### hailuo
+POST /hailuo/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+POST /hailuo/videos
+  - model: string enum=minimax-i2v,minimax-t2v,minimax-i2v-director
+  * action: string enum=generate
+  - prompt: string
+  - callback_url: string
+  - async: boolean
+  - first_image_url: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+
+### happyhorse
+POST /happyhorse/videos
+  - action: string enum=generate,image_to_video,reference_to_video,video_edit
+  - model: string enum=happyhorse-1.0-t2v,happyhorse-1.1-t2v,happyhorse-1.0-i2v,happyhorse-1.1-i2v,happyhorse-1.0-r2v,happyhorse-1.1-r2v,happyhorse-1.0-video-edit
+  - prompt: string
+  - image_url: string
+  - image_urls: array[string]
+  - video_url: string
+  - resolution: string enum=720P,1080P
+  - ratio: string enum=16:9,9:16,1:1,4:3,3:4
+  - duration: integer
+  - watermark: boolean
+  - audio_setting: string enum=auto,origin
+  - seed: integer
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /happyhorse/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### hcaptcha
+POST /captcha/recognition/hcaptcha
+  - queries: array[string]
+  - question: string
+  params:
+   header - accept: string enum=application/json
+POST /captcha/token/hcaptcha
+  * website_key: string
+  * website_url: string
+  params:
+   header - accept: string enum=application/json
+
+### identity
+POST /identity/bankcard/check-1e
+  * bank_card: string
+  - encryption: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/bankcard/check-2e
+  * name: string
+  * bank_card: string
+  - encryption: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/bankcard/check-3e
+  * name: string
+  * id_card: string
+  * bank_card: string
+  - cert_type: number
+  - encryption: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/bankcard/check-4e
+  * name: string
+  * phone: string
+  * id_card: string
+  * bank_card: string
+  - cert_type: number
+  - encryption: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/idcard/check-1e
+  - config: string
+  * image_url: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/idcard/check-2e
+  * name: string
+  * id_card: string
+  - encryption: array[object]
+  * validity_end: string
+  * validity_begin: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/idcard/ocr
+  - name: string
+  - id_card: string
+  - image_url: string
+  - encryption: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/phone/check-1e
+  * mobile: string
+  - encryption: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/phone/check-2e
+  * name: string
+  * mobile: string
+  - encryption: array[object]
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /identity/phone/check-3e
+  - iv: string
+  * name: string
+  * phone: string
+  * id_card: string
+  - verify_mode: string
+  - encrypt_list: array[string]
+  - ciphertext_blob: number
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+
+### image2text
+POST /captcha/recognition/image2text
+  * image: string
+  params:
+   header - accept: string enum=application/json
+
+### kimi
+POST /kimi/chat/completions
+  - n: number
+  * model: string enum=kimi-k2.6,kimi-k2-thinking-turbo,kimi-k2.5,kimi-k2-thinking,kimi-k2-instruct-0905,kimi-k2-0905-preview,kimi-k2-turbo-preview,kimi-k2-0711-preview
+  - stream: boolean
+  * messages: array[object]
+  - max_tokens: number
+  - temperature: number
+  - response_format: None
+  - top_p: number
+  - frequency_penalty: number
+  - presence_penalty: number
+  - seed: integer
+  - stop: None
+  - max_completion_tokens: integer
+  - logprobs: boolean
+  - top_logprobs: integer
+  - stream_options: object
+  - parallel_tool_calls: boolean
+  - user: string
+  - reasoning_effort: string enum=minimal,low,medium,high
+  - service_tier: string enum=auto,default,flex,scale,priority
+  - store: boolean
+  - metadata: object
+  - logit_bias: object
+  - modalities: array[string]
+  - audio: object
+  - prediction: object
+  - web_search_options: object
+  - tools: array[object]
+  - tool_choice: None
+  params:
+   header - accept: string enum=application/json
+
+### kling
+POST /kling/motion
+  - model_name: string enum=kling-v2-6,kling-v3
+  * mode: string enum=std,pro
+  - keep_original_sound: string enum=yes,no
+  - watermark_info: object
+  * image_url: string
+  * video_url: string
+  * character_orientation: string enum=image,video
+  - prompt: string
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /kling/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+POST /kling/videos
+  - mode: string enum=std,pro,4k
+  - model: string enum=kling-v1,kling-v1-6,kling-v2-master,kling-v2-1-master,kling-v2-5-turbo,kling-v2-6,kling-v3,kling-v3-omni,kling-video-o1
+  * action: string enum=text2video,image2video,extend
+  - prompt: string
+  - duration: number
+  - generate_audio: boolean
+  - video_id: string
+  - cfg_scale: string
+  - aspect_ratio: string enum=16:9,9:16,1:1
+  - callback_url: string
+  - async: boolean
+  - end_image_url: string
+  - camera_control: string
+  - element_list: array[object]
+  - image_list: array[object]
+  - video_list: array[object]
+  - negative_prompt: string
+  - start_image_url: string
+  params:
+   header - accept: string enum=application/json
+POST /kling/lip-sync
+  - video_id: string
+  - video_url: string
+  * mode: string enum=audio2video,text2video
+  - audio_url: string
+  - audio_type: string enum=url,file
+  - audio_file: string
+  - text: string
+  - voice_id: string
+  - voice_language: string enum=zh,en
+  - voice_speed: number
+  - callback_url: string
+  - async: boolean
+POST /kling/talking-photo
+  * image_url: string
+  * audio_url: string
+  - prompt: string
+  - model: string enum=kling-v1,kling-v1-6,kling-v2-master,kling-v2-1-master,kling-v2-5-turbo,kling-v2-6
+  - duration: integer enum=5,10
+  - mode: string enum=std,pro
+  - callback_url: string
+  - async: boolean
+
+### localization
+POST /localization/translate
+  * input: object
+  - model: string enum=gpt-3.5,gpt-4
+  * locale: string enum=en,de,pt,es,fr,zh-CN,zh-TW,it,ko,ja,ru,pl,fi,sv,el,uk,ar,sr
+  * extension: string enum=json,md
+  params:
+   header - accept: string enum=application/json
+
+### luma
+POST /luma/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+POST /luma/videos
+  - loop: boolean
+  - action: string enum=generate,extend
+  - prompt: string
+  - timeout: number
+  - video_id: string
+  - aspect_ratio: string
+  - video_url: string
+  - enhancement: boolean
+  - callback_url: string
+  - async: boolean
+  - end_image_url: string
+  - start_image_url: string
+  params:
+   header - accept: string enum=application/json
+
+### midjourney
+POST /midjourney/imagine
+  - mask: string
+  - mode: string enum=fast,relax,turbo
+  - action: string
+  - prompt: string
+  - timeout: number
+  - image_id: string
+  - translation: boolean
+  - callback_url: string
+  - async: boolean
+  - split_images: boolean
+  - version: string
+  - hd: boolean
+  - quality: string
+  - style_reference: boolean
+  - moodboard: boolean
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /midjourney/seed
+  * image_id: string
+  params:
+   header - accept: string enum=application/json
+POST /midjourney/edits
+  - mask: string
+  - mode: string enum=fast,relax,turbo
+  - action: string
+  - prompt: string
+  - image_url: string
+  - callback_url: string
+  - async: boolean
+  - split_images: boolean
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /midjourney/videos
+  - action: string enum=generate,extend
+  - mode: string enum=fast,turbo
+  - resolution: string enum=480p,720p
+  - prompt: string
+  - video_id: string
+  - video_index: number
+  - loop: boolean
+  - image_url: string
+  - end_image_url: string
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /midjourney/describe
+  * image_url: string
+  params:
+   header - accept: string enum=application/json
+POST /midjourney/shorten
+  * prompt: string
+  params:
+   header - accept: string enum=application/json
+POST /midjourney/translate
+  * content: string
+  params:
+   header - accept: string enum=application/json
+POST /midjourney/tasks
+  - action: string enum=retrieve,retrieve_batch
+  - id: string
+  - trace_id: string
+  - ids: array[string]
+  - trace_ids: array[string]
+  - offset: integer
+  - limit: integer
+  params:
+   header - accept: string enum=application/json
+
+### nano-banana
+POST /nano-banana/images
+  * action: string enum=generate,edit
+  - model: string enum=nano-banana,nano-banana-2-lite,nano-banana-2,nano-banana-pro,nano-banana:official,nano-banana-2-lite:official,nano-banana-2:official,nano-banana-pro:official
+  * prompt: string
+  - image_urls: array[string]
+  - aspect_ratio: string enum=1:1,3:2,2:3,16:9,9:16,4:3,3:4
+  - resolution: string enum=1K,2K,4K
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /nano-banana/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### openai
+POST /openai/chat/completions
+  - n: number
+  * model: string enum=gpt-oss:free,gpt-5.5:free,gpt-5:free,gpt-4.1:free,gpt-4o:free,gpt-4o-mini:free,gpt-5.6-luna,gpt-5.6-terra,gpt-5.6-sol,gpt-5.5,gpt-5.5-pro,gpt-5.4,gpt-5.4-mini,gpt-5.4-nano,gpt-5.4-pro,gpt-5.2,gpt-5.1,gpt-5.1-all,gpt-5,gpt-5-mini...
+  - stream: boolean
+  * messages: array[object]
+  - max_tokens: number
+  - temperature: number
+  - response_format: None
+  - tools: array[object]
+  - tool_choice: None
+  - top_p: number
+  - frequency_penalty: number
+  - presence_penalty: number
+  - seed: integer
+  - stop: None
+  - max_completion_tokens: integer
+  - logprobs: boolean
+  - top_logprobs: integer
+  - stream_options: object
+  - parallel_tool_calls: boolean
+  - user: string
+  - reasoning_effort: string enum=minimal,low,medium,high
+  - service_tier: string enum=auto,default,flex,scale,priority
+  - store: boolean
+  - metadata: object
+  - logit_bias: object
+  - modalities: array[string]
+  - audio: object
+  - prediction: object
+  - web_search_options: object
+  params:
+   header - accept: string enum=application/json
+POST /openai/embeddings
+  * model: string enum=text-embedding-3-small,text-embedding-3-large,text-embedding-ada-002
+  * input: None
+  - encoding_format: string enum=float,base64
+  - dimensions: integer
+  params:
+   header - accept: string enum=application/json
+POST /openai/images/generations
+  * prompt: string enum=A cute baby sea otter,A wooden bookshelf consisting of three shelves: on the top shelf one book, the second shelf three books, and the bottom shelf seven books.,Cinematic minimal portrait of a solitary man standing in an intense orange-to-red gradient environment, strong silhouette lighting, deep shadow contrast, reflective glossy floor, symmetrical composition.,Symmetrical design featuring two elegant blue peacocks with detailed feather patterns, surrounded by blue floral elements, intricate vintage botanical ornament, soft beige background, decorative art illustration.,Avant-garde sports fashion advertisement, oversized basketball posed like a monumental sculpture, female athlete reclining across the ball's curved surface, giant word 'ELEVATE' in bold typography behind, burnt orange studio backdrop, glossy reflective floor.,High-fashion surrealist poster for Rolex. Deep emerald green minimalist studio with polished reflective floor. A massive Rolex watch standing upright like a monument; a male model in tailored dark green suit leans casually against the watch face, wearing a matching Rolex.,Ultra-realistic product photography of a rich strawberry soft-serve ice cream in a crispy waffle cone, clean modern premium aesthetic, soft serve vibrant natural pink, sculpted swirl with curled peak, lightly topped with strawberry dust.,Hyper-realistic UI/UX mockup on a slim modern laptop on a minimal wooden desk with soft natural daylight; clean SaaS dashboard with elegant typography, glassmorphism cards, smooth gradients, subtle drop shadows, charts, sidebar navigation, macOS-style window frame.,9:16 vertical Korean idol portrait photoshoot, 3x3 grid (nine frames), same person in all images, consistent facial features and styling, soft black mist filter effect, lowered contrast, blooming highlights, subtle glow around light sources.,Mobile phone photo, old CCD camera aesthetic, harsh flash, grainy, dim messy indoor lighting, candid snapshot feeling, slight motion blur.,Create a science fiction movie poster.,以中国连环画（小人书）的风格帮我绘制大闹天宫,新中式水墨山水海报，竖版9:16构图，东方极简美学风格，大面积留白，主题是春岚一叶红
+  - background: string enum=transparent,opaque,auto
+  * model: string enum=dall-e-2,dall-e-3,gpt-image-1,gpt-image-1.5,gpt-image-2,gpt-image-2:reverse,gpt-image-2:official,nano-banana,nano-banana-2-lite,nano-banana-2,nano-banana-pro
+  - moderation: string enum=low,auto
+  - n: integer
+  - output_compression: integer
+  - output_format: string enum=png,jpeg,webp
+  - partial_images: integer
+  - size: string
+  - quality: string enum=auto,high,medium,low,hd,standard
+  - response_format: string enum=url,b64_json
+  - style: string enum=vivid,natural
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+GET /openai/models
+  params:
+   header - accept: string enum=application/json
+POST /openai/responses
+  - n: number
+  * model: string enum=gpt-5.6-luna,gpt-5.6-terra,gpt-5.6-sol,gpt-5.5,gpt-5.5-pro,gpt-5.4,gpt-5.4-mini,gpt-5.4-nano,gpt-5.4-pro,gpt-5.1,gpt-5.1-all,gpt-5,gpt-5-mini,gpt-5-nano,gpt-4,gpt-4-all,gpt-4-turbo,gpt-4-turbo-preview,gpt-4-vision-preview,gpt-4.1...
+  - background: boolean
+  - stream: boolean
+  * input: array[object]
+  - tools: array[$ref]
+  - max_tokens: number
+  - temperature: number
+  - response_format: object
+  params:
+   header - accept: string enum=application/json
+POST /openai/images/edits
+  * image: None
+  * prompt: string
+  - model: string enum=dall-e-2,dall-e-3,gpt-image-1,gpt-image-1.5,gpt-image-2,gpt-image-2:reverse,gpt-image-2:official,nano-banana,nano-banana-2-lite,nano-banana-2,nano-banana-pro
+  - n: integer
+  - background: string enum=transparent,opaque,auto
+  - input_fidelity: string enum=high,low
+  - output_format: string enum=png,jpeg,webp
+  - output_compression: integer
+  - quality: string enum=auto,high,medium,low,standard
+  - size: string
+  - response_format: string enum=url,b64_json
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+   header * Content-Type: string enum=multipart/form-data,application/json
+POST /openai/tasks
+  - action: string enum=retrieve,retrieve_batch
+  - id: string
+  - trace_id: string
+  - ids: array[string]
+  - trace_ids: array[string]
+  - application_id: string
+  - user_id: string
+  - type: string enum=images,images_generations,images_edits
+  - offset: integer
+  - limit: integer
+  - created_at_min: number
+  - created_at_max: number
+  params:
+   header - accept: string enum=application/json
+
+### producer
+POST /producer/upload
+  * audio_url: string
+  params:
+   header - accept: string enum=application/json
+POST /producer/videos
+  * audio_id: string
+  params:
+   header - accept: string enum=application/json
+POST /producer/wav
+  * audio_id: string
+  params:
+   header - accept: string enum=application/json
+POST /producer/audios
+  * lyric: string
+  - model: string enum=FUZZ-2.0 Pro,FUZZ-2.0,FUZZ-2.0 Raw,FUZZ-1.1 Pro,FUZZ-1.0 Pro,FUZZ-1.0,FUZZ-1.1,FUZZ-0.8
+  - title: string
+  * action: string enum=generate,cover,extend,variation,swap_vocals,swap_instrumentals,replace_section,stems
+  - custom: boolean
+  * prompt: string
+  - audio_id: string
+  - continue_at: number
+  - callback_url: string
+  - async: boolean
+  - seed: string
+  - instrumental: boolean
+  - sound_strength: number
+  - lyrics_strength: number
+  - weirdness: number
+  - replace_section_end: number
+  - replace_section_start: number
+  params:
+   header - accept: string enum=application/json
+POST /producer/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+POST /producer/lyrics
+  * prompt: object
+  params:
+   header - accept: string enum=application/json
+
+### recaptcha
+POST /captcha/recognition/recaptcha2
+  * image: string
+  * question: string
+  params:
+   header - accept: string enum=application/json
+POST /captcha/token/recaptcha2
+  * website_key: string
+  * website_url: string
+  params:
+   header - accept: string enum=application/json
+POST /captcha/token/recaptcha3
+  * page_action: string
+  * website_key: string
+  * website_url: string
+  params:
+   header - accept: string enum=application/json
+
+### seedance
+POST /seedance/videos
+  * model: string enum=doubao-seedance-1-0-pro-250528,doubao-seedance-1-0-pro-fast-251015,doubao-seedance-1-5-pro-251215,doubao-seedance-1-0-lite-t2v-250428,doubao-seedance-1-0-lite-i2v-250428,doubao-seedance-2-0-260128,doubao-seedance-2-0-fast-260128,doubao-seedance-2-0-mini-260615
+  * content: array[$ref]
+  - resolution: string enum=480p,720p,1080p,4k
+  - ratio: string enum=16:9,4:3,1:1,3:4,9:16,21:9,adaptive
+  - duration: integer
+  - frames: integer
+  - seed: integer
+  - camerafixed: boolean
+  - watermark: boolean
+  - generate_audio: boolean
+  - callback_url: string
+  - async: boolean
+  - return_last_frame: boolean
+  - execution_expires_after: integer
+  params:
+   header - accept: string enum=application/json
+POST /seedance/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### seedream
+POST /seedream/images
+  * model: string enum=doubao-seedream-5-0-pro-260628,doubao-seedream-5-0-260128,doubao-seedream-4-0-250828,doubao-seedream-4-5-251128,doubao-seedream-3-0-t2i-250415,doubao-seededit-3-0-i2i-250628
+  * prompt: string
+  - image: array[string]
+  - size: string enum=1K,2K,3K,4K,adaptive
+  - seed: integer
+  - sequential_image_generation: string enum=auto,disabled
+  - sequential_image_generation_options: object
+  - stream: boolean
+  - guidance_scale: number
+  - response_format: string
+  - watermark: boolean
+  - output_format: string enum=jpeg,png
+  - tools: array[object]
+  - optimize_prompt_options: object
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /seedream/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### serp
+POST /serp/google
+  - page: number
+  - type: string enum=search,images,news,maps,places,videos
+  - query: string
+  - range: string
+  - number: number
+  - country: string
+  - language: string
+  params:
+   header - accept: string enum=application/json
+
+### shorturl
+POST /shorturl
+  - content: object
+  params:
+   header - accept: string enum=application/json
+
+### sora
+POST /sora/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+POST /sora/videos
+  * model: string enum=sora-2,sora-2-pro
+  - duration: integer enum=4,8,10,12,15,25
+  - orientation: string enum=landscape,portrait
+  - size: string enum=small,large,720x1280,1280x720,1024x1792,1792x1024
+  * prompt: string
+  - character_url: string
+  - character_start: integer
+  - character_end: integer
+  - image_urls: array[string]
+  - callback_url: string
+  - async: boolean
+  - version: string enum=1.0,2.0
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+
+### suno
+POST /suno/audios
+  - lyric: string
+  - model: string enum=chirp-v5-5,chirp-v5,chirp-v4-5-plus,chirp-v4-5,chirp-v4,chirp-v3-5,chirp-v3-0
+  - style: string
+  - variation_category: string
+  - title: string
+  - action: string enum=generate,extend,upload_extend,upload_cover,concat,cover,artist_consistency,artist_consistency_vox,stems,all_stems,replace_section,underpainting,overpainting,remaster,mashup,samples,inspo
+  - custom: boolean
+  - prompt: object
+  - lyric_prompt: object
+  - audio_id: string
+  - mashup_audio_ids: array[string]
+  - audio_urls: array[string]
+  - weirdness: number
+  - persona_id: string
+  - overpainting_start: number
+  - overpainting_end: number
+  - samples_start: number
+  - samples_end: number
+  - underpainting_start: number
+  - underpainting_end: number
+  - continue_at: number
+  - callback_url: string
+  - async: boolean
+  - instrumental: boolean
+  - vocal_gender: string
+  - style_negative: string
+  - style_influence: number
+  - audio_weight: number
+  - replace_section_end: number
+  - replace_section_start: number
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /suno/persona
+  * name: string
+  * audio_id: string
+  - vox_audio_id: string
+  - vocal_start: number
+  - vocal_end: number
+  - description: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+GET /suno/persona
+  params:
+   query * user_id: string
+   query - limit: integer
+   query - offset: integer
+DELETE /suno/persona
+  params:
+   query * persona_id: string
+   query - user_id: string
+POST /suno/mp4
+  * audio_id: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /suno/voices
+  * audio_url: string
+  - name: string
+  - description: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /suno/timing
+  * audio_id: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+POST /suno/vox
+  * audio_id: string
+  - vocal_start: number
+  - vocal_end: number
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /suno/wav
+  * audio_id: string
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /suno/midi
+  * audio_id: string
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /suno/style
+  * prompt: string
+  params:
+   header - accept: string enum=application/json
+POST /suno/lyrics
+  * model: string enum=default,remi-v1
+  * prompt: object
+  params:
+   header - accept: string enum=application/json
+POST /suno/mashup-lyrics
+  * lyrics_a: string
+  * lyrics_b: string
+  params:
+   header - accept: string enum=application/json
+POST /suno/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+POST /suno/upload
+  * audio_url: string
+  params:
+   header - accept: string enum=application/json,application/x-ndjson
+
+### veo
+POST /veo/videos
+  - model: string enum=veo3,veo3-fast,veo31-fast,veo31,veo31-fast-ingredients
+  - resolution: string enum=4k,1080p,gif
+  * action: string enum=text2video,image2video,ingredients2video,get1080p
+  - prompt: string
+  - video_id: string
+  - translation: boolean
+  - aspect_ratio: string enum=16:9,9:16
+  - image_urls: array[string]
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /veo/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+
+### wan
+POST /wan/tasks
+  - id: string
+  - ids: array[string]
+  - action: string enum=retrieve,retrieve_batch
+  params:
+   header - accept: string enum=application/json
+POST /wan/videos
+  - audio: boolean
+  - prompt_extend: boolean
+  * action: string enum=text2video,image2video
+  - resolution: string enum=480P,720P,1080P
+  - shot_type: string enum=single,multi
+  - duration: number enum=5,10,15
+  * prompt: string
+  - negative_prompt: string
+  - size: string
+  - audio_url: string
+  - reference_video_urls: array[string]
+  * model: string enum=wan2.6-i2v,wan2.6-r2v,wan2.6-i2v-flash,wan2.6-t2v
+  - callback_url: string
+  - async: boolean
+  - image_url: string
+  params:
+   header - accept: string enum=application/json
+
+### webextrator
+POST /webextrator/extract
+  * url: string
+  - expected_type: string enum=product,article,general
+  - enable_llm: boolean
+  - wait_until: string enum=load,domcontentloaded,networkidle,commit
+  - timeout: number
+  - delay: number
+  - wait_for_selector: string
+  - block_resources: array[string]
+  - headers: object
+  - user_agent: string
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /webextrator/render
+  * url: string
+  - wait_until: string enum=load,domcontentloaded,networkidle,commit
+  - timeout: number
+  - delay: number
+  - wait_for_selector: string
+  - block_resources: array[string]
+  - headers: object
+  - user_agent: string
+  - callback_url: string
+  - async: boolean
+  params:
+   header - accept: string enum=application/json
+POST /webextrator/tasks
+  - action: string enum=retrieve,retrieve_batch
+  - id: string
+  - trace_id: string
+  - ids: array[string]
+  - trace_ids: array[string]
+  - offset: number
+  - limit: number
+  params:
+   header - accept: string enum=application/json
+

@@ -1,0 +1,3225 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Identity Authentication",
+    "version": "1.0.0",
+    "description": "API reference for Identity Authentication on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/identity/bankcard/check-1e": {
+      "post": {
+        "summary": "Bank card basic information inquiry.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 1E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 1E Response 200 Description"
+                    },
+                    "account_bank": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 1E Response 200 Account Bank"
+                    },
+                    "account_type": {
+                      "type": "number",
+                      "description": "Identity Bankcard Check 1E Response 200 Account Type"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 1E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Bankcard Check 1E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Bankcard Check 1E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 1E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Bankcard Check 1E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Bankcard Check 1E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 1E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 1E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Bankcard Check 1E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Bankcard Check 1E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 1E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 1E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Bankcard Check 1E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Bankcard Check 1E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 1E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 1E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Bankcard Check 1E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Bankcard Check 1E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 1E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 1E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Bankcard Check 1E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "bank_card"
+                ],
+                "properties": {
+                  "bank_card": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 1E Bank Card"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 1E Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 1E Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 1E Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 1E Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Bankcard Check 1E Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Bankcard Check 1E Encryption"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "bank_card": "6222021234567890123"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/identity/bankcard/check-2e": {
+      "post": {
+        "summary": "Bankcard Check 2E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 2E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 2E Response 200 Description"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 2E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Bankcard Check 2E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Bankcard Check 2E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 2E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Bankcard Check 2E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Bankcard Check 2E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 2E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 2E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Bankcard Check 2E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Bankcard Check 2E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 2E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 2E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Bankcard Check 2E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Bankcard Check 2E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 2E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 2E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Bankcard Check 2E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Bankcard Check 2E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 2E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 2E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Bankcard Check 2E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "bank_card"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 2E Name"
+                  },
+                  "bank_card": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 2E Bank Card"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 2E Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 2E Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 2E Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 2E Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Bankcard Check 2E Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Bankcard Check 2E Encryption"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "name": "John Doe",
+                "bank_card": "6222021234567890123"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "This interface is used to verify the authenticity and consistency of names and bank card numbers."
+      }
+    },
+    "/identity/bankcard/check-3e": {
+      "post": {
+        "summary": "Bankcard Check 3E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 3E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 3E Response 200 Description"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 3E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Bankcard Check 3E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Bankcard Check 3E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 3E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Bankcard Check 3E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Bankcard Check 3E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 3E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 3E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Bankcard Check 3E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Bankcard Check 3E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 3E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 3E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Bankcard Check 3E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Bankcard Check 3E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 3E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 3E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Bankcard Check 3E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Bankcard Check 3E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 3E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 3E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Bankcard Check 3E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id_card",
+                  "name",
+                  "bank_card"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 3E Name"
+                  },
+                  "id_card": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 3E Id Card"
+                  },
+                  "bank_card": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 3E Bank Card"
+                  },
+                  "cert_type": {
+                    "type": "number",
+                    "description": "Identity Bankcard Check 3E Cert Type"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 3E Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 3E Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 3E Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 3E Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Bankcard Check 3E Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Bankcard Check 3E Encryption"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "name": "John Doe",
+                "id_card": "110101199001011234",
+                "bank_card": "6222021234567890123"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "This interface is used to ensure the authenticity and consistency of bank card number, name, and account opening certificate number."
+      }
+    },
+    "/identity/bankcard/check-4e": {
+      "post": {
+        "summary": "Bankcard Check 4E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 4E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Bankcard Check 4E Response 200 Description"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 4E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Bankcard Check 4E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Bankcard Check 4E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 4E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Bankcard Check 4E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Bankcard Check 4E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 4E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 4E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Bankcard Check 4E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Bankcard Check 4E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 4E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 4E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Bankcard Check 4E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Bankcard Check 4E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 4E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 4E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Bankcard Check 4E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Bankcard Check 4E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 4E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Bankcard Check 4E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Bankcard Check 4E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "bank_card",
+                  "phone",
+                  "id_card"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 4E Name"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 4E Phone"
+                  },
+                  "id_card": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 4E Id Card"
+                  },
+                  "bank_card": {
+                    "type": "string",
+                    "description": "Identity Bankcard Check 4E Bank Card"
+                  },
+                  "cert_type": {
+                    "type": "number",
+                    "description": "Identity Bankcard Check 4E Cert Type"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 4E Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 4E Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Bankcard Check 4E Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Bankcard Check 4E Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Bankcard Check 4E Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Bankcard Check 4E Encryption"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "name": "John Doe",
+                "phone": "13800138000",
+                "id_card": "110101199001011234",
+                "bank_card": "6222021234567890123"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "This interface is used to enter the bank card number, name, account ID number, account phone number, and verify the authenticity and consistency of the information."
+      }
+    },
+    "/identity/idcard/check-1e": {
+      "post": {
+        "summary": "Idcard Check 1E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sex": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Sex"
+                    },
+                    "sim": {
+                      "type": "number",
+                      "description": "Identity Idcard Check 1E Response 200 Sim"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Name"
+                    },
+                    "birth": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Birth"
+                    },
+                    "id_num": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Id Num"
+                    },
+                    "nation": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Nation"
+                    },
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Result"
+                    },
+                    "address": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Address"
+                    },
+                    "quality": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Quality"
+                    },
+                    "portrait": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Portrait"
+                    },
+                    "warnings": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Warnings"
+                    },
+                    "encryption": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "iv": {
+                            "type": "string",
+                            "description": "Identity Idcard Check 1E Response 200 Encryption Iv"
+                          },
+                          "tag_list": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Identity Idcard Check 1E Response 200 Encryption Tag List"
+                          },
+                          "algorithm": {
+                            "type": "string",
+                            "description": "Identity Idcard Check 1E Response 200 Encryption Algorithm"
+                          },
+                          "encrypt_list": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Identity Idcard Check 1E Response 200 Encryption Encrypt List"
+                          },
+                          "ciphertext_blob": {
+                            "type": "number",
+                            "description": "Identity Idcard Check 1E Response 200 Encryption Ciphertext Blob"
+                          }
+                        },
+                        "description": "Identity Idcard Check 1E Response 200 Encryption"
+                      }
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 1E Response 200 Description"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Idcard Check 1E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Idcard Check 1E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Idcard Check 1E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 1E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Idcard Check 1E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Idcard Check 1E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 1E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 1E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Idcard Check 1E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Idcard Check 1E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 1E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 1E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Idcard Check 1E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Idcard Check 1E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 1E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 1E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Idcard Check 1E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Idcard Check 1E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 1E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 1E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Idcard Check 1E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url"
+                ],
+                "properties": {
+                  "config": {
+                    "type": "string",
+                    "description": "Identity Idcard Check 1E Config"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "description": "Identity Idcard Check 1E Image Url"
+                  }
+                }
+              },
+              "example": {
+                "image_url": "https://cdn.acedata.cloud/0iad3k.png"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "Pass in the portrait photo of the ID card, identify the information on the ID card photo, and compare the name, ID card number, portrait photo of the ID card with the certificate photo of the authority database, whether it belongs to the same person, so as to verify the authenticity of the ID card information."
+      }
+    },
+    "/identity/idcard/check-2e": {
+      "post": {
+        "summary": "Idcard Check 2E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 2E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Idcard Check 2E Response 200 Description"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Idcard Check 2E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Idcard Check 2E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Idcard Check 2E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 2E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Idcard Check 2E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Idcard Check 2E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 2E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 2E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Idcard Check 2E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Idcard Check 2E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 2E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 2E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Idcard Check 2E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Idcard Check 2E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 2E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 2E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Idcard Check 2E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Idcard Check 2E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 2E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Check 2E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Idcard Check 2E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "id_card",
+                  "validity_begin",
+                  "validity_end"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Identity Idcard Check 2E Name"
+                  },
+                  "id_card": {
+                    "type": "string",
+                    "description": "Identity Idcard Check 2E Id Card"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 2E Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Idcard Check 2E Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Idcard Check 2E Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Idcard Check 2E Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Idcard Check 2E Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Idcard Check 2E Encryption"
+                    },
+                    "description": "Identity Idcard Check 2E Encryption 2"
+                  },
+                  "validity_end": {
+                    "type": "string",
+                    "description": "Identity Idcard Check 2E Validity End"
+                  },
+                  "validity_begin": {
+                    "type": "string",
+                    "description": "Identity Idcard Check 2E Validity Begin"
+                  }
+                }
+              },
+              "example": {
+                "name": "John Doe",
+                "id_card": "110101199001011234",
+                "validity_end": "2030-01-01",
+                "validity_begin": "2020-01-01"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "This interface is used to verify the authenticity and consistency of names, ID numbers, and ID card validity periods."
+      }
+    },
+    "/identity/idcard/ocr": {
+      "post": {
+        "summary": "Idcard Ocr",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sex": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Sex"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Name"
+                    },
+                    "birth": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Birth"
+                    },
+                    "nation": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Nation"
+                    },
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Result"
+                    },
+                    "address": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Address"
+                    },
+                    "id_card": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Id Card"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Idcard Ocr Response 200 Description"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Idcard Ocr Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Idcard Ocr Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Idcard Ocr Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Ocr Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Idcard Ocr Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Idcard Ocr Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Ocr Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Ocr Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Idcard Ocr Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Idcard Ocr Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Ocr Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Ocr Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Idcard Ocr Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Idcard Ocr Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Ocr Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Ocr Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Idcard Ocr Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Idcard Ocr Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Idcard Ocr Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Idcard Ocr Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Idcard Ocr Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Identity Idcard Ocr Name"
+                  },
+                  "id_card": {
+                    "type": "string",
+                    "description": "Identity Idcard Ocr Id Card"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "description": "Identity Idcard Ocr Image Url"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Idcard Ocr Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Idcard Ocr Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Idcard Ocr Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Idcard Ocr Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Idcard Ocr Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Idcard Ocr Encryption"
+                    },
+                    "description": "Identity Idcard Ocr Encryption 2"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "This interface is used to verify the authenticity and consistency of the name and ID number. You can provide the required verification information by entering the name and ID number or entering the portrait photo of the ID card."
+      }
+    },
+    "/identity/phone/check-1e": {
+      "post": {
+        "summary": "Phone Check 1E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Phone Check 1E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Phone Check 1E Response 200 Description"
+                    },
+                    "status_code": {
+                      "type": "string",
+                      "description": "Identity Phone Check 1E Response 200 Status Code"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Phone Check 1E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Phone Check 1E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Phone Check 1E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 1E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Phone Check 1E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Phone Check 1E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 1E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 1E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Phone Check 1E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Phone Check 1E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 1E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 1E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Phone Check 1E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Phone Check 1E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 1E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 1E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Phone Check 1E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Phone Check 1E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 1E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 1E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Phone Check 1E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mobile"
+                ],
+                "properties": {
+                  "mobile": {
+                    "type": "string",
+                    "description": "Identity Phone Check 1E Mobile"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Phone Check 1E Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Phone Check 1E Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Phone Check 1E Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Phone Check 1E Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Phone Check 1E Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Phone Check 1E Encryption"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "mobile": "13800138000"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "This interface is used to verify the status of the mobile phone number. You can query the status by entering the mobile phone number."
+      }
+    },
+    "/identity/phone/check-2e": {
+      "post": {
+        "summary": "Phone Check 2E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Phone Check 2E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Phone Check 2E Response 200 Description"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Phone Check 2E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Phone Check 2E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Phone Check 2E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 2E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Phone Check 2E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Phone Check 2E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 2E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 2E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Phone Check 2E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Phone Check 2E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 2E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 2E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Phone Check 2E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Phone Check 2E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 2E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 2E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Phone Check 2E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Phone Check 2E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 2E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 2E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Phone Check 2E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mobile",
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Identity Phone Check 2E Name"
+                  },
+                  "mobile": {
+                    "type": "string",
+                    "description": "Identity Phone Check 2E Mobile"
+                  },
+                  "encryption": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "iv": {
+                          "type": "string",
+                          "description": "Identity Phone Check 2E Encryption Iv"
+                        },
+                        "tag_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Phone Check 2E Encryption Tag List"
+                        },
+                        "algorithm": {
+                          "type": "string",
+                          "description": "Identity Phone Check 2E Encryption Algorithm"
+                        },
+                        "encrypt_list": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Identity Phone Check 2E Encryption Encrypt List"
+                        },
+                        "ciphertext_blob": {
+                          "type": "number",
+                          "description": "Identity Phone Check 2E Encryption Ciphertext Blob"
+                        }
+                      },
+                      "description": "Identity Phone Check 2E Encryption"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "name": "John Doe",
+                "mobile": "13800138000"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "The phone number two-factor verification interface is used to verify the authenticity and consistency of the phone number and name. For details about the supported phone number segments, see the carrier documents."
+      }
+    },
+    "/identity/phone/check-3e": {
+      "post": {
+        "summary": "Phone Check 3E",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isp": {
+                      "type": "string",
+                      "description": "Identity Phone Check 3E Response 200 Isp"
+                    },
+                    "result": {
+                      "type": "string",
+                      "description": "Identity Phone Check 3E Response 200 Result"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Identity Phone Check 3E Response 200 Description"
+                    },
+                    "result_detail": {
+                      "type": "string",
+                      "description": "Identity Phone Check 3E Response 200 Result Detail"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Identity Phone Check 3E Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Identity Phone Check 3E Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Identity Phone Check 3E Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 3E Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Identity Phone Check 3E Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Identity Phone Check 3E Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 3E Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 3E Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Identity Phone Check 3E Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Identity Phone Check 3E Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 3E Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 3E Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Identity Phone Check 3E Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Identity Phone Check 3E Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 3E Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 3E Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Identity Phone Check 3E Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Identity Phone Check 3E Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Identity Phone Check 3E Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Identity Phone Check 3E Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Identity Phone Check 3E Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id_card",
+                  "name",
+                  "phone"
+                ],
+                "properties": {
+                  "iv": {
+                    "type": "string",
+                    "description": "Identity Phone Check 3E Iv"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Identity Phone Check 3E Name"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "Identity Phone Check 3E Phone"
+                  },
+                  "id_card": {
+                    "type": "string",
+                    "description": "Identity Phone Check 3E Id Card"
+                  },
+                  "verify_mode": {
+                    "type": "string",
+                    "description": "Identity Phone Check 3E Verify Mode"
+                  },
+                  "encrypt_list": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Identity Phone Check 3E Encrypt List"
+                  },
+                  "ciphertext_blob": {
+                    "type": "number",
+                    "description": "Identity Phone Check 3E Ciphertext Blob"
+                  }
+                }
+              },
+              "example": {
+                "name": "John Doe",
+                "phone": "13800138000",
+                "id_card": "110101199001011234"
+              }
+            }
+          },
+          "required": true
+        },
+        "description": "This interface is used to verify the authenticity and consistency of mobile phone numbers, names, and ID numbers. For details about the supported phone number segments, see the carrier documents."
+      }
+    }
+  }
+}
