@@ -32,6 +32,7 @@ export class Kling {
     endImageUrl?: string;
     cameraControl?: string;
     elementList?: unknown[];
+    imageList?: unknown[];
     videoList?: unknown[];
     negativePrompt?: string;
     startImageUrl?: string;
@@ -51,6 +52,7 @@ export class Kling {
       endImageUrl,
       cameraControl,
       elementList,
+      imageList,
       videoList,
       negativePrompt,
       startImageUrl,
@@ -69,7 +71,8 @@ export class Kling {
     if (endImageUrl !== undefined) body.end_image_url = endImageUrl;
     if (cameraControl !== undefined) body.camera_control = cameraControl;
     if (elementList !== undefined) body.element_list = elementList;
-    if (videoList !== undefined) body.video_list = videoList;
+    if (imageList !== undefined) body.image_list = imageList;
+    else if (videoList !== undefined) body.image_list = videoList;
     if (negativePrompt !== undefined) body.negative_prompt = negativePrompt;
     if (startImageUrl !== undefined) body.start_image_url = startImageUrl;
     return this.transport.request('POST', '/kling/videos', { json: body });
@@ -81,12 +84,14 @@ export class Kling {
     videoUrl: string;
     characterOrientation: 'image' | 'video';
     keepOriginalSound?: 'yes' | 'no';
+    modelName?: 'kling-v2-6' | 'kling-v3';
     prompt?: string;
+    watermarkInfo?: boolean;
     callbackUrl?: string;
     async?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
-    const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, prompt, callbackUrl, ...rest } = opts;
+    const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, modelName, prompt, watermarkInfo, callbackUrl, ...rest } = opts;
     const body: Record<string, unknown> = {
       mode,
       image_url: imageUrl,
@@ -95,7 +100,9 @@ export class Kling {
       ...rest,
     };
     if (keepOriginalSound !== undefined) body.keep_original_sound = keepOriginalSound;
+    if (modelName !== undefined) body.model_name = modelName;
     if (prompt !== undefined) body.prompt = prompt;
+    if (watermarkInfo !== undefined) body.watermark_info = watermarkInfo;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     return this.transport.request('POST', '/kling/motion', { json: body });
   }

@@ -40,6 +40,7 @@ class Kling:
         end_image_url: str | None = None,
         camera_control: str | None = None,
         element_list: list[Any] | None = None,
+        image_list: list[Any] | None = None,
         video_list: list[Any] | None = None,
         negative_prompt: str | None = None,
         start_image_url: str | None = None,
@@ -72,8 +73,10 @@ class Kling:
             body["camera_control"] = camera_control
         if element_list is not None:
             body["element_list"] = element_list
-        if video_list is not None:
-            body["video_list"] = video_list
+        if image_list is not None:
+            body["image_list"] = image_list
+        elif video_list is not None:
+            body["image_list"] = video_list
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
         if start_image_url is not None:
@@ -88,7 +91,9 @@ class Kling:
         video_url: str,
         character_orientation: Literal["image", "video"],
         keep_original_sound: Literal["yes", "no"] | None = None,
+        model_name: Literal["kling-v2-6", "kling-v3"] | None = None,
         prompt: str | None = None,
+        watermark_info: bool | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
         **kwargs: Any,
@@ -102,8 +107,12 @@ class Kling:
         }
         if keep_original_sound is not None:
             body["keep_original_sound"] = keep_original_sound
+        if model_name is not None:
+            body["model_name"] = model_name
         if prompt is not None:
             body["prompt"] = prompt
+        if watermark_info is not None:
+            body["watermark_info"] = watermark_info
         if callback_url is not None:
             body["callback_url"] = callback_url
         if async_ is not None:
@@ -134,6 +143,7 @@ class AsyncKling:
         end_image_url: str | None = None,
         camera_control: str | None = None,
         element_list: list[Any] | None = None,
+        image_list: list[Any] | None = None,
         video_list: list[Any] | None = None,
         negative_prompt: str | None = None,
         start_image_url: str | None = None,
@@ -166,8 +176,10 @@ class AsyncKling:
             body["camera_control"] = camera_control
         if element_list is not None:
             body["element_list"] = element_list
-        if video_list is not None:
-            body["video_list"] = video_list
+        if image_list is not None:
+            body["image_list"] = image_list
+        elif video_list is not None:
+            body["image_list"] = video_list
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
         if start_image_url is not None:
@@ -182,7 +194,9 @@ class AsyncKling:
         video_url: str,
         character_orientation: Literal["image", "video"],
         keep_original_sound: Literal["yes", "no"] | None = None,
+        model_name: Literal["kling-v2-6", "kling-v3"] | None = None,
         prompt: str | None = None,
+        watermark_info: bool | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
         **kwargs: Any,
@@ -196,8 +210,12 @@ class AsyncKling:
         }
         if keep_original_sound is not None:
             body["keep_original_sound"] = keep_original_sound
+        if model_name is not None:
+            body["model_name"] = model_name
         if prompt is not None:
             body["prompt"] = prompt
+        if watermark_info is not None:
+            body["watermark_info"] = watermark_info
         if callback_url is not None:
             body["callback_url"] = callback_url
         if async_ is not None:

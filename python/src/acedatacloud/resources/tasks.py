@@ -13,6 +13,7 @@ _SERVICE_TASK_ENDPOINTS = {
     "nano-banana": "/nano-banana/tasks",
     "seedream": "/seedream/tasks",
     "seedance": "/seedance/tasks",
+    "gemini": "/gemini/tasks",
     "sora": "/sora/tasks",
     "luma": "/luma/tasks",
     "veo": "/veo/tasks",
