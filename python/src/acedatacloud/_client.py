@@ -26,7 +26,7 @@ from acedatacloud.resources.veo import AsyncVeo, Veo
 from acedatacloud.resources.video import AsyncVideo, Video
 from acedatacloud.resources.webextrator import AsyncWebExtrator, WebExtrator
 
-_API_BASE = "https://api.acedata.cloud"
+_API_BASE = "https://x402.acedata.cloud"
 _PLATFORM_BASE = "https://platform.acedata.cloud"
 
 

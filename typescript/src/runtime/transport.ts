@@ -104,7 +104,7 @@ export class Transport {
         code: 'no_token',
       });
     }
-    this.baseURL = (opts.baseURL ?? 'https://api.acedata.cloud').replace(/\/+$/, '');
+    this.baseURL = (opts.baseURL ?? 'https://x402.acedata.cloud').replace(/\/+$/, '');
     this.platformBaseURL = (opts.platformBaseURL ?? 'https://platform.acedata.cloud').replace(/\/+$/, '');
     this.timeout = opts.timeout ?? 300_000;
     this.maxRetries = opts.maxRetries ?? 2;
@@ -144,7 +144,8 @@ export class Transport {
     let lastError: Error | null = null;
     let paymentAttempted = false;
     let extraHeaders: Record<string, string> = {};
-    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+    let attempt = 0;
+    while (true) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -186,8 +187,9 @@ export class Transport {
           } catch {
             body = { error: { code: 'unknown', message: text } };
           }
-          if (RETRY_STATUS_CODES.has(resp.status) && attempt < this.maxRetries) {
+          if (!paymentAttempted && RETRY_STATUS_CODES.has(resp.status) && attempt < this.maxRetries) {
             await sleep(backoffDelay(attempt) * 1000);
+            attempt += 1;
             continue;
           }
           throw mapError(resp.status, body);
@@ -198,13 +200,14 @@ export class Transport {
         clearTimeout(timer);
         if (err instanceof APIError) throw err;
         lastError = err as Error;
-        if (attempt < this.maxRetries) {
+        if (!paymentAttempted && attempt < this.maxRetries) {
           await sleep(backoffDelay(attempt) * 1000);
+          attempt += 1;
           continue;
         }
+        throw lastError;
       }
     }
-    throw lastError ?? new TransportError('Request failed after retries');
   }
 
   async *requestStream(
@@ -214,52 +217,83 @@ export class Transport {
   ): AsyncGenerator<string, void, unknown> {
     const url = `${this.baseURL}${path}`;
     const headers = { ...this.headers, accept: 'text/event-stream' };
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), opts.timeout ?? this.timeout);
+    let paymentAttempted = false;
+    let extraHeaders: Record<string, string> = {};
 
-    try {
-      const resp = await fetch(url, {
-        method,
-        headers,
-        body: opts.json ? JSON.stringify(opts.json) : undefined,
-        signal: controller.signal,
-      });
+    while (true) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), opts.timeout ?? this.timeout);
+      try {
+        const resp = await fetch(url, {
+          method,
+          headers: { ...headers, ...extraHeaders },
+          body: opts.json ? JSON.stringify(opts.json) : undefined,
+          signal: controller.signal,
+        });
 
-      if (resp.status >= 400) {
-        const text = await resp.text();
-        let body: Record<string, unknown>;
-        try {
-          body = JSON.parse(text) as Record<string, unknown>;
-        } catch {
-          body = { error: { code: 'unknown', message: text } };
-        }
-        throw mapError(resp.status, body);
-      }
-
-      if (!resp.body) throw new TransportError('No response body for stream');
-
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split('\n');
-        buffer = lines.pop() ?? '';
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') return;
-            yield data;
+        if (resp.status === 402 && this.paymentHandler && !paymentAttempted) {
+          const text = await resp.text();
+          let body: PaymentRequiredBody;
+          try {
+            body = JSON.parse(text) as PaymentRequiredBody;
+          } catch {
+            throw mapError(402, { error: { code: 'invalid_402', message: text } });
           }
+          if (!body.accepts?.length) {
+            throw mapError(402, { error: { code: 'invalid_402', message: 'No payment requirements' } });
+          }
+          const result = await this.paymentHandler({
+            url,
+            method,
+            body: opts.json,
+            accepts: body.accepts,
+          });
+          extraHeaders = { ...extraHeaders, ...result.headers };
+          paymentAttempted = true;
+          continue;
         }
+
+        if (resp.status >= 400) {
+          const text = await resp.text();
+          let body: Record<string, unknown>;
+          try {
+            body = JSON.parse(text) as Record<string, unknown>;
+          } catch {
+            body = { error: { code: 'unknown', message: text } };
+          }
+          throw mapError(resp.status, body);
+        }
+
+        if (!resp.body) throw new TransportError('No response body for stream');
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') return;
+                yield data;
+              }
+            }
+          }
+        } finally {
+          await reader.cancel();
+        }
+        return;
+      } finally {
+        clearTimeout(timer);
       }
-    } finally {
-      clearTimeout(timer);
     }
   }
 

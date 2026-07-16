@@ -114,7 +114,7 @@ except RateLimitError:
 ```python
 client = AceDataCloud(
     api_token="your-token",
-    base_url="https://api.acedata.cloud",       # API gateway
+    base_url="https://x402.acedata.cloud",      # API gateway (default)
     platform_base_url="https://platform.acedata.cloud",  # Management plane
     timeout=300.0,      # Request timeout in seconds
     max_retries=2,      # Retry count for transient errors

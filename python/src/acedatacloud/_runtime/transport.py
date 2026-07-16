@@ -144,8 +144,8 @@ class SyncTransport:
         extra_auth_headers: dict[str, str] = {}
         payment_attempted = False
 
-        last_exc: Exception | None = None
-        for attempt in range(self._max_retries + 1):
+        attempt = 0
+        while True:
             try:
                 resp = self._client.request(
                     method,
@@ -156,21 +156,22 @@ class SyncTransport:
                     timeout=timeout or self._timeout,
                 )
             except httpx.TimeoutException as exc:
-                last_exc = TimeoutError(
+                timeout_error = TimeoutError(
                     message=f"Request timed out: {exc}",
                     status_code=0,
                     code="timeout",
                 )
-                if attempt < self._max_retries:
+                if not payment_attempted and attempt < self._max_retries:
                     time.sleep(_backoff_delay(attempt))
+                    attempt += 1
                     continue
-                raise last_exc from exc
+                raise timeout_error from exc
             except httpx.TransportError as exc:
-                last_exc = TransportError(str(exc))
-                if attempt < self._max_retries:
+                if not payment_attempted and attempt < self._max_retries:
                     time.sleep(_backoff_delay(attempt))
+                    attempt += 1
                     continue
-                raise last_exc from exc
+                raise TransportError(str(exc)) from exc
 
             if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                 try:
@@ -197,14 +198,13 @@ class SyncTransport:
                 except Exception:
                     body = {"error": {"code": "unknown", "message": resp.text}}
 
-                if _should_retry(resp.status_code) and attempt < self._max_retries:
+                if not payment_attempted and _should_retry(resp.status_code) and attempt < self._max_retries:
                     time.sleep(_backoff_delay(attempt))
+                    attempt += 1
                     continue
                 raise _map_error(resp.status_code, body)
 
             return resp.json()
-
-        raise last_exc or TransportError("Request failed after retries")
 
     def request_stream(
         self,
@@ -223,30 +223,56 @@ class SyncTransport:
             "accept": "text/event-stream",
             **(extra_headers or {}),
         }
+        extra_auth_headers: dict[str, str] = {}
+        payment_attempted = False
 
-        with self._client.stream(
-            method,
-            url,
-            json=json,
-            headers=headers,
-            timeout=timeout or self._timeout,
-        ) as resp:
-            if resp.status_code >= 400:
-                body_bytes = resp.read()
-                try:
-                    import json as _json
+        while True:
+            with self._client.stream(
+                method,
+                url,
+                json=json,
+                headers={**headers, **extra_auth_headers},
+                timeout=timeout or self._timeout,
+            ) as resp:
+                if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
+                    body_bytes = resp.read()
+                    try:
+                        import json as _json
 
-                    body = _json.loads(body_bytes)
-                except Exception:
-                    body = {"error": {"code": "unknown", "message": body_bytes.decode(errors="replace")}}
-                raise _map_error(resp.status_code, body)
+                        body = _json.loads(body_bytes)
+                    except Exception as exc:
+                        raise _map_error(
+                            402,
+                            {"error": {"code": "invalid_402", "message": body_bytes.decode(errors="replace")}},
+                        ) from exc
+                    accepts = body.get("accepts") or []
+                    if not accepts:
+                        raise _map_error(
+                            402,
+                            {"error": {"code": "invalid_402", "message": "No payment requirements"}},
+                        )
+                    result = self._payment_handler({"url": url, "method": method, "body": json, "accepts": accepts})
+                    extra_auth_headers.update(result.get("headers", {}))
+                    payment_attempted = True
+                    continue
 
-            for line in resp.iter_lines():
-                if line.startswith("data: "):
-                    data = line[6:]
-                    if data == "[DONE]":
-                        return
-                    yield data
+                if resp.status_code >= 400:
+                    body_bytes = resp.read()
+                    try:
+                        import json as _json
+
+                        body = _json.loads(body_bytes)
+                    except Exception:
+                        body = {"error": {"code": "unknown", "message": body_bytes.decode(errors="replace")}}
+                    raise _map_error(resp.status_code, body)
+
+                for line in resp.iter_lines():
+                    if line.startswith("data: "):
+                        data = line[6:]
+                        if data == "[DONE]":
+                            return
+                        yield data
+                return
 
     def upload(
         self,
@@ -335,8 +361,8 @@ class AsyncTransport:
         extra_auth_headers: dict[str, str] = {}
         payment_attempted = False
 
-        last_exc: Exception | None = None
-        for attempt in range(self._max_retries + 1):
+        attempt = 0
+        while True:
             try:
                 resp = await self._client.request(
                     method,
@@ -347,21 +373,22 @@ class AsyncTransport:
                     timeout=timeout or self._timeout,
                 )
             except httpx.TimeoutException as exc:
-                last_exc = TimeoutError(
+                timeout_error = TimeoutError(
                     message=f"Request timed out: {exc}",
                     status_code=0,
                     code="timeout",
                 )
-                if attempt < self._max_retries:
+                if not payment_attempted and attempt < self._max_retries:
                     await asyncio.sleep(_backoff_delay(attempt))
+                    attempt += 1
                     continue
-                raise last_exc from exc
+                raise timeout_error from exc
             except httpx.TransportError as exc:
-                last_exc = TransportError(str(exc))
-                if attempt < self._max_retries:
+                if not payment_attempted and attempt < self._max_retries:
                     await asyncio.sleep(_backoff_delay(attempt))
+                    attempt += 1
                     continue
-                raise last_exc from exc
+                raise TransportError(str(exc)) from exc
 
             if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                 try:
@@ -390,14 +417,13 @@ class AsyncTransport:
                 except Exception:
                     body = {"error": {"code": "unknown", "message": resp.text}}
 
-                if _should_retry(resp.status_code) and attempt < self._max_retries:
+                if not payment_attempted and _should_retry(resp.status_code) and attempt < self._max_retries:
                     await asyncio.sleep(_backoff_delay(attempt))
+                    attempt += 1
                     continue
                 raise _map_error(resp.status_code, body)
 
             return resp.json()
-
-        raise last_exc or TransportError("Request failed after retries")
 
     async def request_stream(
         self,
@@ -416,30 +442,60 @@ class AsyncTransport:
             "accept": "text/event-stream",
             **(extra_headers or {}),
         }
+        extra_auth_headers: dict[str, str] = {}
+        payment_attempted = False
 
-        async with self._client.stream(
-            method,
-            url,
-            json=json,
-            headers=headers,
-            timeout=timeout or self._timeout,
-        ) as resp:
-            if resp.status_code >= 400:
-                body_bytes = await resp.aread()
-                try:
-                    import json as _json
+        while True:
+            async with self._client.stream(
+                method,
+                url,
+                json=json,
+                headers={**headers, **extra_auth_headers},
+                timeout=timeout or self._timeout,
+            ) as resp:
+                if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
+                    body_bytes = await resp.aread()
+                    try:
+                        import json as _json
 
-                    body = _json.loads(body_bytes)
-                except Exception:
-                    body = {"error": {"code": "unknown", "message": body_bytes.decode(errors="replace")}}
-                raise _map_error(resp.status_code, body)
+                        body = _json.loads(body_bytes)
+                    except Exception as exc:
+                        raise _map_error(
+                            402,
+                            {"error": {"code": "invalid_402", "message": body_bytes.decode(errors="replace")}},
+                        ) from exc
+                    accepts = body.get("accepts") or []
+                    if not accepts:
+                        raise _map_error(
+                            402,
+                            {"error": {"code": "invalid_402", "message": "No payment requirements"}},
+                        )
+                    handler_result = self._payment_handler(
+                        {"url": url, "method": method, "body": json, "accepts": accepts}
+                    )
+                    if inspect.isawaitable(handler_result):
+                        handler_result = await handler_result
+                    extra_auth_headers.update(handler_result.get("headers", {}))
+                    payment_attempted = True
+                    continue
 
-            async for line in resp.aiter_lines():
-                if line.startswith("data: "):
-                    data = line[6:]
-                    if data == "[DONE]":
-                        return
-                    yield data
+                if resp.status_code >= 400:
+                    body_bytes = await resp.aread()
+                    try:
+                        import json as _json
+
+                        body = _json.loads(body_bytes)
+                    except Exception:
+                        body = {"error": {"code": "unknown", "message": body_bytes.decode(errors="replace")}}
+                    raise _map_error(resp.status_code, body)
+
+                async for line in resp.aiter_lines():
+                    if line.startswith("data: "):
+                        data = line[6:]
+                        if data == "[DONE]":
+                            return
+                        yield data
+                return
 
     async def upload(
         self,
