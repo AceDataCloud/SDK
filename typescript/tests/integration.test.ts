@@ -2,7 +2,7 @@
  * Integration tests for AceDataCloud TypeScript SDK.
  *
  * These tests run against the live API. Set these in .env (repo root) or environment:
- *   - ACEDATACLOUD_API_TOKEN      — API token for api.acedata.cloud
+ *   - ACEDATACLOUD_API_TOKEN      — API token for x402.acedata.cloud
  *   - ACEDATACLOUD_PLATFORM_TOKEN — Platform token for platform.acedata.cloud (optional)
  *
  * Usage:

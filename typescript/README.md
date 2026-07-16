@@ -113,8 +113,8 @@ try {
 ```typescript
 const client = new AceDataCloud({
   apiToken: 'your-token',
-  baseUrl: 'https://api.acedata.cloud',
-  platformBaseUrl: 'https://platform.acedata.cloud',
+  baseURL: 'https://x402.acedata.cloud',
+  platformBaseURL: 'https://platform.acedata.cloud',
   timeout: 300000,    // ms
   maxRetries: 2,
 });

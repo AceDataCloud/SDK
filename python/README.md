@@ -114,7 +114,7 @@ except RateLimitError:
 ```python
 client = AceDataCloud(
     api_token="your-token",
-    base_url="https://api.acedata.cloud",       # API gateway
+    base_url="https://x402.acedata.cloud",      # API gateway (default)
     platform_base_url="https://platform.acedata.cloud",  # Management plane
     timeout=300.0,      # Request timeout in seconds
     max_retries=2,      # Retry count for transient errors
@@ -147,12 +147,25 @@ result = client.openai.chat.completions.create(
 )
 ```
 
-The `AsyncAceDataCloud` client accepts either a synchronous or
-asynchronous handler, so you can plug in wallet SDKs that use
-`asyncio`. A ready-made x402 signer for Python is not shipped yet
-(there is a TypeScript implementation in
-[`@acedatacloud/x402-client`](https://github.com/AceDataCloud/X402Client)
-— contributions for a Python port are welcome).
+The `AsyncAceDataCloud` client accepts either a synchronous or asynchronous
+handler. For a ready-made signer, install `acedatacloud-x402` and pass its
+handler directly:
+
+```python
+from acedatacloud import AceDataCloud
+from acedatacloud_x402 import EVMAccountSigner, create_x402_payment_handler
+
+client = AceDataCloud(
+    payment_handler=create_x402_payment_handler(
+        network="base",
+        evm_signer=EVMAccountSigner.from_private_key("0x..."),
+        prefer_scheme="upto",
+    )
+)
+```
+
+See [`AceDataCloud/X402Client`](https://github.com/AceDataCloud/X402Client) for
+Base, Solana, and SKALE setup details.
 
 ## License
 
