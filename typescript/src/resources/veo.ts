@@ -2,7 +2,7 @@
 
 import { Transport } from '../runtime/transport';
 
-export type VeoModel = 'veo2' | 'veo2-fast' | 'veo3' | 'veo3-fast' | 'veo31-fast' | 'veo31' | 'veo31-fast-ingredients' | (string & {});
+export type VeoModel = 'veo3' | 'veo3-fast' | 'veo31-fast' | 'veo31' | 'veo31-fast-ingredients' | (string & {});
 
 export class Veo {
   constructor(private transport: Transport) {}
@@ -13,8 +13,8 @@ export class Veo {
     model?: VeoModel;
     resolution?: '4k' | '1080p' | 'gif';
     videoId?: string;
-    translation?: string;
-    aspectRatio?: '9:16' | '1:1' | '3:4' | '4:3' | '16:9';
+    translation?: boolean;
+    aspectRatio?: '16:9' | '9:16';
     imageUrls?: string[];
     callbackUrl?: string;
     async?: boolean;

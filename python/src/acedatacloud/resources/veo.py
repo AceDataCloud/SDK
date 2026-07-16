@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-VeoModel = Literal["veo2", "veo2-fast", "veo3", "veo3-fast", "veo31-fast", "veo31", "veo31-fast-ingredients"]
+VeoModel = Literal["veo3", "veo3-fast", "veo31-fast", "veo31", "veo31-fast-ingredients"]
 
 
 class Veo:
@@ -21,8 +21,8 @@ class Veo:
         model: str | None = None,
         resolution: Literal["4k", "1080p", "gif"] | None = None,
         video_id: str | None = None,
-        translation: str | None = None,
-        aspect_ratio: Literal["9:16", "1:1", "3:4", "4:3", "16:9"] | None = None,
+        translation: bool | None = None,
+        aspect_ratio: Literal["16:9", "9:16"] | None = None,
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
@@ -137,8 +137,8 @@ class AsyncVeo:
         model: str | None = None,
         resolution: Literal["4k", "1080p", "gif"] | None = None,
         video_id: str | None = None,
-        translation: str | None = None,
-        aspect_ratio: Literal["9:16", "1:1", "3:4", "4:3", "16:9"] | None = None,
+        translation: bool | None = None,
+        aspect_ratio: Literal["16:9", "9:16"] | None = None,
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
