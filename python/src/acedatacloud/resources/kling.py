@@ -214,6 +214,8 @@ def _build_motion_body(
     video_url: str,
     character_orientation: Literal["image", "video"],
     keep_original_sound: Literal["yes", "no"] | None,
+    model_name: Literal["kling-v2-6", "kling-v3"] | None,
+    watermark_info: dict[str, Any] | None,
     prompt: str | None,
     callback_url: str | None,
     async_: bool | None,
@@ -228,6 +230,8 @@ def _build_motion_body(
         raise ValueError("character_orientation must be image or video")
     if keep_original_sound is not None and keep_original_sound not in {"yes", "no"}:
         raise ValueError("keep_original_sound must be yes or no")
+    if model_name is not None and model_name not in {"kling-v2-6", "kling-v3"}:
+        raise ValueError("model_name must be kling-v2-6 or kling-v3")
     if callback_url and not _is_http_url(callback_url):
         raise ValueError("callback_url must be an HTTP URL")
 
@@ -239,6 +243,8 @@ def _build_motion_body(
     }
     optional_fields = {
         "keep_original_sound": keep_original_sound,
+        "model_name": model_name,
+        "watermark_info": watermark_info,
         "prompt": prompt,
         "callback_url": callback_url,
         "async": async_,
@@ -305,6 +311,8 @@ class Kling:
         video_url: str,
         character_orientation: Literal["image", "video"],
         keep_original_sound: Literal["yes", "no"] | None = None,
+        model_name: Literal["kling-v2-6", "kling-v3"] | None = None,
+        watermark_info: dict[str, Any] | None = None,
         prompt: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
@@ -315,6 +323,8 @@ class Kling:
             video_url=video_url,
             character_orientation=character_orientation,
             keep_original_sound=keep_original_sound,
+            model_name=model_name,
+            watermark_info=watermark_info,
             prompt=prompt,
             callback_url=callback_url,
             async_=async_,
@@ -380,6 +390,8 @@ class AsyncKling:
         video_url: str,
         character_orientation: Literal["image", "video"],
         keep_original_sound: Literal["yes", "no"] | None = None,
+        model_name: Literal["kling-v2-6", "kling-v3"] | None = None,
+        watermark_info: dict[str, Any] | None = None,
         prompt: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
@@ -390,6 +402,8 @@ class AsyncKling:
             video_url=video_url,
             character_orientation=character_orientation,
             keep_original_sound=keep_original_sound,
+            model_name=model_name,
+            watermark_info=watermark_info,
             prompt=prompt,
             callback_url=callback_url,
             async_=async_,
