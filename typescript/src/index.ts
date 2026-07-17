@@ -39,3 +39,4 @@ export type {
   KlingReferenceVideo,
 } from './resources/kling';
 export type { AudioProvider } from './resources/audio';
+export type { GrokChatModel, GrokVideoModel } from './resources/grok';

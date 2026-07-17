@@ -27,6 +27,7 @@ from acedatacloud._runtime.payment import (
 from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
 from acedatacloud.resources.glm import GlmModel
+from acedatacloud.resources.grok import GrokChatModel, GrokVideoModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
     KlingCameraControl,
@@ -50,6 +51,8 @@ __all__ = [
     "KlingReferenceVideo",
     "VideoProvider",
     "VeoModel",
+    "GrokChatModel",
+    "GrokVideoModel",
     "AceDataCloudError",
     "APIError",
     "AuthenticationError",
