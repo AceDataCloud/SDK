@@ -16,6 +16,7 @@ from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
 from acedatacloud.resources.images import AsyncImages, Images
+from acedatacloud.resources.kimi import AsyncKimi, Kimi
 from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
@@ -66,6 +67,7 @@ class AceDataCloud:
         self.glm = Glm(self._transport)
         self.veo = Veo(self._transport)
         self.kling = Kling(self._transport)
+        self.kimi = Kimi(self._transport)
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
@@ -116,6 +118,7 @@ class AsyncAceDataCloud:
         self.glm = AsyncGlm(self._transport)
         self.veo = AsyncVeo(self._transport)
         self.kling = AsyncKling(self._transport)
+        self.kimi = AsyncKimi(self._transport)
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
