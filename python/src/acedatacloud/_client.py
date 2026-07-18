@@ -15,6 +15,7 @@ from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
+from acedatacloud.resources.grok import AsyncGrok, Grok
 from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
@@ -64,6 +65,7 @@ class AceDataCloud:
         self.platform = Platform(self._transport)
         self.openai = OpenAI(self._transport)
         self.glm = Glm(self._transport)
+        self.grok = Grok(self._transport)
         self.veo = Veo(self._transport)
         self.kling = Kling(self._transport)
         self.webextrator = WebExtrator(self._transport)
@@ -114,6 +116,7 @@ class AsyncAceDataCloud:
         self.platform = AsyncPlatform(self._transport)
         self.openai = AsyncOpenAI(self._transport)
         self.glm = AsyncGlm(self._transport)
+        self.grok = AsyncGrok(self._transport)
         self.veo = AsyncVeo(self._transport)
         self.kling = AsyncKling(self._transport)
         self.webextrator = AsyncWebExtrator(self._transport)

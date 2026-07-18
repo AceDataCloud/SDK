@@ -38,4 +38,5 @@ export type {
   KlingReferenceImage,
   KlingReferenceVideo,
 } from './resources/kling';
+export type { GrokChatModel, GrokVideoModel } from './resources/grok';
 export type { AudioProvider } from './resources/audio';

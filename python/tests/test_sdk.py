@@ -234,6 +234,26 @@ def test_chat_count_tokens(client):
     assert result["input_tokens"] == 42
 
 
+# ── Grok Chat Completions ─────────────────────────────────────────────
+
+
+@respx.mock
+def test_grok_chat_completions(client):
+    mock_response = {
+        "id": "chatcmpl-grok",
+        "choices": [{"index": 0, "message": {"role": "assistant", "content": "Hi from grok"}, "finish_reason": "stop"}],
+    }
+    respx.post("https://api.acedata.cloud/grok/chat/completions").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.grok.chat.completions.create(
+        model="grok-4.5",
+        messages=[{"role": "user", "content": "Hello"}],
+    )
+    assert result["choices"][0]["message"]["content"] == "Hi from grok"
+
+
 # ── Image Generation ──────────────────────────────────────────────────
 
 
@@ -313,6 +333,25 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+# ── Grok Video Generation ─────────────────────────────────────────────
+
+
+@respx.mock
+def test_grok_video_generate(client):
+    mock_response = {
+        "success": True,
+        "task_id": "task-grok-video",
+        "data": [{"video_url": "https://cdn.acedata.cloud/grok-video.mp4"}],
+    }
+    respx.post("https://api.acedata.cloud/grok/videos").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.grok.videos.generate(
+        prompt="A scenic mountain flyover",
+        model="grok-imagine-video-1.5-fast",
+    )
+    assert result["task_id"] == "task-grok-video"
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
@@ -339,6 +378,15 @@ def test_tasks_get(client):
     respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.tasks.get("task-abc", service="nano-banana")
+    assert result["response"]["status"] == "succeeded"
+
+
+@respx.mock
+def test_tasks_get_grok(client):
+    mock_response = {"id": "task-grok", "response": {"status": "succeeded"}}
+    respx.post("https://api.acedata.cloud/grok/tasks").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.tasks.get("task-grok", service="grok")
     assert result["response"]["status"] == "succeeded"
 
 

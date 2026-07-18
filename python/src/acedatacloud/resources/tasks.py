@@ -18,6 +18,7 @@ _SERVICE_TASK_ENDPOINTS = {
     "veo": "/veo/tasks",
     "flux": "/flux/tasks",
     "kling": "/kling/tasks",
+    "grok": "/grok/tasks",
     "hailuo": "/hailuo/tasks",
     "wan": "/wan/tasks",
     "pika": "/pika/tasks",
