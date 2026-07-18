@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json as _json
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 from typing import Any, Literal
 
 GrokChatModel = Literal["grok-4.5", "grok-4", "grok-3"]
@@ -44,14 +44,14 @@ class _AsyncCompletions:
         messages: list[dict[str, Any]],
         stream: bool = False,
         **kwargs: Any,
-    ) -> dict[str, Any]:
+    ) -> dict[str, Any] | AsyncIterator[dict[str, Any]]:
         body = {"model": model, "messages": messages, **kwargs}
         if stream:
             body["stream"] = True
             return self._stream(body)
         return await self._transport.request("POST", "/grok/chat/completions", json=body)
 
-    async def _stream(self, body: dict[str, Any]):
+    async def _stream(self, body: dict[str, Any]) -> AsyncIterator[dict[str, Any]]:
         async for chunk in self._transport.request_stream("POST", "/grok/chat/completions", json=body):
             yield _json.loads(chunk)
 
