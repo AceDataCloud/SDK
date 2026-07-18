@@ -1,6 +1,7 @@
 """Tests for AceDataCloud Python SDK."""
 
 import json
+from unittest.mock import Mock
 
 import httpx
 import pytest
@@ -8,6 +9,7 @@ import respx
 
 from acedatacloud import AceDataCloud, AsyncAceDataCloud
 from acedatacloud._runtime.errors import (
+    APIError,
     AuthenticationError,
     InsufficientBalanceError,
     RateLimitError,
@@ -17,14 +19,135 @@ from acedatacloud._runtime.errors import (
 
 @pytest.fixture
 def client():
-    c = AceDataCloud(api_token="test-token", max_retries=0)
+    c = AceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
     yield c
     c.close()
 
 
 @pytest.fixture
 def async_client():
-    return AsyncAceDataCloud(api_token="test-token", max_retries=0)
+    return AsyncAceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
+
+
+@respx.mock
+def test_default_api_base_uses_x402_host():
+    route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
+        return_value=httpx.Response(200, json={"choices": []})
+    )
+    client = AceDataCloud(api_token="test-token", max_retries=0)
+
+    client.openai.chat.completions.create(model="test", messages=[])
+
+    assert route.called
+    client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_default_api_base_uses_x402_host():
+    route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
+        return_value=httpx.Response(200, json={"choices": []})
+    )
+    client = AsyncAceDataCloud(api_token="test-token", max_retries=0)
+
+    await client.openai.chat.completions.create(model="test", messages=[])
+
+    assert route.called
+    await client.close()
+
+
+@respx.mock
+def test_x402_payment_retry_does_not_use_retry_budget():
+    payment_handler = Mock(return_value={"headers": {"X-Payment": "signed-payment"}})
+    route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
+        side_effect=[
+            httpx.Response(402, json={"accepts": [{"network": "base", "scheme": "exact"}]}),
+            httpx.Response(200, json={"choices": []}),
+        ]
+    )
+    client = AceDataCloud(payment_handler=payment_handler, max_retries=0)
+
+    client.openai.chat.completions.create(model="test", messages=[])
+
+    assert route.call_count == 2
+    assert route.calls.last.request.headers["X-Payment"] == "signed-payment"
+    client.close()
+
+
+@respx.mock
+def test_x402_paid_request_is_not_retried_with_same_signature():
+    payment_handler = Mock(return_value={"headers": {"X-Payment": "signed-payment"}})
+    route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
+        side_effect=[
+            httpx.Response(402, json={"accepts": [{"network": "base", "scheme": "exact"}]}),
+            httpx.Response(500, json={"error": {"message": "upstream failed"}}),
+            httpx.Response(200, json={"choices": []}),
+        ]
+    )
+    client = AceDataCloud(payment_handler=payment_handler, max_retries=2)
+
+    with pytest.raises(APIError, match="upstream failed"):
+        client.openai.chat.completions.create(model="test", messages=[])
+
+    assert route.call_count == 2
+    client.close()
+
+
+@pytest.mark.parametrize("body", [None, [], "error", {"accepts": "base"}, {"accepts": [None]}])
+@respx.mock
+def test_x402_rejects_malformed_payment_requirement_shapes(body):
+    payment_handler = Mock(return_value={"headers": {"X-Payment": "signed-payment"}})
+    respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(return_value=httpx.Response(402, json=body))
+    client = AceDataCloud(payment_handler=payment_handler, max_retries=0)
+
+    with pytest.raises(APIError) as exc_info:
+        client.openai.chat.completions.create(model="test", messages=[])
+
+    assert exc_info.value.code == "invalid_402"
+    payment_handler.assert_not_called()
+    client.close()
+
+
+@respx.mock
+def test_x402_payment_handler_supports_streaming():
+    payment_handler = Mock(return_value={"headers": {"X-Payment": "signed-payment"}})
+    route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
+        side_effect=[
+            httpx.Response(402, json={"accepts": [{"network": "base", "scheme": "exact"}]}),
+            httpx.Response(200, text='data: {"delta":"ok"}\n\ndata: [DONE]\n\n'),
+        ]
+    )
+    client = AceDataCloud(payment_handler=payment_handler, max_retries=0)
+
+    chunks = list(client.openai.chat.completions.create(model="test", messages=[], stream=True))
+
+    assert chunks == [{"delta": "ok"}]
+    assert route.call_count == 2
+    assert route.calls.last.request.headers["X-Payment"] == "signed-payment"
+    client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_x402_payment_handler_supports_streaming():
+    async def payment_handler(_context):
+        return {"headers": {"X-Payment": "signed-payment"}}
+
+    route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
+        side_effect=[
+            httpx.Response(402, json={"accepts": [{"network": "base", "scheme": "exact"}]}),
+            httpx.Response(200, text='data: {"delta":"ok"}\n\ndata: [DONE]\n\n'),
+        ]
+    )
+    client = AsyncAceDataCloud(payment_handler=payment_handler, max_retries=0)
+
+    stream = await client.openai.chat.completions.create(model="test", messages=[], stream=True)
+    chunks = [chunk async for chunk in stream]
+
+    assert chunks == [{"delta": "ok"}]
+    assert route.call_count == 2
+    assert route.calls.last.request.headers["X-Payment"] == "signed-payment"
+    await client.close()
 
 
 # ── OpenAI Chat Completions ──────────────────────────────────────────
