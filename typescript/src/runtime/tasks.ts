@@ -7,6 +7,19 @@ export interface TaskHandleOptions {
   maxWait?: number;
 }
 
+function taskStatus(state: Record<string, unknown>): 'succeeded' | 'failed' | '' {
+  const response = (state.response ?? state) as Record<string, unknown>;
+  if (response.status === 'succeeded' || response.status === 'failed') return response.status;
+  if (response.status !== undefined && response.status !== null) return '';
+  const finished =
+    (response.finished_at !== undefined && response.finished_at !== null) ||
+    (state.finished_at !== undefined && state.finished_at !== null);
+  if (!finished) return '';
+  if (response.success === true) return 'succeeded';
+  if (response.success === false) return 'failed';
+  return '';
+}
+
 export class TaskHandle {
   readonly id: string;
   private pollEndpoint: string;
@@ -27,8 +40,7 @@ export class TaskHandle {
 
   async isCompleted(): Promise<boolean> {
     const state = await this.get();
-    const response = (state.response ?? state) as Record<string, unknown>;
-    const status = response.status as string;
+    const status = taskStatus(state);
     return status === 'succeeded' || status === 'failed';
   }
 
@@ -39,8 +51,7 @@ export class TaskHandle {
 
     while (Date.now() - start < maxWait) {
       const state = await this.get();
-      const response = (state.response ?? state) as Record<string, unknown>;
-      const status = response.status as string;
+      const status = taskStatus(state);
 
       if (status === 'succeeded' || status === 'failed') {
         this._result = state;

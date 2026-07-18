@@ -7,6 +7,27 @@ import time
 from typing import Any
 
 
+def _task_status(state: dict[str, Any]) -> str:
+    response = state.get("response")
+    if response is None:
+        response = state
+    if not isinstance(response, dict):
+        return ""
+    status = response.get("status")
+    if status in ("succeeded", "failed"):
+        return status
+    if status is not None:
+        return ""
+    finished = response.get("finished_at") is not None or state.get("finished_at") is not None
+    if not finished:
+        return ""
+    if response.get("success") is True:
+        return "succeeded"
+    if response.get("success") is False:
+        return "failed"
+    return ""
+
+
 class TaskHandle:
     """Synchronous task handle for polling long-running operations."""
 
@@ -26,9 +47,7 @@ class TaskHandle:
 
     def is_completed(self) -> bool:
         state = self.get()
-        response = state.get("response", state)
-        status = response.get("status", "")
-        return status in ("succeeded", "failed")
+        return _task_status(state) in ("succeeded", "failed")
 
     def wait(
         self,
@@ -40,12 +59,8 @@ class TaskHandle:
         start = time.monotonic()
         while time.monotonic() - start < max_wait:
             state = self.get()
-            response = state.get("response", state)
-            status = response.get("status", "")
-            if status == "succeeded":
-                self._result = state
-                return state
-            if status == "failed":
+            status = _task_status(state)
+            if status in ("succeeded", "failed"):
                 self._result = state
                 return state
             time.sleep(poll_interval)
@@ -73,9 +88,7 @@ class AsyncTaskHandle:
 
     async def is_completed(self) -> bool:
         state = await self.get()
-        response = state.get("response", state)
-        status = response.get("status", "")
-        return status in ("succeeded", "failed")
+        return _task_status(state) in ("succeeded", "failed")
 
     async def wait(
         self,
@@ -86,12 +99,8 @@ class AsyncTaskHandle:
         start = time.monotonic()
         while time.monotonic() - start < max_wait:
             state = await self.get()
-            response = state.get("response", state)
-            status = response.get("status", "")
-            if status == "succeeded":
-                self._result = state
-                return state
-            if status == "failed":
+            status = _task_status(state)
+            if status in ("succeeded", "failed"):
                 self._result = state
                 return state
             await asyncio.sleep(poll_interval)
