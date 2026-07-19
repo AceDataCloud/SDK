@@ -36,9 +36,11 @@ class Images:
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
-        normalized_action = action or ("generate" if provider == "nano-banana" else None)
-        normalized_image_urls = image_urls or (
-            [image_url] if provider == "nano-banana" and image_url is not None else None
+        normalized_action = action if action is not None else ("generate" if provider == "nano-banana" else None)
+        normalized_image_urls = (
+            image_urls
+            if image_urls is not None
+            else ([image_url] if provider == "nano-banana" and image_url is not None else None)
         )
         if normalized_action is not None:
             body["action"] = normalized_action
@@ -101,9 +103,11 @@ class AsyncImages:
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
-        normalized_action = action or ("generate" if provider == "nano-banana" else None)
-        normalized_image_urls = image_urls or (
-            [image_url] if provider == "nano-banana" and image_url is not None else None
+        normalized_action = action if action is not None else ("generate" if provider == "nano-banana" else None)
+        normalized_image_urls = (
+            image_urls
+            if image_urls is not None
+            else ([image_url] if provider == "nano-banana" and image_url is not None else None)
         )
         if normalized_action is not None:
             body["action"] = normalized_action
