@@ -10,16 +10,16 @@ ImageProvider = Literal["nano-banana", "flux", "seedream"]
 
 
 def _normalize_image_generation_fields(
-    provider: ImageProvider | str,
+    is_nano_banana: bool,
     action: Literal["generate", "edit"] | None,
     image_url: str | None,
     image_urls: list[str] | None,
 ) -> tuple[Literal["generate", "edit"] | None, list[str] | None]:
-    normalized_action = action if action is not None else ("generate" if provider == "nano-banana" else None)
+    normalized_action = action if action is not None else ("generate" if is_nano_banana else None)
     normalized_image_urls = (
         image_urls
         if image_urls is not None
-        else ([image_url] if provider == "nano-banana" and image_url is not None else None)
+        else ([image_url] if is_nano_banana and image_url is not None else None)
     )
     return normalized_action, normalized_image_urls
 
@@ -51,8 +51,9 @@ class Images:
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        is_nano_banana = provider == "nano-banana"
         normalized_action, normalized_image_urls = _normalize_image_generation_fields(
-            provider, action, image_url, image_urls
+            is_nano_banana, action, image_url, image_urls
         )
         if normalized_action is not None:
             body["action"] = normalized_action
@@ -60,7 +61,7 @@ class Images:
             body["model"] = model
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
-        if image_url is not None and provider != "nano-banana":
+        if image_url is not None and not is_nano_banana:
             body["image_url"] = image_url
         if normalized_image_urls is not None:
             body["image_urls"] = normalized_image_urls
@@ -115,8 +116,9 @@ class AsyncImages:
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        is_nano_banana = provider == "nano-banana"
         normalized_action, normalized_image_urls = _normalize_image_generation_fields(
-            provider, action, image_url, image_urls
+            is_nano_banana, action, image_url, image_urls
         )
         if normalized_action is not None:
             body["action"] = normalized_action
@@ -124,7 +126,7 @@ class AsyncImages:
             body["model"] = model
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
-        if image_url is not None and provider != "nano-banana":
+        if image_url is not None and not is_nano_banana:
             body["image_url"] = image_url
         if normalized_image_urls is not None:
             body["image_urls"] = normalized_image_urls
