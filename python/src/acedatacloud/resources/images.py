@@ -9,6 +9,21 @@ from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 ImageProvider = Literal["nano-banana", "flux", "seedream"]
 
 
+def _normalize_image_generation_fields(
+    provider: ImageProvider | str,
+    action: Literal["generate", "edit"] | None,
+    image_url: str | None,
+    image_urls: list[str] | None,
+) -> tuple[Literal["generate", "edit"] | None, list[str] | None]:
+    normalized_action = action if action is not None else ("generate" if provider == "nano-banana" else None)
+    normalized_image_urls = (
+        image_urls
+        if image_urls is not None
+        else ([image_url] if provider == "nano-banana" and image_url is not None else None)
+    )
+    return normalized_action, normalized_image_urls
+
+
 class Images:
     """Synchronous image generation client."""
 
@@ -36,11 +51,8 @@ class Images:
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
-        normalized_action = action if action is not None else ("generate" if provider == "nano-banana" else None)
-        normalized_image_urls = (
-            image_urls
-            if image_urls is not None
-            else ([image_url] if provider == "nano-banana" and image_url is not None else None)
+        normalized_action, normalized_image_urls = _normalize_image_generation_fields(
+            provider, action, image_url, image_urls
         )
         if normalized_action is not None:
             body["action"] = normalized_action
@@ -103,11 +115,8 @@ class AsyncImages:
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
-        normalized_action = action if action is not None else ("generate" if provider == "nano-banana" else None)
-        normalized_image_urls = (
-            image_urls
-            if image_urls is not None
-            else ([image_url] if provider == "nano-banana" and image_url is not None else None)
+        normalized_action, normalized_image_urls = _normalize_image_generation_fields(
+            provider, action, image_url, image_urls
         )
         if normalized_action is not None:
             body["action"] = normalized_action
