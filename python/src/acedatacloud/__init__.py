@@ -28,6 +28,7 @@ from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
 from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
+from acedatacloud.resources.kimi import KimiModel
 from acedatacloud.resources.kling import (
     KlingCameraControl,
     KlingModel,
@@ -48,6 +49,7 @@ __all__ = [
     "KlingModel",
     "KlingReferenceImage",
     "KlingReferenceVideo",
+    "KimiModel",
     "VideoProvider",
     "VeoModel",
     "AceDataCloudError",
