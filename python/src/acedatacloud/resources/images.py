@@ -25,6 +25,7 @@ class Images:
         negative_prompt: str | None = None,
         image_url: str | None = None,
         image_urls: list[str] | None = None,
+        count: int | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
@@ -35,16 +36,20 @@ class Images:
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
-        if action is not None:
-            body["action"] = action
+        normalized_action = action or ("generate" if provider == "nano-banana" else None)
+        normalized_image_urls = image_urls or ([image_url] if provider == "nano-banana" and image_url is not None else None)
+        if normalized_action is not None:
+            body["action"] = normalized_action
         if model is not None:
             body["model"] = model
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
-        if image_url is not None:
+        if image_url is not None and provider != "nano-banana":
             body["image_url"] = image_url
-        if image_urls is not None:
-            body["image_urls"] = image_urls
+        if normalized_image_urls is not None:
+            body["image_urls"] = normalized_image_urls
+        if count is not None:
+            body["count"] = count
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
@@ -83,6 +88,7 @@ class AsyncImages:
         negative_prompt: str | None = None,
         image_url: str | None = None,
         image_urls: list[str] | None = None,
+        count: int | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
@@ -93,16 +99,20 @@ class AsyncImages:
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
         body: dict[str, Any] = {"prompt": prompt, **kwargs}
-        if action is not None:
-            body["action"] = action
+        normalized_action = action or ("generate" if provider == "nano-banana" else None)
+        normalized_image_urls = image_urls or ([image_url] if provider == "nano-banana" and image_url is not None else None)
+        if normalized_action is not None:
+            body["action"] = normalized_action
         if model is not None:
             body["model"] = model
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
-        if image_url is not None:
+        if image_url is not None and provider != "nano-banana":
             body["image_url"] = image_url
-        if image_urls is not None:
-            body["image_urls"] = image_urls
+        if normalized_image_urls is not None:
+            body["image_urls"] = normalized_image_urls
+        if count is not None:
+            body["count"] = count
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
