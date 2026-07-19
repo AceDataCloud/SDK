@@ -18,6 +18,7 @@ import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
 import { ShortUrl } from './resources/shorturl';
+import { Kimi } from './resources/kimi';
 
 export interface AceDataCloudOptions {
   apiToken?: string;
@@ -51,6 +52,7 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  readonly kimi: Kimi;
 
   private transport: Transport;
 
@@ -81,5 +83,6 @@ export class AceDataCloud {
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);
+    this.kimi = new Kimi(this.transport);
   }
 }
