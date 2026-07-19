@@ -16,6 +16,7 @@ export class Images {
     negativePrompt?: string;
     imageUrl?: string;
     imageUrls?: string[];
+    count?: number;
     aspectRatio?: string;
     resolution?: string;
     callbackUrl?: string;
@@ -25,13 +26,14 @@ export class Images {
     maxWait?: number;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | TaskHandle> {
-    const { prompt, provider = 'nano-banana', action, model, negativePrompt, imageUrl, imageUrls, aspectRatio, resolution, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
+    const { prompt, provider = 'nano-banana', action, model, negativePrompt, imageUrl, imageUrls, count, aspectRatio, resolution, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     const body: Record<string, unknown> = { prompt, ...rest };
     if (action !== undefined) body.action = action;
     if (model !== undefined) body.model = model;
     if (negativePrompt !== undefined) body.negative_prompt = negativePrompt;
     if (imageUrl !== undefined) body.image_url = imageUrl;
     if (imageUrls !== undefined) body.image_urls = imageUrls;
+    if (count !== undefined) body.count = count;
     if (aspectRatio !== undefined) body.aspect_ratio = aspectRatio;
     if (resolution !== undefined) body.resolution = resolution;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;

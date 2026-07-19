@@ -25,6 +25,7 @@ class Images:
         negative_prompt: str | None = None,
         image_url: str | None = None,
         image_urls: list[str] | None = None,
+        count: int | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
@@ -45,6 +46,8 @@ class Images:
             body["image_url"] = image_url
         if image_urls is not None:
             body["image_urls"] = image_urls
+        if count is not None:
+            body["count"] = count
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
@@ -83,6 +86,7 @@ class AsyncImages:
         negative_prompt: str | None = None,
         image_url: str | None = None,
         image_urls: list[str] | None = None,
+        count: int | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
@@ -103,6 +107,8 @@ class AsyncImages:
             body["image_url"] = image_url
         if image_urls is not None:
             body["image_urls"] = image_urls
+        if count is not None:
+            body["count"] = count
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
