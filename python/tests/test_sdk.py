@@ -234,6 +234,28 @@ def test_chat_count_tokens(client):
     assert result["input_tokens"] == 42
 
 
+# ── Kimi Chat Completions ──────────────────────────────────────────────
+
+
+@respx.mock
+def test_kimi_chat_completions(client):
+    mock_response = {
+        "id": "chatcmpl-kimi-123",
+        "object": "chat.completion",
+        "model": "kimi-k3",
+        "choices": [{"index": 0, "message": {"role": "assistant", "content": "Hi from Kimi"}, "finish_reason": "stop"}],
+    }
+    respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.kimi.chat.completions.create(
+        model="kimi-k3",
+        messages=[{"role": "user", "content": "Hello"}],
+    )
+    assert result["choices"][0]["message"]["content"] == "Hi from Kimi"
+
+
 # ── Image Generation ──────────────────────────────────────────────────
 
 
@@ -456,6 +478,25 @@ async def test_async_openai_completions(async_client):
         messages=[{"role": "user", "content": "Hi"}],
     )
     assert result["choices"][0]["message"]["content"] == "Async!"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_kimi_completions(async_client):
+    mock_response = {
+        "id": "chatcmpl-kimi-async",
+        "choices": [{"index": 0, "message": {"role": "assistant", "content": "Async Kimi"}, "finish_reason": "stop"}],
+    }
+    respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = await async_client.kimi.chat.completions.create(
+        model="kimi-k3",
+        messages=[{"role": "user", "content": "Hello"}],
+    )
+    assert result["choices"][0]["message"]["content"] == "Async Kimi"
     await async_client.close()
 
 
