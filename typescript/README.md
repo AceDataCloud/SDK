@@ -44,6 +44,7 @@ for await (const chunk of stream) {
 | Resource | Description |
 |----------|-------------|
 | `client.openai` | OpenAI-compatible chat completions and responses |
+| `client.kimi` | Kimi chat completions |
 | `client.chat` | Native chat messages |
 | `client.images` | Image generation (Flux, Seedream, Nano Banana, etc.) |
 | `client.audio` | Music generation (Suno) |
