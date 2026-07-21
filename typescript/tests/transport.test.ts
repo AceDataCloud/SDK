@@ -66,6 +66,35 @@ describe('Transport API base URL', () => {
     expect(fetchMock.mock.calls[1][1]?.headers).toMatchObject({ 'X-Payment': 'signed-payment' });
   });
 
+  it('parses PAYMENT-REQUIRED when the 402 body has no accepts list', async () => {
+    const paymentHandler = jest.fn().mockResolvedValue({
+      headers: { 'PAYMENT-SIGNATURE': 'signed-payment' },
+    });
+    const required = {
+      x402Version: 2,
+      accepts: [{ network: 'eip155:8453', scheme: 'exact', amount: '1' }],
+    };
+    const fetchMock = jest
+      .spyOn(global, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: 'payment required' }), {
+          status: 402,
+          headers: { 'PAYMENT-REQUIRED': btoa(JSON.stringify(required)) },
+        })
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+
+    const transport = new Transport({ paymentHandler, maxRetries: 0 });
+    await transport.request('GET', '/paid');
+
+    expect(paymentHandler).toHaveBeenCalledWith(
+      expect.objectContaining({ accepts: required.accepts })
+    );
+    expect(fetchMock.mock.calls[1][1]?.headers).toMatchObject({
+      'PAYMENT-SIGNATURE': 'signed-payment',
+    });
+  });
+
   it('does not retry a paid request with the same signature', async () => {
     const paymentHandler = jest.fn().mockResolvedValue({
       headers: { 'X-Payment': 'signed-payment' },

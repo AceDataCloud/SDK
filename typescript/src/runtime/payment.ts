@@ -3,7 +3,7 @@
  *
  * When the API returns `402 Payment Required`, the transport calls the
  * configured `PaymentHandler` to produce the extra headers (typically
- * `X-Payment`) to attach to the retry. This keeps the SDK free of any
+ * `PAYMENT-SIGNATURE`) to attach to the retry. This keeps the SDK free of any
  * chain-specific signing logic, and lets callers plug in a real x402
  * implementation such as `@acedatacloud/x402-client`.
  */
@@ -12,7 +12,9 @@
 export interface PaymentRequirement {
   scheme: string;
   network: string;
-  maxAmountRequired: string;
+  amount?: string;
+  /** @deprecated Legacy challenge field. */
+  maxAmountRequired?: string;
   maxTimeoutSeconds?: number;
   resource?: string;
   description?: string;
@@ -38,7 +40,7 @@ export interface PaymentHandlerContext {
 
 /** Result a payment handler must return. */
 export interface PaymentHandlerResult {
-  /** Extra headers to attach to the retry (must include `X-Payment`). */
+  /** Extra headers to attach to the retry (normally `PAYMENT-SIGNATURE`). */
   headers: Record<string, string>;
 }
 
