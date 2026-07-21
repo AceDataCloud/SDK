@@ -17,6 +17,24 @@ import type {
   PaymentRequiredBody,
 } from './payment';
 
+function parsePaymentRequired(resp: Response, text: string): PaymentRequiredBody {
+  const encoded = resp.headers.get('PAYMENT-REQUIRED');
+  if (encoded) {
+    try {
+      return JSON.parse(atob(encoded)) as PaymentRequiredBody;
+    } catch {
+      throw mapError(402, {
+        error: { code: 'invalid_402', message: 'Invalid PAYMENT-REQUIRED header' },
+      });
+    }
+  }
+  try {
+    return JSON.parse(text) as PaymentRequiredBody;
+  } catch {
+    throw mapError(402, { error: { code: 'invalid_402', message: text } });
+  }
+}
+
 const ERROR_CODE_MAP: Record<string, typeof APIError> = {
   invalid_token: AuthenticationError,
   token_expired: AuthenticationError,
@@ -171,12 +189,7 @@ export class Transport {
 
         if (resp.status === 402 && this.paymentHandler && !paymentAttempted) {
           const text = await resp.text();
-          let body: unknown;
-          try {
-            body = JSON.parse(text);
-          } catch {
-            throw mapError(402, { error: { code: 'invalid_402', message: text } });
-          }
+          const body = parsePaymentRequired(resp, text);
           if (
             !body ||
             typeof body !== 'object' ||
@@ -267,12 +280,7 @@ export class Transport {
 
         if (resp.status === 402 && this.paymentHandler && !paymentAttempted) {
           const text = await resp.text();
-          let body: unknown;
-          try {
-            body = JSON.parse(text);
-          } catch {
-            throw mapError(402, { error: { code: 'invalid_402', message: text } });
-          }
+          const body = parsePaymentRequired(resp, text);
           if (
             !body ||
             typeof body !== 'object' ||

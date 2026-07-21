@@ -3,6 +3,7 @@ package acedatacloud
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,6 +25,32 @@ type transport struct {
 }
 
 var retryStatus = map[int]bool{408: true, 409: true, 429: true, 500: true, 502: true, 503: true, 504: true}
+
+func parsePaymentRequired(resp *http.Response, body []byte) ([]PaymentRequirement, error) {
+	paymentRequired := body
+	if encoded := resp.Header.Get("PAYMENT-REQUIRED"); encoded != "" {
+		decoded, err := base64.StdEncoding.DecodeString(encoded)
+		if err != nil {
+			return nil, mapError(402, map[string]any{"error": map[string]any{"code": "invalid_402", "message": "Invalid PAYMENT-REQUIRED header"}})
+		}
+		paymentRequired = decoded
+	}
+	var parsed map[string]any
+	if err := json.Unmarshal(paymentRequired, &parsed); err != nil {
+		return nil, mapError(402, map[string]any{"error": map[string]any{"code": "invalid_402", "message": string(paymentRequired)}})
+	}
+	rawAccepts, _ := parsed["accepts"].([]any)
+	accepts := make([]PaymentRequirement, 0, len(rawAccepts))
+	for _, value := range rawAccepts {
+		if requirement, ok := value.(map[string]any); ok {
+			accepts = append(accepts, requirement)
+		}
+	}
+	if len(accepts) == 0 || len(accepts) != len(rawAccepts) {
+		return nil, mapError(402, map[string]any{"error": map[string]any{"code": "invalid_402", "message": "No payment requirements"}})
+	}
+	return accepts, nil
+}
 
 func newTransport(opts *options) (*transport, error) {
 	token := opts.apiToken
@@ -131,19 +158,9 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 
 		// Handle 402 Payment Required: invoke handler once, then retry with new headers.
 		if resp.StatusCode == http.StatusPaymentRequired && t.opts.paymentHandler != nil && !paymentAttempted {
-			var parsed map[string]any
-			if err := json.Unmarshal(respBody, &parsed); err != nil {
-				return nil, mapError(402, map[string]any{"error": map[string]any{"code": "invalid_402", "message": string(respBody)}})
-			}
-			rawAccepts, _ := parsed["accepts"].([]any)
-			if len(rawAccepts) == 0 {
-				return nil, mapError(402, map[string]any{"error": map[string]any{"code": "invalid_402", "message": "No payment requirements"}})
-			}
-			accepts := make([]PaymentRequirement, 0, len(rawAccepts))
-			for _, a := range rawAccepts {
-				if m, ok := a.(map[string]any); ok {
-					accepts = append(accepts, m)
-				}
+			accepts, err := parsePaymentRequired(resp, respBody)
+			if err != nil {
+				return nil, err
 			}
 			pctx := PaymentContext{URL: fullURL, Method: r.Method, Body: r.Body, Accepts: accepts}
 			result, err := t.opts.paymentHandler.Handle(ctx, pctx)
@@ -206,20 +223,53 @@ func (t *transport) stream(ctx context.Context, path string, body any) (<-chan [
 			}
 		}
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullURL, bytes.NewReader(bodyBytes))
-		if err != nil {
-			errCh <- err
-			return
-		}
-		for k, v := range t.headers {
-			req.Header.Set(k, v)
-		}
-		req.Header.Set("Accept", "text/event-stream")
+		extraAuth := map[string]string{}
+		paymentAttempted := false
+		var resp *http.Response
+		for {
+			req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullURL, bytes.NewReader(bodyBytes))
+			if err != nil {
+				errCh <- err
+				return
+			}
+			for k, v := range t.headers {
+				req.Header.Set(k, v)
+			}
+			for k, v := range extraAuth {
+				req.Header.Set(k, v)
+			}
+			req.Header.Set("Accept", "text/event-stream")
 
-		resp, err := t.httpClient.Do(req)
-		if err != nil {
-			errCh <- err
-			return
+			resp, err = t.httpClient.Do(req)
+			if err != nil {
+				errCh <- err
+				return
+			}
+			if resp.StatusCode != http.StatusPaymentRequired || t.opts.paymentHandler == nil || paymentAttempted {
+				break
+			}
+			respBody, readErr := io.ReadAll(resp.Body)
+			_ = resp.Body.Close()
+			if readErr != nil {
+				errCh <- readErr
+				return
+			}
+			accepts, parseErr := parsePaymentRequired(resp, respBody)
+			if parseErr != nil {
+				errCh <- parseErr
+				return
+			}
+			result, handleErr := t.opts.paymentHandler.Handle(ctx, PaymentContext{
+				URL: fullURL, Method: http.MethodPost, Body: body, Accepts: accepts,
+			})
+			if handleErr != nil {
+				errCh <- fmt.Errorf("payment handler: %w", handleErr)
+				return
+			}
+			for k, v := range result.Headers {
+				extraAuth[k] = v
+			}
+			paymentAttempted = true
 		}
 		defer resp.Body.Close()
 
