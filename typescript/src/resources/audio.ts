@@ -48,10 +48,23 @@ const FISH_AUDIO_FIELD_ALIASES = {
   maxNewTokens: 'max_new_tokens',
 } as const;
 
-function buildFishAudioBody(prompt: string, opts: AudioGenerateOptions, rest: Record<string, unknown>): Record<string, unknown> {
+const FISH_AUDIO_CAMEL_CASE_FIELDS = new Set(Object.keys(FISH_AUDIO_FIELD_ALIASES));
+
+function buildFishAudioBody(opts: AudioGenerateOptions): Record<string, unknown> {
+  const {
+    prompt,
+    provider: _provider,
+    model: _model,
+    tags: _tags,
+    callbackUrl: _callbackUrl,
+    wait: _wait,
+    pollInterval: _pollInterval,
+    maxWait: _maxWait,
+    ...rest
+  } = opts;
   const body: Record<string, unknown> = { text: prompt };
   for (const [key, value] of Object.entries(rest)) {
-    if (!(key in FISH_AUDIO_FIELD_ALIASES)) body[key] = value;
+    if (!FISH_AUDIO_CAMEL_CASE_FIELDS.has(key)) body[key] = value;
   }
   for (const [camelCaseField, snakeCaseField] of Object.entries(FISH_AUDIO_FIELD_ALIASES)) {
     const value = opts[camelCaseField];
@@ -59,6 +72,7 @@ function buildFishAudioBody(prompt: string, opts: AudioGenerateOptions, rest: Re
       body[snakeCaseField] = value;
     }
   }
+  if (opts.callbackUrl !== undefined) body.callback_url = opts.callbackUrl;
   return body;
 }
 
@@ -98,8 +112,7 @@ export class Audio {
     const { prompt, provider = 'suno', model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     let result: Record<string, unknown>;
     if (provider === 'fish') {
-      const body = buildFishAudioBody(prompt, opts, rest);
-      if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+      const body = buildFishAudioBody(opts);
       result = await this.transport.request('POST', '/fish/tts', {
         json: body,
         headers: model !== undefined ? { model } : undefined,

@@ -28,6 +28,7 @@ describe('Audio resource', () => {
     await audio.generate({
       provider: 'fish',
       prompt: 'hello',
+      model: 's1',
       referenceId: 'voice-1',
       sampleRate: 32000,
       mp3Bitrate: 128,
@@ -52,7 +53,7 @@ describe('Audio resource', () => {
         max_new_tokens: 512,
         normalize: true,
       },
-      headers: undefined,
+      headers: { model: 's1' },
     });
   });
 
