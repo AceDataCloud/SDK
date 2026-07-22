@@ -26,6 +26,7 @@ from acedatacloud._runtime.errors import (
 from acedatacloud._runtime.payment import (
     PaymentHandler,
     SyncPaymentHandler,
+    parse_payment_required,
 )
 
 _ERROR_CODE_MAP = {
@@ -175,13 +176,10 @@ class SyncTransport:
 
             if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                 try:
-                    body = resp.json()
-                except Exception as exc:
-                    raise _map_error(
-                        402,
-                        {"error": {"code": "invalid_402", "message": resp.text}},
-                    ) from exc
-                accepts = body.get("accepts") if isinstance(body, dict) else None
+                    body = parse_payment_required(resp.headers, resp.text)
+                except ValueError as exc:
+                    raise _map_error(402, {"error": {"code": "invalid_402", "message": str(exc)}}) from exc
+                accepts = body.get("accepts")
                 if not isinstance(accepts, list) or not accepts or not all(isinstance(item, dict) for item in accepts):
                     raise _map_error(
                         402,
@@ -237,15 +235,10 @@ class SyncTransport:
                 if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                     body_bytes = resp.read()
                     try:
-                        import json as _json
-
-                        body = _json.loads(body_bytes)
-                    except Exception as exc:
-                        raise _map_error(
-                            402,
-                            {"error": {"code": "invalid_402", "message": body_bytes.decode(errors="replace")}},
-                        ) from exc
-                    accepts = body.get("accepts") if isinstance(body, dict) else None
+                        body = parse_payment_required(resp.headers, body_bytes)
+                    except ValueError as exc:
+                        raise _map_error(402, {"error": {"code": "invalid_402", "message": str(exc)}}) from exc
+                    accepts = body.get("accepts")
                     if (
                         not isinstance(accepts, list)
                         or not accepts
@@ -396,13 +389,10 @@ class AsyncTransport:
 
             if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                 try:
-                    body = resp.json()
-                except Exception as exc:
-                    raise _map_error(
-                        402,
-                        {"error": {"code": "invalid_402", "message": resp.text}},
-                    ) from exc
-                accepts = body.get("accepts") if isinstance(body, dict) else None
+                    body = parse_payment_required(resp.headers, resp.text)
+                except ValueError as exc:
+                    raise _map_error(402, {"error": {"code": "invalid_402", "message": str(exc)}}) from exc
+                accepts = body.get("accepts")
                 if not isinstance(accepts, list) or not accepts or not all(isinstance(item, dict) for item in accepts):
                     raise _map_error(
                         402,
@@ -460,15 +450,10 @@ class AsyncTransport:
                 if resp.status_code == 402 and self._payment_handler is not None and not payment_attempted:
                     body_bytes = await resp.aread()
                     try:
-                        import json as _json
-
-                        body = _json.loads(body_bytes)
-                    except Exception as exc:
-                        raise _map_error(
-                            402,
-                            {"error": {"code": "invalid_402", "message": body_bytes.decode(errors="replace")}},
-                        ) from exc
-                    accepts = body.get("accepts") if isinstance(body, dict) else None
+                        body = parse_payment_required(resp.headers, body_bytes)
+                    except ValueError as exc:
+                        raise _map_error(402, {"error": {"code": "invalid_402", "message": str(exc)}}) from exc
+                    accepts = body.get("accepts")
                     if (
                         not isinstance(accepts, list)
                         or not accepts

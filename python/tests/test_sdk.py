@@ -1,5 +1,6 @@
 """Tests for AceDataCloud Python SDK."""
 
+import base64
 import json
 from unittest.mock import Mock
 
@@ -71,6 +72,33 @@ def test_x402_payment_retry_does_not_use_retry_budget():
 
     assert route.call_count == 2
     assert route.calls.last.request.headers["X-Payment"] == "signed-payment"
+    client.close()
+
+
+@respx.mock
+def test_x402_payment_retry_parses_payment_required_header():
+    required = {
+        "x402Version": 2,
+        "accepts": [{"network": "eip155:8453", "scheme": "exact", "amount": "1"}],
+    }
+    encoded = base64.b64encode(json.dumps(required).encode()).decode()
+    payment_handler = Mock(return_value={"headers": {"PAYMENT-SIGNATURE": "signed-payment"}})
+    route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
+        side_effect=[
+            httpx.Response(
+                402,
+                content=b"",
+                headers={"PAYMENT-REQUIRED": encoded},
+            ),
+            httpx.Response(200, json={"choices": []}),
+        ]
+    )
+    client = AceDataCloud(payment_handler=payment_handler, max_retries=0)
+
+    client.openai.chat.completions.create(model="test", messages=[])
+
+    assert payment_handler.call_args.args[0]["accepts"] == required["accepts"]
+    assert route.calls.last.request.headers["PAYMENT-SIGNATURE"] == "signed-payment"
     client.close()
 
 

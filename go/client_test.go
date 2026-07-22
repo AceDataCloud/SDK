@@ -2,6 +2,7 @@ package acedatacloud
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -185,6 +186,86 @@ func TestPaymentHandler_OnSecond402ThenSuccess(t *testing.T) {
 	}
 	if hit != 2 {
 		t.Fatalf("expected 2 hits, got %d", hit)
+	}
+}
+
+func TestPaymentHandler_ParsesPaymentRequiredHeader(t *testing.T) {
+	var calls int
+	required := `{"x402Version":2,"accepts":[{"network":"eip155:8453","scheme":"exact","amount":"1"}]}`
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		if calls == 1 {
+			w.Header().Set("PAYMENT-REQUIRED", base64.StdEncoding.EncodeToString([]byte(required)))
+			w.WriteHeader(http.StatusPaymentRequired)
+			_, _ = w.Write([]byte(`{"error":"payment required"}`))
+			return
+		}
+		if got := r.Header.Get("PAYMENT-SIGNATURE"); got != "signed-payment" {
+			t.Fatalf("expected PAYMENT-SIGNATURE, got %q", got)
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer srv.Close()
+
+	handler := PaymentHandlerFunc(func(_ context.Context, pctx PaymentContext) (PaymentResult, error) {
+		if got := pctx.Accepts[0]["network"]; got != "eip155:8453" {
+			t.Fatalf("expected canonical network, got %v", got)
+		}
+		return PaymentResult{Headers: map[string]string{"PAYMENT-SIGNATURE": "signed-payment"}}, nil
+	})
+	c, _ := NewClient(WithBaseURL(srv.URL), WithPaymentHandler(handler))
+
+	if _, err := c.transport.do(
+		context.Background(),
+		requestOpts{Method: http.MethodGet, Path: "/paid"},
+	); err != nil {
+		t.Fatal(err)
+	}
+	if calls != 2 {
+		t.Fatalf("expected two calls, got %d", calls)
+	}
+}
+
+func TestPaymentHandler_ParsesPaymentRequiredHeaderForStream(t *testing.T) {
+	var calls int
+	required := `{"x402Version":2,"accepts":[{"network":"eip155:8453","scheme":"exact","amount":"1"}]}`
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		if calls == 1 {
+			w.Header().Set("PAYMENT-REQUIRED", base64.StdEncoding.EncodeToString([]byte(required)))
+			w.WriteHeader(http.StatusPaymentRequired)
+			return
+		}
+		if got := r.Header.Get("PAYMENT-SIGNATURE"); got != "signed-payment" {
+			t.Fatalf("expected PAYMENT-SIGNATURE, got %q", got)
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		_, _ = w.Write([]byte("data: {\"id\":\"chunk-1\"}\n\ndata: [DONE]\n\n"))
+	}))
+	defer srv.Close()
+
+	handler := PaymentHandlerFunc(func(_ context.Context, pctx PaymentContext) (PaymentResult, error) {
+		if got := pctx.Accepts[0]["network"]; got != "eip155:8453" {
+			t.Fatalf("expected canonical network, got %v", got)
+		}
+		return PaymentResult{Headers: map[string]string{"PAYMENT-SIGNATURE": "signed-payment"}}, nil
+	})
+	c, _ := NewClient(WithBaseURL(srv.URL), WithPaymentHandler(handler))
+
+	chunks, errors := c.OpenAI().Chat().Completions().CreateStream(context.Background(), ChatCompletionRequest{
+		Model: "test", Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	})
+	var received []map[string]any
+	for chunk := range chunks {
+		received = append(received, chunk)
+	}
+	for err := range errors {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if calls != 2 || len(received) != 1 || received[0]["id"] != "chunk-1" {
+		t.Fatalf("unexpected stream result calls=%d chunks=%+v", calls, received)
 	}
 }
 
