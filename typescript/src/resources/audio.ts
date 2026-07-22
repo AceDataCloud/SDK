@@ -48,14 +48,18 @@ const FISH_AUDIO_FIELD_ALIASES = {
   maxNewTokens: 'max_new_tokens',
 } as const;
 
-function applyFishAudioAliases(body: Record<string, unknown>, opts: AudioGenerateOptions): void {
+function buildFishAudioBody(prompt: string, opts: AudioGenerateOptions, rest: Record<string, unknown>): Record<string, unknown> {
+  const body: Record<string, unknown> = { text: prompt };
+  for (const [key, value] of Object.entries(rest)) {
+    if (!(key in FISH_AUDIO_FIELD_ALIASES)) body[key] = value;
+  }
   for (const [camelCaseField, snakeCaseField] of Object.entries(FISH_AUDIO_FIELD_ALIASES)) {
     const value = opts[camelCaseField];
     if (value !== undefined) {
-      delete body[camelCaseField];
       body[snakeCaseField] = value;
     }
   }
+  return body;
 }
 
 export class Audio {
@@ -94,8 +98,7 @@ export class Audio {
     const { prompt, provider = 'suno', model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     let result: Record<string, unknown>;
     if (provider === 'fish') {
-      const body: Record<string, unknown> = { text: prompt, ...rest };
-      applyFishAudioAliases(body, opts);
+      const body = buildFishAudioBody(prompt, opts, rest);
       if (callbackUrl !== undefined) body.callback_url = callbackUrl;
       result = await this.transport.request('POST', '/fish/tts', {
         json: body,

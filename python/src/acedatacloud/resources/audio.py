@@ -12,6 +12,12 @@ FishAudioLatency = Literal["normal", "balanced"]
 FishAudioMp3Bitrate = Literal[64, 128, 192]
 
 
+def _add_optional_fields(body: dict[str, Any], **values: Any) -> None:
+    for key, value in values.items():
+        if value is not None:
+            body[key] = value
+
+
 class Audio:
     """Synchronous audio generation client."""
 
@@ -86,38 +92,25 @@ class Audio:
     ) -> dict[str, Any] | TaskHandle:
         if provider == "fish":
             body: dict[str, Any] = {"text": prompt, **kwargs}
-            if callback_url is not None:
-                body["callback_url"] = callback_url
-            if reference_id is not None:
-                body["reference_id"] = reference_id
-            if format is not None:
-                body["format"] = format
-            if sample_rate is not None:
-                body["sample_rate"] = sample_rate
-            if mp3_bitrate is not None:
-                body["mp3_bitrate"] = mp3_bitrate
-            if opus_bitrate is not None:
-                body["opus_bitrate"] = opus_bitrate
-            if latency is not None:
-                body["latency"] = latency
-            if chunk_length is not None:
-                body["chunk_length"] = chunk_length
-            if min_chunk_length is not None:
-                body["min_chunk_length"] = min_chunk_length
-            if temperature is not None:
-                body["temperature"] = temperature
-            if top_p is not None:
-                body["top_p"] = top_p
-            if repetition_penalty is not None:
-                body["repetition_penalty"] = repetition_penalty
-            if max_new_tokens is not None:
-                body["max_new_tokens"] = max_new_tokens
-            if normalize is not None:
-                body["normalize"] = normalize
-            if prosody is not None:
-                body["prosody"] = prosody
-            if references is not None:
-                body["references"] = references
+            _add_optional_fields(
+                body,
+                callback_url=callback_url,
+                reference_id=reference_id,
+                format=format,
+                sample_rate=sample_rate,
+                mp3_bitrate=mp3_bitrate,
+                opus_bitrate=opus_bitrate,
+                latency=latency,
+                chunk_length=chunk_length,
+                min_chunk_length=min_chunk_length,
+                temperature=temperature,
+                top_p=top_p,
+                repetition_penalty=repetition_penalty,
+                max_new_tokens=max_new_tokens,
+                normalize=normalize,
+                prosody=prosody,
+                references=references,
+            )
             if async_ is not None:
                 body["async"] = async_
             result = self._transport.request(
@@ -222,38 +215,25 @@ class AsyncAudio:
     ) -> dict[str, Any] | AsyncTaskHandle:
         if provider == "fish":
             body: dict[str, Any] = {"text": prompt, **kwargs}
-            if callback_url is not None:
-                body["callback_url"] = callback_url
-            if reference_id is not None:
-                body["reference_id"] = reference_id
-            if format is not None:
-                body["format"] = format
-            if sample_rate is not None:
-                body["sample_rate"] = sample_rate
-            if mp3_bitrate is not None:
-                body["mp3_bitrate"] = mp3_bitrate
-            if opus_bitrate is not None:
-                body["opus_bitrate"] = opus_bitrate
-            if latency is not None:
-                body["latency"] = latency
-            if chunk_length is not None:
-                body["chunk_length"] = chunk_length
-            if min_chunk_length is not None:
-                body["min_chunk_length"] = min_chunk_length
-            if temperature is not None:
-                body["temperature"] = temperature
-            if top_p is not None:
-                body["top_p"] = top_p
-            if repetition_penalty is not None:
-                body["repetition_penalty"] = repetition_penalty
-            if max_new_tokens is not None:
-                body["max_new_tokens"] = max_new_tokens
-            if normalize is not None:
-                body["normalize"] = normalize
-            if prosody is not None:
-                body["prosody"] = prosody
-            if references is not None:
-                body["references"] = references
+            _add_optional_fields(
+                body,
+                callback_url=callback_url,
+                reference_id=reference_id,
+                format=format,
+                sample_rate=sample_rate,
+                mp3_bitrate=mp3_bitrate,
+                opus_bitrate=opus_bitrate,
+                latency=latency,
+                chunk_length=chunk_length,
+                min_chunk_length=min_chunk_length,
+                temperature=temperature,
+                top_p=top_p,
+                repetition_penalty=repetition_penalty,
+                max_new_tokens=max_new_tokens,
+                normalize=normalize,
+                prosody=prosody,
+                references=references,
+            )
             if async_ is not None:
                 body["async"] = async_
             result = await self._transport.request(
