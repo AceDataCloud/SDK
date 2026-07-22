@@ -21,6 +21,41 @@ describe('Audio resource', () => {
     });
   });
 
+  it('maps fish camelCase options to API snake_case fields', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-fish' });
+    const audio = new Audio({ request } as any);
+
+    await audio.generate({
+      provider: 'fish',
+      prompt: 'hello',
+      referenceId: 'voice-1',
+      sampleRate: 32000,
+      mp3Bitrate: 128,
+      chunkLength: 200,
+      minChunkLength: 100,
+      topP: 0.8,
+      repetitionPenalty: 1.1,
+      maxNewTokens: 512,
+      normalize: true,
+    });
+
+    expect(request).toHaveBeenCalledWith('POST', '/fish/tts', {
+      json: {
+        text: 'hello',
+        reference_id: 'voice-1',
+        sample_rate: 32000,
+        mp3_bitrate: 128,
+        chunk_length: 200,
+        min_chunk_length: 100,
+        top_p: 0.8,
+        repetition_penalty: 1.1,
+        max_new_tokens: 512,
+        normalize: true,
+      },
+      headers: undefined,
+    });
+  });
+
   it('keeps non-fish providers on /{provider}/audios', async () => {
     const request = jest.fn().mockResolvedValue({ task_id: 'task-suno' });
     const audio = new Audio({ request } as any);

@@ -5,6 +5,37 @@ import { TaskHandle } from '../runtime/tasks';
 
 export type AudioProvider = 'suno' | 'producer' | 'fish' | (string & {});
 
+export type FishAudioFormat = 'mp3' | 'wav' | 'pcm' | 'opus';
+export type FishAudioLatency = 'normal' | 'balanced';
+
+export interface AudioGenerateOptions {
+  prompt: string;
+  provider?: AudioProvider;
+  model?: string;
+  tags?: string;
+  callbackUrl?: string;
+  referenceId?: string;
+  format?: FishAudioFormat;
+  sampleRate?: number;
+  mp3Bitrate?: 64 | 128 | 192;
+  opusBitrate?: number;
+  latency?: FishAudioLatency;
+  chunkLength?: number;
+  minChunkLength?: number;
+  temperature?: number;
+  topP?: number;
+  repetitionPenalty?: number;
+  maxNewTokens?: number;
+  normalize?: boolean;
+  prosody?: Record<string, unknown>;
+  references?: Record<string, unknown>[];
+  async?: boolean;
+  wait?: boolean;
+  pollInterval?: number;
+  maxWait?: number;
+  [key: string]: unknown;
+}
+
 export class Audio {
   constructor(private transport: Transport) {}
 
@@ -37,22 +68,47 @@ export class Audio {
     return this.transport.request('GET', `/fish/model/${id}`);
   }
 
-  async generate(opts: {
-    prompt: string;
-    provider?: AudioProvider;
-    model?: string;
-    tags?: string;
-    callbackUrl?: string;
-    async?: boolean;
-    wait?: boolean;
-    pollInterval?: number;
-    maxWait?: number;
-    [key: string]: unknown;
-  }): Promise<Record<string, unknown> | TaskHandle> {
+  async generate(opts: AudioGenerateOptions): Promise<Record<string, unknown> | TaskHandle> {
     const { prompt, provider = 'suno', model, tags, callbackUrl, wait: shouldWait, pollInterval, maxWait, ...rest } = opts;
     let result: Record<string, unknown>;
     if (provider === 'fish') {
       const body: Record<string, unknown> = { text: prompt, ...rest };
+      if (opts.referenceId !== undefined) {
+        delete body.referenceId;
+        body.reference_id = opts.referenceId;
+      }
+      if (opts.sampleRate !== undefined) {
+        delete body.sampleRate;
+        body.sample_rate = opts.sampleRate;
+      }
+      if (opts.mp3Bitrate !== undefined) {
+        delete body.mp3Bitrate;
+        body.mp3_bitrate = opts.mp3Bitrate;
+      }
+      if (opts.opusBitrate !== undefined) {
+        delete body.opusBitrate;
+        body.opus_bitrate = opts.opusBitrate;
+      }
+      if (opts.chunkLength !== undefined) {
+        delete body.chunkLength;
+        body.chunk_length = opts.chunkLength;
+      }
+      if (opts.minChunkLength !== undefined) {
+        delete body.minChunkLength;
+        body.min_chunk_length = opts.minChunkLength;
+      }
+      if (opts.topP !== undefined) {
+        delete body.topP;
+        body.top_p = opts.topP;
+      }
+      if (opts.repetitionPenalty !== undefined) {
+        delete body.repetitionPenalty;
+        body.repetition_penalty = opts.repetitionPenalty;
+      }
+      if (opts.maxNewTokens !== undefined) {
+        delete body.maxNewTokens;
+        body.max_new_tokens = opts.maxNewTokens;
+      }
       if (callbackUrl !== undefined) body.callback_url = callbackUrl;
       result = await this.transport.request('POST', '/fish/tts', {
         json: body,

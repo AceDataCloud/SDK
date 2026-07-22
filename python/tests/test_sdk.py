@@ -312,6 +312,39 @@ def test_audio_generate_fish_uses_tts_endpoint(client):
 
 
 @respx.mock
+def test_audio_generate_fish_supports_explicit_tts_options(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["reference_id"] == "voice-1"
+        assert payload["sample_rate"] == 32000
+        assert payload["mp3_bitrate"] == 128
+        assert payload["chunk_length"] == 200
+        assert payload["min_chunk_length"] == 100
+        assert payload["top_p"] == 0.8
+        assert payload["repetition_penalty"] == 1.1
+        assert payload["max_new_tokens"] == 512
+        assert payload["normalize"] is True
+        return httpx.Response(200, json={"success": True, "task_id": "task-fish"})
+
+    respx.post("https://api.acedata.cloud/fish/tts").mock(side_effect=_handler)
+
+    result = client.audio.generate(
+        prompt="Hello fish",
+        provider="fish",
+        reference_id="voice-1",
+        sample_rate=32000,
+        mp3_bitrate=128,
+        chunk_length=200,
+        min_chunk_length=100,
+        top_p=0.8,
+        repetition_penalty=1.1,
+        max_new_tokens=512,
+        normalize=True,
+    )
+    assert hasattr(result, "wait")
+
+
+@respx.mock
 def test_audio_fish_model_endpoints(client):
     respx.get("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(200, json={"data": []}))
     respx.get("https://api.acedata.cloud/fish/model/model-1").mock(
