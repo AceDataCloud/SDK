@@ -36,6 +36,28 @@ export interface AudioGenerateOptions {
   [key: string]: unknown;
 }
 
+const FISH_AUDIO_FIELD_ALIASES = {
+  referenceId: 'reference_id',
+  sampleRate: 'sample_rate',
+  mp3Bitrate: 'mp3_bitrate',
+  opusBitrate: 'opus_bitrate',
+  chunkLength: 'chunk_length',
+  minChunkLength: 'min_chunk_length',
+  topP: 'top_p',
+  repetitionPenalty: 'repetition_penalty',
+  maxNewTokens: 'max_new_tokens',
+} as const;
+
+function applyFishAudioAliases(body: Record<string, unknown>, opts: AudioGenerateOptions): void {
+  for (const [camelCaseField, snakeCaseField] of Object.entries(FISH_AUDIO_FIELD_ALIASES)) {
+    const value = opts[camelCaseField];
+    if (value !== undefined) {
+      delete body[camelCaseField];
+      body[snakeCaseField] = value;
+    }
+  }
+}
+
 export class Audio {
   constructor(private transport: Transport) {}
 
@@ -73,42 +95,7 @@ export class Audio {
     let result: Record<string, unknown>;
     if (provider === 'fish') {
       const body: Record<string, unknown> = { text: prompt, ...rest };
-      if (opts.referenceId !== undefined) {
-        delete body.referenceId;
-        body.reference_id = opts.referenceId;
-      }
-      if (opts.sampleRate !== undefined) {
-        delete body.sampleRate;
-        body.sample_rate = opts.sampleRate;
-      }
-      if (opts.mp3Bitrate !== undefined) {
-        delete body.mp3Bitrate;
-        body.mp3_bitrate = opts.mp3Bitrate;
-      }
-      if (opts.opusBitrate !== undefined) {
-        delete body.opusBitrate;
-        body.opus_bitrate = opts.opusBitrate;
-      }
-      if (opts.chunkLength !== undefined) {
-        delete body.chunkLength;
-        body.chunk_length = opts.chunkLength;
-      }
-      if (opts.minChunkLength !== undefined) {
-        delete body.minChunkLength;
-        body.min_chunk_length = opts.minChunkLength;
-      }
-      if (opts.topP !== undefined) {
-        delete body.topP;
-        body.top_p = opts.topP;
-      }
-      if (opts.repetitionPenalty !== undefined) {
-        delete body.repetitionPenalty;
-        body.repetition_penalty = opts.repetitionPenalty;
-      }
-      if (opts.maxNewTokens !== undefined) {
-        delete body.maxNewTokens;
-        body.max_new_tokens = opts.maxNewTokens;
-      }
+      applyFishAudioAliases(body, opts);
       if (callbackUrl !== undefined) body.callback_url = callbackUrl;
       result = await this.transport.request('POST', '/fish/tts', {
         json: body,
