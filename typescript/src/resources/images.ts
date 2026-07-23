@@ -11,6 +11,8 @@ const IMAGE_ENDPOINTS: Record<string, string> = {
   recaptcha: '/captcha/recognition/recaptcha2',
 };
 
+const isCaptchaProvider = (provider: string): boolean => provider in IMAGE_ENDPOINTS;
+
 export class Images {
   constructor(private transport: Transport) {}
 
@@ -59,9 +61,10 @@ export class Images {
       maxWait,
       ...rest
     } = opts;
+    const captchaProvider = isCaptchaProvider(provider);
     const endpoint = IMAGE_ENDPOINTS[provider] ?? `/${provider}/images`;
     const body: Record<string, unknown> = { ...rest };
-    if (prompt !== undefined && !IMAGE_ENDPOINTS[provider]) body.prompt = prompt;
+    if (prompt !== undefined && !captchaProvider) body.prompt = prompt;
     if (action !== undefined) body.action = action;
     if (model !== undefined) body.model = model;
     if (negativePrompt !== undefined) body.negative_prompt = negativePrompt;
@@ -77,7 +80,7 @@ export class Images {
     if (resolution !== undefined) body.resolution = resolution;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
-    if (!prompt && !IMAGE_ENDPOINTS[provider]) {
+    if (!prompt && !captchaProvider) {
       throw new Error('prompt is required for image generation providers');
     }
     const result = await this.transport.request('POST', endpoint, { json: body });
