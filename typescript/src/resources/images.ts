@@ -62,6 +62,9 @@ export class Images {
       ...rest
     } = opts;
     const captchaProvider = isCaptchaProvider(provider);
+    if (!prompt && !captchaProvider) {
+      throw new Error('prompt is required for image generation providers');
+    }
     const endpoint = IMAGE_ENDPOINTS[provider] ?? `/${provider}/images`;
     const body: Record<string, unknown> = { ...rest };
     if (prompt !== undefined && !captchaProvider) body.prompt = prompt;
@@ -80,9 +83,6 @@ export class Images {
     if (resolution !== undefined) body.resolution = resolution;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
 
-    if (!prompt && !captchaProvider) {
-      throw new Error('prompt is required for image generation providers');
-    }
     const result = await this.transport.request('POST', endpoint, { json: body });
     const taskId = result.task_id as string | undefined;
 

@@ -50,8 +50,11 @@ class Images:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
-        body: dict[str, Any] = {**kwargs}
         captcha_provider = _is_captcha_provider(provider)
+        if prompt is None and not captcha_provider:
+            raise ValueError("prompt is required for image generation providers")
+
+        body: dict[str, Any] = {**kwargs}
         if prompt is not None and not captcha_provider:
             body["prompt"] = prompt
         if action is not None:
@@ -86,8 +89,6 @@ class Images:
             body["async"] = async_
 
         endpoint = _IMAGE_ENDPOINTS.get(provider, f"/{provider}/images")
-        if prompt is None and not captcha_provider:
-            raise ValueError("prompt is required for image generation providers")
         result = self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 
@@ -131,8 +132,11 @@ class AsyncImages:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
-        body: dict[str, Any] = {**kwargs}
         captcha_provider = _is_captcha_provider(provider)
+        if prompt is None and not captcha_provider:
+            raise ValueError("prompt is required for image generation providers")
+
+        body: dict[str, Any] = {**kwargs}
         if prompt is not None and not captcha_provider:
             body["prompt"] = prompt
         if action is not None:
@@ -167,8 +171,6 @@ class AsyncImages:
             body["async"] = async_
 
         endpoint = _IMAGE_ENDPOINTS.get(provider, f"/{provider}/images")
-        if prompt is None and not captcha_provider:
-            raise ValueError("prompt is required for image generation providers")
         result = await self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 
