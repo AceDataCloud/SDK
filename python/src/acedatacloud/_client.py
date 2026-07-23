@@ -11,6 +11,7 @@ from acedatacloud._runtime.payment import (
 from acedatacloud._runtime.transport import AsyncTransport, SyncTransport
 from acedatacloud.resources.aichat import AiChat, AsyncAiChat
 from acedatacloud.resources.audio import AsyncAudio, Audio
+from acedatacloud.resources.captcha import AsyncCaptcha, Captcha
 from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
@@ -63,6 +64,7 @@ class AceDataCloud:
         self.files = Files(self._transport)
         self.platform = Platform(self._transport)
         self.openai = OpenAI(self._transport)
+        self.captcha = Captcha(self._transport)
         self.glm = Glm(self._transport)
         self.veo = Veo(self._transport)
         self.kling = Kling(self._transport)
@@ -113,6 +115,7 @@ class AsyncAceDataCloud:
         self.files = AsyncFiles(self._transport)
         self.platform = AsyncPlatform(self._transport)
         self.openai = AsyncOpenAI(self._transport)
+        self.captcha = AsyncCaptcha(self._transport)
         self.glm = AsyncGlm(self._transport)
         self.veo = AsyncVeo(self._transport)
         self.kling = AsyncKling(self._transport)

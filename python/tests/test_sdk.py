@@ -355,6 +355,35 @@ def test_search_google(client):
     assert result["organic"][0]["title"] == "Example"
 
 
+# ── Captcha ───────────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_captcha_image2text(client):
+    mock_response = {"solution": {"text": "1234"}}
+    respx.post("https://api.acedata.cloud/captcha/recognition/image2text").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.captcha.recognition.image2text(image="data:image/png;base64,abc", async_=True)
+    assert result["solution"]["text"] == "1234"
+
+
+@respx.mock
+def test_captcha_recaptcha3_token(client):
+    mock_response = {"token": "captcha-token"}
+    respx.post("https://api.acedata.cloud/captcha/token/recaptcha3").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.captcha.token.recaptcha3(
+        page_action="submit",
+        website_key="site-key",
+        website_url="https://example.com/form",
+    )
+    assert result["token"] == "captcha-token"
+
+
 # ── Tasks ─────────────────────────────────────────────────────────────
 
 
@@ -495,6 +524,22 @@ async def test_async_search(async_client):
 
     result = await async_client.search.google(query="async test")
     assert result["organic"][0]["title"] == "Async Example"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_captcha_hcaptcha(async_client):
+    mock_response = {"solution": {"label": "cat"}}
+    respx.post("https://api.acedata.cloud/captcha/recognition/hcaptcha").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = await async_client.captcha.recognition.hcaptcha(
+        queries=["cat"],
+        question="Select the cat",
+    )
+    assert result["solution"]["label"] == "cat"
     await async_client.close()
 
 
