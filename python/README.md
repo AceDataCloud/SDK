@@ -91,7 +91,7 @@ Available providers:
 
 | Resource | Providers |
 |----------|-----------|
-| `client.images` | `nano-banana` (default), `flux`, `seedream` |
+| `client.images` | `nano-banana` (default), `flux`, `seedream`, `hcaptcha`, `image2text`, `recaptcha` |
 | `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
 | `client.audio` | `suno` (default), `producer`, `fish` |
 

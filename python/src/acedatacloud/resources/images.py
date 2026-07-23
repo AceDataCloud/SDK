@@ -6,7 +6,13 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-ImageProvider = Literal["nano-banana", "flux", "seedream"]
+ImageProvider = Literal["nano-banana", "flux", "seedream", "hcaptcha", "image2text", "recaptcha"]
+
+_IMAGE_ENDPOINTS = {
+    "hcaptcha": "/captcha/recognition/hcaptcha",
+    "image2text": "/captcha/recognition/image2text",
+    "recaptcha": "/captcha/recognition/recaptcha2",
+}
 
 
 class Images:
@@ -18,13 +24,19 @@ class Images:
     def generate(
         self,
         *,
-        prompt: str,
+        prompt: str | None = None,
         provider: ImageProvider | str = "nano-banana",
         action: Literal["generate", "edit"] | None = None,
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
         image_urls: list[str] | None = None,
+        image: str | None = None,
+        question: str | None = None,
+        queries: Any | None = None,
+        website_key: str | None = None,
+        website_url: str | None = None,
+        page_action: str | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
@@ -34,7 +46,9 @@ class Images:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | TaskHandle:
-        body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        body: dict[str, Any] = {**kwargs}
+        if prompt is not None and provider not in _IMAGE_ENDPOINTS:
+            body["prompt"] = prompt
         if action is not None:
             body["action"] = action
         if model is not None:
@@ -45,6 +59,18 @@ class Images:
             body["image_url"] = image_url
         if image_urls is not None:
             body["image_urls"] = image_urls
+        if image is not None:
+            body["image"] = image
+        if question is not None:
+            body["question"] = question
+        if queries is not None:
+            body["queries"] = queries
+        if website_key is not None:
+            body["website_key"] = website_key
+        if website_url is not None:
+            body["website_url"] = website_url
+        if page_action is not None:
+            body["page_action"] = page_action
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
@@ -54,7 +80,9 @@ class Images:
         if async_ is not None:
             body["async"] = async_
 
-        endpoint = f"/{provider}/images"
+        endpoint = _IMAGE_ENDPOINTS.get(provider, f"/{provider}/images")
+        if prompt is None and provider not in _IMAGE_ENDPOINTS:
+            raise ValueError("prompt is required for image generation providers")
         result = self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 
@@ -76,13 +104,19 @@ class AsyncImages:
     async def generate(
         self,
         *,
-        prompt: str,
+        prompt: str | None = None,
         provider: ImageProvider | str = "nano-banana",
         action: Literal["generate", "edit"] | None = None,
         model: str | None = None,
         negative_prompt: str | None = None,
         image_url: str | None = None,
         image_urls: list[str] | None = None,
+        image: str | None = None,
+        question: str | None = None,
+        queries: Any | None = None,
+        website_key: str | None = None,
+        website_url: str | None = None,
+        page_action: str | None = None,
         aspect_ratio: str | None = None,
         resolution: str | None = None,
         callback_url: str | None = None,
@@ -92,7 +126,9 @@ class AsyncImages:
         max_wait: float = 600.0,
         **kwargs: Any,
     ) -> dict[str, Any] | AsyncTaskHandle:
-        body: dict[str, Any] = {"prompt": prompt, **kwargs}
+        body: dict[str, Any] = {**kwargs}
+        if prompt is not None and provider not in _IMAGE_ENDPOINTS:
+            body["prompt"] = prompt
         if action is not None:
             body["action"] = action
         if model is not None:
@@ -103,6 +139,18 @@ class AsyncImages:
             body["image_url"] = image_url
         if image_urls is not None:
             body["image_urls"] = image_urls
+        if image is not None:
+            body["image"] = image
+        if question is not None:
+            body["question"] = question
+        if queries is not None:
+            body["queries"] = queries
+        if website_key is not None:
+            body["website_key"] = website_key
+        if website_url is not None:
+            body["website_url"] = website_url
+        if page_action is not None:
+            body["page_action"] = page_action
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
         if resolution is not None:
@@ -112,7 +160,9 @@ class AsyncImages:
         if async_ is not None:
             body["async"] = async_
 
-        endpoint = f"/{provider}/images"
+        endpoint = _IMAGE_ENDPOINTS.get(provider, f"/{provider}/images")
+        if prompt is None and provider not in _IMAGE_ENDPOINTS:
+            raise ValueError("prompt is required for image generation providers")
         result = await self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
 

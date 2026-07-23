@@ -280,6 +280,21 @@ def test_images_generate(client):
     assert result["data"][0]["image_url"] == "https://cdn.acedata.cloud/cat.png"
 
 
+@respx.mock
+def test_images_generate_image2text_provider(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["image"] == "base64-image"
+        assert payload["async"] is True
+        assert "prompt" not in payload
+        return httpx.Response(200, json={"success": True, "data": [{"text": "1234"}]})
+
+    respx.post("https://api.acedata.cloud/captcha/recognition/image2text").mock(side_effect=_handler)
+
+    result = client.images.generate(provider="image2text", image="base64-image", async_=True)
+    assert result["data"][0]["text"] == "1234"
+
+
 # ── Audio Generation ──────────────────────────────────────────────────
 
 
