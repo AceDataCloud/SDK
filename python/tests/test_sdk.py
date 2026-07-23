@@ -355,6 +355,38 @@ def test_search_google(client):
     assert result["organic"][0]["title"] == "Example"
 
 
+# ── Captcha ───────────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_captcha_recognition_and_token_routes(client):
+    recognition_route = respx.post("https://api.acedata.cloud/captcha/recognition/recaptcha2").mock(
+        return_value=httpx.Response(200, json={"task_id": "task-captcha"})
+    )
+    token_route = respx.post("https://api.acedata.cloud/captcha/token/recaptcha3").mock(
+        return_value=httpx.Response(200, json={"task_id": "task-token"})
+    )
+
+    recognition = client.captcha.recognition.recaptcha2(image="data:image/png;base64,abc", question="cars")
+    token = client.captcha.token.recaptcha3(
+        page_action="submit",
+        website_key="site-key",
+        website_url="https://example.com",
+        async_=True,
+    )
+
+    assert recognition["task_id"] == "task-captcha"
+    assert token["task_id"] == "task-token"
+    assert recognition_route.called
+    assert token_route.called
+    assert json.loads(token_route.calls.last.request.content.decode("utf-8")) == {
+        "page_action": "submit",
+        "website_key": "site-key",
+        "website_url": "https://example.com",
+        "async": True,
+    }
+
+
 # ── Tasks ─────────────────────────────────────────────────────────────
 
 
@@ -512,6 +544,18 @@ async def test_async_images(async_client):
 
     result = await async_client.images.generate(prompt="Test async")
     assert result["data"][0]["image_url"] == "https://cdn.acedata.cloud/async.png"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_captcha(async_client):
+    respx.post("https://api.acedata.cloud/captcha/recognition/image2text").mock(
+        return_value=httpx.Response(200, json={"text": "1234"})
+    )
+
+    result = await async_client.captcha.recognition.image2text(image="data:image/png;base64,abc")
+    assert result["text"] == "1234"
     await async_client.close()
 
 
