@@ -11,6 +11,7 @@ from acedatacloud._runtime.payment import (
 from acedatacloud._runtime.transport import AsyncTransport, SyncTransport
 from acedatacloud.resources.aichat import AiChat, AsyncAiChat
 from acedatacloud.resources.audio import AsyncAudio, Audio
+from acedatacloud.resources.captcha import AsyncCaptcha, Captcha
 from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
@@ -69,6 +70,7 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
+        self.captcha = Captcha(self._transport)
 
     def close(self) -> None:
         self._transport.close()
@@ -119,6 +121,7 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        self.captcha = AsyncCaptcha(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()
