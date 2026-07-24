@@ -34,6 +34,20 @@ describe('Captcha resource', () => {
     expect(result).toBeInstanceOf(TaskHandle);
   });
 
+  it('returns solved captcha responses immediately even when task_id is present', async () => {
+    const solved = { task_id: 'captcha-task', token: 'captcha-token' };
+    const request = jest.fn().mockResolvedValue(solved);
+    const captcha = new Captcha({ request } as any);
+
+    const result = await captcha.token.hcaptcha({
+      websiteKey: 'site-key',
+      websiteUrl: 'https://example.com',
+      async: true,
+    });
+
+    expect(result).toEqual(solved);
+  });
+
   it('polls captcha tasks through the shared captcha task endpoint', async () => {
     const request = jest.fn().mockResolvedValue({ response: { status: 'succeeded', data: { text: '1234' } } });
     const tasks = new Tasks({ request } as any);

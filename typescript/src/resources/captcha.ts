@@ -15,8 +15,9 @@ class CaptchaBase {
   ): CaptchaResult {
     const result = await this.transport.request('POST', endpoint, { json: body });
     const taskId = result.task_id as string | undefined;
+    const hasSolvedResult = ['solution', 'text', 'token'].some((key) => result[key] !== undefined);
 
-    if (!taskId || (result.data && !opts.wait)) return result;
+    if (!taskId || hasSolvedResult) return result;
 
     const handle = new TaskHandle(taskId, '/captcha/tasks', this.transport);
     if (opts.wait) return handle.wait({ pollInterval: opts.pollInterval, maxWait: opts.maxWait });

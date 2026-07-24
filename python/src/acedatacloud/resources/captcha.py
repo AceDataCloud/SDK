@@ -22,8 +22,9 @@ class _CaptchaBase:
     ) -> dict[str, Any] | TaskHandle:
         result = self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
+        has_solved_result = any(result.get(key) is not None for key in ("solution", "text", "token"))
 
-        if not task_id or (result.get("data") and not wait):
+        if not task_id or has_solved_result:
             return result
 
         handle = TaskHandle(task_id, "/captcha/tasks", self._transport)
@@ -47,8 +48,9 @@ class _AsyncCaptchaBase:
     ) -> dict[str, Any] | AsyncTaskHandle:
         result = await self._transport.request("POST", endpoint, json=body)
         task_id = result.get("task_id")
+        has_solved_result = any(result.get(key) is not None for key in ("solution", "text", "token"))
 
-        if not task_id or (result.get("data") and not wait):
+        if not task_id or has_solved_result:
             return result
 
         handle = AsyncTaskHandle(task_id, "/captcha/tasks", self._transport)

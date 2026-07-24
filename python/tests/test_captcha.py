@@ -39,6 +39,21 @@ def test_async_captcha_returns_task_handle():
     assert isinstance(result, TaskHandle)
 
 
+def test_solved_captcha_response_returns_immediately_even_with_task_id():
+    transport = Mock()
+    solved = {"task_id": "captcha-task", "token": "captcha-token"}
+    transport.request.return_value = solved
+    captcha = Captcha(transport)
+
+    result = captcha.token.hcaptcha(
+        website_key="site-key",
+        website_url="https://example.com",
+        async_=True,
+    )
+
+    assert result == solved
+
+
 def test_tasks_service_supports_captcha_endpoint():
     transport = Mock()
     transport.request.return_value = {"response": {"status": "succeeded", "data": {"text": "1234"}}}
