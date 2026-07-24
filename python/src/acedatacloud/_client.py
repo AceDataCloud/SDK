@@ -22,6 +22,7 @@ from acedatacloud.resources.platform import AsyncPlatform, Platform
 from acedatacloud.resources.search import AsyncSearch, Search
 from acedatacloud.resources.shorturl import AsyncShortUrl, ShortUrl
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
+from acedatacloud.resources.turnstile import AsyncTurnstile, Turnstile
 from acedatacloud.resources.veo import AsyncVeo, Veo
 from acedatacloud.resources.video import AsyncVideo, Video
 from acedatacloud.resources.webextrator import AsyncWebExtrator, WebExtrator
@@ -69,6 +70,7 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
+        self.turnstile = Turnstile(self._transport)
 
     def close(self) -> None:
         self._transport.close()
@@ -119,6 +121,7 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        self.turnstile = AsyncTurnstile(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()
