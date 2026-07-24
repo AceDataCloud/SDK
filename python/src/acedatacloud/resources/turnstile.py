@@ -18,6 +18,7 @@ class Turnstile:
         website_url: str,
         action: str | None = None,
         cdata: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"website_key": website_key, "website_url": website_url, **kwargs}
@@ -25,6 +26,8 @@ class Turnstile:
             body["action"] = action
         if cdata is not None:
             body["cdata"] = cdata
+        if async_ is not None:
+            body["async"] = async_
         return self._transport.request("POST", "/captcha/token/turnstile", json=body)
 
 
@@ -41,6 +44,7 @@ class AsyncTurnstile:
         website_url: str,
         action: str | None = None,
         cdata: str | None = None,
+        async_: bool | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"website_key": website_key, "website_url": website_url, **kwargs}
@@ -48,4 +52,6 @@ class AsyncTurnstile:
             body["action"] = action
         if cdata is not None:
             body["cdata"] = cdata
+        if async_ is not None:
+            body["async"] = async_
         return await self._transport.request("POST", "/captcha/token/turnstile", json=body)
