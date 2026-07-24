@@ -19,6 +19,7 @@ from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
+from acedatacloud.resources.producer import AsyncProducer, Producer
 from acedatacloud.resources.search import AsyncSearch, Search
 from acedatacloud.resources.shorturl import AsyncShortUrl, ShortUrl
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
@@ -69,6 +70,7 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
+        self.producer = Producer(self._transport)
 
     def close(self) -> None:
         self._transport.close()
@@ -119,6 +121,7 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        self.producer = AsyncProducer(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()
