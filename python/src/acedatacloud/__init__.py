@@ -26,6 +26,7 @@ from acedatacloud._runtime.payment import (
 )
 from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
+from acedatacloud.resources.captcha import AsyncCaptcha, Captcha
 from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
@@ -42,6 +43,8 @@ __all__ = [
     "AsyncAceDataCloud",
     "AiChatModel",
     "AudioProvider",
+    "Captcha",
+    "AsyncCaptcha",
     "GlmModel",
     "ImageProvider",
     "KlingCameraControl",

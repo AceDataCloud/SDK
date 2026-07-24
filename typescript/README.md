@@ -45,6 +45,7 @@ for await (const chunk of stream) {
 |----------|-------------|
 | `client.openai` | OpenAI-compatible chat completions and responses |
 | `client.chat` | Native chat messages |
+| `client.captcha` | Captcha recognition and token solving |
 | `client.images` | Image generation (Flux, Seedream, Nano Banana, etc.) |
 | `client.audio` | Music generation (Suno) |
 | `client.video` | Video generation (Luma, Sora, Veo, etc.) |
