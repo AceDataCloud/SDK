@@ -34,6 +34,7 @@ from acedatacloud.resources.kling import (
     KlingReferenceImage,
     KlingReferenceVideo,
 )
+from acedatacloud.resources.producer import ProducerAction, ProducerModel
 from acedatacloud.resources.veo import VeoModel
 from acedatacloud.resources.video import VideoProvider
 
@@ -50,6 +51,8 @@ __all__ = [
     "KlingReferenceVideo",
     "VideoProvider",
     "VeoModel",
+    "ProducerAction",
+    "ProducerModel",
     "AceDataCloudError",
     "APIError",
     "AuthenticationError",

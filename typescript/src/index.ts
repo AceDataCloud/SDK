@@ -39,3 +39,4 @@ export type {
   KlingReferenceVideo,
 } from './resources/kling';
 export type { AudioProvider } from './resources/audio';
+export type { ProducerAction, ProducerModel } from './resources/producer';
