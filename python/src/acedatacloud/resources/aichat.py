@@ -77,6 +77,8 @@ AiChatModel = Literal[
     "deepseek-v3",
     "deepseek-v3-250324",
     "deepseek-v4-flash",
+    "grok-4.5",
+    "grok-4",
     "grok-3",
     "glm-5.1",
     "glm-4.7",

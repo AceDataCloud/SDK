@@ -88,7 +88,7 @@ Available providers:
 | Resource | Providers |
 |----------|-----------|
 | `client.images` | `nano-banana` (default), `flux`, `seedream` |
-| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse` |
+| `client.video` | `sora` (default), `luma`, `veo`, `kling`, `hailuo`, `seedance`, `wan`, `pika`, `pixverse`, `grok` |
 | `client.audio` | `suno` (default), `producer`, `fish` |
 
 ## Error Handling

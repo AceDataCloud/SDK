@@ -341,6 +341,21 @@ def test_video_generate(client):
     assert result["data"][0]["video_url"] == "https://cdn.acedata.cloud/video.mp4"
 
 
+@respx.mock
+def test_video_generate_grok_provider(client):
+    respx.post("https://api.acedata.cloud/grok/videos").mock(
+        return_value=httpx.Response(200, json={"task_id": "task-grok"})
+    )
+    route_task = respx.post("https://api.acedata.cloud/grok/tasks").mock(
+        return_value=httpx.Response(200, json={"response": {"status": "succeeded"}})
+    )
+
+    handle = client.video.generate(prompt="A sunset timelapse", provider="grok")
+    assert hasattr(handle, "get")
+    assert handle.get()["response"]["status"] == "succeeded"
+    assert route_task.called
+
+
 # ── Search ────────────────────────────────────────────────────────────
 
 
@@ -368,6 +383,16 @@ def test_tasks_get(client):
 
     result = client.tasks.get("task-abc", service="nano-banana")
     assert result["response"]["status"] == "succeeded"
+
+
+@respx.mock
+def test_tasks_get_grok(client):
+    respx.post("https://api.acedata.cloud/grok/tasks").mock(
+        return_value=httpx.Response(200, json={"response": {"status": "processing"}})
+    )
+
+    result = client.tasks.get("task-grok", service="grok")
+    assert result["response"]["status"] == "processing"
 
 
 # ── Platform Management ───────────────────────────────────────────────
