@@ -11,14 +11,18 @@ from acedatacloud._runtime.payment import (
 from acedatacloud._runtime.transport import AsyncTransport, SyncTransport
 from acedatacloud.resources.aichat import AiChat, AsyncAiChat
 from acedatacloud.resources.audio import AsyncAudio, Audio
+from acedatacloud.resources.captcha import AsyncCaptcha, Captcha
 from acedatacloud.resources.chat import AsyncChat, Chat
 from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
+from acedatacloud.resources.grok import AsyncGrok, Grok
 from acedatacloud.resources.images import AsyncImages, Images
+from acedatacloud.resources.kickart import AsyncKickart, Kickart
 from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
+from acedatacloud.resources.producer import AsyncProducer, Producer
 from acedatacloud.resources.search import AsyncSearch, Search
 from acedatacloud.resources.shorturl import AsyncShortUrl, ShortUrl
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
@@ -69,6 +73,10 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
+        self.grok = Grok(self._transport)
+        self.captcha = Captcha(self._transport)
+        self.kickart = Kickart(self._transport)
+        self.producer = Producer(self._transport)
 
     def close(self) -> None:
         self._transport.close()
@@ -119,6 +127,10 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        self.grok = AsyncGrok(self._transport)
+        self.captcha = AsyncCaptcha(self._transport)
+        self.kickart = AsyncKickart(self._transport)
+        self.producer = AsyncProducer(self._transport)
 
     async def close(self) -> None:
         await self._transport.close()

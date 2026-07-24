@@ -18,6 +18,10 @@ import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
 import { ShortUrl } from './resources/shorturl';
+import { Grok } from './resources/grok';
+import { Captcha } from './resources/captcha';
+import { Kickart } from './resources/kickart';
+import { Producer } from './resources/producer';
 
 export interface AceDataCloudOptions {
   apiToken?: string;
@@ -51,6 +55,10 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  readonly grok: Grok;
+  readonly captcha: Captcha;
+  readonly kickart: Kickart;
+  readonly producer: Producer;
 
   private transport: Transport;
 
@@ -81,5 +89,9 @@ export class AceDataCloud {
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);
+    this.grok = new Grok(this.transport);
+    this.captcha = new Captcha(this.transport);
+    this.kickart = new Kickart(this.transport);
+    this.producer = new Producer(this.transport);
   }
 }

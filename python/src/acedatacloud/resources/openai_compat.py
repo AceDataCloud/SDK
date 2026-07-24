@@ -461,6 +461,22 @@ class _AsyncTasks:
         return await self._transport.request("POST", "/openai/tasks", json=body)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models")
+
+
 class OpenAI:
     """Synchronous OpenAI-compatible facade."""
 
@@ -470,6 +486,7 @@ class OpenAI:
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
         self.tasks = _Tasks(transport)
+        self.models = _Models(transport)
 
 
 class AsyncOpenAI:
@@ -481,3 +498,4 @@ class AsyncOpenAI:
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
         self.tasks = _AsyncTasks(transport)
+        self.models = _AsyncModels(transport)
