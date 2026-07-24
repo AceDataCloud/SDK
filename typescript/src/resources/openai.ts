@@ -210,7 +210,7 @@ class Models {
   constructor(private transport: Transport) {}
 
   async list(): Promise<Record<string, unknown>> {
-    return this.transport.request('GET', '/openai/models', {});
+    return this.transport.request('GET', '/openai/models');
   }
 }
 
