@@ -249,6 +249,27 @@ def test_chat_messages(client):
 
 
 @respx.mock
+def test_aichat_create(client):
+    route = respx.post("https://api.acedata.cloud/aichat/conversations").mock(
+        return_value=httpx.Response(200, json={"id": "conv-123"})
+    )
+
+    result = client.aichat.create(
+        model="gpt-5.6-sol",
+        question="Hello",
+        references=["doc-1"],
+    )
+
+    assert route.called
+    assert json.loads(route.calls.last.request.content.decode("utf-8")) == {
+        "model": "gpt-5.6-sol",
+        "question": "Hello",
+        "references": ["doc-1"],
+    }
+    assert result["id"] == "conv-123"
+
+
+@respx.mock
 def test_chat_count_tokens(client):
     mock_response = {"input_tokens": 42}
     respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
