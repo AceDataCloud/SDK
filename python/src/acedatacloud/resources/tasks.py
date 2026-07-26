@@ -23,6 +23,9 @@ _SERVICE_TASK_ENDPOINTS = {
     "pika": "/pika/tasks",
     "pixverse": "/pixverse/tasks",
     "webextrator": "/webextrator/tasks",
+    "digital-human": "/digital-human/tasks",
+    "captcha": "/captcha/tasks",
+    "maestro": "/maestro/tasks",
 }
 
 

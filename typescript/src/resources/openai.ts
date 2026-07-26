@@ -206,12 +206,43 @@ class Tasks {
   }
 }
 
+class AudioNamespace {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: 'tts-1' | 'tts-1-hd' | (string & {});
+    voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' | (string & {});
+    responseFormat?: 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm' | (string & {});
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { input, model, voice, responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (model !== undefined) body.model = model;
+    if (voice !== undefined) body.voice = voice;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly audio: AudioNamespace;
+  readonly models: Models;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
@@ -219,5 +250,7 @@ export class OpenAI {
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.audio = new AudioNamespace(transport);
+    this.models = new Models(transport);
   }
 }
