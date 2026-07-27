@@ -30,9 +30,12 @@ from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
     KlingCameraControl,
+    KlingLipSyncMode,
     KlingModel,
+    KlingMotionModelName,
     KlingReferenceImage,
     KlingReferenceVideo,
+    KlingTalkingPhotoModel,
 )
 from acedatacloud.resources.veo import VeoModel
 from acedatacloud.resources.video import VideoProvider
@@ -45,9 +48,12 @@ __all__ = [
     "GlmModel",
     "ImageProvider",
     "KlingCameraControl",
+    "KlingLipSyncMode",
     "KlingModel",
+    "KlingMotionModelName",
     "KlingReferenceImage",
     "KlingReferenceVideo",
+    "KlingTalkingPhotoModel",
     "VideoProvider",
     "VeoModel",
     "AceDataCloudError",

@@ -75,7 +75,7 @@ export class AceDataCloud {
     this.tasks = new Tasks(this.transport);
     this.files = new Files(this.transport);
     this.platform = new Platform(this.transport);
-    this.openai = new OpenAI(this.transport);
+    this.openai = new OpenAI(this.transport, opts.baseURL ?? 'https://x402.acedata.cloud');
     this.glm = new Glm(this.transport);
     this.veo = new Veo(this.transport);
     this.kling = new Kling(this.transport);

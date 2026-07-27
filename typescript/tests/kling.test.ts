@@ -234,4 +234,103 @@ describe('Kling resource', () => {
     ).rejects.toThrow('generateAudio cannot be used with videoList');
     expect(request).not.toHaveBeenCalled();
   });
+
+  it('serializes motion with modelName and watermarkInfo', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-motion' });
+    const kling = new Kling({ request } as any);
+
+    await kling.motion({
+      mode: 'pro',
+      imageUrl: 'https://example.com/subject.jpg',
+      videoUrl: 'https://example.com/motion.mp4',
+      characterOrientation: 'image',
+      modelName: 'kling-v3',
+      watermarkInfo: { enabled: true },
+      async: true,
+    });
+
+    expect(request).toHaveBeenCalledWith('POST', '/kling/motion', {
+      json: {
+        mode: 'pro',
+        image_url: 'https://example.com/subject.jpg',
+        video_url: 'https://example.com/motion.mp4',
+        character_orientation: 'image',
+        model_name: 'kling-v3',
+        watermark_info: { enabled: true },
+        async: true,
+      },
+    });
+  });
+
+  it('serializes lipSync to /kling/lip-sync', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-lipsync' });
+    const kling = new Kling({ request } as any);
+
+    await kling.lipSync({
+      mode: 'audio2video',
+      videoUrl: 'https://example.com/video.mp4',
+      audioUrl: 'https://example.com/audio.mp3',
+      voiceLanguage: 'zh',
+      async: true,
+    });
+
+    expect(request).toHaveBeenCalledWith('POST', '/kling/lip-sync', {
+      json: {
+        mode: 'audio2video',
+        video_url: 'https://example.com/video.mp4',
+        audio_url: 'https://example.com/audio.mp3',
+        voice_language: 'zh',
+        async: true,
+      },
+    });
+  });
+
+  it('rejects invalid lipSync mode before transport', async () => {
+    const request = jest.fn();
+    const kling = new Kling({ request } as any);
+
+    await expect(
+      kling.lipSync({ mode: 'invalid' as any })
+    ).rejects.toThrow('mode must be audio2video or text2video');
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  it('serializes talkingPhoto to /kling/talking-photo', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-talking-photo' });
+    const kling = new Kling({ request } as any);
+
+    await kling.talkingPhoto({
+      imageUrl: 'https://example.com/photo.jpg',
+      audioUrl: 'https://example.com/audio.mp3',
+      model: 'kling-v1-6',
+      duration: 5,
+      mode: 'std',
+      async: true,
+    });
+
+    expect(request).toHaveBeenCalledWith('POST', '/kling/talking-photo', {
+      json: {
+        image_url: 'https://example.com/photo.jpg',
+        audio_url: 'https://example.com/audio.mp3',
+        model: 'kling-v1-6',
+        duration: 5,
+        mode: 'std',
+        async: true,
+      },
+    });
+  });
+
+  it('rejects invalid talkingPhoto duration before transport', async () => {
+    const request = jest.fn();
+    const kling = new Kling({ request } as any);
+
+    await expect(
+      kling.talkingPhoto({
+        imageUrl: 'https://example.com/photo.jpg',
+        audioUrl: 'https://example.com/audio.mp3',
+        duration: 3 as any,
+      })
+    ).rejects.toThrow('duration must be 5 or 10');
+    expect(request).not.toHaveBeenCalled();
+  });
 });

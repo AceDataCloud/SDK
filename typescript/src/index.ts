@@ -34,8 +34,11 @@ export type { VeoModel } from './resources/veo';
 export type {
   KlingCameraControl,
   KlingGenerateOptions,
+  KlingLipSyncMode,
   KlingModel,
+  KlingMotionModelName,
   KlingReferenceImage,
   KlingReferenceVideo,
+  KlingTalkingPhotoModel,
 } from './resources/kling';
 export type { AudioProvider } from './resources/audio';

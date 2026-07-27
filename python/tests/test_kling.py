@@ -6,9 +6,12 @@ import pytest
 
 from acedatacloud import (
     KlingCameraControl,
+    KlingLipSyncMode,
     KlingModel,
+    KlingMotionModelName,
     KlingReferenceImage,
     KlingReferenceVideo,
+    KlingTalkingPhotoModel,
 )
 from acedatacloud.resources.kling import AsyncKling, Kling
 
@@ -242,3 +245,123 @@ def test_generate_rejects_model_and_reference_constraints(options: dict[str, Any
         client.generate(**request)  # type: ignore[arg-type]
 
     assert transport.calls == []
+
+
+def test_sync_motion_accepts_model_name_and_watermark_info() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.motion(
+        mode="pro",
+        image_url="https://example.com/subject.jpg",
+        video_url="https://example.com/motion.mp4",
+        character_orientation="image",
+        model_name="kling-v3",
+        watermark_info={"enabled": True},
+        async_=True,
+    )
+
+    assert transport.calls == [
+        (
+            "POST",
+            "/kling/motion",
+            {
+                "mode": "pro",
+                "image_url": "https://example.com/subject.jpg",
+                "video_url": "https://example.com/motion.mp4",
+                "character_orientation": "image",
+                "model_name": "kling-v3",
+                "watermark_info": {"enabled": True},
+                "async": True,
+            },
+        )
+    ]
+
+
+def test_sync_lip_sync_serializes_body() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.lip_sync(
+        mode="audio2video",
+        video_url="https://example.com/video.mp4",
+        audio_url="https://example.com/audio.mp3",
+        voice_language="zh",
+        async_=True,
+    )
+
+    assert transport.calls == [
+        (
+            "POST",
+            "/kling/lip-sync",
+            {
+                "mode": "audio2video",
+                "video_url": "https://example.com/video.mp4",
+                "audio_url": "https://example.com/audio.mp3",
+                "voice_language": "zh",
+                "async": True,
+            },
+        )
+    ]
+
+
+def test_lip_sync_rejects_invalid_mode() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    with pytest.raises(ValueError, match="mode must be audio2video or text2video"):
+        client.lip_sync(mode="invalid")  # type: ignore[arg-type]
+
+    assert transport.calls == []
+
+
+def test_sync_talking_photo_serializes_body() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.talking_photo(
+        image_url="https://example.com/photo.jpg",
+        audio_url="https://example.com/audio.mp3",
+        model="kling-v1-6",
+        duration=5,
+        mode="std",
+        async_=True,
+    )
+
+    assert transport.calls == [
+        (
+            "POST",
+            "/kling/talking-photo",
+            {
+                "image_url": "https://example.com/photo.jpg",
+                "audio_url": "https://example.com/audio.mp3",
+                "model": "kling-v1-6",
+                "duration": 5,
+                "mode": "std",
+                "async": True,
+            },
+        )
+    ]
+
+
+def test_talking_photo_rejects_invalid_duration() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    with pytest.raises(ValueError, match="duration must be 5 or 10"):
+        client.talking_photo(
+            image_url="https://example.com/photo.jpg",
+            audio_url="https://example.com/audio.mp3",
+            duration=3,
+        )
+
+    assert transport.calls == []
+
+
+def test_new_kling_types_are_importable() -> None:
+    mode: KlingLipSyncMode = "audio2video"
+    model_name: KlingMotionModelName = "kling-v3"
+    tp_model: KlingTalkingPhotoModel = "kling-v2-6"
+    assert mode == "audio2video"
+    assert model_name == "kling-v3"
+    assert tp_model == "kling-v2-6"

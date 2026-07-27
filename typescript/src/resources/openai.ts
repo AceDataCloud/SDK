@@ -206,18 +206,64 @@ class Tasks {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class Audio {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { input, model = 'tts-1', voice = 'alloy', responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, model, voice, ...rest };
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Realtime {
+  private baseURL: string;
+
+  constructor(transport: Transport, baseURL?: string) {
+    this.baseURL = baseURL ?? 'https://x402.acedata.cloud';
+  }
+
+  url(model: string = 'gpt-realtime'): string {
+    const wsBase = this.baseURL.replace(/^https?:\/\//, (m) => (m.startsWith('https') ? 'wss://' : 'ws://'));
+    return `${wsBase}/v1/realtime?model=${encodeURIComponent(model)}`;
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly models: Models;
+  readonly audio: Audio;
+  readonly realtime: Realtime;
 
-  constructor(transport: Transport) {
+  constructor(transport: Transport, baseURL?: string) {
     this.chat = new ChatNamespace(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.models = new Models(transport);
+    this.audio = new Audio(transport);
+    this.realtime = new Realtime(transport, baseURL);
   }
 }
