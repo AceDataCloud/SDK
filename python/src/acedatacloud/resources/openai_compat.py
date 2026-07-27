@@ -353,6 +353,92 @@ class _AsyncEmbeddings:
         return await self._transport.request("POST", "/openai/embeddings", json=body)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models")
+
+
+class _SpeechAudio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return self._transport.request("POST", "/v1/audio/speech", json=body)
+
+
+class _AsyncSpeechAudio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return await self._transport.request("POST", "/v1/audio/speech", json=body)
+
+
+class _Realtime:
+    """WebSocket URL builder for the OpenAI Realtime endpoint."""
+
+    def __init__(self, base_url: str) -> None:
+        self._ws_base = base_url.rstrip("/").replace("https://", "wss://").replace("http://", "ws://")
+
+    def url(self, *, model: str = "gpt-realtime") -> str:
+        """Return the WebSocket URL for the Realtime endpoint.
+
+        Connect using a WebSocket client and pass an
+        ``Authorization: ****** header (or via the ``Sec-WebSocket-Protocol``
+        subprotocol for browsers).
+        """
+        from urllib.parse import quote
+
+        return f"{self._ws_base}/v1/realtime?model={quote(model)}"
+
+
 class _Tasks:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
@@ -464,20 +550,26 @@ class _AsyncTasks:
 class OpenAI:
     """Synchronous OpenAI-compatible facade."""
 
-    def __init__(self, transport: Any) -> None:
+    def __init__(self, transport: Any, base_url: str = "https://x402.acedata.cloud") -> None:
         self.chat = _ChatNamespace(transport)
         self.responses = _Responses(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
         self.tasks = _Tasks(transport)
+        self.models = _Models(transport)
+        self.audio = _SpeechAudio(transport)
+        self.realtime = _Realtime(base_url)
 
 
 class AsyncOpenAI:
     """Async OpenAI-compatible facade."""
 
-    def __init__(self, transport: Any) -> None:
+    def __init__(self, transport: Any, base_url: str = "https://x402.acedata.cloud") -> None:
         self.chat = _AsyncChatNamespace(transport)
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
         self.tasks = _AsyncTasks(transport)
+        self.models = _AsyncModels(transport)
+        self.audio = _AsyncSpeechAudio(transport)
+        self.realtime = _Realtime(base_url)

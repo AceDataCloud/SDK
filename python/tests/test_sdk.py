@@ -226,6 +226,57 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+# ── OpenAI Models ────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_openai_models_list(client):
+    mock_response = {"object": "list", "data": [{"id": "gpt-4o", "object": "model"}]}
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.openai.models.list()
+    assert result["object"] == "list"
+    assert result["data"][0]["id"] == "gpt-4o"
+
+
+# ── OpenAI Audio Speech ───────────────────────────────────────────────
+
+
+@respx.mock
+def test_openai_audio_speech(client):
+    mock_response = {"url": "https://example.com/audio.mp3"}
+    respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.openai.audio.speech(
+        input="Hello world",
+        model="tts-1",
+        voice="alloy",
+        response_format="mp3",
+        speed=1.0,
+    )
+    assert result["url"] == "https://example.com/audio.mp3"
+
+
+# ── OpenAI Realtime ───────────────────────────────────────────────────
+
+
+def test_openai_realtime_url(client):
+    url = client.openai.realtime.url(model="gpt-realtime")
+    assert url == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime"
+
+
+def test_openai_realtime_url_default_model(client):
+    url = client.openai.realtime.url()
+    assert url == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime"
+
+
+def test_openai_realtime_url_v2(client):
+    url = client.openai.realtime.url(model="gpt-realtime-2")
+    assert url == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2"
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

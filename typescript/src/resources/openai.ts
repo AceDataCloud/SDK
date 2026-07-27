@@ -164,6 +164,50 @@ class Embeddings {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class SpeechAudio {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: 'tts-1' | 'tts-1-hd';
+    voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+    responseFormat?: 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm';
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { input, model, voice, responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (model !== undefined) body.model = model;
+    if (voice !== undefined) body.voice = voice;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Realtime {
+  private baseURL: string;
+
+  constructor(private transport: Transport, baseURL: string) {
+    this.baseURL = baseURL.replace(/^https?:\/\//, 'wss://').replace(/\/+$/, '');
+  }
+
+  /** Returns the WebSocket URL for the Realtime endpoint. Connect using a WebSocket client and pass
+   *  an `Authorization: ****** header (or via the `Sec-WebSocket-Protocol` subprotocol for browsers). */
+  url(opts: { model?: 'gpt-realtime' | 'gpt-realtime-2' } = {}): string {
+    const model = opts.model ?? 'gpt-realtime';
+    return `${this.baseURL}/v1/realtime?model=${encodeURIComponent(model)}`;
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -212,12 +256,18 @@ export class OpenAI {
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly models: Models;
+  readonly audio: SpeechAudio;
+  readonly realtime: Realtime;
 
-  constructor(transport: Transport) {
+  constructor(transport: Transport, baseURL = 'https://x402.acedata.cloud') {
     this.chat = new ChatNamespace(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.models = new Models(transport);
+    this.audio = new SpeechAudio(transport);
+    this.realtime = new Realtime(transport, baseURL);
   }
 }
