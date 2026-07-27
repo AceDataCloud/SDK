@@ -1,0 +1,163 @@
+"""Happyhorse (happyhorse) — generated from the platform OpenAPI spec.
+
+Do not edit by hand: run ``python scripts/generate_providers.py``. Parameter
+names, types, enums and required-ness all come from the live spec, so adding a
+model upstream reaches the SDK without anyone retyping it.
+"""
+
+from __future__ import annotations
+
+from typing import Any, Literal  # noqa: F401
+
+from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
+
+_DEFAULT_GENERATE_PROMPT = (
+    "A cinematic white horse lifts its head, the mane moves gently in the sunrise wind, slow camera push "
+    "in, warm film lighting"
+)
+_DEFAULT_GENERATE_VIDEO_URL = "https://platform2.cdn.acedata.cloud/happyhorse/27837f92-d1c1-4db4-ad9a-4e6e81d9f6c1.mp4"
+
+HappyhorseModel = Literal[
+    "happyhorse-1.0-t2v",
+    "happyhorse-1.1-t2v",
+    "happyhorse-1.0-i2v",
+    "happyhorse-1.1-i2v",
+    "happyhorse-1.0-r2v",
+    "happyhorse-1.1-r2v",
+    "happyhorse-1.0-video-edit",
+]
+HappyhorseRatio = Literal[
+    "16:9",
+    "9:16",
+    "1:1",
+    "4:3",
+    "3:4",
+]
+HappyhorseAction = Literal[
+    "generate",
+    "image_to_video",
+    "reference_to_video",
+    "video_edit",
+]
+
+
+def _task_id(result: Any) -> str:
+    """Task ids appear at the top level or nested under `data`."""
+    if not isinstance(result, dict):
+        return ""
+    if result.get("task_id"):
+        return str(result["task_id"])
+    data = result.get("data")
+    if isinstance(data, dict) and data.get("task_id"):
+        return str(data["task_id"])
+    return str(result.get("id") or "")
+
+
+class Happyhorse:
+    """Synchronous happyhorse client."""
+
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def generate(
+        self,
+        *,
+        seed: int | None = None,
+        model: HappyhorseModel | None = None,
+        ratio: HappyhorseRatio | None = None,
+        action: HappyhorseAction | None = None,
+        prompt: str | None = None,
+        duration: int | None = None,
+        image_url: str | None = None,
+        video_url: str | None = None,
+        watermark: bool | None = None,
+        image_urls: list[str] | None = None,
+        resolution: Literal["720P", "1080P"] | None = None,
+        audio_setting: Literal["auto", "origin"] | None = None,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> TaskHandle:
+        """Call /happyhorse/videos."""
+        body: dict[str, Any] = {}
+        if seed is not None:
+            body["seed"] = seed
+        body["model"] = model if model is not None else "happyhorse-1.1-t2v"
+        body["ratio"] = ratio if ratio is not None else "16:9"
+        body["action"] = action if action is not None else "generate"
+        body["prompt"] = prompt if prompt is not None else _DEFAULT_GENERATE_PROMPT
+        body["duration"] = duration if duration is not None else 5
+        body["image_url"] = image_url if image_url is not None else "https://cdn.acedata.cloud/b1c82e4937.png"
+        body["video_url"] = video_url if video_url is not None else _DEFAULT_GENERATE_VIDEO_URL
+        body["watermark"] = watermark if watermark is not None else False
+        if image_urls is not None:
+            body["image_urls"] = image_urls
+        body["resolution"] = resolution if resolution is not None else "1080P"
+        body["audio_setting"] = audio_setting if audio_setting is not None else "auto"
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = self._transport.request("POST", "/happyhorse/videos", json=body)
+        handle = TaskHandle(_task_id(result), "/happyhorse/tasks", self._transport, submitted=result)
+        if wait:
+            handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
+
+class AsyncHappyhorse:
+    """Asynchronous happyhorse client."""
+
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def generate(
+        self,
+        *,
+        seed: int | None = None,
+        model: HappyhorseModel | None = None,
+        ratio: HappyhorseRatio | None = None,
+        action: HappyhorseAction | None = None,
+        prompt: str | None = None,
+        duration: int | None = None,
+        image_url: str | None = None,
+        video_url: str | None = None,
+        watermark: bool | None = None,
+        image_urls: list[str] | None = None,
+        resolution: Literal["720P", "1080P"] | None = None,
+        audio_setting: Literal["auto", "origin"] | None = None,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> AsyncTaskHandle:
+        """Call /happyhorse/videos."""
+        body: dict[str, Any] = {}
+        if seed is not None:
+            body["seed"] = seed
+        body["model"] = model if model is not None else "happyhorse-1.1-t2v"
+        body["ratio"] = ratio if ratio is not None else "16:9"
+        body["action"] = action if action is not None else "generate"
+        body["prompt"] = prompt if prompt is not None else _DEFAULT_GENERATE_PROMPT
+        body["duration"] = duration if duration is not None else 5
+        body["image_url"] = image_url if image_url is not None else "https://cdn.acedata.cloud/b1c82e4937.png"
+        body["video_url"] = video_url if video_url is not None else _DEFAULT_GENERATE_VIDEO_URL
+        body["watermark"] = watermark if watermark is not None else False
+        if image_urls is not None:
+            body["image_urls"] = image_urls
+        body["resolution"] = resolution if resolution is not None else "1080P"
+        body["audio_setting"] = audio_setting if audio_setting is not None else "auto"
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = await self._transport.request("POST", "/happyhorse/videos", json=body)
+        handle = AsyncTaskHandle(_task_id(result), "/happyhorse/tasks", self._transport, submitted=result)
+        if wait:
+            await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
