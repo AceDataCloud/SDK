@@ -41,10 +41,6 @@ KlingTalkingPhotoModel = Literal[
 ]
 
 
-class KlingWatermarkInfo(TypedDict, total=False):
-    pass
-
-
 class KlingCameraConfig(TypedDict, total=False):
     horizontal: float
     vertical: float

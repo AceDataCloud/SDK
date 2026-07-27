@@ -241,7 +241,7 @@ class Realtime {
   }
 
   url(model: string = 'gpt-realtime'): string {
-    const wsBase = this.baseURL.replace(/^https?:\/\//, (m) => (m.startsWith('https') ? 'wss://' : 'ws://'));
+    const wsBase = this.baseURL.replace(/^https?:\/\//, (m) => (m === 'https://' ? 'wss://' : 'ws://'));
     return `${wsBase}/v1/realtime?model=${encodeURIComponent(model)}`;
   }
 }

@@ -527,7 +527,7 @@ class _Realtime:
 
     def url(self, *, model: str = "gpt-realtime") -> str:
         base: str = getattr(self._transport, "_base_url", "https://x402.acedata.cloud")
-        ws_base = base.replace("https://", "wss://").replace("http://", "ws://")
+        ws_base = "wss://" + base[len("https://"):] if base.startswith("https://") else "ws://" + base[len("http://"):]
         return f"{ws_base}/v1/realtime?model={model}"
 
 
@@ -537,7 +537,7 @@ class _AsyncRealtime:
 
     def url(self, *, model: str = "gpt-realtime") -> str:
         base: str = getattr(self._transport, "_base_url", "https://x402.acedata.cloud")
-        ws_base = base.replace("https://", "wss://").replace("http://", "ws://")
+        ws_base = "wss://" + base[len("https://"):] if base.startswith("https://") else "ws://" + base[len("http://"):]
         return f"{ws_base}/v1/realtime?model={model}"
 
 
