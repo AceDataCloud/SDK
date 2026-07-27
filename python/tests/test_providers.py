@@ -177,3 +177,47 @@ def test_success_false_without_an_artifact_keeps_waiting():
     from acedatacloud._runtime.tasks import task_status
 
     assert task_status({"response": {"success": False, "error": "temporary"}}) == ""
+
+
+def test_get_records_a_terminal_state(client):
+    """A caller driving its own poll loop only ever calls get().
+
+    Without recording here, urls() and result() stay empty after a task has
+    plainly finished — the failure looks like "generation succeeded but produced
+    nothing", which is worse than an error.
+    """
+    from unittest.mock import Mock
+
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.flux._transport = transport
+    handle = client.flux.generate(action="generate", prompt="a cat")
+    assert not handle.done
+
+    transport.request.return_value = {
+        "response": {
+            "success": True,
+            "finished_at": "2026-07-27T09:38:41Z",
+            "data": [{"image_url": "https://cdn.example.com/a.png"}],
+        }
+    }
+    handle.get()
+
+    assert handle.done
+    assert handle.urls() == ["https://cdn.example.com/a.png"]
+    assert handle.result() is not None
+
+
+def test_get_leaves_a_running_task_alone(client):
+    from unittest.mock import Mock
+
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.flux._transport = transport
+    handle = client.flux.generate(action="generate", prompt="a cat")
+
+    transport.request.return_value = {"response": {"status": "processing"}}
+    handle.get()
+
+    assert not handle.done
+    assert handle.urls() == []
