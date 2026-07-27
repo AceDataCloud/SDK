@@ -184,16 +184,32 @@ export class TaskHandle {
     return taskProgress(this._result);
   }
 
+  /**
+   * Fetch current task state, remembering it once terminal.
+   *
+   * A caller that drives its own poll loop — checking status between polls so it
+   * can report progress — only ever calls this. Without recording here, urls()
+   * and result() stay empty after the task has plainly finished.
+   */
   async get(): Promise<Record<string, unknown>> {
-    return this.transport.request('POST', this.pollEndpoint, {
+    const state = await this.transport.request('POST', this.pollEndpoint, {
       json: { id: this.id, action: 'retrieve' },
     });
+    this.accept(state);
+    return state;
+  }
+
+  private accept(state: Record<string, unknown>): void {
+    const status = taskStatus(state);
+    if (status === 'succeeded' || status === 'failed') {
+      this._result = state;
+    }
   }
 
   async isCompleted(): Promise<boolean> {
     if (this.done) return true;
-    const status = taskStatus(await this.get());
-    return status === 'succeeded' || status === 'failed';
+    await this.get(); // records a terminal state as a side effect
+    return this.done;
   }
 
   async wait(opts: TaskHandleOptions = {}): Promise<Record<string, unknown>> {
@@ -205,12 +221,7 @@ export class TaskHandle {
 
     while (Date.now() - start < maxWait) {
       const state = await this.get();
-      const status = taskStatus(state);
-
-      if (status === 'succeeded' || status === 'failed') {
-        this._result = state;
-        return state;
-      }
+      if (this.done) return state;
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
     throw new Error(`Task ${this.id} did not complete within ${maxWait}ms`);
