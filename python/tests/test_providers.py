@@ -159,3 +159,21 @@ def test_handle_is_born_complete_when_the_server_answered_synchronously(client):
     assert handle.wait() is not None
     assert handle.urls() == ["https://cdn.example.com/a.png"]
     assert transport.request.call_count == 1, "wait() must not poll a finished task"
+
+
+def test_success_false_with_an_artifact_is_a_failure():
+    """A finished-but-unsuccessful response must not be delivered as a success.
+
+    `success: false` alone is ambiguous — some services use it for a retryable
+    hiccup mid-run — but paired with an artifact the job has clearly ended.
+    """
+    from acedatacloud._runtime.tasks import task_status
+
+    state = {"response": {"success": False, "video_url": "https://cdn.example.com/x.mp4"}}
+    assert task_status(state) == "failed"
+
+
+def test_success_false_without_an_artifact_keeps_waiting():
+    from acedatacloud._runtime.tasks import task_status
+
+    assert task_status({"response": {"success": False, "error": "temporary"}}) == ""

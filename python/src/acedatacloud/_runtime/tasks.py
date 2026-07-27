@@ -99,6 +99,14 @@ def task_status(state: dict[str, Any]) -> str:
         # A non-terminal word (queued, processing, …) means keep waiting.
         return ""
 
+    # No status word at all. `success: false` on its own is ambiguous — some
+    # services use it for a retryable hiccup mid-run, and the task tests pin
+    # that — but paired with an artifact the job has clearly finished, and
+    # finished unsuccessfully. Without this, such a response reaches the caller
+    # as a success.
+    if response.get("success") is False and artifact_urls(state):
+        return "failed"
+
     finished = response.get("finished_at") is not None or state.get("finished_at") is not None
     if finished:
         if response.get("success") is True:
