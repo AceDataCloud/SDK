@@ -44,7 +44,7 @@ type ChatResource struct {
 // Messages returns the messages sub-namespace.
 func (c *ChatResource) Messages() *ChatMessages { return &ChatMessages{t: c.t} }
 
-// ChatMessages exposes ``/v1/messages`` and ``/v1/messages/count_tokens``.
+// ChatMessages exposes “/v1/messages“ and “/v1/messages/count_tokens“.
 type ChatMessages struct{ t *transport }
 
 // Create performs a blocking messages.create.
@@ -60,7 +60,7 @@ func (m *ChatMessages) CreateStream(ctx context.Context, req MessagesRequest) (<
 	return streamDecode(m.t, "/v1/messages", req.toBody())
 }
 
-// CountTokens exposes ``/v1/messages/count_tokens``.
+// CountTokens exposes “/v1/messages/count_tokens“.
 func (m *ChatMessages) CountTokens(ctx context.Context, req MessagesRequest) (map[string]any, error) {
 	body := req.toBody()
 	delete(body, "stream")

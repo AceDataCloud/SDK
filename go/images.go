@@ -56,8 +56,8 @@ type ImagesResource struct{ t *transport }
 // result map when the server produced the image synchronously.
 //
 // If both a TaskHandle and a direct result are in-scope, prefer the
-// TaskHandle when ``req.Provider != ""`` and the server returned a
-// ``task_id``.
+// TaskHandle when “req.Provider != ""“ and the server returned a
+// “task_id“.
 func (i *ImagesResource) Generate(ctx context.Context, req ImageGenerateRequest) (*TaskHandle, map[string]any, error) {
 	provider := req.Provider
 	if provider == "" {

@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from genlib import python_gen  # noqa: E402
+from genlib import go_gen, python_gen, ts_gen  # noqa: E402
 from genlib.model import load  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -63,6 +63,16 @@ def main() -> int:
     # Generated source goes through the repo's own formatter so a human reading
     # a diff sees house style, not generator quirks.
     _format(ROOT / "python" / "src" / "acedatacloud")
+
+    if "typescript" in languages:
+        written = ts_gen.write_all(services, ROOT / "typescript" / "src")
+        total += len(written)
+        print(f"typescript: {len(written)} files")
+
+    if "go" in languages:
+        written = go_gen.write_all(services, ROOT / "go")
+        total += len(written)
+        print(f"go: {len(written)} files")
 
     endpoints = sum(len(s.endpoints) for s in services)
     print(f"generated {len(services)} services / {endpoints} endpoints ({total} files)")

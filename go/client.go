@@ -17,6 +17,9 @@ type Client struct {
 	search   *SearchResource
 	face     *FaceResource
 	shorturl *ShortURLResource
+
+	// providers holds the generated provider-axis clients, one per service.
+	providers *providers
 }
 
 // NewClient constructs a Client. At least one of WithAPIToken /
@@ -38,6 +41,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.video = &VideoResource{t: tr}
 	c.audio = &AudioResource{t: tr}
 	c.search = &SearchResource{t: tr}
+	c.providers = newProviders(tr)
 	c.face = &FaceResource{t: tr}
 	c.shorturl = &ShortURLResource{t: tr}
 	return c, nil

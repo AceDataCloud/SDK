@@ -40,7 +40,7 @@ func defaultOptions() *options {
 }
 
 // WithAPIToken sets the Bearer token. If omitted, the SDK reads
-// ``ACEDATACLOUD_API_TOKEN`` from the environment.
+// “ACEDATACLOUD_API_TOKEN“ from the environment.
 func WithAPIToken(token string) Option { return func(o *options) { o.apiToken = token } }
 
 // WithBaseURL overrides the API gateway base URL.
