@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Luma is the luma provider client.
 type Luma struct {
 	t *transport
@@ -22,7 +23,7 @@ type LumaGenerateRequest struct {
 	Timeout float64
 	// The unique identifier of the generated video used for the continuation operation (`extend`). If both are speci
 	VideoID string
-	// The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time,
+	// The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time, 
 	VideoURL string
 	// Whether to enable automatic optimization enhancement for the input prompt text, suitable for use when unsure h
 	Enhancement bool

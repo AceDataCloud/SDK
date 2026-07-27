@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Suno is the suno provider client.
 type Suno struct {
 	t *transport
@@ -18,7 +19,7 @@ type SunoGenerateRequest struct {
 	Model string
 	// Music style description. `chirp-v3-5` and `chirp-v4` up to 200 characters; `chirp-v4-5` and above (including `
 	Style string
-	// Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including
+	// Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including 
 	Title string
 	// Types of operations for generating music. `generate`: Generate audio based on prompts; `extend`: Continue gene
 	Action string

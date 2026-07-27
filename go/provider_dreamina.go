@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Dreamina is the dreamina provider client.
 type Dreamina struct {
 	t *transport
@@ -12,7 +13,7 @@ type Dreamina struct {
 
 // DreaminaGenerateRequest is the input to dreamina.Generate.
 type DreaminaGenerateRequest struct {
-	// Public URL for audio (mp3/wav). The character will lip-sync to it, and it is recommended that the duration be
+	// Public URL for audio (mp3/wav). The character will lip-sync to it, and it is recommended that the duration be 
 	AudioURL string
 	// Public URL of portrait images. Clear frontal face effects are best.
 	ImageURL string

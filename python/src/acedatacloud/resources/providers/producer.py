@@ -66,7 +66,7 @@ class Producer:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/producer/upload", json=body)
 
-    def generate(
+    def videos(
         self,
         *,
         audio_id: str,
@@ -96,7 +96,7 @@ class Producer:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/producer/wav", json=body)
 
-    def producer_audios(
+    def generate(
         self,
         *,
         lyric: str,
@@ -190,7 +190,7 @@ class AsyncProducer:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/producer/upload", json=body)
 
-    async def generate(
+    async def videos(
         self,
         *,
         audio_id: str,
@@ -220,7 +220,7 @@ class AsyncProducer:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/producer/wav", json=body)
 
-    async def producer_audios(
+    async def generate(
         self,
         *,
         lyric: str,
