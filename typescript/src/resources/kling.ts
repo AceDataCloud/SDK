@@ -251,11 +251,13 @@ export class Kling {
     videoUrl: string;
     characterOrientation: 'image' | 'video';
     keepOriginalSound?: 'yes' | 'no';
+    modelName?: 'kling-v2-6' | 'kling-v3';
+    watermarkInfo?: Record<string, unknown>;
     prompt?: string;
     callbackUrl?: string;
     async?: boolean;
   }): Promise<Record<string, unknown>> {
-    const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, prompt, callbackUrl } = opts;
+    const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, modelName, watermarkInfo, prompt, callbackUrl } = opts;
     if (!['std', 'pro'].includes(mode)) throw new Error('mode must be std or pro');
     if (!isHttpUrl(imageUrl)) throw new Error('imageUrl must be an HTTP URL');
     if (!isHttpUrl(videoUrl)) throw new Error('videoUrl must be an HTTP URL');
@@ -272,7 +274,9 @@ export class Kling {
       video_url: videoUrl,
       character_orientation: characterOrientation,
     };
+    if (modelName !== undefined) body.model_name = modelName;
     if (keepOriginalSound !== undefined) body.keep_original_sound = keepOriginalSound;
+    if (watermarkInfo !== undefined) body.watermark_info = watermarkInfo;
     if (prompt !== undefined) body.prompt = prompt;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     if (opts.async !== undefined) body.async = opts.async;
