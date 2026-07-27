@@ -197,15 +197,20 @@ class Realtime {
 
   constructor(private transport: Transport, baseURL: string) {
     // Convert https/http scheme to wss/ws and strip trailing slashes without regex
-    let url = baseURL.startsWith('https://') ? 'wss://' + baseURL.slice('https://'.length)
-            : baseURL.startsWith('http://') ? 'ws://' + baseURL.slice('http://'.length)
-            : baseURL;
+    let url: string;
+    if (baseURL.startsWith('https://')) {
+      url = 'wss://' + baseURL.slice('https://'.length);
+    } else if (baseURL.startsWith('http://')) {
+      url = 'ws://' + baseURL.slice('http://'.length);
+    } else {
+      url = baseURL;
+    }
     while (url.endsWith('/')) url = url.slice(0, -1);
     this.baseURL = url;
   }
 
   /** Returns the WebSocket URL for the Realtime endpoint. Connect using a WebSocket client and pass
-   *  an `Authorization: ****** header (or via the `Sec-WebSocket-Protocol` subprotocol for browsers). */
+   *  an `Authorization: ******` header (or via the `Sec-WebSocket-Protocol` subprotocol for browsers). */
   url(opts: { model?: 'gpt-realtime' | 'gpt-realtime-2' } = {}): string {
     const model = opts.model ?? 'gpt-realtime';
     return `${this.baseURL}/v1/realtime?model=${encodeURIComponent(model)}`;

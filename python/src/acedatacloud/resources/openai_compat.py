@@ -434,7 +434,7 @@ class _Realtime:
         """Return the WebSocket URL for the Realtime endpoint.
 
         Connect using a WebSocket client and pass an
-        ``Authorization: ****** header (or via the ``Sec-WebSocket-Protocol``
+        ``Authorization: ******`` header (or via the ``Sec-WebSocket-Protocol``
         subprotocol for browsers).
         """
         from urllib.parse import quote
