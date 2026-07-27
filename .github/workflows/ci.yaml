@@ -133,3 +133,8 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # The jest suite existed but nothing ran it, so TypeScript regressions
+      # could only be caught by a type error.
+      - name: Test
+        run: npm test

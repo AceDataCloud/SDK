@@ -12,20 +12,37 @@ Official SDK clients for the [AceDataCloud API](https://platform.acedata.cloud).
 
 ## Architecture
 
-Both SDKs share the same design:
+All three SDKs share the same design, organised along **two axes**:
 
 ```
 client
-├── openai          # OpenAI-compatible completions & responses
-├── chat            # Native chat messages
-├── images          # Image generation (returns TaskHandle for polling)
-├── audio           # Music generation (returns TaskHandle)
-├── video           # Video generation (returns TaskHandle)
-├── search          # Web search
-├── tasks           # Cross-service task retrieval
-├── files           # File uploads
-└── platform        # Applications, credentials, models, config
+│
+├── ── provider axis — one namespace per service, fully typed ──
+│   ├── kling       # every Kling parameter, validated
+│   ├── veo         # generate / upsample / extend / reshoot / objects
+│   ├── glm
+│   └── openai      # OpenAI-compatible completions & responses
+│
+├── ── modality axis — pick a provider at call time ──
+│   ├── images      # images.generate(prompt=..., provider="flux")
+│   ├── audio
+│   ├── video
+│   └── chat
+│
+└── ── cross-cutting ──
+    ├── search      # Web search
+    ├── tasks       # Cross-service task retrieval
+    ├── files       # File uploads
+    └── platform    # Applications, credentials, models, config
 ```
+
+The **provider axis** is the primary surface: services in the same modality do
+not share a parameter set (Kling has `cfg_scale` and `camera_control`, Flux has
+`size` and `count`), so each gets a closed, precisely typed signature.
+
+The **modality axis** is a convenience wrapper over it, for callers who just
+want "generate an image" and are happy with common parameters plus a
+`provider=` switch. It delegates rather than reimplementing.
 
 ### Key Patterns
 
@@ -33,7 +50,7 @@ client
 - **SSE streaming**: Chat and OpenAI-compat endpoints support streaming via Server-Sent Events
 - **Automatic retries**: Transient errors (5xx, network) are retried with exponential backoff + jitter
 - **Error hierarchy**: Typed errors for auth, rate-limit, balance, validation, moderation, etc.
-- **Dual base URLs**: API gateway (`api.acedata.cloud`) for calling-plane, platform (`platform.acedata.cloud`) for management
+- **Dual base URLs**: calling plane (`x402.acedata.cloud`) and management plane (`platform.acedata.cloud`)
 - **Pluggable payment handler**: on `402 Payment Required`, the SDK invokes an optional handler to produce the retry headers — the integration point for on-chain (x402) payments
 
 ## Paying Per Request with X402
@@ -68,7 +85,12 @@ In Python the hook is the same shape — any callable that returns
 
 ## Spec Overlays
 
-Machine-readable metadata in [spec/overlays](spec/overlays/) drives code generation:
+Machine-readable metadata in [spec/overlays](spec/overlays/) describing the API
+surface. **Note: nothing reads these files today** — the SDKs are hand-written
+and kept in sync from `AceDataCloud/Docs` (see
+[.github/copilot-instructions.md](.github/copilot-instructions.md)). The overlays
+are a design artifact for a generator that was planned but never built, and they
+are stale — they cover only the original nine domains.
 
 - `domains.yaml` — service domains and grouping
 - `operations.yaml` — HTTP method + path for each operation

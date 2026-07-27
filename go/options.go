@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	defaultAPIBase      = "https://api.acedata.cloud"
+	// Matches Python and TypeScript. Go was left behind when the other two moved
+	// to the x402 gateway, so a Go caller silently talked to a different host.
+	defaultAPIBase      = "https://x402.acedata.cloud"
 	defaultPlatformBase = "https://platform.acedata.cloud"
 	defaultTimeout      = 300 * time.Second
 	defaultMaxRetries   = 2
