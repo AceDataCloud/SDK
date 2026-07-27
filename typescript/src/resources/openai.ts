@@ -181,10 +181,9 @@ class SpeechAudio {
     voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
     responseFormat?: 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm';
     speed?: number;
-    [key: string]: unknown;
   }): Promise<Record<string, unknown>> {
-    const { input, model, voice, responseFormat, speed, ...rest } = opts;
-    const body: Record<string, unknown> = { input, ...rest };
+    const { input, model, voice, responseFormat, speed } = opts;
+    const body: Record<string, unknown> = { input };
     if (model !== undefined) body.model = model;
     if (voice !== undefined) body.voice = voice;
     if (responseFormat !== undefined) body.response_format = responseFormat;
@@ -197,7 +196,12 @@ class Realtime {
   private baseURL: string;
 
   constructor(private transport: Transport, baseURL: string) {
-    this.baseURL = baseURL.replace(/^https?:\/\//, 'wss://').replace(/\/+$/, '');
+    // Convert https/http scheme to wss/ws and strip trailing slashes without regex
+    let url = baseURL.startsWith('https://') ? 'wss://' + baseURL.slice('https://'.length)
+            : baseURL.startsWith('http://') ? 'ws://' + baseURL.slice('http://'.length)
+            : baseURL;
+    while (url.endsWith('/')) url = url.slice(0, -1);
+    this.baseURL = url;
   }
 
   /** Returns the WebSocket URL for the Realtime endpoint. Connect using a WebSocket client and pass

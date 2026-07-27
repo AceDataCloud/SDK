@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json as _json
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Literal
 
 
 class _Completions:
@@ -377,13 +377,12 @@ class _SpeechAudio:
         self,
         *,
         input: str,
-        model: str | None = None,
-        voice: str | None = None,
-        response_format: str | None = None,
+        model: Literal["tts-1", "tts-1-hd"] | None = None,
+        voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"] | None = None,
+        response_format: Literal["mp3", "opus", "aac", "flac", "wav", "pcm"] | None = None,
         speed: float | None = None,
-        **kwargs: Any,
     ) -> dict[str, Any]:
-        body: dict[str, Any] = {"input": input, **kwargs}
+        body: dict[str, Any] = {"input": input}
         if model is not None:
             body["model"] = model
         if voice is not None:
@@ -403,13 +402,12 @@ class _AsyncSpeechAudio:
         self,
         *,
         input: str,
-        model: str | None = None,
-        voice: str | None = None,
-        response_format: str | None = None,
+        model: Literal["tts-1", "tts-1-hd"] | None = None,
+        voice: Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"] | None = None,
+        response_format: Literal["mp3", "opus", "aac", "flac", "wav", "pcm"] | None = None,
         speed: float | None = None,
-        **kwargs: Any,
     ) -> dict[str, Any]:
-        body: dict[str, Any] = {"input": input, **kwargs}
+        body: dict[str, Any] = {"input": input}
         if model is not None:
             body["model"] = model
         if voice is not None:
@@ -425,9 +423,14 @@ class _Realtime:
     """WebSocket URL builder for the OpenAI Realtime endpoint."""
 
     def __init__(self, base_url: str) -> None:
-        self._ws_base = base_url.rstrip("/").replace("https://", "wss://").replace("http://", "ws://")
+        url = base_url
+        if url.startswith("https://"):
+            url = "wss://" + url[len("https://"):]
+        elif url.startswith("http://"):
+            url = "ws://" + url[len("http://"):]
+        self._ws_base = url.rstrip("/")
 
-    def url(self, *, model: str = "gpt-realtime") -> str:
+    def url(self, *, model: Literal["gpt-realtime", "gpt-realtime-2"] = "gpt-realtime") -> str:
         """Return the WebSocket URL for the Realtime endpoint.
 
         Connect using a WebSocket client and pass an
