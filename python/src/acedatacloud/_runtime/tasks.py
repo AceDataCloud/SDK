@@ -72,7 +72,7 @@ def artifact_urls(state: dict[str, Any]) -> list[str]:
     return ordered
 
 
-def _task_status(state: dict[str, Any]) -> str:
+def task_status(state: dict[str, Any]) -> str:
     """Reduce a poll response to ``succeeded`` | ``failed`` | ``""`` (running).
 
     Services report completion inconsistently — a ``status`` word, a ``state``
@@ -199,7 +199,7 @@ class _HandleBase:
         return progress(self._result) if self._result else None
 
     def _accept(self, state: dict[str, Any]) -> str:
-        status = _task_status(state)
+        status = task_status(state)
         if status in ("succeeded", "failed"):
             self._result = state
         return status
@@ -279,3 +279,7 @@ class AsyncTaskHandle(_HandleBase):
 
 class TimeoutError(Exception):  # noqa: A001 - kept for backwards compatibility
     """Task polling timeout."""
+
+
+# Kept as a private alias: the original name is referenced by existing callers.
+_task_status = task_status
