@@ -28,8 +28,8 @@ class _Tasks:
         *,
         ids: list[str] | None = None,
         trace_ids: list[str] | None = None,
-        offset: float | None = None,
-        limit: float | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"action": "retrieve_batch", **kwargs}
@@ -67,8 +67,8 @@ class _AsyncTasks:
         *,
         ids: list[str] | None = None,
         trace_ids: list[str] | None = None,
-        offset: float | None = None,
-        limit: float | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"action": "retrieve_batch", **kwargs}

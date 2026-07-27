@@ -123,6 +123,10 @@ export class Transport {
   private headers: Record<string, string>;
   private paymentHandler?: PaymentHandler;
 
+  get apiBaseURL(): string {
+    return this.baseURL;
+  }
+
   constructor(opts: TransportOptions = {}) {
     const token = opts.apiToken ?? process.env.ACEDATACLOUD_API_TOKEN ?? '';
     if (!token && !opts.paymentHandler) {

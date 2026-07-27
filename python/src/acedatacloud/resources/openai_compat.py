@@ -465,7 +465,7 @@ class _Models:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
 
-    def list(self, **kwargs: Any) -> dict[str, Any]:
+    def list(self) -> dict[str, Any]:
         return self._transport.request("GET", "/openai/models")
 
 
@@ -473,7 +473,7 @@ class _AsyncModels:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
 
-    async def list(self, **kwargs: Any) -> dict[str, Any]:
+    async def list(self) -> dict[str, Any]:
         return await self._transport.request("GET", "/openai/models")
 
 
@@ -543,7 +543,7 @@ class _Realtime:
     def __init__(self, transport: Any, base_url: str) -> None:
         self._base_url = base_url
 
-    def url(self, model: str, **kwargs: Any) -> str:
+    def url(self, model: str) -> str:
         """Return a WebSocket URL for the Realtime API."""
         base = self._base_url.rstrip("/")
         wss_base = base.replace("https://", "wss://").replace("http://", "ws://")
@@ -554,7 +554,7 @@ class _AsyncRealtime:
     def __init__(self, transport: Any, base_url: str) -> None:
         self._base_url = base_url
 
-    def url(self, model: str, **kwargs: Any) -> str:
+    def url(self, model: str) -> str:
         """Return a WebSocket URL for the Realtime API."""
         base = self._base_url.rstrip("/")
         wss_base = base.replace("https://", "wss://").replace("http://", "ws://")

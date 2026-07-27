@@ -246,7 +246,7 @@ class Realtime {
   constructor(private transport: Transport) {}
 
   url(model: string): string {
-    const baseUrl = (this.transport as unknown as { baseURL: string }).baseURL ?? 'https://x402.acedata.cloud';
+    const baseUrl = this.transport.apiBaseURL;
     const wssBase = baseUrl.replace(/^https:\/\//, 'wss://').replace(/^http:\/\//, 'ws://').replace(/\/$/, '');
     return `${wssBase}/v1/realtime?model=${encodeURIComponent(model)}`;
   }
