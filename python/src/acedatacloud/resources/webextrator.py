@@ -5,11 +5,90 @@ from __future__ import annotations
 from typing import Any, Literal
 
 
+class _Tasks:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def retrieve(
+        self,
+        *,
+        id: str | None = None,
+        trace_id: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve", **kwargs}
+        if id is not None:
+            body["id"] = id
+        if trace_id is not None:
+            body["trace_id"] = trace_id
+        return self._transport.request("POST", "/webextrator/tasks", json=body)
+
+    def retrieve_batch(
+        self,
+        *,
+        ids: list[str] | None = None,
+        trace_ids: list[str] | None = None,
+        offset: float | None = None,
+        limit: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve_batch", **kwargs}
+        if ids is not None:
+            body["ids"] = ids
+        if trace_ids is not None:
+            body["trace_ids"] = trace_ids
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        return self._transport.request("POST", "/webextrator/tasks", json=body)
+
+
+class _AsyncTasks:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def retrieve(
+        self,
+        *,
+        id: str | None = None,
+        trace_id: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve", **kwargs}
+        if id is not None:
+            body["id"] = id
+        if trace_id is not None:
+            body["trace_id"] = trace_id
+        return await self._transport.request("POST", "/webextrator/tasks", json=body)
+
+    async def retrieve_batch(
+        self,
+        *,
+        ids: list[str] | None = None,
+        trace_ids: list[str] | None = None,
+        offset: float | None = None,
+        limit: float | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"action": "retrieve_batch", **kwargs}
+        if ids is not None:
+            body["ids"] = ids
+        if trace_ids is not None:
+            body["trace_ids"] = trace_ids
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        return await self._transport.request("POST", "/webextrator/tasks", json=body)
+
+
 class WebExtrator:
     """Synchronous WebExtrator client."""
 
     def __init__(self, transport: Any) -> None:
         self._transport = transport
+        self.tasks = _Tasks(transport)
 
     def extract(
         self,
@@ -95,6 +174,7 @@ class AsyncWebExtrator:
 
     def __init__(self, transport: Any) -> None:
         self._transport = transport
+        self.tasks = _AsyncTasks(transport)
 
     async def extract(
         self,

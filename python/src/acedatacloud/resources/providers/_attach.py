@@ -22,6 +22,7 @@ from .nano_banana import AsyncNanoBanana, NanoBanana
 from .producer import AsyncProducer, Producer
 from .seedance import AsyncSeedance, Seedance
 from .seedream import AsyncSeedream, Seedream
+from .sora import AsyncSora, Sora
 from .suno import AsyncSuno, Suno
 from .wan import AsyncWan, Wan
 
@@ -42,6 +43,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.producer = AsyncProducer(transport)
         client.seedance = AsyncSeedance(transport)
         client.seedream = AsyncSeedream(transport)
+        client.sora = AsyncSora(transport)
         client.suno = AsyncSuno(transport)
         client.wan = AsyncWan(transport)
     else:
@@ -58,5 +60,6 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.producer = Producer(transport)
         client.seedance = Seedance(transport)
         client.seedream = Seedream(transport)
+        client.sora = Sora(transport)
         client.suno = Suno(transport)
         client.wan = Wan(transport)

@@ -13,6 +13,7 @@ export { NanoBanana } from './nano-banana';
 export { Producer } from './producer';
 export { Seedance } from './seedance';
 export { Seedream } from './seedream';
+export { Sora } from './sora';
 export { Suno } from './suno';
 export { Wan } from './wan';
 
@@ -30,6 +31,7 @@ import { NanoBanana } from './nano-banana';
 import { Producer } from './producer';
 import { Seedance } from './seedance';
 import { Seedream } from './seedream';
+import { Sora } from './sora';
 import { Suno } from './suno';
 import { Wan } from './wan';
 
@@ -48,6 +50,7 @@ export function attachProviders(client: Record<string, unknown>, transport: Tran
   client.producer = new Producer(transport);
   client.seedance = new Seedance(transport);
   client.seedream = new Seedream(transport);
+  client.sora = new Sora(transport);
   client.suno = new Suno(transport);
   client.wan = new Wan(transport);
 }

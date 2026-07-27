@@ -34,6 +34,7 @@ type providers struct {
 	producer     *Producer
 	seedance     *Seedance
 	seedream     *Seedream
+	sora         *Sora
 	suno         *Suno
 	wan          *Wan
 }
@@ -53,6 +54,7 @@ func newProviders(tr *transport) *providers {
 		producer:     &Producer{t: tr},
 		seedance:     &Seedance{t: tr},
 		seedream:     &Seedream{t: tr},
+		sora:         &Sora{t: tr},
 		suno:         &Suno{t: tr},
 		wan:          &Wan{t: tr},
 	}
@@ -96,6 +98,9 @@ func (c *Client) Seedance() *Seedance { return c.providers.seedance }
 
 // Seedream returns the seedream provider client.
 func (c *Client) Seedream() *Seedream { return c.providers.seedream }
+
+// Sora returns the sora provider client.
+func (c *Client) Sora() *Sora { return c.providers.sora }
 
 // Suno returns the suno provider client.
 func (c *Client) Suno() *Suno { return c.providers.suno }

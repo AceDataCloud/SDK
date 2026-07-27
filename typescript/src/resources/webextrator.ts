@@ -2,8 +2,44 @@
 
 import { Transport } from '../runtime/transport';
 
-export class WebExtrator {
+class Tasks {
   constructor(private transport: Transport) {}
+
+  async retrieve(opts: {
+    id?: string;
+    traceId?: string;
+    [key: string]: unknown;
+  } = {}): Promise<Record<string, unknown>> {
+    const { id, traceId, ...rest } = opts;
+    const body: Record<string, unknown> = { action: 'retrieve', ...rest };
+    if (id !== undefined) body.id = id;
+    if (traceId !== undefined) body.trace_id = traceId;
+    return this.transport.request('POST', '/webextrator/tasks', { json: body });
+  }
+
+  async retrieveBatch(opts: {
+    ids?: string[];
+    traceIds?: string[];
+    offset?: number;
+    limit?: number;
+    [key: string]: unknown;
+  } = {}): Promise<Record<string, unknown>> {
+    const { ids, traceIds, offset, limit, ...rest } = opts;
+    const body: Record<string, unknown> = { action: 'retrieve_batch', ...rest };
+    if (ids !== undefined) body.ids = ids;
+    if (traceIds !== undefined) body.trace_ids = traceIds;
+    if (offset !== undefined) body.offset = offset;
+    if (limit !== undefined) body.limit = limit;
+    return this.transport.request('POST', '/webextrator/tasks', { json: body });
+  }
+}
+
+export class WebExtrator {
+  readonly tasks: Tasks;
+
+  constructor(private transport: Transport) {
+    this.tasks = new Tasks(transport);
+  }
 
   async extract(opts: {
     url: string;
