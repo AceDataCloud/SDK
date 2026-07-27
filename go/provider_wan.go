@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Wan is the wan provider client.
 type Wan struct {
 	t *transport
@@ -32,7 +33,7 @@ type WanGenerateRequest struct {
 	ShotType string
 	// Specify the resolution level for generating the video, used to adjust the video clarity (total pixel count). T
 	Resolution string
-	// Whether to enable intelligent rewriting of prompts. Once enabled, a large model will be used to intelligently
+	// Whether to enable intelligent rewriting of prompts. Once enabled, a large model will be used to intelligently 
 	PromptExtend bool
 	// Reverse prompt words, used to describe content that is not desired to appear in the video footage, can be used
 	NegativePrompt string

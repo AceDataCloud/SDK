@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Seedream is the seedream provider client.
 type Seedream struct {
 	t *transport
@@ -16,7 +17,7 @@ type SeedreamGenerateRequest struct {
 	Model string
 	// Prompts for generating images.
 	Prompt string
-	// Generate a random seed for image generation. The supported range is [-1, 2147483647], with a default value of
+	// Generate a random seed for image generation. The supported range is [-1, 2147483647], with a default value of 
 	Seed int
 	// Generate image dimensions or aspect ratios. Supports preset options (`1K`/`2K`/`3K`/`4K`), `adaptive` (adaptiv
 	Size string

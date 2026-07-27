@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Producer is the producer provider client.
 type Producer struct {
 	t *transport
@@ -43,8 +44,8 @@ func (c *Producer) Upload(ctx context.Context, req ProducerUploadRequest) (map[s
 	})
 }
 
-// ProducerGenerateRequest is the input to producer.Generate.
-type ProducerGenerateRequest struct {
+// ProducerVideosRequest is the input to producer.Videos.
+type ProducerVideosRequest struct {
 	// Reference audio ID.
 	AudioID string
 	// CallbackURL optionally receives the completion webhook.
@@ -53,7 +54,7 @@ type ProducerGenerateRequest struct {
 	Extra map[string]any
 }
 
-func (r ProducerGenerateRequest) toBody() map[string]any {
+func (r ProducerVideosRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["audio_id"] = r.AudioID
 	if r.CallbackURL != "" {
@@ -67,8 +68,8 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate AceData Producer MP4 retrieval API. Pass an audio_id to receive an MP4 video download link with cover art.
-func (c *Producer) Generate(ctx context.Context, req ProducerGenerateRequest) (map[string]any, error) {
+// Videos AceData Producer MP4 retrieval API. Pass an audio_id to receive an MP4 video download link with cover art.
+func (c *Producer) Videos(ctx context.Context, req ProducerVideosRequest) (map[string]any, error) {
 	return c.t.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   "/producer/videos",
@@ -109,8 +110,8 @@ func (c *Producer) Wav(ctx context.Context, req ProducerWavRequest) (map[string]
 	})
 }
 
-// ProducerProducerAudiosRequest is the input to producer.Producer_Audios.
-type ProducerProducerAudiosRequest struct {
+// ProducerGenerateRequest is the input to producer.Generate.
+type ProducerGenerateRequest struct {
 	// Lyrics content for generating audio.
 	Lyric string
 	// Types of audio generation operations. Supported values include `generate` (generate based on prompts), `cover`
@@ -149,7 +150,7 @@ type ProducerProducerAudiosRequest struct {
 	Extra map[string]any
 }
 
-func (r ProducerProducerAudiosRequest) toBody() map[string]any {
+func (r ProducerGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["lyric"] = r.Lyric
 	body["action"] = r.Action
@@ -213,8 +214,8 @@ func (r ProducerProducerAudiosRequest) toBody() map[string]any {
 	return body
 }
 
-// ProducerAudios Producer AI music generation API, generates 1 song per request.
-func (c *Producer) ProducerAudios(ctx context.Context, req ProducerProducerAudiosRequest) (*TaskHandle, error) {
+// Generate Producer AI music generation API, generates 1 song per request.
+func (c *Producer) Generate(ctx context.Context, req ProducerGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   "/producer/audios",

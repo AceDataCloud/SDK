@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Happyhorse is the happyhorse provider client.
 type Happyhorse struct {
 	t *transport
@@ -16,7 +17,7 @@ type HappyhorseGenerateRequest struct {
 	Seed int
 	// HappyHorse model name. Different actions only support the corresponding model family.
 	Model string
-	// Output video aspect ratio. Text-to-video and reference image-to-video support this parameter; the first frame
+	// Output video aspect ratio. Text-to-video and reference image-to-video support this parameter; the first frame 
 	Ratio string
 	// Operation types. `generate` is for generating video from text, `image_to_video` is for generating video from t
 	Action string

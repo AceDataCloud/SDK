@@ -24,7 +24,7 @@ export interface ProducerUploadOptions {
   [key: string]: unknown;
 }
 
-export interface ProducerGenerateOptions {
+export interface ProducerVideosOptions {
   /** Reference audio ID. */
   audioId: string;
   callbackUrl?: string;
@@ -40,7 +40,7 @@ export interface ProducerWavOptions {
   [key: string]: unknown;
 }
 
-export interface ProducerProducerAudiosOptions {
+export interface ProducerGenerateOptions {
   /** Lyrics content for generating audio. */
   lyric: string;
   /** Types of audio generation operations. Supported values include `generate` (generate based on prompts), `cover` (cover song), `extend` (continue writing), `variation` (variant), `swap_vocals` (replace vocals), `swap_instrumentals` (replace instrumentals), `replace_section` (replace section), `stems` (separate tracks). */
@@ -108,7 +108,7 @@ export class Producer {
   }
 
   /** AceData Producer MP4 retrieval API. Pass an audio_id to receive an MP4 video download link with cover art. */
-  async generate(options: ProducerGenerateOptions): Promise<Record<string, unknown>> {
+  async videos(options: ProducerVideosOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["audio_id"] = options.audioId;
     for (const [key, value] of Object.entries(options)) {
@@ -134,7 +134,7 @@ export class Producer {
   }
 
   /** Producer AI music generation API, generates 1 song per request. */
-  async producer_audios(options: ProducerProducerAudiosOptions): Promise<TaskHandle> {
+  async generate(options: ProducerGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["lyric"] = options.lyric;
     body["action"] = options.action;

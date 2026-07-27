@@ -131,9 +131,20 @@ class Param:
 
 
 # The last path segment names the artifact ("/flux/images"), but a method reads
-# better as a verb. Only the primary generation endpoint is renamed; secondary
-# ones keep their own noun, which is what distinguishes them.
+# better as a verb. Exactly one endpoint per service becomes `generate`; the
+# others keep their own noun, which is what distinguishes them.
 _PRIMARY = {"images", "videos", "audios", "tts"}
+
+# Which artifact a service is really about. Producer exposes /producer/videos
+# (render a finished track to video) alongside /producer/audios (write the
+# music) — picking whichever came first in the spec listing made
+# `producer.generate` mean "render a video", so calling it demanded an audio_id
+# the caller had no way to have.
+_MODALITY_PRIMARY = {
+    "AI Image": "images",
+    "AI Video": "videos",
+    "AI Audio": "audios",
+}
 
 
 def _method_name(path: str) -> str:
@@ -171,9 +182,29 @@ class Service:
             if not spec_file.exists():
                 continue
             self.endpoints.append(Endpoint(alias, ep["path"], json.loads(spec_file.read_text())))
+        self._name_methods()
+
+    def _name_methods(self) -> None:
+        """Give exactly one endpoint the name `generate`, and make it the right one."""
+        want = _MODALITY_PRIMARY.get(self.category)
+        primary = None
+        if want:
+            primary = next(
+                (e for e in self.endpoints if snake(e.path.rsplit("/", 1)[-1]) == want), None
+            )
+        if primary is None:
+            primary = next((e for e in self.endpoints if e.method == "generate"), None)
+
+        for ep in self.endpoints:
+            if ep is primary:
+                ep.method = "generate"
+            elif ep.method == "generate":
+                # Lost the claim; fall back to its own noun.
+                ep.method = snake(ep.path.rsplit("/", 1)[-1]) or snake(ep.path.replace("/", "_"))
+
         seen: set[str] = set()
         for ep in self.endpoints:
-            # Two endpoints under one service can end in the same word.
+            # Two endpoints under one service can still end in the same word.
             if ep.method in seen:
                 ep.method = snake(ep.path.replace("/", "_"))
             seen.add(ep.method)

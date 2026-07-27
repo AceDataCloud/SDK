@@ -5,6 +5,7 @@ package acedatacloud
 
 import "context"
 
+
 // Maestro is the maestro provider client.
 type Maestro struct {
 	t *transport
@@ -24,7 +25,7 @@ type MaestroGenerateRequest struct {
 	Action string
 	// Output aspect ratio (hint — the agent may follow the prompt).
 	Aspect string
-	// Production tier, a multiplier on the duration-based price. `draft` = a fast rough cut for previewing the idea
+	// Production tier, a multiplier on the duration-based price. `draft` = a fast rough cut for previewing the idea 
 	Quality string
 	// Target video length in seconds (1–600, i.e. up to 10 minutes). Billed by duration: credits ≈ 0.85 × duration ×
 	Duration int
