@@ -62,7 +62,9 @@ def main() -> int:
 
     # Generated source goes through the repo's own formatter so a human reading
     # a diff sees house style, not generator quirks.
-    _format(ROOT / "python" / "src" / "acedatacloud")
+    # CI checks formatting across the whole package, so format the package —
+    # formatting only the generated subtree leaves the check red.
+    _format(ROOT / "python")
 
     if "typescript" in languages:
         written = ts_gen.write_all(services, ROOT / "typescript" / "src")

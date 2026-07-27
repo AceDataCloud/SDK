@@ -132,11 +132,7 @@ def test_extra_parameters_pass_through(client):
 @pytest.mark.parametrize("name", GENERATED)
 def test_every_provider_has_a_callable_method(client, name):
     provider = getattr(client, name)
-    methods = [
-        m
-        for m, _ in inspect.getmembers(provider, inspect.ismethod)
-        if not m.startswith("_")
-    ]
+    methods = [m for m, _ in inspect.getmembers(provider, inspect.ismethod) if not m.startswith("_")]
     assert methods, f"client.{name} exposes no methods"
 
 
