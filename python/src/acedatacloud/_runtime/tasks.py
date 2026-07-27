@@ -217,17 +217,26 @@ class TaskHandle(_HandleBase):
     """Synchronous handle for a long-running task."""
 
     def get(self) -> dict[str, Any]:
-        """Fetch current task state."""
-        return self._transport.request(
+        """Fetch current task state, remembering it once terminal.
+
+        A caller that drives its own poll loop — checking status between polls so
+        it can report progress — only ever calls this. If a terminal response
+        were not recorded here, `urls()` and `result()` would stay empty after
+        the task had plainly finished.
+        """
+        state = self._transport.request(
             "POST",
             self._poll_endpoint,
             json={"id": self.id, "action": "retrieve"},
         )
+        self._accept(state)
+        return state
 
     def is_completed(self) -> bool:
         if self.done:
             return True
-        return self._accept(self.get()) in ("succeeded", "failed")
+        self.get()  # records a terminal state as a side effect
+        return self.done
 
     def wait(
         self,
@@ -241,7 +250,7 @@ class TaskHandle(_HandleBase):
         start = time.monotonic()
         while time.monotonic() - start < max_wait:
             state = self.get()
-            if self._accept(state) in ("succeeded", "failed"):
+            if self.done:
                 return state
             time.sleep(poll_interval)
         raise TimeoutError(f"Task {self.id} did not complete within {max_wait}s")
@@ -254,16 +263,20 @@ class AsyncTaskHandle(_HandleBase):
     """Asynchronous handle for a long-running task."""
 
     async def get(self) -> dict[str, Any]:
-        return await self._transport.request(
+        """Fetch current task state, remembering it once terminal."""
+        state = await self._transport.request(
             "POST",
             self._poll_endpoint,
             json={"id": self.id, "action": "retrieve"},
         )
+        self._accept(state)
+        return state
 
     async def is_completed(self) -> bool:
         if self.done:
             return True
-        return self._accept(await self.get()) in ("succeeded", "failed")
+        await self.get()  # records a terminal state as a side effect
+        return self.done
 
     async def wait(
         self,
@@ -276,7 +289,7 @@ class AsyncTaskHandle(_HandleBase):
         start = time.monotonic()
         while time.monotonic() - start < max_wait:
             state = await self.get()
-            if self._accept(state) in ("succeeded", "failed"):
+            if self.done:
                 return state
             await asyncio.sleep(poll_interval)
         raise TimeoutError(f"Task {self.id} did not complete within {max_wait}s")

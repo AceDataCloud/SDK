@@ -335,3 +335,51 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 		t.Fatalf("bad url: %+v", resp)
 	}
 }
+
+// TestGetRecordsTerminalState covers the parity fix: a caller driving its own
+// poll loop only ever calls Get, so Get is where completion must be recorded.
+// Without it, URLs stays empty after a task has plainly finished.
+func TestGetRecordsTerminalState(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"response":{"success":true,"finished_at":"2026-07-27T09:38:41Z",
+			"data":[{"image_url":"https://cdn.example.com/a.png"}]}}`))
+	}))
+	defer server.Close()
+
+	c, err := NewClient(WithAPIToken("t"), WithBaseURL(server.URL))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	h := newTaskHandle("task-1", "/flux/tasks", c.transport, nil)
+	if h.Done() {
+		t.Fatal("handle should not start complete")
+	}
+
+	if _, err := h.Get(context.Background()); err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if !h.Done() {
+		t.Error("Get must record a terminal state")
+	}
+	if urls := h.URLs(); len(urls) != 1 || urls[0] != "https://cdn.example.com/a.png" {
+		t.Errorf("URLs after Get = %v, want the artifact", urls)
+	}
+}
+
+func TestGetLeavesRunningTaskAlone(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"response":{"status":"processing"}}`))
+	}))
+	defer server.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(server.URL))
+	h := newTaskHandle("task-1", "/flux/tasks", c.transport, nil)
+	if _, err := h.Get(context.Background()); err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if h.Done() {
+		t.Error("a running task must not be marked complete")
+	}
+}

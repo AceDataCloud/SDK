@@ -39,7 +39,11 @@ func (h *TaskHandle) URLs() []string { return ArtifactURLs(h.last) }
 // Progress returns percent complete, or nil when the service does not report it.
 func (h *TaskHandle) Progress() *int { return TaskProgress(h.last) }
 
-// Get fetches the current task state from the server.
+// Get fetches the current task state, remembering it once terminal.
+//
+// A caller that drives its own poll loop — checking status between polls so it
+// can report progress — only ever calls this. Without recording completion here,
+// URLs and Result would stay empty after the task had plainly finished.
 func (h *TaskHandle) Get(ctx context.Context) (map[string]any, error) {
 	state, err := h.transport.do(ctx, requestOpts{
 		Method: "POST",
@@ -50,6 +54,9 @@ func (h *TaskHandle) Get(ctx context.Context) (map[string]any, error) {
 		return nil, err
 	}
 	h.last = state
+	if terminalStatus(state) {
+		h.done = true
+	}
 	return state, nil
 }
 
@@ -85,8 +92,7 @@ func (h *TaskHandle) Wait(ctx context.Context, pollInterval, maxWait time.Durati
 		if err != nil {
 			return nil, err
 		}
-		if terminalStatus(state) {
-			h.done = true
+		if h.done {
 			return state, nil
 		}
 		if time.Now().After(deadline) {

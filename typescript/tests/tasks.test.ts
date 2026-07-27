@@ -55,3 +55,49 @@ describe('TaskHandle', () => {
     await expect(handle.isCompleted()).resolves.toBe(expected);
   });
 });
+describe('get() records a terminal state', () => {
+  // The parity fix: a caller driving its own poll loop only ever calls get(),
+  // so get() is where completion must be recorded. Without it, urls() stays
+  // empty after a task has plainly finished.
+  const finished = {
+    response: {
+      success: true,
+      finished_at: '2026-07-27T09:38:41Z',
+      data: [{ image_url: 'https://cdn.example.com/a.png' }],
+    },
+  };
+
+  it('marks the handle done and exposes the artifact', async () => {
+    const transport = { request: jest.fn().mockResolvedValue(finished) } as never;
+    const handle = new TaskHandle('task-1', '/flux/tasks', transport);
+    expect(handle.done).toBe(false);
+
+    await handle.get();
+
+    expect(handle.done).toBe(true);
+    expect(handle.urls()).toEqual(['https://cdn.example.com/a.png']);
+    expect(handle.result).not.toBeNull();
+  });
+
+  it('leaves a running task alone', async () => {
+    const transport = {
+      request: jest.fn().mockResolvedValue({ response: { status: 'processing' } }),
+    } as never;
+    const handle = new TaskHandle('task-1', '/flux/tasks', transport);
+
+    await handle.get();
+
+    expect(handle.done).toBe(false);
+    expect(handle.urls()).toEqual([]);
+  });
+
+  it('does not poll again once complete', async () => {
+    const request = jest.fn().mockResolvedValue(finished);
+    const handle = new TaskHandle('task-1', '/flux/tasks', { request } as never);
+
+    await handle.get();
+    await handle.wait();
+
+    expect(request).toHaveBeenCalledTimes(1);
+  });
+});
