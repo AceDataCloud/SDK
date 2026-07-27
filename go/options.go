@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	defaultAPIBase      = "https://api.acedata.cloud"
+	// Matches Python and TypeScript. Go was left behind when the other two moved
+	// to the x402 gateway, so a Go caller silently talked to a different host.
+	defaultAPIBase      = "https://x402.acedata.cloud"
 	defaultPlatformBase = "https://platform.acedata.cloud"
 	defaultTimeout      = 300 * time.Second
 	defaultMaxRetries   = 2
@@ -38,7 +40,7 @@ func defaultOptions() *options {
 }
 
 // WithAPIToken sets the Bearer token. If omitted, the SDK reads
-// ``ACEDATACLOUD_API_TOKEN`` from the environment.
+// “ACEDATACLOUD_API_TOKEN“ from the environment.
 func WithAPIToken(token string) Option { return func(o *options) { o.apiToken = token } }
 
 // WithBaseURL overrides the API gateway base URL.

@@ -28,25 +28,25 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("acedatacloud: %s (status=%d code=%s)", e.Message, e.Status, e.ErrCode)
 }
 
-func (e *APIError) Unwrap() error         { return e.Underlying }
-func (e *APIError) StatusCode() int       { return e.Status }
-func (e *APIError) Code() string          { return e.ErrCode }
-func (e *APIError) TraceID() string       { return e.Trace }
-func (e *APIError) Body() map[string]any  { return e.RawBody }
+func (e *APIError) Unwrap() error        { return e.Underlying }
+func (e *APIError) StatusCode() int      { return e.Status }
+func (e *APIError) Code() string         { return e.ErrCode }
+func (e *APIError) TraceID() string      { return e.Trace }
+func (e *APIError) Body() map[string]any { return e.RawBody }
 
 // Typed error wrappers. All embed *APIError.
 type (
-	AuthenticationError     struct{ *APIError }
-	TokenMismatchError      struct{ *APIError }
-	PermissionError         struct{ *APIError }
-	RateLimitError          struct{ *APIError }
-	ValidationError         struct{ *APIError }
+	AuthenticationError      struct{ *APIError }
+	TokenMismatchError       struct{ *APIError }
+	PermissionError          struct{ *APIError }
+	RateLimitError           struct{ *APIError }
+	ValidationError          struct{ *APIError }
 	InsufficientBalanceError struct{ *APIError }
-	ResourceDisabledError   struct{ *APIError }
-	ModerationError         struct{ *APIError }
-	TimeoutError            struct{ *APIError }
-	InternalServerError     struct{ *APIError }
-	TransportError          struct{ *APIError }
+	ResourceDisabledError    struct{ *APIError }
+	ModerationError          struct{ *APIError }
+	TimeoutError             struct{ *APIError }
+	InternalServerError      struct{ *APIError }
+	TransportError           struct{ *APIError }
 )
 
 // mapError converts an HTTP status code + parsed body into a typed error.

@@ -7,7 +7,7 @@ import (
 
 // ChatCompletionRequest is the input to OpenAI chat.completions.create.
 //
-// The struct exposes the common fields explicitly and an ``Extra`` map
+// The struct exposes the common fields explicitly and an “Extra“ map
 // for forward-compatible fields (tools, response_format, etc.).
 type ChatCompletionRequest struct {
 	Model       string           `json:"model"`
@@ -79,7 +79,7 @@ func (o *OpenAIResource) Chat() *OpenAIChat { return &OpenAIChat{t: o.t} }
 // Responses returns the responses sub-namespace.
 func (o *OpenAIResource) Responses() *OpenAIResponses { return &OpenAIResponses{t: o.t} }
 
-// OpenAIChat exposes ``/v1/chat/completions``.
+// OpenAIChat exposes “/v1/chat/completions“.
 type OpenAIChat struct{ t *transport }
 
 // Completions returns the completions sub-namespace.
@@ -96,14 +96,14 @@ func (c *OpenAIChatCompletions) Create(ctx context.Context, req ChatCompletionRe
 }
 
 // CreateStream performs a streaming chat completion and returns a
-// channel of decoded chunks (each a ``map[string]any`` parsed from a
-// single SSE ``data:`` line).
+// channel of decoded chunks (each a “map[string]any“ parsed from a
+// single SSE “data:“ line).
 func (c *OpenAIChatCompletions) CreateStream(ctx context.Context, req ChatCompletionRequest) (<-chan map[string]any, <-chan error) {
 	req.Stream = true
 	return streamDecode(c.t, "/v1/chat/completions", req.toBody())
 }
 
-// OpenAIResponses exposes ``/openai/responses``.
+// OpenAIResponses exposes “/openai/responses“.
 type OpenAIResponses struct{ t *transport }
 
 // Create performs a blocking responses.create.

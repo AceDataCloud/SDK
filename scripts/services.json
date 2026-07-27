@@ -1,0 +1,373 @@
+{
+ "fish": {
+  "category": "AI Audio",
+  "endpoints": [
+   {
+    "id": "77adcb84-d59f-5ef9-b8a0-8b35eb42a71d",
+    "path": "/fish/tts",
+    "name": "Fish TTS API"
+   },
+   {
+    "id": "82dcabe9-b1a3-541f-80f1-decb183b920c",
+    "path": "/fish/model",
+    "name": "Fish Model Create API"
+   }
+  ],
+  "tasks": "/fish/tasks"
+ },
+ "maestro": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "ab512c42-324c-42e6-8d79-49a5042f3548",
+    "path": "/maestro/videos",
+    "name": "Maestro Videos API"
+   },
+   {
+    "id": "2a5bb4f0-9f83-4ecf-b357-f29ddcc0e9c5",
+    "path": "/maestro/estimates",
+    "name": "Maestro Estimates API"
+   }
+  ],
+  "tasks": "/maestro/tasks"
+ },
+ "openai": {
+  "category": "AI Chat",
+  "endpoints": [
+   {
+    "id": "c9969b66-effb-4753-b504-a82c4d16f83f",
+    "path": "/openai/chat/completions",
+    "name": "OpenAI Chat Completion API"
+   },
+   {
+    "id": "a0840c8a-2b9a-4407-8aaf-0057f0e1f65c",
+    "path": "/openai/embeddings",
+    "name": "OpenAI Embeddings API"
+   },
+   {
+    "id": "8f01fe72-8a3e-4872-8d8d-330cde179b3a",
+    "path": "/openai/images/generations",
+    "name": "OpenAI Images Generations API"
+   },
+   {
+    "id": "ed972a38-ecef-4fcb-af33-750de42d25dc",
+    "path": "/openai/responses",
+    "name": "OpenAI Responses API"
+   },
+   {
+    "id": "fb74083e-bb68-48d5-8ba6-b5a224400cd3",
+    "path": "/openai/images/edits",
+    "name": "OpenAI Images Edits API"
+   },
+   {
+    "id": "078d0146-f820-4617-b98e-47ba15a93d60",
+    "path": "/v1/audio/speech",
+    "name": "OpenAI Audio Speech API"
+   },
+   {
+    "id": "a5292a2e-d6a7-4215-a56c-e470ee2028db",
+    "path": "/v1/realtime",
+    "name": "OpenAI Realtime API"
+   }
+  ],
+  "tasks": "/openai/tasks"
+ },
+ "seedance": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "0083b874-4da6-40df-87e3-835b1300c1e8",
+    "path": "/seedance/videos",
+    "name": "ByteDance Seedance Videos API"
+   }
+  ],
+  "tasks": "/seedance/tasks"
+ },
+ "seedream": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "86ad30f3-0bc8-4b9b-b019-b9fa5b05672e",
+    "path": "/seedream/images",
+    "name": "ByteDance Seedream Images API"
+   }
+  ],
+  "tasks": "/seedream/tasks"
+ },
+ "nano-banana": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "9d8a117e-31ca-4322-a0fd-1771296ec610",
+    "path": "/nano-banana/images",
+    "name": "Nano Banana Generation API"
+   }
+  ],
+  "tasks": "/nano-banana/tasks"
+ },
+ "veo": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "52a0fa83-3c78-4793-b45a-c1a5c869ae46",
+    "path": "/veo/videos",
+    "name": "Veo Videos Generation API"
+   }
+  ],
+  "tasks": "/veo/tasks"
+ },
+ "suno": {
+  "category": "AI Audio",
+  "endpoints": [
+   {
+    "id": "09a26295-5972-4392-9318-dcd9b218f90d",
+    "path": "/suno/audios",
+    "name": "Suno Audios Generation API"
+   },
+   {
+    "id": "c578b8de-f9fe-4220-8d5f-5da7384705fd",
+    "path": "/suno/persona",
+    "name": "Suno Persona API"
+   },
+   {
+    "id": "2e4c9e30-a793-4f43-9322-d682120ffff2",
+    "path": "/suno/mp4",
+    "name": "Suno MP4 API"
+   },
+   {
+    "id": "1aece23f-07b3-4c21-8b2b-d93ce9bf0e84",
+    "path": "/suno/voices",
+    "name": "Suno Voices API"
+   },
+   {
+    "id": "da474a4e-f32a-41dc-b2fe-59cc5cea5c32",
+    "path": "/suno/timing",
+    "name": "Suno Timing API"
+   },
+   {
+    "id": "a8d46e2d-a042-4321-ab97-a5ab1d7fed5e",
+    "path": "/suno/vox",
+    "name": "Suno Vox API"
+   },
+   {
+    "id": "d4004774-4d0b-4aac-a8ea-be99627880e6",
+    "path": "/suno/wav",
+    "name": "Suno Wav API"
+   },
+   {
+    "id": "be1de4f0-b5f5-43dc-bc7a-d2f90b2efe9c",
+    "path": "/suno/midi",
+    "name": "Suno MIDI Generation API"
+   },
+   {
+    "id": "e5ff24c0-ae4e-46bb-93db-2d678610a8d3",
+    "path": "/suno/style",
+    "name": "Suno Style API"
+   },
+   {
+    "id": "c98fe4e5-73c0-462d-ad24-5080ee1fa01a",
+    "path": "/suno/lyrics",
+    "name": "Suno Lyrics Generation API"
+   },
+   {
+    "id": "e0ffe8d7-c6dd-4b46-93d9-5fa6c744310c",
+    "path": "/suno/mashup-lyrics",
+    "name": "Suno MashupLyrics Generation API"
+   },
+   {
+    "id": "8823cd83-54f6-4ea8-979a-7fa448577186",
+    "path": "/suno/upload",
+    "name": "Suno Upload API"
+   }
+  ],
+  "tasks": "/suno/tasks"
+ },
+ "flux": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "deefc5d7-7f22-43e9-929e-f2b6afee60b7",
+    "path": "/flux/images",
+    "name": "Flux Images Generation API"
+   }
+  ],
+  "tasks": "/flux/tasks"
+ },
+ "serp": {
+  "category": "Web & Data",
+  "endpoints": [
+   {
+    "id": "7753ed09-1046-46d3-ad80-cd7ff19676b5",
+    "path": "/serp/google",
+    "name": "Google SERP API"
+   }
+  ],
+  "tasks": null
+ },
+ "kling": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "2c26cb33-46ac-4bd7-82f9-0ec63e688172",
+    "path": "/kling/motion",
+    "name": "Kling Motion Generation API"
+   },
+   {
+    "id": "29187cb2-1acb-43b8-baf5-3f3f709292eb",
+    "path": "/kling/videos",
+    "name": "Kling Videos Generation API"
+   },
+   {
+    "id": "a8b06673-3565-4989-b6be-bd638f72eadb",
+    "path": "/kling/lip-sync",
+    "name": "Kling Lip Sync API"
+   },
+   {
+    "id": "1daf8204-7306-4c54-8014-a00c5996cbfe",
+    "path": "/kling/talking-photo",
+    "name": "Kling Talking Photo API"
+   }
+  ],
+  "tasks": "/kling/tasks"
+ },
+ "wan": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "6a4ecdbf-b219-4505-8277-5ec4b1ac14f8",
+    "path": "/wan/videos",
+    "name": "Wan Videos Generation API"
+   }
+  ],
+  "tasks": "/wan/tasks"
+ },
+ "webextrator": {
+  "category": "",
+  "endpoints": [
+   {
+    "id": "c32c05d0-5f47-4b89-8458-9776aad4a8c4",
+    "path": "/webextrator/extract",
+    "name": "WebExtrator Extract API"
+   },
+   {
+    "id": "4ab24fda-2140-476c-a190-91bde5f0baf4",
+    "path": "/webextrator/render",
+    "name": "WebExtrator Render API"
+   }
+  ],
+  "tasks": "/webextrator/tasks"
+ },
+ "luma": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "94fc9028-5a9f-4875-aae4-38463bd30ac5",
+    "path": "/luma/videos",
+    "name": "Luma Videos Generation API"
+   }
+  ],
+  "tasks": "/luma/tasks"
+ },
+ "digitalhuman": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "5ced04db-8d92-4a6b-b988-91423dcc1f02",
+    "path": "/digital-human/videos",
+    "name": "Digital Human Video API"
+   },
+   {
+    "id": "c334172a-a0b1-451f-8137-d9c9830a15b9",
+    "path": "/digital-human/voices",
+    "name": "Digital Human Voice Clone API"
+   }
+  ],
+  "tasks": "/digital-human/tasks"
+ },
+ "dreamina": {
+  "category": "",
+  "endpoints": [
+   {
+    "id": "b3880780-678f-4495-bda7-3a1ecf42781c",
+    "path": "/dreamina/videos",
+    "name": "Dreamina Video Generation API"
+   }
+  ],
+  "tasks": "/dreamina/tasks"
+ },
+ "hailuo": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "d5af91f6-a7ec-4015-b0a5-d25051158470",
+    "path": "/hailuo/videos",
+    "name": "Hailuo Videos Generation API"
+   }
+  ],
+  "tasks": "/hailuo/tasks"
+ },
+ "happyhorse": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "d656e357-50cb-4390-b8c9-67464bc2a2f2",
+    "path": "/happyhorse/videos",
+    "name": "HappyHorse Videos API"
+   }
+  ],
+  "tasks": "/happyhorse/tasks"
+ },
+ "producer": {
+  "category": "AI Audio",
+  "endpoints": [
+   {
+    "id": "91fcbb81-8bc9-4ed4-bdfa-0f296b2fec9d",
+    "path": "/producer/upload",
+    "name": "Producer Upload API"
+   },
+   {
+    "id": "5e06cbdd-ba7d-456d-a211-e3f242adec82",
+    "path": "/producer/videos",
+    "name": "Producer Videos API"
+   },
+   {
+    "id": "e7cad274-9c48-494c-b7e3-fc1556eea827",
+    "path": "/producer/wav",
+    "name": "Producer Wav API"
+   },
+   {
+    "id": "01d96900-9f8c-41d7-814c-95c7a885ba61",
+    "path": "/producer/audios",
+    "name": "Producer Audios Generation API"
+   },
+   {
+    "id": "2f636fdb-faa4-4308-8cef-9258dd14fd90",
+    "path": "/producer/lyrics",
+    "name": "Producer Lyrics Generation API"
+   }
+  ],
+  "tasks": "/producer/tasks"
+ },
+ "shorturl": {
+  "category": "Web & Data",
+  "endpoints": [
+   {
+    "id": "d57df7ea-e1ba-4873-905c-d4c072e40450",
+    "path": "/shorturl",
+    "name": "Short URL API"
+   }
+  ],
+  "tasks": null
+ },
+ "localization": {
+  "category": "Web & Data",
+  "endpoints": [
+   {
+    "id": "f7322d41-51dc-48b2-8584-dabc632b5031",
+    "path": "/localization/translate",
+    "name": "Localization Translate API"
+   }
+  ],
+  "tasks": null
+ }
+}

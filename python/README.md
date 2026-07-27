@@ -37,11 +37,13 @@ for chunk in client.openai.chat.completions.create(
 import asyncio
 from acedatacloud import AsyncAceDataCloud
 
+
 async def main():
     client = AsyncAceDataCloud(api_token="your-token")
     result = await client.search.google(query="Python SDK")
     print(result)
     await client.close()
+
 
 asyncio.run(main())
 ```
@@ -114,10 +116,10 @@ except RateLimitError:
 ```python
 client = AceDataCloud(
     api_token="your-token",
-    base_url="https://x402.acedata.cloud",      # API gateway (default)
+    base_url="https://x402.acedata.cloud",  # API gateway (default)
     platform_base_url="https://platform.acedata.cloud",  # Management plane
-    timeout=300.0,      # Request timeout in seconds
-    max_retries=2,      # Retry count for transient errors
+    timeout=300.0,  # Request timeout in seconds
+    max_retries=2,  # Retry count for transient errors
 )
 ```
 
@@ -132,11 +134,13 @@ that returns the required headers is accepted:
 ```python
 from acedatacloud import AceDataCloud, PaymentHandlerContext, PaymentHandlerResult
 
+
 def my_payment_handler(ctx: PaymentHandlerContext) -> PaymentHandlerResult:
     # ctx["accepts"] is the list of payment requirements returned by the server.
     # Your job: sign the preferred one and return the retry header.
     x_payment = sign_and_encode(ctx["accepts"])  # your implementation
     return {"headers": {"X-Payment": x_payment}}
+
 
 client = AceDataCloud(payment_handler=my_payment_handler)
 

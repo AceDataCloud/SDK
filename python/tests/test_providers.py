@@ -1,0 +1,161 @@
+"""The provider axis: one namespace per service, generated from the specs."""
+
+from __future__ import annotations
+
+import inspect
+import typing
+from unittest.mock import Mock
+
+import pytest
+
+from acedatacloud import AceDataCloud, AsyncAceDataCloud
+from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
+
+# Every service the platform exposes as a non-private generation API.
+GENERATED = (
+    "flux",
+    "seedream",
+    "nano_banana",
+    "seedance",
+    "suno",
+    "producer",
+    "fish",
+    "hailuo",
+    "wan",
+    "luma",
+    "happyhorse",
+    "maestro",
+    "digitalhuman",
+    "dreamina",
+    "localization",
+)
+HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
+
+
+@pytest.fixture
+def client():
+    return AceDataCloud(api_token="test-token")
+
+
+@pytest.mark.parametrize("name", GENERATED + HAND_WRITTEN)
+def test_provider_namespace_exists(client, name):
+    assert hasattr(client, name), f"client.{name} is missing"
+
+
+@pytest.mark.parametrize("name", GENERATED + HAND_WRITTEN)
+def test_async_client_has_the_same_namespaces(name):
+    assert hasattr(AsyncAceDataCloud(api_token="test-token"), name)
+
+
+@pytest.mark.parametrize("name", GENERATED)
+def test_sync_and_async_bind_different_classes(client, name):
+    """A sync client holding an async provider would fail only at call time."""
+    sync_class = type(getattr(client, name)).__name__
+    async_class = type(getattr(AsyncAceDataCloud(api_token="t"), name)).__name__
+    assert async_class == f"Async{sync_class}"
+
+
+def test_generation_returns_a_task_handle(client):
+    """Consistently a handle — never sometimes a dict, which is what the old
+    modality methods did depending on the server's runtime response shape."""
+    transport = Mock()
+    transport.request.return_value = {"success": True, "task_id": "t-1"}
+    client.flux._transport = transport
+
+    result = client.flux.generate(action="generate", prompt="a cat")
+    assert isinstance(result, TaskHandle)
+    assert result.id == "t-1"
+
+
+@pytest.mark.asyncio
+async def test_async_generation_returns_an_async_handle():
+    client = AsyncAceDataCloud(api_token="t")
+
+    async def request(*_args, **_kwargs):
+        return {"success": True, "task_id": "t-2"}
+
+    client.flux._transport = Mock(request=request)
+    assert isinstance(await client.flux.generate(action="generate", prompt="a cat"), AsyncTaskHandle)
+
+
+def test_de_facto_required_parameter_is_sent(client):
+    """/flux/images rejects a request with no `size` while not declaring it
+    required. The spec carries an example, so the SDK forwards it."""
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.flux._transport = transport
+
+    client.flux.generate(action="generate", prompt="a cat")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["size"], "size must be sent or the upstream 400s"
+
+
+def test_caller_value_beats_the_spec_default(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.flux._transport = transport
+
+    client.flux.generate(action="generate", prompt="a cat", size="512x512")
+    assert transport.request.call_args.kwargs["json"]["size"] == "512x512"
+
+
+def test_async_is_requested_by_default(client):
+    """Otherwise a slow generation holds the HTTP connection open."""
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.flux._transport = transport
+
+    client.flux.generate(action="generate", prompt="a cat")
+    assert transport.request.call_args.kwargs["json"]["async"] is True
+
+
+def test_model_enum_is_typed(client):
+    """A wrong model name should be a type error, not a runtime 400."""
+    hints = typing.get_type_hints(type(client.flux).generate)
+    model = hints["model"]
+    args = typing.get_args(model)
+    literal = next((a for a in args if typing.get_origin(a) is typing.Literal), None)
+    assert literal is not None, "model should be a Literal of the spec's enum"
+    assert "flux-dev" in typing.get_args(literal)
+
+
+def test_extra_parameters_pass_through(client):
+    """A parameter added upstream must be reachable before the SDK is regenerated."""
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.flux._transport = transport
+
+    client.flux.generate(action="generate", prompt="a cat", brand_new_flag=True)
+    assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
+
+
+@pytest.mark.parametrize("name", GENERATED)
+def test_every_provider_has_a_callable_method(client, name):
+    provider = getattr(client, name)
+    methods = [m for m, _ in inspect.getmembers(provider, inspect.ismethod) if not m.startswith("_")]
+    assert methods, f"client.{name} exposes no methods"
+
+
+def test_suno_keeps_its_secondary_endpoints(client):
+    """A service with many endpoints must not collapse to just `generate`."""
+    for method in ("generate", "lyrics", "wav", "mp4"):
+        assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_handle_is_born_complete_when_the_server_answered_synchronously(client):
+    """Some endpoints return the artifact inline. `.wait()` must not then poll
+    for a task that already finished — which is what made the documented
+    `task.wait()` raise AttributeError before."""
+    transport = Mock()
+    transport.request.return_value = {
+        "success": True,
+        "task_id": "t-1",
+        "data": [{"image_url": "https://cdn.example.com/a.png"}],
+    }
+    client.flux._transport = transport
+
+    handle = client.flux.generate(action="generate", prompt="a cat")
+    assert handle.done
+    assert handle.wait() is not None
+    assert handle.urls() == ["https://cdn.example.com/a.png"]
+    assert transport.request.call_count == 1, "wait() must not poll a finished task"

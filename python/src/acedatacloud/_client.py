@@ -19,6 +19,7 @@ from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
+from acedatacloud.resources.providers import _attach as _providers
 from acedatacloud.resources.search import AsyncSearch, Search
 from acedatacloud.resources.shorturl import AsyncShortUrl, ShortUrl
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
@@ -69,6 +70,8 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
+        # Provider axis: one namespace per service, generated from the specs.
+        _providers.attach(self, self._transport, is_async=False)
 
     def close(self) -> None:
         self._transport.close()
@@ -119,6 +122,8 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        # Provider axis: one namespace per service, generated from the specs.
+        _providers.attach(self, self._transport, is_async=True)
 
     async def close(self) -> None:
         await self._transport.close()
