@@ -158,6 +158,25 @@ func taskStatus(state map[string]any) string {
 		return "" // queued, processing, … — keep waiting
 	}
 
+	// success:false alone is ambiguous — some services set it for a transient
+	// hiccup mid-run, alongside a bare string, and carry on. A structured error
+	// (a map with a code) is the upstream's final answer: hailuo reports an
+	// unavailable model that way, with no finished_at, and treating it as still
+	// running makes the caller poll until timeout instead of showing the reason.
+	if v, present := resp["success"]; present {
+		if b, isBool := v.(bool); isBool && !b {
+			structured := false
+			if e, ok := resp["error"].(map[string]any); ok {
+				if code, has := e["code"]; has && code != nil {
+					structured = true
+				}
+			}
+			if structured || len(ArtifactURLs(state)) > 0 {
+				return "failed"
+			}
+		}
+	}
+
 	_, finishedInResp := resp["finished_at"]
 	_, finishedInState := state["finished_at"]
 	if finishedInResp || finishedInState {
