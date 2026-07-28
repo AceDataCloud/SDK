@@ -262,6 +262,24 @@ def test_chat_count_tokens(client):
     assert result["input_tokens"] == 42
 
 
+@respx.mock
+def test_aichat_conversations_accepts_new_models(client):
+    mock_response = {
+        "id": "aichat-123",
+        "answer": "Hello!",
+    }
+    respx.post("https://api.acedata.cloud/aichat/conversations").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.aichat.create(
+        model="gpt-5.6-sol",
+        question="Hi",
+        references=["https://example.com"],
+    )
+    assert result["id"] == "aichat-123"
+
+
 # ── Image Generation ──────────────────────────────────────────────────
 
 
