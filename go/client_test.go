@@ -383,3 +383,27 @@ func TestGetLeavesRunningTaskAlone(t *testing.T) {
 		t.Error("a running task must not be marked complete")
 	}
 }
+
+// TestStructuredErrorIsTerminal covers the hailuo shape: success:false with an
+// error object and no finished_at. Reading it as still-running makes a caller
+// poll until timeout instead of surfacing the upstream's reason.
+func TestStructuredErrorIsTerminal(t *testing.T) {
+	state := map[string]any{
+		"response": map[string]any{
+			"success": false,
+			"error":   map[string]any{"code": "api_error", "message": "no channel"},
+		},
+	}
+	if got := taskStatus(state); got != "failed" {
+		t.Errorf("taskStatus = %q, want failed", got)
+	}
+}
+
+func TestTransientErrorKeepsWaiting(t *testing.T) {
+	state := map[string]any{
+		"response": map[string]any{"success": false, "error": "temporary"},
+	}
+	if got := taskStatus(state); got != "" {
+		t.Errorf("taskStatus = %q, want empty (still running)", got)
+	}
+}

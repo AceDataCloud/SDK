@@ -1,4 +1,4 @@
-import { TaskHandle } from '../src/runtime/tasks';
+import { TaskHandle, taskStatus } from '../src/runtime/tasks';
 
 describe('TaskHandle', () => {
   it('waits through accepted responses and completes on success data without status', async () => {
@@ -99,5 +99,24 @@ describe('get() records a terminal state', () => {
     await handle.wait();
 
     expect(request).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('success:false without finished_at', () => {
+  // hailuo answers an unavailable-model request this way. Treating it as still
+  // running makes a caller poll until timeout instead of showing the reason.
+  it('is terminal when the error is structured', () => {
+    const state = {
+      response: {
+        success: false,
+        error: { code: 'api_error', message: 'no channel available for minimax-t2v' },
+      },
+    };
+    expect(taskStatus(state)).toBe('failed');
+  });
+
+  it('keeps waiting on a bare string error', () => {
+    expect(taskStatus({ response: { success: false, error: 'temporary' } })).toBe('');
+    expect(taskStatus({ response: { success: false, error: null } })).toBe('');
   });
 });

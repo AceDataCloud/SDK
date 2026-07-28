@@ -137,6 +137,17 @@ export function taskStatus(state: Record<string, unknown>): 'succeeded' | 'faile
   }
   if (words.length > 0) return '';
 
+  // `success: false` alone is ambiguous — some services set it for a transient
+  // hiccup mid-run, alongside a bare string, and carry on. A *structured* error
+  // (a dict with a code) is the upstream's final answer: hailuo reports an
+  // unavailable model that way, with no finished_at, and treating it as still
+  // running makes the caller poll until timeout instead of showing the reason.
+  if (response.success === false) {
+    const error = response.error as Record<string, unknown> | undefined;
+    const structured = !!error && typeof error === 'object' && !!error.code;
+    if (artifactUrls(state).length > 0 || structured) return 'failed';
+  }
+
   const finished =
     (response.finished_at !== undefined && response.finished_at !== null) ||
     (state.finished_at !== undefined && state.finished_at !== null);

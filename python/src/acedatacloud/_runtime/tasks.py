@@ -99,13 +99,17 @@ def task_status(state: dict[str, Any]) -> str:
         # A non-terminal word (queued, processing, …) means keep waiting.
         return ""
 
-    # No status word at all. `success: false` on its own is ambiguous — some
-    # services use it for a retryable hiccup mid-run, and the task tests pin
-    # that — but paired with an artifact the job has clearly finished, and
-    # finished unsuccessfully. Without this, such a response reaches the caller
-    # as a success.
-    if response.get("success") is False and artifact_urls(state):
-        return "failed"
+    # No status word at all. `success: false` alone is ambiguous: some services
+    # set it for a transient hiccup mid-run, alongside a bare string like
+    # "temporary", and keep going. A *structured* error — a dict carrying a code
+    # — is different: that is the upstream's final answer. hailuo reports an
+    # unavailable model exactly so, with no finished_at, and reading it as
+    # "still running" makes the caller poll until timeout instead of telling the
+    # user "no channel available for this model".
+    if response.get("success") is False:
+        error = response.get("error")
+        if artifact_urls(state) or (isinstance(error, dict) and error.get("code")):
+            return "failed"
 
     finished = response.get("finished_at") is not None or state.get("finished_at") is not None
     if finished:

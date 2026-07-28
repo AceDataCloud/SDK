@@ -221,3 +221,29 @@ def test_get_leaves_a_running_task_alone(client):
 
     assert not handle.done
     assert handle.urls() == []
+
+
+def test_a_structured_error_is_terminal_even_without_finished_at():
+    """hailuo answers an unavailable-model request with success:false plus an
+    error object and no finished_at. Reading that as "still running" makes the
+    caller poll until timeout instead of showing the upstream's own reason."""
+    from acedatacloud._runtime.tasks import task_status
+
+    state = {
+        "response": {
+            "success": False,
+            "error": {"code": "api_error", "message": "no channel available for minimax-t2v"},
+            "task_id": "x",
+        },
+        "finished_at": None,
+    }
+    assert task_status(state) == "failed"
+
+
+def test_a_transient_string_error_still_keeps_waiting():
+    """Some services set success:false mid-run with a bare string and carry on.
+    Only a structured error — a dict with a code — is the upstream's last word."""
+    from acedatacloud._runtime.tasks import task_status
+
+    assert task_status({"response": {"success": False, "error": "temporary"}}) == ""
+    assert task_status({"response": {"success": False, "error": None}}) == ""
