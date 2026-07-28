@@ -56,6 +56,10 @@ class KlingReferenceVideo(TypedDict, total=False):
     keep_original_sound: Literal["yes", "no"]
 
 
+class KlingWatermarkInfo(TypedDict, total=False):
+    enabled: bool
+
+
 def _is_http_url(value: object) -> bool:
     if not isinstance(value, str):
         return False
@@ -66,7 +70,7 @@ def _is_http_url(value: object) -> bool:
 def _build_generate_body(
     *,
     action: KlingAction,
-    model: KlingModel,
+    model: KlingModel | None,
     mode: KlingMode | None,
     prompt: str | None,
     duration: int | None,
@@ -84,7 +88,8 @@ def _build_generate_body(
     negative_prompt: str | None,
     start_image_url: str | None,
 ) -> dict[str, Any]:
-    if model not in KLING_MODELS:
+    resolved_model = model or "kling-v1"
+    if resolved_model not in KLING_MODELS:
         raise ValueError(f"model must be one of: {', '.join(KLING_MODELS)}")
     if action not in {"text2video", "image2video", "extend"}:
         raise ValueError("action must be text2video, image2video, or extend")
@@ -93,7 +98,7 @@ def _build_generate_body(
     if video_list is not None and not video_list:
         raise ValueError("video_list must be non-empty or omitted")
 
-    is_v3 = model in {"kling-v3", "kling-v3-omni"}
+    is_v3 = resolved_model in {"kling-v3", "kling-v3-omni"}
     has_references = bool(image_list or video_list)
     if action in {"text2video", "image2video"} and not prompt:
         raise ValueError("prompt is required for text2video and image2video")
@@ -101,7 +106,7 @@ def _build_generate_body(
         raise ValueError("start_image_url is required for image2video")
     if action == "extend" and not video_id:
         raise ValueError("video_id is required for extend")
-    if action == "extend" and model not in {"kling-v1", "kling-v1-6", "kling-v2-5-turbo"}:
+    if action == "extend" and resolved_model not in {"kling-v1", "kling-v1-6", "kling-v2-5-turbo"}:
         raise ValueError("extend requires kling-v1, kling-v1-6, or kling-v2-5-turbo")
     if action == "extend" and has_references:
         raise ValueError("image_list and video_list are not supported with extend")
@@ -119,27 +124,27 @@ def _build_generate_body(
         raise ValueError("duration must be an integer")
     if is_v3 and duration is not None and not 3 <= duration <= 15:
         raise ValueError("Kling V3 duration must be between 3 and 15 seconds")
-    if not is_v3 and model != "kling-o1" and duration is not None and duration not in {5, 10}:
+    if not is_v3 and resolved_model != "kling-o1" and duration is not None and duration not in {5, 10}:
         raise ValueError("This Kling model supports only 5- or 10-second generation")
-    if model == "kling-o1" and duration is not None and duration != 5:
+    if resolved_model == "kling-o1" and duration is not None and duration != 5:
         raise ValueError("kling-o1 supports only 5-second generation")
-    if model == "kling-o1" and mode is not None and mode not in {"std", "pro"}:
+    if resolved_model == "kling-o1" and mode is not None and mode not in {"std", "pro"}:
         raise ValueError("kling-o1 supports only std and pro modes")
     if mode == "4k" and not is_v3:
         raise ValueError("4k mode requires kling-v3 or kling-v3-omni")
-    if has_references and model not in {"kling-o1", "kling-v3-omni"}:
+    if has_references and resolved_model not in {"kling-o1", "kling-v3-omni"}:
         raise ValueError("Omni references require kling-o1 or kling-v3-omni")
     if has_references and mode == "4k":
         raise ValueError("4k cannot be combined with Omni references")
-    if (model == "kling-o1" or has_references) and any(
+    if (resolved_model == "kling-o1" or has_references) and any(
         value is not None for value in (negative_prompt, camera_control, cfg_scale)
     ):
         raise ValueError("Kling O1 and Omni references do not support negative_prompt, camera_control, or cfg_scale")
-    if model == "kling-o1" and generate_audio:
+    if resolved_model == "kling-o1" and generate_audio:
         raise ValueError("kling-o1 does not support generate_audio")
-    if generate_audio and not is_v3 and model != "kling-v2-6":
+    if generate_audio and not is_v3 and resolved_model != "kling-v2-6":
         raise ValueError("generate_audio requires a V3 model or kling-v2-6 pro mode")
-    if generate_audio and model == "kling-v2-6" and mode != "pro":
+    if generate_audio and resolved_model == "kling-v2-6" and mode != "pro":
         raise ValueError("kling-v2-6 supports generate_audio only in pro mode")
     if generate_audio and video_list:
         raise ValueError("generate_audio cannot be used with video_list")
@@ -172,7 +177,7 @@ def _build_generate_body(
     if image_count > image_limit:
         raise ValueError(f"Reference images cannot exceed {image_limit} for this request")
 
-    body: dict[str, Any] = {"action": action, "model": model}
+    body: dict[str, Any] = {"action": action, "model": resolved_model}
     optional_fields = {
         "mode": mode,
         "prompt": prompt,
@@ -209,7 +214,9 @@ def _build_generate_body(
 
 def _build_motion_body(
     *,
+    model_name: Literal["kling-v2-6", "kling-v3"] | None,
     mode: Literal["std", "pro"],
+    watermark_info: KlingWatermarkInfo | None,
     image_url: str,
     video_url: str,
     character_orientation: Literal["image", "video"],
@@ -218,8 +225,12 @@ def _build_motion_body(
     callback_url: str | None,
     async_: bool | None,
 ) -> dict[str, Any]:
+    if model_name is not None and model_name not in {"kling-v2-6", "kling-v3"}:
+        raise ValueError("model_name must be kling-v2-6 or kling-v3")
     if mode not in {"std", "pro"}:
         raise ValueError("mode must be std or pro")
+    if watermark_info is not None and "enabled" in watermark_info and not isinstance(watermark_info["enabled"], bool):
+        raise ValueError("watermark_info.enabled must be a boolean")
     if not _is_http_url(image_url):
         raise ValueError("image_url must be an HTTP URL")
     if not _is_http_url(video_url):
@@ -238,6 +249,8 @@ def _build_motion_body(
         "character_orientation": character_orientation,
     }
     optional_fields = {
+        "model_name": model_name,
+        "watermark_info": watermark_info,
         "keep_original_sound": keep_original_sound,
         "prompt": prompt,
         "callback_url": callback_url,
@@ -257,7 +270,7 @@ class Kling:
         self,
         *,
         action: KlingAction,
-        model: KlingModel,
+        model: KlingModel | None = None,
         mode: KlingMode | None = None,
         prompt: str | None = None,
         duration: int | None = None,
@@ -300,7 +313,9 @@ class Kling:
     def motion(
         self,
         *,
+        model_name: Literal["kling-v2-6", "kling-v3"] | None = None,
         mode: Literal["std", "pro"],
+        watermark_info: KlingWatermarkInfo | None = None,
         image_url: str,
         video_url: str,
         character_orientation: Literal["image", "video"],
@@ -310,7 +325,9 @@ class Kling:
         async_: bool | None = None,
     ) -> dict[str, Any]:
         body = _build_motion_body(
+            model_name=model_name,
             mode=mode,
+            watermark_info=watermark_info,
             image_url=image_url,
             video_url=video_url,
             character_orientation=character_orientation,
@@ -332,7 +349,7 @@ class AsyncKling:
         self,
         *,
         action: KlingAction,
-        model: KlingModel,
+        model: KlingModel | None = None,
         mode: KlingMode | None = None,
         prompt: str | None = None,
         duration: int | None = None,
@@ -375,7 +392,9 @@ class AsyncKling:
     async def motion(
         self,
         *,
+        model_name: Literal["kling-v2-6", "kling-v3"] | None = None,
         mode: Literal["std", "pro"],
+        watermark_info: KlingWatermarkInfo | None = None,
         image_url: str,
         video_url: str,
         character_orientation: Literal["image", "video"],
@@ -385,7 +404,9 @@ class AsyncKling:
         async_: bool | None = None,
     ) -> dict[str, Any]:
         body = _build_motion_body(
+            model_name=model_name,
             mode=mode,
+            watermark_info=watermark_info,
             image_url=image_url,
             video_url=video_url,
             character_orientation=character_orientation,

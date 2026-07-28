@@ -39,10 +39,14 @@ export interface KlingReferenceVideo {
   keepOriginalSound?: 'yes' | 'no';
 }
 
+export interface KlingWatermarkInfo {
+  enabled?: boolean;
+}
+
 export interface KlingGenerateOptions {
   action: 'text2video' | 'image2video' | 'extend';
   mode?: 'std' | 'pro' | '4k';
-  model: KlingModel;
+  model?: KlingModel;
   prompt?: string;
   duration?: number;
   generateAudio?: boolean;
@@ -70,10 +74,11 @@ function isHttpUrl(value: string): boolean {
 }
 
 function validateGenerateOptions(opts: KlingGenerateOptions): void {
-  if (!KLING_MODELS.includes(opts.model)) {
+  const model = opts.model ?? 'kling-v1';
+  if (!KLING_MODELS.includes(model)) {
     throw new Error(`model must be one of: ${KLING_MODELS.join(', ')}`);
   }
-  const isV3 = opts.model === 'kling-v3' || opts.model === 'kling-v3-omni';
+  const isV3 = model === 'kling-v3' || model === 'kling-v3-omni';
   const hasReferences = Boolean(opts.imageList?.length || opts.videoList?.length);
 
   if (opts.imageList !== undefined && opts.imageList.length === 0) {
@@ -113,40 +118,40 @@ function validateGenerateOptions(opts: KlingGenerateOptions): void {
   if (isV3 && opts.duration !== undefined && (opts.duration < 3 || opts.duration > 15)) {
     throw new Error('Kling V3 duration must be between 3 and 15 seconds');
   }
-  if (!isV3 && opts.model !== 'kling-o1' && opts.duration !== undefined && ![5, 10].includes(opts.duration)) {
+  if (!isV3 && model !== 'kling-o1' && opts.duration !== undefined && ![5, 10].includes(opts.duration)) {
     throw new Error('This Kling model supports only 5- or 10-second generation');
   }
-  if (opts.model === 'kling-o1' && opts.duration !== undefined && opts.duration !== 5) {
+  if (model === 'kling-o1' && opts.duration !== undefined && opts.duration !== 5) {
     throw new Error('kling-o1 supports only 5-second generation');
   }
-  if (opts.model === 'kling-o1' && opts.mode !== undefined && !['std', 'pro'].includes(opts.mode)) {
+  if (model === 'kling-o1' && opts.mode !== undefined && !['std', 'pro'].includes(opts.mode)) {
     throw new Error('kling-o1 supports only std and pro modes');
   }
   if (opts.mode === '4k' && !isV3) {
     throw new Error('4k mode requires kling-v3 or kling-v3-omni');
   }
-  if (opts.action === 'extend' && !['kling-v1', 'kling-v1-6', 'kling-v2-5-turbo'].includes(opts.model)) {
+  if (opts.action === 'extend' && !['kling-v1', 'kling-v1-6', 'kling-v2-5-turbo'].includes(model)) {
     throw new Error('extend requires kling-v1, kling-v1-6, or kling-v2-5-turbo');
   }
   if (opts.action === 'extend' && hasReferences) {
     throw new Error('imageList and videoList are not supported with extend');
   }
-  if (hasReferences && opts.model !== 'kling-o1' && opts.model !== 'kling-v3-omni') {
+  if (hasReferences && model !== 'kling-o1' && model !== 'kling-v3-omni') {
     throw new Error('Omni references require kling-o1 or kling-v3-omni');
   }
   if (hasReferences && opts.mode === '4k') {
     throw new Error('4k cannot be combined with Omni references');
   }
-  if ((opts.model === 'kling-o1' || hasReferences) && (opts.negativePrompt !== undefined || opts.cameraControl !== undefined || opts.cfgScale !== undefined)) {
+  if ((model === 'kling-o1' || hasReferences) && (opts.negativePrompt !== undefined || opts.cameraControl !== undefined || opts.cfgScale !== undefined)) {
     throw new Error('Kling O1 and Omni references do not support negativePrompt, cameraControl, or cfgScale');
   }
-  if (opts.model === 'kling-o1' && opts.generateAudio) {
+  if (model === 'kling-o1' && opts.generateAudio) {
     throw new Error('kling-o1 does not support generateAudio');
   }
-  if (opts.generateAudio && !isV3 && opts.model !== 'kling-v2-6') {
+  if (opts.generateAudio && !isV3 && model !== 'kling-v2-6') {
     throw new Error('generateAudio requires a V3 model or kling-v2-6 pro mode');
   }
-  if (opts.generateAudio && opts.model === 'kling-v2-6' && opts.mode !== 'pro') {
+  if (opts.generateAudio && model === 'kling-v2-6' && opts.mode !== 'pro') {
     throw new Error('kling-v2-6 supports generateAudio only in pro mode');
   }
   if (opts.generateAudio && opts.videoList?.length) {
@@ -199,7 +204,7 @@ export class Kling {
     const {
       action,
       mode,
-      model,
+      model: modelOption,
       prompt,
       duration,
       generateAudio,
@@ -216,9 +221,9 @@ export class Kling {
       negativePrompt,
       startImageUrl,
     } = opts;
-    const body: Record<string, unknown> = { action };
+    const model = modelOption ?? 'kling-v1';
+    const body: Record<string, unknown> = { action, model };
     if (mode !== undefined) body.mode = mode;
-    if (model !== undefined) body.model = model;
     if (prompt !== undefined) body.prompt = prompt;
     if (duration !== undefined) body.duration = duration;
     if (generateAudio !== undefined) body.generate_audio = generateAudio;
@@ -246,7 +251,9 @@ export class Kling {
   }
 
   async motion(opts: {
+    modelName?: 'kling-v2-6' | 'kling-v3';
     mode: 'std' | 'pro';
+    watermarkInfo?: KlingWatermarkInfo;
     imageUrl: string;
     videoUrl: string;
     characterOrientation: 'image' | 'video';
@@ -255,8 +262,14 @@ export class Kling {
     callbackUrl?: string;
     async?: boolean;
   }): Promise<Record<string, unknown>> {
-    const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, prompt, callbackUrl } = opts;
+    const { modelName, mode, watermarkInfo, imageUrl, videoUrl, characterOrientation, keepOriginalSound, prompt, callbackUrl } = opts;
+    if (modelName !== undefined && !['kling-v2-6', 'kling-v3'].includes(modelName)) {
+      throw new Error('modelName must be kling-v2-6 or kling-v3');
+    }
     if (!['std', 'pro'].includes(mode)) throw new Error('mode must be std or pro');
+    if (watermarkInfo?.enabled !== undefined && typeof watermarkInfo.enabled !== 'boolean') {
+      throw new Error('watermarkInfo.enabled must be a boolean');
+    }
     if (!isHttpUrl(imageUrl)) throw new Error('imageUrl must be an HTTP URL');
     if (!isHttpUrl(videoUrl)) throw new Error('videoUrl must be an HTTP URL');
     if (!['image', 'video'].includes(characterOrientation)) {
@@ -272,6 +285,8 @@ export class Kling {
       video_url: videoUrl,
       character_orientation: characterOrientation,
     };
+    if (modelName !== undefined) body.model_name = modelName;
+    if (watermarkInfo !== undefined) body.watermark_info = watermarkInfo;
     if (keepOriginalSound !== undefined) body.keep_original_sound = keepOriginalSound;
     if (prompt !== undefined) body.prompt = prompt;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;

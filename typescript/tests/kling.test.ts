@@ -150,7 +150,9 @@ describe('Kling resource', () => {
     const kling = new Kling({ request } as any);
 
     await kling.motion({
+      modelName: 'kling-v3',
       mode: 'pro',
+      watermarkInfo: { enabled: true },
       imageUrl: 'https://example.com/subject.jpg',
       videoUrl: 'https://example.com/motion.mp4',
       characterOrientation: 'image',
@@ -161,13 +163,33 @@ describe('Kling resource', () => {
 
     expect(request).toHaveBeenCalledWith('POST', '/kling/motion', {
       json: {
+        model_name: 'kling-v3',
         mode: 'pro',
+        watermark_info: { enabled: true },
         image_url: 'https://example.com/subject.jpg',
         video_url: 'https://example.com/motion.mp4',
         character_orientation: 'image',
         keep_original_sound: 'yes',
         prompt: 'follow the motion',
         async: true,
+      },
+    });
+  });
+
+  it('defaults model to kling-v1 when omitted', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-kling-default' });
+    const kling = new Kling({ request } as any);
+
+    await kling.generate({
+      action: 'text2video',
+      prompt: 'default model',
+    });
+
+    expect(request).toHaveBeenCalledWith('POST', '/kling/videos', {
+      json: {
+        action: 'text2video',
+        model: 'kling-v1',
+        prompt: 'default model',
       },
     });
   });

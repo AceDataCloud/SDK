@@ -112,7 +112,9 @@ def test_sync_motion_uses_closed_serialization() -> None:
     client = Kling(transport)
 
     client.motion(
+        model_name="kling-v3",
         mode="pro",
+        watermark_info={"enabled": True},
         image_url="https://example.com/subject.jpg",
         video_url="https://example.com/motion.mp4",
         character_orientation="image",
@@ -126,7 +128,9 @@ def test_sync_motion_uses_closed_serialization() -> None:
             "POST",
             "/kling/motion",
             {
+                "model_name": "kling-v3",
                 "mode": "pro",
+                "watermark_info": {"enabled": True},
                 "image_url": "https://example.com/subject.jpg",
                 "video_url": "https://example.com/motion.mp4",
                 "character_orientation": "image",
@@ -152,6 +156,25 @@ async def test_async_motion_uses_same_validation() -> None:
         )
 
     assert transport.calls == []
+
+
+def test_generate_defaults_model_to_kling_v1() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.generate(action="text2video", prompt="default model")
+
+    assert transport.calls == [
+        (
+            "POST",
+            "/kling/videos",
+            {
+                "action": "text2video",
+                "model": "kling-v1",
+                "prompt": "default model",
+            },
+        )
+    ]
 
 
 def test_generate_rejects_invalid_contract_before_transport() -> None:
