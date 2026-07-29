@@ -266,6 +266,20 @@ def test_chat_count_tokens(client):
 
 
 @respx.mock
+def test_aichat_create_supports_latest_model_names(client):
+    route = respx.post("https://api.acedata.cloud/aichat/conversations").mock(
+        return_value=httpx.Response(200, json={"id": "chat-1", "answer": "Hello!"})
+    )
+
+    result = client.aichat.create(model="gpt-5.6-sol", question="Hi")
+    payload = json.loads(route.calls.last.request.content.decode("utf-8"))
+
+    assert route.called
+    assert payload["model"] == "gpt-5.6-sol"
+    assert result["id"] == "chat-1"
+
+
+@respx.mock
 def test_images_generate(client):
     mock_response = {
         "success": True,
