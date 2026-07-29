@@ -1,13 +1,18 @@
-"""AI Chat resources — aichat/conversations endpoint."""
+"""AI Chat resources — aichat and aichat2 conversation endpoints."""
 
 from __future__ import annotations
 
 from typing import Any, Literal
 
 AiChatModel = Literal[
+    "gpt-5.6-luna",
+    "gpt-5.6-terra",
+    "gpt-5.6-sol",
     "gpt-5.5",
     "gpt-5.5-pro",
     "gpt-5.4",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
     "gpt-5.4-pro",
     "gpt-5.2",
     "gpt-5.1",
@@ -77,12 +82,66 @@ AiChatModel = Literal[
     "deepseek-v3",
     "deepseek-v3-250324",
     "deepseek-v4-flash",
+    "grok-4.5",
     "grok-3",
+    "glm-5.2",
+    "glm-5",
+    "glm-5-turbo",
     "glm-5.1",
     "glm-4.7",
     "glm-4.6",
     "glm-3-turbo",
+    "gpt-5.2-pro",
+    "gpt-image-1",
+    "claude-3-5-haiku-20241022",
+    "claude-3-5-sonnet-20240620",
+    "claude-3-5-sonnet-20241022",
+    "claude-3-7-sonnet-20250219",
+    "claude-3-haiku-20240307",
+    "claude-3-opus-20240229",
+    "claude-3-sonnet-20240229",
+    "claude-haiku-4-5-20251001",
+    "claude-opus-4-1-20250805",
+    "claude-opus-4-20250514",
+    "claude-opus-4-5-20251101",
+    "claude-opus-4-6",
+    "claude-fable-5",
+    "claude-opus-5",
+    "claude-opus-4-8",
+    "claude-opus-4-7",
+    "claude-sonnet-4-20250514",
+    "claude-sonnet-4-5-20250929",
+    "claude-sonnet-4-6",
+    "claude-sonnet-5",
+    "gemini-2.0-flash-lite",
+    "gemini-2.5-flash-lite",
+    "gemini-3-pro-preview",
+    "gemini-3.1-flash-image-preview",
+    "gemini-3.1-flash-lite-preview",
+    "gemini-3.1-pro",
+    "gemini-3.1-pro-preview",
+    "grok-3-fast",
+    "grok-4",
+    "grok-4-0709",
+    "deepseek-chat",
+    "deepseek-reasoner",
+    "deepseek-v3.2-exp",
+    "kimi-k2-0711-preview",
+    "kimi-k2-0905-preview",
+    "kimi-k2-instruct-0905",
+    "kimi-k2-thinking",
+    "kimi-k2-thinking-turbo",
+    "kimi-k2-turbo-preview",
+    "kimi-k3",
+    "kimi-k2.6",
+    "kimi-k2.5",
+    "glm-4.5",
+    "glm-4.5v",
 ]
+
+AiChatAction = Literal["chat", "retrieve", "retrieve_batch", "update", "delete"]
+
+AiChatModelGroup = Literal["chatgpt", "claude", "gemini", "grok", "kimi", "glm", "deepseek"]
 
 
 class AiChat:
@@ -94,7 +153,7 @@ class AiChat:
     def create(
         self,
         *,
-        model: str,
+        model: AiChatModel,
         question: str,
         id: str | None = None,
         preset: str | None = None,
@@ -113,6 +172,78 @@ class AiChat:
             body["references"] = references
         return self._transport.request("POST", "/aichat/conversations", json=body)
 
+    def create_v2(
+        self,
+        *,
+        model: AiChatModel,
+        action: AiChatAction | None = None,
+        id: str | None = None,
+        question: str | None = None,
+        message: Any | None = None,
+        stateful: bool | None = None,
+        references: list[str] | None = None,
+        preset: str | None = None,
+        max_turns: int | None = None,
+        async_: bool | None = None,
+        callback_url: str | None = None,
+        allowed_skills: list[str] | None = None,
+        allowed_mcp_servers: list[str] | None = None,
+        unattended_policy: dict[str, Any] | None = None,
+        tool_results: list[dict[str, Any]] | None = None,
+        messages: list[dict[str, Any]] | None = None,
+        title: str | None = None,
+        user_id: str | None = None,
+        application_id: str | None = None,
+        model_group: AiChatModelGroup | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"model": model, **kwargs}
+        if action is not None:
+            body["action"] = action
+        if id is not None:
+            body["id"] = id
+        if question is not None:
+            body["question"] = question
+        if message is not None:
+            body["message"] = message
+        if stateful is not None:
+            body["stateful"] = stateful
+        if references is not None:
+            body["references"] = references
+        if preset is not None:
+            body["preset"] = preset
+        if max_turns is not None:
+            body["max_turns"] = max_turns
+        if async_ is not None:
+            body["async"] = async_
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        if allowed_skills is not None:
+            body["allowed_skills"] = allowed_skills
+        if allowed_mcp_servers is not None:
+            body["allowed_mcp_servers"] = allowed_mcp_servers
+        if unattended_policy is not None:
+            body["unattended_policy"] = unattended_policy
+        if tool_results is not None:
+            body["tool_results"] = tool_results
+        if messages is not None:
+            body["messages"] = messages
+        if title is not None:
+            body["title"] = title
+        if user_id is not None:
+            body["user_id"] = user_id
+        if application_id is not None:
+            body["application_id"] = application_id
+        if model_group is not None:
+            body["model_group"] = model_group
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        return self._transport.request("POST", "/aichat2/conversations", json=body)
+
 
 class AsyncAiChat:
     """Async AI chat client."""
@@ -123,7 +254,7 @@ class AsyncAiChat:
     async def create(
         self,
         *,
-        model: str,
+        model: AiChatModel,
         question: str,
         id: str | None = None,
         preset: str | None = None,
@@ -141,3 +272,75 @@ class AsyncAiChat:
         if references is not None:
             body["references"] = references
         return await self._transport.request("POST", "/aichat/conversations", json=body)
+
+    async def create_v2(
+        self,
+        *,
+        model: AiChatModel,
+        action: AiChatAction | None = None,
+        id: str | None = None,
+        question: str | None = None,
+        message: Any | None = None,
+        stateful: bool | None = None,
+        references: list[str] | None = None,
+        preset: str | None = None,
+        max_turns: int | None = None,
+        async_: bool | None = None,
+        callback_url: str | None = None,
+        allowed_skills: list[str] | None = None,
+        allowed_mcp_servers: list[str] | None = None,
+        unattended_policy: dict[str, Any] | None = None,
+        tool_results: list[dict[str, Any]] | None = None,
+        messages: list[dict[str, Any]] | None = None,
+        title: str | None = None,
+        user_id: str | None = None,
+        application_id: str | None = None,
+        model_group: AiChatModelGroup | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"model": model, **kwargs}
+        if action is not None:
+            body["action"] = action
+        if id is not None:
+            body["id"] = id
+        if question is not None:
+            body["question"] = question
+        if message is not None:
+            body["message"] = message
+        if stateful is not None:
+            body["stateful"] = stateful
+        if references is not None:
+            body["references"] = references
+        if preset is not None:
+            body["preset"] = preset
+        if max_turns is not None:
+            body["max_turns"] = max_turns
+        if async_ is not None:
+            body["async"] = async_
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        if allowed_skills is not None:
+            body["allowed_skills"] = allowed_skills
+        if allowed_mcp_servers is not None:
+            body["allowed_mcp_servers"] = allowed_mcp_servers
+        if unattended_policy is not None:
+            body["unattended_policy"] = unattended_policy
+        if tool_results is not None:
+            body["tool_results"] = tool_results
+        if messages is not None:
+            body["messages"] = messages
+        if title is not None:
+            body["title"] = title
+        if user_id is not None:
+            body["user_id"] = user_id
+        if application_id is not None:
+            body["application_id"] = application_id
+        if model_group is not None:
+            body["model_group"] = model_group
+        if offset is not None:
+            body["offset"] = offset
+        if limit is not None:
+            body["limit"] = limit
+        return await self._transport.request("POST", "/aichat2/conversations", json=body)
