@@ -21,7 +21,7 @@ type SeedanceGenerateRequest struct {
 	Seed int
 	// Aspect ratio of the generated video
 	Ratio string
-	// The frame count for generating a video must meet 25 + 4n (such as 29, 33, 37... 361). Either duration or frame
+	// The frame count for generating a video must meet 25 + 4n (such as 29, 33, 37... 289). Either duration or frame
 	Frames int
 	// The duration of the generated video, in seconds. Either duration or frames can be specified; if both are speci
 	Duration int
