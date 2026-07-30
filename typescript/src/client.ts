@@ -17,6 +17,7 @@ import { Veo } from './resources/veo';
 import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
+import { Midjourney } from './resources/providers/midjourney';
 import { ShortUrl } from './resources/shorturl';
 import { attachProviders } from './resources/providers';
 
@@ -49,6 +50,7 @@ export class AceDataCloud {
   readonly glm: Glm;
   readonly veo: Veo;
   readonly kling: Kling;
+  readonly midjourney: Midjourney;
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
@@ -75,10 +77,11 @@ export class AceDataCloud {
     this.tasks = new Tasks(this.transport);
     this.files = new Files(this.transport);
     this.platform = new Platform(this.transport);
-    this.openai = new OpenAI(this.transport);
+    this.openai = new OpenAI(this.transport, opts.baseURL);
     this.glm = new Glm(this.transport);
     this.veo = new Veo(this.transport);
     this.kling = new Kling(this.transport);
+    this.midjourney = new Midjourney(this.transport);
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);

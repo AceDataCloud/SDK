@@ -154,7 +154,9 @@ describe('Kling resource', () => {
       imageUrl: 'https://example.com/subject.jpg',
       videoUrl: 'https://example.com/motion.mp4',
       characterOrientation: 'image',
+      modelName: 'kling-v3',
       keepOriginalSound: 'yes',
+      watermarkInfo: { text: 'AceDataCloud' },
       prompt: 'follow the motion',
       async: true,
     });
@@ -165,7 +167,9 @@ describe('Kling resource', () => {
         image_url: 'https://example.com/subject.jpg',
         video_url: 'https://example.com/motion.mp4',
         character_orientation: 'image',
+        model_name: 'kling-v3',
         keep_original_sound: 'yes',
+        watermark_info: { text: 'AceDataCloud' },
         prompt: 'follow the motion',
         async: true,
       },
@@ -193,6 +197,60 @@ describe('Kling resource', () => {
       })
     ).rejects.toThrow('callbackUrl must be an HTTP URL');
     expect(request).not.toHaveBeenCalled();
+  });
+
+  it('serializes lip sync and talking photo requests', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-kling' });
+    const kling = new Kling({ request } as any);
+
+    await kling.lipSync({
+      mode: 'audio2video',
+      videoUrl: 'https://example.com/video.mp4',
+      audioUrl: 'https://example.com/audio.mp3',
+      audioType: 'url',
+      async: true,
+    });
+    await kling.talkingPhoto({
+      imageUrl: 'https://example.com/photo.jpg',
+      audioUrl: 'https://example.com/audio.mp3',
+      model: 'kling-v2-6',
+      duration: 10,
+      mode: 'pro',
+    });
+
+    expect(request).toHaveBeenNthCalledWith(1, 'POST', '/kling/lip-sync', {
+      json: {
+        mode: 'audio2video',
+        video_url: 'https://example.com/video.mp4',
+        audio_url: 'https://example.com/audio.mp3',
+        audio_type: 'url',
+        async: true,
+      },
+    });
+    expect(request).toHaveBeenNthCalledWith(2, 'POST', '/kling/talking-photo', {
+      json: {
+        image_url: 'https://example.com/photo.jpg',
+        audio_url: 'https://example.com/audio.mp3',
+        model: 'kling-v2-6',
+        duration: 10,
+        mode: 'pro',
+      },
+    });
+  });
+
+  it('rejects invalid lip sync and talking photo contracts', async () => {
+    const kling = new Kling({ request: jest.fn() } as any);
+
+    await expect(kling.lipSync({ mode: 'audio2video' })).rejects.toThrow('videoId or videoUrl is required');
+    await expect(
+      kling.lipSync({ mode: 'text2video', videoUrl: 'https://example.com/video.mp4' })
+    ).rejects.toThrow('text is required for text2video');
+    await expect(
+      kling.talkingPhoto({
+        imageUrl: 'https://example.com/photo.jpg',
+        audioUrl: 'file:///tmp/audio.mp3',
+      })
+    ).rejects.toThrow('audioUrl must be an HTTP URL');
   });
 
   it('rejects invalid reference enums and audio with video before transport', async () => {

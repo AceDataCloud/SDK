@@ -25,6 +25,7 @@ GENERATED = (
     "luma",
     "happyhorse",
     "maestro",
+    "midjourney",
     "digitalhuman",
     "dreamina",
     "localization",

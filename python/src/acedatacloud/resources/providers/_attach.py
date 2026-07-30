@@ -18,6 +18,7 @@ from .happyhorse import AsyncHappyhorse, Happyhorse
 from .localization import AsyncLocalization, Localization
 from .luma import AsyncLuma, Luma
 from .maestro import AsyncMaestro, Maestro
+from .midjourney import AsyncMidjourney, Midjourney
 from .nano_banana import AsyncNanoBanana, NanoBanana
 from .producer import AsyncProducer, Producer
 from .seedance import AsyncSeedance, Seedance
@@ -38,6 +39,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.localization = AsyncLocalization(transport)
         client.luma = AsyncLuma(transport)
         client.maestro = AsyncMaestro(transport)
+        client.midjourney = AsyncMidjourney(transport)
         client.nano_banana = AsyncNanoBanana(transport)
         client.producer = AsyncProducer(transport)
         client.seedance = AsyncSeedance(transport)
@@ -54,6 +56,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.localization = Localization(transport)
         client.luma = Luma(transport)
         client.maestro = Maestro(transport)
+        client.midjourney = Midjourney(transport)
         client.nano_banana = NanoBanana(transport)
         client.producer = Producer(transport)
         client.seedance = Seedance(transport)

@@ -164,6 +164,52 @@ class Embeddings {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class AudioSpeech {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { input, responseFormat, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class AudioNamespace {
+  readonly speech: AudioSpeech['speech'];
+  constructor(transport: Transport) {
+    const audioSpeech = new AudioSpeech(transport);
+    this.speech = audioSpeech.speech.bind(audioSpeech);
+  }
+}
+
+class Realtime {
+  constructor(private baseURL: string) {}
+
+  url(opts: { model: string }): string {
+    const httpURL = new URL(this.baseURL);
+    httpURL.protocol = httpURL.protocol === 'https:' ? 'wss:' : 'ws:';
+    httpURL.pathname = '/v1/realtime';
+    httpURL.search = new URLSearchParams({ model: opts.model }).toString();
+    return httpURL.toString();
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -211,13 +257,19 @@ export class OpenAI {
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly models: Models;
+  readonly audio: AudioNamespace;
+  readonly realtime: Realtime;
   readonly tasks: Tasks;
 
-  constructor(transport: Transport) {
+  constructor(transport: Transport, baseURL?: string) {
     this.chat = new ChatNamespace(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.models = new Models(transport);
+    this.audio = new AudioNamespace(transport);
+    this.realtime = new Realtime(baseURL ?? (transport as any).baseURL ?? 'https://x402.acedata.cloud');
     this.tasks = new Tasks(transport);
   }
 }

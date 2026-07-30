@@ -84,6 +84,18 @@ export interface FishModelOptions {
   [key: string]: unknown;
 }
 
+export interface FishListModelsOptions {
+  pageSize?: number;
+  pageNumber?: number;
+  title?: string;
+  tag?: string;
+  selfOnly?: boolean;
+  authorId?: string;
+  language?: string;
+  titleLanguage?: string;
+  sortBy?: string;
+}
+
 /** fish client. */
 export class Fish {
   constructor(private transport: Transport) {}
@@ -141,6 +153,26 @@ export class Fish {
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
     return (await this.transport.request('POST', "/fish/model", { json: body })) as Record<string, unknown>;
+  }
+
+  async listModels(options: FishListModelsOptions = {}): Promise<Record<string, unknown>> {
+    const params: Record<string, string> = {};
+    if (options.pageSize !== undefined) params.page_size = String(options.pageSize);
+    if (options.pageNumber !== undefined) params.page_number = String(options.pageNumber);
+    if (options.title !== undefined) params.title = options.title;
+    if (options.tag !== undefined) params.tag = options.tag;
+    if (options.selfOnly !== undefined) params.self = String(options.selfOnly);
+    if (options.authorId !== undefined) params.author_id = options.authorId;
+    if (options.language !== undefined) params.language = options.language;
+    if (options.titleLanguage !== undefined) params.title_language = options.titleLanguage;
+    if (options.sortBy !== undefined) params.sort_by = options.sortBy;
+    return (await this.transport.request('GET', "/fish/model", {
+      params: Object.keys(params).length ? params : undefined,
+    })) as Record<string, unknown>;
+  }
+
+  async getModel(modelId: string): Promise<Record<string, unknown>> {
+    return (await this.transport.request('GET', `/fish/model/${modelId}`)) as Record<string, unknown>;
   }
 
 }
