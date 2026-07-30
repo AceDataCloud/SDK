@@ -84,6 +84,18 @@ export interface FishModelOptions {
   [key: string]: unknown;
 }
 
+export interface FishListModelsOptions {
+  pageSize?: number;
+  pageNumber?: number;
+  title?: string;
+  tag?: string;
+  self?: boolean;
+  authorId?: string;
+  language?: string;
+  titleLanguage?: string;
+  sortBy?: string;
+}
+
 /** fish client. */
 export class Fish {
   constructor(private transport: Transport) {}
@@ -120,6 +132,26 @@ export class Fish {
       await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });
     }
     return handle;
+  }
+
+  /** Fish Model Query */
+  async listModels(options: FishListModelsOptions = {}): Promise<Record<string, unknown>> {
+    const params: Record<string, string> = {};
+    if (options.pageSize !== undefined) params.page_size = String(options.pageSize);
+    if (options.pageNumber !== undefined) params.page_number = String(options.pageNumber);
+    if (options.title !== undefined) params.title = options.title;
+    if (options.tag !== undefined) params.tag = options.tag;
+    if (options.self !== undefined) params.self = String(options.self);
+    if (options.authorId !== undefined) params.author_id = options.authorId;
+    if (options.language !== undefined) params.language = options.language;
+    if (options.titleLanguage !== undefined) params.title_language = options.titleLanguage;
+    if (options.sortBy !== undefined) params.sort_by = options.sortBy;
+    return (await this.transport.request('GET', '/fish/model', { params })) as Record<string, unknown>;
+  }
+
+  /** Fish Model Get */
+  async getModel(id: string): Promise<Record<string, unknown>> {
+    return (await this.transport.request('GET', `/fish/model/${id}`)) as Record<string, unknown>;
   }
 
   /** Fish Audio model creation API — upload reference audio to create a custom voice-clone model. */

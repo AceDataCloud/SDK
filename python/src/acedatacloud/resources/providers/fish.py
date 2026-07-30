@@ -98,6 +98,45 @@ class Fish:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
+    def list_models(
+        self,
+        *,
+        page_size: int | None = None,
+        page_number: int | None = None,
+        title: str | None = None,
+        tag: str | None = None,
+        self_: bool | None = None,
+        author_id: str | None = None,
+        language: str | None = None,
+        title_language: str | None = None,
+        sort_by: str | None = None,
+    ) -> dict[str, Any]:
+        """Fish Model Query"""
+        params: dict[str, Any] = {}
+        if page_size is not None:
+            params["page_size"] = page_size
+        if page_number is not None:
+            params["page_number"] = page_number
+        if title is not None:
+            params["title"] = title
+        if tag is not None:
+            params["tag"] = tag
+        if self_ is not None:
+            params["self"] = self_
+        if author_id is not None:
+            params["author_id"] = author_id
+        if language is not None:
+            params["language"] = language
+        if title_language is not None:
+            params["title_language"] = title_language
+        if sort_by is not None:
+            params["sort_by"] = sort_by
+        return self._transport.request("GET", "/fish/model", params=params)
+
+    def get_model(self, model_id: str) -> dict[str, Any]:
+        """Fish Model Get"""
+        return self._transport.request("GET", f"/fish/model/{model_id}")
+
     def model(
         self,
         *,
@@ -210,6 +249,45 @@ class AsyncFish:
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
+
+    async def list_models(
+        self,
+        *,
+        page_size: int | None = None,
+        page_number: int | None = None,
+        title: str | None = None,
+        tag: str | None = None,
+        self_: bool | None = None,
+        author_id: str | None = None,
+        language: str | None = None,
+        title_language: str | None = None,
+        sort_by: str | None = None,
+    ) -> dict[str, Any]:
+        """Fish Model Query"""
+        params: dict[str, Any] = {}
+        if page_size is not None:
+            params["page_size"] = page_size
+        if page_number is not None:
+            params["page_number"] = page_number
+        if title is not None:
+            params["title"] = title
+        if tag is not None:
+            params["tag"] = tag
+        if self_ is not None:
+            params["self"] = self_
+        if author_id is not None:
+            params["author_id"] = author_id
+        if language is not None:
+            params["language"] = language
+        if title_language is not None:
+            params["title_language"] = title_language
+        if sort_by is not None:
+            params["sort_by"] = sort_by
+        return await self._transport.request("GET", "/fish/model", params=params)
+
+    async def get_model(self, model_id: str) -> dict[str, Any]:
+        """Fish Model Get"""
+        return await self._transport.request("GET", f"/fish/model/{model_id}")
 
     async def model(
         self,

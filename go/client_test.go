@@ -307,6 +307,7 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 			_, _ = w.Write([]byte(`{"task_id":"img-1"}`))
 			return
 		}
+
 		if r.URL.Path == "/nano-banana/tasks" {
 			_, _ = w.Write([]byte(`{"response":{"status":"succeeded","url":"https://cdn/x.png"}}`))
 			return
@@ -333,6 +334,47 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 	resp := res["response"].(map[string]any)
 	if resp["url"] != "https://cdn/x.png" {
 		t.Fatalf("bad url: %+v", resp)
+	}
+}
+
+func TestFish_ListModelsAndGetModel(t *testing.T) {
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		w.Header().Set("Content-Type", "application/json")
+		if calls == 1 {
+			if r.Method != http.MethodGet || r.URL.Path != "/fish/model" {
+				t.Fatalf("unexpected list request %s %s", r.Method, r.URL.Path)
+			}
+			q := r.URL.Query()
+			if q.Get("page_size") != "10" || q.Get("page_number") != "2" || q.Get("self") != "true" {
+				t.Fatalf("unexpected query %v", q)
+			}
+			_, _ = w.Write([]byte(`{"data":[]}`))
+			return
+		}
+		if calls == 2 {
+			if r.Method != http.MethodGet || r.URL.Path != "/fish/model/voice-1" {
+				t.Fatalf("unexpected get request %s %s", r.Method, r.URL.Path)
+			}
+			_, _ = w.Write([]byte(`{"id":"voice-1"}`))
+			return
+		}
+		t.Fatalf("unexpected call #%d", calls)
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	selfOnly := true
+	if _, err := c.Fish().ListModels(context.Background(), FishListModelsRequest{
+		PageSize:   10,
+		PageNumber: 2,
+		Self:       &selfOnly,
+	}); err != nil {
+		t.Fatalf("ListModels: %v", err)
+	}
+	if _, err := c.Fish().GetModel(context.Background(), "voice-1"); err != nil {
+		t.Fatalf("GetModel: %v", err)
 	}
 }
 

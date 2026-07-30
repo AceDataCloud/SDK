@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import inspect
 import typing
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
@@ -140,6 +140,42 @@ def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
     for method in ("generate", "lyrics", "wav", "mp4"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_fish_model_read_endpoints_match_docs(client):
+    transport = Mock()
+    transport.request.return_value = {"data": []}
+    client.fish._transport = transport
+
+    client.fish.list_models(page_size=10, page_number=2, self_=True)
+    client.fish.get_model("voice-1")
+
+    assert transport.request.call_args_list[0].args == ("GET", "/fish/model")
+    assert transport.request.call_args_list[0].kwargs["params"] == {
+        "page_size": 10,
+        "page_number": 2,
+        "self": True,
+    }
+    assert transport.request.call_args_list[1].args == ("GET", "/fish/model/voice-1")
+
+
+@pytest.mark.asyncio
+async def test_async_fish_model_read_endpoints_match_docs():
+    client = AsyncAceDataCloud(api_token="t")
+    transport = Mock()
+    transport.request = AsyncMock(return_value={"data": []})
+    client.fish._transport = transport
+
+    await client.fish.list_models(page_size=10, page_number=2, self_=True)
+    await client.fish.get_model("voice-1")
+
+    assert transport.request.call_args_list[0].args == ("GET", "/fish/model")
+    assert transport.request.call_args_list[0].kwargs["params"] == {
+        "page_size": 10,
+        "page_number": 2,
+        "self": True,
+    }
+    assert transport.request.call_args_list[1].args == ("GET", "/fish/model/voice-1")
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):

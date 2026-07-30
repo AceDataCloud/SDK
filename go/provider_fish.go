@@ -4,7 +4,8 @@
 package acedatacloud
 
 import "context"
-
+import "net/url"
+import "strconv"
 
 // Fish is the fish provider client.
 type Fish struct {
@@ -129,6 +130,77 @@ func (c *Fish) Generate(ctx context.Context, req FishGenerateRequest) (*TaskHand
 	return newTaskHandle(taskIDFrom(result), "/fish/tasks", c.t, result), nil
 }
 
+// FishListModelsRequest is the input to fish.ListModels.
+type FishListModelsRequest struct {
+	// Number of items per page.
+	PageSize int
+	// Current page number.
+	PageNumber int
+	// Fuzzy search by title.
+	Title string
+	// Filter by tag.
+	Tag string
+	// Whether to query only self-created records.
+	Self *bool
+	// Filter by author ID.
+	AuthorID string
+	// Language code.
+	Language string
+	// Filter by title language.
+	TitleLanguage string
+	// Sort rule.
+	SortBy string
+}
+
+func (r FishListModelsRequest) toQuery() url.Values {
+	q := url.Values{}
+	if r.PageSize != 0 {
+		q.Set("page_size", strconv.Itoa(r.PageSize))
+	}
+	if r.PageNumber != 0 {
+		q.Set("page_number", strconv.Itoa(r.PageNumber))
+	}
+	if r.Title != "" {
+		q.Set("title", r.Title)
+	}
+	if r.Tag != "" {
+		q.Set("tag", r.Tag)
+	}
+	if r.Self != nil {
+		q.Set("self", strconv.FormatBool(*r.Self))
+	}
+	if r.AuthorID != "" {
+		q.Set("author_id", r.AuthorID)
+	}
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+	if r.TitleLanguage != "" {
+		q.Set("title_language", r.TitleLanguage)
+	}
+	if r.SortBy != "" {
+		q.Set("sort_by", r.SortBy)
+	}
+	return q
+}
+
+// ListModels Fish Model Query
+func (c *Fish) ListModels(ctx context.Context, req FishListModelsRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/fish/model",
+		Query:  req.toQuery(),
+	})
+}
+
+// GetModel Fish Model Get
+func (c *Fish) GetModel(ctx context.Context, id string) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/fish/model/" + id,
+	})
+}
+
 // FishModelRequest is the input to fish.Model.
 type FishModelRequest struct {
 	// Name of the voice model.
@@ -147,7 +219,7 @@ type FishModelRequest struct {
 	Description string
 	// If it is `true`, the upstream service will generate a sample voice after the training is completed.
 	GenerateSample bool
-	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before 
+	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before
 	EnhanceAudioQuality bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
