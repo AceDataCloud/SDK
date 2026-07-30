@@ -18,6 +18,7 @@ import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
 import { ShortUrl } from './resources/shorturl';
+import { Captcha } from './resources/captcha';
 import { attachProviders } from './resources/providers';
 
 export interface AceDataCloudOptions {
@@ -52,6 +53,7 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  readonly captcha: Captcha;
 
   private transport: Transport;
 
@@ -82,6 +84,7 @@ export class AceDataCloud {
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);
+    this.captcha = new Captcha(this.transport);
     // Provider axis: one namespace per service, generated from the specs.
     attachProviders(this as unknown as Record<string, unknown>, this.transport);
   }

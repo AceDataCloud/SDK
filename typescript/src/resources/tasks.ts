@@ -20,6 +20,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   pika: '/pika/tasks',
   pixverse: '/pixverse/tasks',
   webextrator: '/webextrator/tasks',
+  captcha: '/captcha/tasks',
 };
 
 export class Tasks {
