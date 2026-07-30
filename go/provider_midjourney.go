@@ -18,13 +18,13 @@ type MidjourneyImagineRequest struct {
 	Prompt         string
 	Timeout        float64
 	ImageID        string
-	Translation    bool
-	SplitImages    bool
+	Translation    *bool
+	SplitImages    *bool
 	Version        string
-	HD             bool
+	HD             *bool
 	Quality        string
-	StyleReference bool
-	Moodboard      bool
+	StyleReference *bool
+	Moodboard      *bool
 	Async          *bool
 	CallbackURL    string
 	Extra          map[string]any
@@ -50,26 +50,26 @@ func (r MidjourneyImagineRequest) toBody() map[string]any {
 	if r.ImageID != "" {
 		body["image_id"] = r.ImageID
 	}
-	if r.Translation {
-		body["translation"] = r.Translation
+	if r.Translation != nil {
+		body["translation"] = *r.Translation
 	}
-	if r.SplitImages {
-		body["split_images"] = r.SplitImages
+	if r.SplitImages != nil {
+		body["split_images"] = *r.SplitImages
 	}
 	if r.Version != "" {
 		body["version"] = r.Version
 	}
-	if r.HD {
-		body["hd"] = r.HD
+	if r.HD != nil {
+		body["hd"] = *r.HD
 	}
 	if r.Quality != "" {
 		body["quality"] = r.Quality
 	}
-	if r.StyleReference {
-		body["style_reference"] = r.StyleReference
+	if r.StyleReference != nil {
+		body["style_reference"] = *r.StyleReference
 	}
-	if r.Moodboard {
-		body["moodboard"] = r.Moodboard
+	if r.Moodboard != nil {
+		body["moodboard"] = *r.Moodboard
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -86,8 +86,13 @@ func (r MidjourneyImagineRequest) toBody() map[string]any {
 	return body
 }
 
+// Imagine calls /midjourney/imagine.
 func (c *Midjourney) Imagine(ctx context.Context, req MidjourneyImagineRequest) (*TaskHandle, error) {
-	result, err := c.t.do(ctx, requestOpts{Method: "POST", Path: "/midjourney/imagine", Body: req.toBody()})
+	result, err := c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/midjourney/imagine",
+		Body:   req.toBody(),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +119,13 @@ func (r MidjourneySeedRequest) toBody() map[string]any {
 	return body
 }
 
+// Seed calls /midjourney/seed.
 func (c *Midjourney) Seed(ctx context.Context, req MidjourneySeedRequest) (map[string]any, error) {
-	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/midjourney/seed", Body: req.toBody()})
+	return c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/midjourney/seed",
+		Body:   req.toBody(),
+	})
 }
 
 // MidjourneyEditsRequest is the input to midjourney.Edits.
@@ -125,7 +135,7 @@ type MidjourneyEditsRequest struct {
 	Action      string
 	Prompt      string
 	ImageURL    string
-	SplitImages bool
+	SplitImages *bool
 	Async       *bool
 	CallbackURL string
 	Extra       map[string]any
@@ -148,8 +158,8 @@ func (r MidjourneyEditsRequest) toBody() map[string]any {
 	if r.ImageURL != "" {
 		body["image_url"] = r.ImageURL
 	}
-	if r.SplitImages {
-		body["split_images"] = r.SplitImages
+	if r.SplitImages != nil {
+		body["split_images"] = *r.SplitImages
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -166,8 +176,13 @@ func (r MidjourneyEditsRequest) toBody() map[string]any {
 	return body
 }
 
+// Edits calls /midjourney/edits.
 func (c *Midjourney) Edits(ctx context.Context, req MidjourneyEditsRequest) (*TaskHandle, error) {
-	result, err := c.t.do(ctx, requestOpts{Method: "POST", Path: "/midjourney/edits", Body: req.toBody()})
+	result, err := c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/midjourney/edits",
+		Body:   req.toBody(),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +197,7 @@ type MidjourneyVideosRequest struct {
 	Prompt      string
 	VideoID     string
 	VideoIndex  float64
-	Loop        bool
+	Loop        *bool
 	ImageURL    string
 	EndImageURL string
 	Async       *bool
@@ -210,8 +225,8 @@ func (r MidjourneyVideosRequest) toBody() map[string]any {
 	if r.VideoIndex != 0 {
 		body["video_index"] = r.VideoIndex
 	}
-	if r.Loop {
-		body["loop"] = r.Loop
+	if r.Loop != nil {
+		body["loop"] = *r.Loop
 	}
 	if r.ImageURL != "" {
 		body["image_url"] = r.ImageURL
@@ -234,8 +249,13 @@ func (r MidjourneyVideosRequest) toBody() map[string]any {
 	return body
 }
 
+// Videos calls /midjourney/videos.
 func (c *Midjourney) Videos(ctx context.Context, req MidjourneyVideosRequest) (*TaskHandle, error) {
-	result, err := c.t.do(ctx, requestOpts{Method: "POST", Path: "/midjourney/videos", Body: req.toBody()})
+	result, err := c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/midjourney/videos",
+		Body:   req.toBody(),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -262,8 +282,13 @@ func (r MidjourneyDescribeRequest) toBody() map[string]any {
 	return body
 }
 
+// Describe calls /midjourney/describe.
 func (c *Midjourney) Describe(ctx context.Context, req MidjourneyDescribeRequest) (map[string]any, error) {
-	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/midjourney/describe", Body: req.toBody()})
+	return c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/midjourney/describe",
+		Body:   req.toBody(),
+	})
 }
 
 // MidjourneyShortenRequest is the input to midjourney.Shorten.
@@ -286,8 +311,13 @@ func (r MidjourneyShortenRequest) toBody() map[string]any {
 	return body
 }
 
+// Shorten calls /midjourney/shorten.
 func (c *Midjourney) Shorten(ctx context.Context, req MidjourneyShortenRequest) (map[string]any, error) {
-	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/midjourney/shorten", Body: req.toBody()})
+	return c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/midjourney/shorten",
+		Body:   req.toBody(),
+	})
 }
 
 // MidjourneyTranslateRequest is the input to midjourney.Translate.
@@ -310,6 +340,11 @@ func (r MidjourneyTranslateRequest) toBody() map[string]any {
 	return body
 }
 
+// Translate calls /midjourney/translate.
 func (c *Midjourney) Translate(ctx context.Context, req MidjourneyTranslateRequest) (map[string]any, error) {
-	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/midjourney/translate", Body: req.toBody()})
+	return c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/midjourney/translate",
+		Body:   req.toBody(),
+	})
 }

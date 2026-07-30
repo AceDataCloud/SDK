@@ -16,6 +16,7 @@ var serviceTaskEndpoints = map[string]string{
 	"luma":        "/luma/tasks",
 	"veo":         "/veo/tasks",
 	"flux":        "/flux/tasks",
+	"midjourney":  "/midjourney/tasks",
 	"kling":       "/kling/tasks",
 	"hailuo":      "/hailuo/tasks",
 	"wan":         "/wan/tasks",

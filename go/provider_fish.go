@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Fish is the fish provider client.
 type Fish struct {
 	t *transport
@@ -145,7 +144,7 @@ type FishModelRequest struct {
 	Description string
 	// If it is `true`, the upstream service will generate a sample voice after the training is completed.
 	GenerateSample bool
-	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before 
+	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before
 	EnhanceAudioQuality bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
