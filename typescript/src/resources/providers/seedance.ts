@@ -25,7 +25,7 @@ export interface SeedanceGenerateOptions {
   seed?: number;
   /** Aspect ratio of the generated video */
   ratio?: "16:9" | "4:3" | "1:1" | "3:4" | "9:16" | "21:9" | "adaptive";
-  /** The frame count for generating a video must meet 25 + 4n (such as 29, 33, 37... 361). Either duration or frames can be specified; if both are specified, frames take priority over duration. */
+  /** The frame count for generating a video must meet 25 + 4n (such as 29, 33, 37... 289). Either duration or frames can be specified; if both are specified, frames take priority over duration. */
   frames?: number;
   /** The duration of the generated video, in seconds. Either duration or frames can be specified; if both are specified, frames take priority over duration. The duration range varies for each model: Seedance 2.0 series is 4 to 15 seconds or -1, Seedance 1.5 Pro is 4 to 12 seconds or -1, and Seedance 1.0 series is 2 to 12 seconds. -1 indicates automatic duration. */
   duration?: number;
