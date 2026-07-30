@@ -35,8 +35,6 @@ type FishGenerateRequest struct {
 	Temperature float64
 	// The chunk length passed to the upstream synthesizer.
 	ChunkLength int
-	// Opus bitrate when `format=opus`.
-	OpusBitrate int
 	// Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios.
 	ReferenceID string
 	// Maximum number of new tokens generated.
@@ -84,9 +82,6 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	if r.ChunkLength != 0 {
 		body["chunk_length"] = r.ChunkLength
 	}
-	if r.OpusBitrate != 0 {
-		body["opus_bitrate"] = r.OpusBitrate
-	}
 	if r.ReferenceID != "" {
 		body["reference_id"] = r.ReferenceID
 	} else {
@@ -109,6 +104,9 @@ func (r FishGenerateRequest) toBody() map[string]any {
 		body["callback_url"] = r.CallbackURL
 	}
 	for k, v := range r.Extra {
+		if k == "opus_bitrate" || k == "opusBitrate" {
+			continue
+		}
 		if _, exists := body[k]; !exists {
 			body[k] = v
 		}

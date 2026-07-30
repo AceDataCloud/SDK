@@ -35,7 +35,7 @@ class Fish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
@@ -44,7 +44,6 @@ class Fish:
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -79,8 +78,6 @@ class Fish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
@@ -88,6 +85,8 @@ class Fish:
             body["min_chunk_length"] = min_chunk_length
         if repetition_penalty is not None:
             body["repetition_penalty"] = repetition_penalty
+        extra.pop("opus_bitrate", None)
+        extra.pop("opusBitrate", None)
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -185,7 +184,7 @@ class AsyncFish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
@@ -194,7 +193,6 @@ class AsyncFish:
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -229,8 +227,6 @@ class AsyncFish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
@@ -238,6 +234,8 @@ class AsyncFish:
             body["min_chunk_length"] = min_chunk_length
         if repetition_penalty is not None:
             body["repetition_penalty"] = repetition_penalty
+        extra.pop("opus_bitrate", None)
+        extra.pop("opusBitrate", None)
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

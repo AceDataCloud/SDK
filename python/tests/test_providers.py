@@ -120,6 +120,25 @@ def test_model_enum_is_typed(client):
     assert "flux-dev" in typing.get_args(literal)
 
 
+def test_fish_format_enum_matches_current_spec(client):
+    hints = typing.get_type_hints(type(client.fish).generate)
+    fmt = hints["format"]
+    args = typing.get_args(fmt)
+    literal = next((a for a in args if typing.get_origin(a) is typing.Literal), None)
+    assert literal is not None, "format should be a Literal of the spec's enum"
+    assert set(typing.get_args(literal)) == {"mp3", "wav", "pcm"}
+
+
+def test_fish_generate_ignores_removed_opus_bitrate(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.fish._transport = transport
+
+    client.fish.generate(text="hello", opus_bitrate=64)
+    body = transport.request.call_args.kwargs["json"]
+    assert "opus_bitrate" not in body
+
+
 def test_extra_parameters_pass_through(client):
     """A parameter added upstream must be reachable before the SDK is regenerated."""
     transport = Mock()

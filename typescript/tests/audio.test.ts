@@ -1,4 +1,5 @@
 import { Audio } from '../src/resources/audio';
+import { Fish } from '../src/resources/providers/fish';
 
 describe('Audio resource', () => {
   it('uses fish tts endpoint with text body and model header', async () => {
@@ -54,5 +55,22 @@ describe('Audio resource', () => {
       },
     });
     expect(request).toHaveBeenNthCalledWith(2, 'GET', '/fish/model/voice-1');
+  });
+
+  it('ignores removed fish opus bitrate fields', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-fish' });
+    const fish = new Fish({ request } as any);
+
+    await fish.generate({ text: 'hello', format: 'pcm', opusBitrate: 64, opus_bitrate: 64 } as any);
+
+    const body = request.mock.calls[0][2].json;
+    expect(body).toMatchObject({
+      text: 'hello',
+      format: 'pcm',
+      reference_id: 'd7900c21663f485ab63ebdb7e5905036',
+      async: true,
+    });
+    expect(body).not.toHaveProperty('opus_bitrate');
+    expect(body).not.toHaveProperty('opusBitrate');
   });
 });
