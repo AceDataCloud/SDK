@@ -6,7 +6,6 @@ from typing import Any, Literal
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-
 MidjourneyMode = Literal["fast", "relax", "turbo"]
 MidjourneyVideoAction = Literal["generate", "extend"]
 MidjourneyVideoMode = Literal["fast", "turbo"]

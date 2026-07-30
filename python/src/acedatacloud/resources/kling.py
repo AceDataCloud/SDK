@@ -29,6 +29,14 @@ KlingModel = Literal[
 ]
 KlingAction = Literal["text2video", "image2video", "extend"]
 KlingMode = Literal["std", "pro", "4k"]
+KlingTalkingPhotoModel = Literal[
+    "kling-v1",
+    "kling-v1-6",
+    "kling-v2-master",
+    "kling-v2-1-master",
+    "kling-v2-5-turbo",
+    "kling-v2-6",
+]
 
 
 class KlingCameraConfig(TypedDict, total=False):
@@ -315,8 +323,7 @@ def _build_talking_photo_body(
     image_url: str,
     audio_url: str,
     prompt: str | None,
-    model: Literal["kling-v1", "kling-v1-6", "kling-v2-master", "kling-v2-1-master", "kling-v2-5-turbo", "kling-v2-6"]
-    | None,
+    model: KlingTalkingPhotoModel | None,
     duration: Literal[5, 10] | None,
     mode: Literal["std", "pro"] | None,
     callback_url: str | None,
@@ -471,8 +478,7 @@ class Kling:
         image_url: str,
         audio_url: str,
         prompt: str | None = None,
-        model: Literal["kling-v1", "kling-v1-6", "kling-v2-master", "kling-v2-1-master", "kling-v2-5-turbo", "kling-v2-6"]
-        | None = None,
+        model: KlingTalkingPhotoModel | None = None,
         duration: Literal[5, 10] | None = None,
         mode: Literal["std", "pro"] | None = None,
         callback_url: str | None = None,
@@ -607,8 +613,7 @@ class AsyncKling:
         image_url: str,
         audio_url: str,
         prompt: str | None = None,
-        model: Literal["kling-v1", "kling-v1-6", "kling-v2-master", "kling-v2-1-master", "kling-v2-5-turbo", "kling-v2-6"]
-        | None = None,
+        model: KlingTalkingPhotoModel | None = None,
         duration: Literal[5, 10] | None = None,
         mode: Literal["std", "pro"] | None = None,
         callback_url: str | None = None,
