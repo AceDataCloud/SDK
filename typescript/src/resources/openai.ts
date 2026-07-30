@@ -206,12 +206,54 @@ class Tasks {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class Audio {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { input, responseFormat, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport) {}
+
+  url(opts: { model: string }): string {
+    const base = (((this.transport as unknown) as { baseURL?: string }).baseURL ?? 'https://api.acedata.cloud').replace(
+      /\/+$/,
+      ''
+    );
+    const wsBase = base.replace(/^http/i, 'ws');
+    return `${wsBase}/v1/realtime?model=${encodeURIComponent(opts.model)}`;
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly models: Models;
+  readonly audio: Audio;
+  readonly realtime: Realtime;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
@@ -219,5 +261,8 @@ export class OpenAI {
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.models = new Models(transport);
+    this.audio = new Audio(transport);
+    this.realtime = new Realtime(transport);
   }
 }

@@ -64,6 +64,74 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 }
 
+func TestOpenAIModels_List(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("unexpected method %s", r.Method)
+		}
+		if r.URL.Path != "/openai/models" {
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"data":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Models().List(context.Background())
+	if err != nil {
+		t.Fatalf("List: %v", err)
+	}
+	if _, ok := res["data"]; !ok {
+		t.Fatalf("missing data: %+v", res)
+	}
+}
+
+func TestOpenAIAudio_Speech(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Fatalf("unexpected method %s", r.Method)
+		}
+		if r.URL.Path != "/v1/audio/speech" {
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if body["response_format"] != "mp3" {
+			t.Fatalf("expected response_format=mp3, got %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"audio":"base64"}`))
+	}))
+	defer srv.Close()
+
+	speed := 1.2
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Audio().Speech(context.Background(), SpeechRequest{
+		Input:          "hello",
+		Model:          "tts-1",
+		ResponseFormat: "mp3",
+		Speed:          &speed,
+	})
+	if err != nil {
+		t.Fatalf("Speech: %v", err)
+	}
+	if res["audio"] != "base64" {
+		t.Fatalf("unexpected response: %+v", res)
+	}
+}
+
+func TestOpenAIRealtime_URL(t *testing.T) {
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL("https://x402.acedata.cloud/"))
+	got := c.OpenAI().Realtime().URL("gpt-realtime-2")
+	want := "wss://x402.acedata.cloud/v1/realtime?model=gpt-realtime-2"
+	if got != want {
+		t.Fatalf("URL() = %q, want %q", got, want)
+	}
+}
+
 func TestTransport_RetriesOn503(t *testing.T) {
 	attempts := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

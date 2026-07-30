@@ -3,6 +3,8 @@ package acedatacloud
 import (
 	"context"
 	"encoding/json"
+	"net/url"
+	"strings"
 )
 
 // ChatCompletionRequest is the input to OpenAI chat.completions.create.
@@ -79,6 +81,15 @@ func (o *OpenAIResource) Chat() *OpenAIChat { return &OpenAIChat{t: o.t} }
 // Responses returns the responses sub-namespace.
 func (o *OpenAIResource) Responses() *OpenAIResponses { return &OpenAIResponses{t: o.t} }
 
+// Models returns the models sub-namespace.
+func (o *OpenAIResource) Models() *OpenAIModels { return &OpenAIModels{t: o.t} }
+
+// Audio returns the audio sub-namespace.
+func (o *OpenAIResource) Audio() *OpenAIAudio { return &OpenAIAudio{t: o.t} }
+
+// Realtime returns the realtime helpers.
+func (o *OpenAIResource) Realtime() *OpenAIRealtime { return &OpenAIRealtime{t: o.t} }
+
 // OpenAIChat exposes “/v1/chat/completions“.
 type OpenAIChat struct{ t *transport }
 
@@ -117,6 +128,65 @@ func (r *OpenAIResponses) Create(ctx context.Context, req ResponsesRequest) (map
 func (r *OpenAIResponses) CreateStream(ctx context.Context, req ResponsesRequest) (<-chan map[string]any, <-chan error) {
 	req.Stream = true
 	return streamDecode(r.t, "/openai/responses", req.toBody())
+}
+
+// OpenAIModels exposes “/openai/models“.
+type OpenAIModels struct{ t *transport }
+
+// List fetches available OpenAI-compatible models.
+func (m *OpenAIModels) List(ctx context.Context) (map[string]any, error) {
+	return m.t.do(ctx, requestOpts{Method: "GET", Path: "/openai/models"})
+}
+
+// SpeechRequest is the input to OpenAI audio.speech.
+type SpeechRequest struct {
+	Input          string         `json:"input"`
+	Model          string         `json:"model,omitempty"`
+	Voice          string         `json:"voice,omitempty"`
+	ResponseFormat string         `json:"response_format,omitempty"`
+	Speed          *float64       `json:"speed,omitempty"`
+	Extra          map[string]any `json:"-"`
+}
+
+func (r SpeechRequest) toBody() map[string]any {
+	body := map[string]any{"input": r.Input}
+	if r.Model != "" {
+		body["model"] = r.Model
+	}
+	if r.Voice != "" {
+		body["voice"] = r.Voice
+	}
+	if r.ResponseFormat != "" {
+		body["response_format"] = r.ResponseFormat
+	}
+	if r.Speed != nil {
+		body["speed"] = *r.Speed
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// OpenAIAudio exposes “/v1/audio/speech“.
+type OpenAIAudio struct{ t *transport }
+
+// Speech performs OpenAI-compatible text-to-speech synthesis.
+func (a *OpenAIAudio) Speech(ctx context.Context, req SpeechRequest) (map[string]any, error) {
+	return a.t.do(ctx, requestOpts{Method: "POST", Path: "/v1/audio/speech", Body: req.toBody()})
+}
+
+// OpenAIRealtime provides helpers for realtime endpoint URLs.
+type OpenAIRealtime struct{ t *transport }
+
+// URL returns a websocket URL for OpenAI-compatible realtime API.
+func (r *OpenAIRealtime) URL(model string) string {
+	base := strings.TrimRight(r.t.opts.baseURL, "/")
+	wsBase := strings.Replace(base, "https://", "wss://", 1)
+	wsBase = strings.Replace(wsBase, "http://", "ws://", 1)
+	return wsBase + "/v1/realtime?model=" + url.QueryEscape(model)
 }
 
 // streamDecode wraps transport.stream and parses each SSE data line as JSON.

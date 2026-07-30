@@ -226,6 +226,43 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_models_list(client):
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json={"data": []}))
+
+    result = client.openai.models.list()
+
+    assert result["data"] == []
+
+
+@respx.mock
+def test_openai_audio_speech(client):
+    route = respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, json={"audio": "base64"})
+    )
+
+    result = client.openai.audio.speech(input="hello", model="tts-1", response_format="mp3", speed=1.2)
+
+    assert result["audio"] == "base64"
+    assert json.loads(route.calls.last.request.content) == {
+        "input": "hello",
+        "model": "tts-1",
+        "response_format": "mp3",
+        "speed": 1.2,
+    }
+
+
+def test_openai_realtime_url_uses_base_url():
+    client = AceDataCloud(api_token="test-token", base_url="https://x402.acedata.cloud", max_retries=0)
+    try:
+        assert (
+            client.openai.realtime.url(model="gpt-realtime-2")
+            == "wss://x402.acedata.cloud/v1/realtime?model=gpt-realtime-2"
+        )
+    finally:
+        client.close()
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
