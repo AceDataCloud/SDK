@@ -28,6 +28,10 @@ GENERATED = (
     "digitalhuman",
     "dreamina",
     "localization",
+    "sora",
+    "drawai",
+    "qrart",
+    "midjourney",
 )
 HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
 

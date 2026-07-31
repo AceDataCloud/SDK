@@ -206,18 +206,78 @@ class Tasks {
   }
 }
 
+class Audio {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<unknown> {
+    const { input, model, voice, responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (model !== undefined) body.model = model;
+    if (voice !== undefined) body.voice = voice;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+
+  async transcriptions(opts: {
+    file: unknown;
+    model?: string;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { file, model, ...rest } = opts;
+    // Build body as JSON for now; multipart support follows transport capabilities
+    const body: Record<string, unknown> = { file, ...rest };
+    if (model !== undefined) body.model = model;
+    return this.transport.request('POST', '/v1/audio/transcriptions', { json: body });
+  }
+}
+
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models', {});
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport, private baseURL: string) {}
+
+  url(opts: { model: string; [key: string]: unknown }): string {
+    const wsBase = this.baseURL.replace(/^https?:\/\//, (m) => (m.startsWith('https') ? 'wss://' : 'ws://'));
+    const params = Object.entries(opts)
+      .map(([k, v]) => `${k}=${v}`)
+      .join('&');
+    return `${wsBase}/v1/realtime?${params}`;
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly audio: Audio;
+  readonly models: Models;
+  readonly realtime: Realtime;
 
   constructor(transport: Transport) {
+    const baseURL = (transport as unknown as Record<string, unknown>)['_baseURL'] as string | undefined ?? 'https://x402.acedata.cloud';
     this.chat = new ChatNamespace(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.audio = new Audio(transport);
+    this.models = new Models(transport);
+    this.realtime = new Realtime(transport, baseURL);
   }
 }

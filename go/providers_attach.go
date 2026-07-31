@@ -23,6 +23,7 @@ func taskIDFrom(result map[string]any) string {
 // providers holds the provider-axis clients, one per service.
 type providers struct {
 	digitalhuman *Digitalhuman
+	drawai *Drawai
 	dreamina *Dreamina
 	fish *Fish
 	flux *Flux
@@ -31,10 +32,13 @@ type providers struct {
 	localization *Localization
 	luma *Luma
 	maestro *Maestro
+	midjourney *Midjourney
 	nanobanana *NanoBanana
 	producer *Producer
+	qrart *Qrart
 	seedance *Seedance
 	seedream *Seedream
+	sora *Sora
 	suno *Suno
 	wan *Wan
 }
@@ -42,6 +46,7 @@ type providers struct {
 func newProviders(tr *transport) *providers {
 	return &providers{
 		digitalhuman: &Digitalhuman{t: tr},
+		drawai: &Drawai{t: tr},
 		dreamina: &Dreamina{t: tr},
 		fish: &Fish{t: tr},
 		flux: &Flux{t: tr},
@@ -50,10 +55,13 @@ func newProviders(tr *transport) *providers {
 		localization: &Localization{t: tr},
 		luma: &Luma{t: tr},
 		maestro: &Maestro{t: tr},
+		midjourney: &Midjourney{t: tr},
 		nanobanana: &NanoBanana{t: tr},
 		producer: &Producer{t: tr},
+		qrart: &Qrart{t: tr},
 		seedance: &Seedance{t: tr},
 		seedream: &Seedream{t: tr},
+		sora: &Sora{t: tr},
 		suno: &Suno{t: tr},
 		wan: &Wan{t: tr},
 	}
@@ -61,6 +69,9 @@ func newProviders(tr *transport) *providers {
 
 // Digitalhuman returns the digitalhuman provider client.
 func (c *Client) Digitalhuman() *Digitalhuman { return c.providers.digitalhuman }
+
+// Drawai returns the drawai provider client.
+func (c *Client) Drawai() *Drawai { return c.providers.drawai }
 
 // Dreamina returns the dreamina provider client.
 func (c *Client) Dreamina() *Dreamina { return c.providers.dreamina }
@@ -86,17 +97,26 @@ func (c *Client) Luma() *Luma { return c.providers.luma }
 // Maestro returns the maestro provider client.
 func (c *Client) Maestro() *Maestro { return c.providers.maestro }
 
+// Midjourney returns the midjourney provider client.
+func (c *Client) Midjourney() *Midjourney { return c.providers.midjourney }
+
 // NanoBanana returns the nano-banana provider client.
 func (c *Client) NanoBanana() *NanoBanana { return c.providers.nanobanana }
 
 // Producer returns the producer provider client.
 func (c *Client) Producer() *Producer { return c.providers.producer }
 
+// Qrart returns the qrart provider client.
+func (c *Client) Qrart() *Qrart { return c.providers.qrart }
+
 // Seedance returns the seedance provider client.
 func (c *Client) Seedance() *Seedance { return c.providers.seedance }
 
 // Seedream returns the seedream provider client.
 func (c *Client) Seedream() *Seedream { return c.providers.seedream }
+
+// Sora returns the sora provider client.
+func (c *Client) Sora() *Sora { return c.providers.sora }
 
 // Suno returns the suno provider client.
 func (c *Client) Suno() *Suno { return c.providers.suno }

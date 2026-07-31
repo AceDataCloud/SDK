@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from .digitalhuman import AsyncDigitalhuman, Digitalhuman
+from .drawai import AsyncDrawai, Drawai
 from .dreamina import AsyncDreamina, Dreamina
 from .fish import AsyncFish, Fish
 from .flux import AsyncFlux, Flux
@@ -18,10 +19,13 @@ from .happyhorse import AsyncHappyhorse, Happyhorse
 from .localization import AsyncLocalization, Localization
 from .luma import AsyncLuma, Luma
 from .maestro import AsyncMaestro, Maestro
+from .midjourney import AsyncMidjourney, Midjourney
 from .nano_banana import AsyncNanoBanana, NanoBanana
 from .producer import AsyncProducer, Producer
+from .qrart import AsyncQrart, Qrart
 from .seedance import AsyncSeedance, Seedance
 from .seedream import AsyncSeedream, Seedream
+from .sora import AsyncSora, Sora
 from .suno import AsyncSuno, Suno
 from .wan import AsyncWan, Wan
 
@@ -30,6 +34,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
     """Bind every generated provider client onto ``client``."""
     if is_async:
         client.digitalhuman = AsyncDigitalhuman(transport)
+        client.drawai = AsyncDrawai(transport)
         client.dreamina = AsyncDreamina(transport)
         client.fish = AsyncFish(transport)
         client.flux = AsyncFlux(transport)
@@ -38,14 +43,18 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.localization = AsyncLocalization(transport)
         client.luma = AsyncLuma(transport)
         client.maestro = AsyncMaestro(transport)
+        client.midjourney = AsyncMidjourney(transport)
         client.nano_banana = AsyncNanoBanana(transport)
         client.producer = AsyncProducer(transport)
+        client.qrart = AsyncQrart(transport)
         client.seedance = AsyncSeedance(transport)
         client.seedream = AsyncSeedream(transport)
+        client.sora = AsyncSora(transport)
         client.suno = AsyncSuno(transport)
         client.wan = AsyncWan(transport)
     else:
         client.digitalhuman = Digitalhuman(transport)
+        client.drawai = Drawai(transport)
         client.dreamina = Dreamina(transport)
         client.fish = Fish(transport)
         client.flux = Flux(transport)
@@ -54,9 +63,12 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.localization = Localization(transport)
         client.luma = Luma(transport)
         client.maestro = Maestro(transport)
+        client.midjourney = Midjourney(transport)
         client.nano_banana = NanoBanana(transport)
         client.producer = Producer(transport)
+        client.qrart = Qrart(transport)
         client.seedance = Seedance(transport)
         client.seedream = Seedream(transport)
+        client.sora = Sora(transport)
         client.suno = Suno(transport)
         client.wan = Wan(transport)
