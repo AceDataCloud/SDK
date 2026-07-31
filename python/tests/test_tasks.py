@@ -8,7 +8,7 @@ from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 def test_wait_accepts_success_data_without_status():
     pending = {"response": {"success": True, "task_id": "task-1"}}
     completed = {
-        "finished_at": "2026-07-18T08:16:11Z",
+        "finished_at": 1784362571.0,
         "response": {
             "success": True,
             "task_id": "task-1",
@@ -40,7 +40,7 @@ def test_is_completed_accepts_explicit_status():
         {"response": {"success": False, "error": "temporary"}},
         {"response": {"success": False, "error": None}},
         {"response": None},
-        {"finished_at": "2026-07-18T08:16:11Z", "response": {"status": "processing", "success": True}},
+        {"finished_at": 1784362571.0, "response": {"status": "processing", "success": True}},
     ],
 )
 def test_is_completed_waits_without_terminal_status_or_finished_at(state):
@@ -53,10 +53,10 @@ def test_is_completed_waits_without_terminal_status_or_finished_at(state):
 @pytest.mark.parametrize(
     ("state", "expected"),
     [
-        ({"finished_at": "2026-07-18T08:16:11Z", "response": {"success": True, "data": None}}, True),
-        ({"response": {"finished_at": "2026-07-18T08:16:11Z", "success": False}}, True),
-        ({"finished_at": "2026-07-18T08:16:11Z", "response": {"success": None}}, False),
-        ({"finished_at": "2026-07-18T08:16:11Z", "response": {"status": "succeeded", "success": False}}, True),
+        ({"finished_at": 1784362571.0, "response": {"success": True, "data": None}}, True),
+        ({"response": {"finished_at": 1784362571.0, "success": False}}, True),
+        ({"finished_at": 1784362571.0, "response": {"success": None}}, False),
+        ({"finished_at": 1784362571.0, "response": {"status": "succeeded", "success": False}}, True),
         ({"response": None, "status": "succeeded"}, True),
     ],
 )
@@ -71,7 +71,7 @@ def test_is_completed_handles_statusless_terminal_shapes(state, expected):
 async def test_async_wait_accepts_success_data_without_status():
     pending = {"response": {"success": True, "task_id": "task-1"}}
     completed = {
-        "finished_at": "2026-07-18T08:16:11Z",
+        "finished_at": 1784362571.0,
         "response": {
             "success": True,
             "data": [{"image_url": "https://cdn.example/image.png"}],

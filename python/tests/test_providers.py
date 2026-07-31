@@ -197,7 +197,7 @@ def test_get_records_a_terminal_state(client):
     transport.request.return_value = {
         "response": {
             "success": True,
-            "finished_at": "2026-07-27T09:38:41Z",
+            "finished_at": 1785145121.0,
             "data": [{"image_url": "https://cdn.example.com/a.png"}],
         }
     }
