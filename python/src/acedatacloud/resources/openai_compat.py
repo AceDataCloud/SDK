@@ -461,6 +461,89 @@ class _AsyncTasks:
         return await self._transport.request("POST", "/openai/tasks", json=body)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self, **kwargs: Any) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models", params=kwargs if kwargs else None)
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self, **kwargs: Any) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models", params=kwargs if kwargs else None)
+
+
+class _Audio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return self._transport.request("POST", "/v1/audio/speech", json=body)
+
+
+class _AsyncAudio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return await self._transport.request("POST", "/v1/audio/speech", json=body)
+
+
+class _Realtime:
+    def __init__(self, base_url: str, transport: Any) -> None:
+        self._base_url = base_url
+        self._transport = transport
+
+    def url(self, model: str | None = None) -> str:
+        """Build a wss:// URL for the OpenAI Realtime API."""
+        from urllib.parse import urlencode, urlparse, urlunparse
+
+        parsed = urlparse(self._base_url)
+        scheme = "wss" if parsed.scheme in {"https", "wss"} else "ws"
+        query = urlencode({"model": model}) if model else ""
+        return urlunparse((scheme, parsed.netloc, "/v1/realtime", "", query, ""))
+
+
 class OpenAI:
     """Synchronous OpenAI-compatible facade."""
 
@@ -470,6 +553,10 @@ class OpenAI:
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
         self.tasks = _Tasks(transport)
+        self.models = _Models(transport)
+        self.audio = _Audio(transport)
+        base_url = getattr(transport, "_base_url", getattr(transport, "base_url", "https://api.acedata.cloud"))
+        self.realtime = _Realtime(base_url, transport)
 
 
 class AsyncOpenAI:
@@ -481,3 +568,7 @@ class AsyncOpenAI:
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
         self.tasks = _AsyncTasks(transport)
+        self.models = _AsyncModels(transport)
+        self.audio = _AsyncAudio(transport)
+        base_url = getattr(transport, "_base_url", getattr(transport, "base_url", "https://api.acedata.cloud"))
+        self.realtime = _Realtime(base_url, transport)

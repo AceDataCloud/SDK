@@ -35,16 +35,15 @@ class Fish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
         references: list[Any] | None = None,
-        mp3_bitrate: int | None = None,
+        mp3_bitrate: Literal[64, 128, 192] | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -79,8 +78,6 @@ class Fish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
@@ -97,6 +94,14 @@ class Fish:
         if wait:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
+
+    def models_list(self, **extra: Any) -> dict[str, Any]:
+        """List all available Fish voice models."""
+        return self._transport.request("GET", "/fish/model", params=extra if extra else None)
+
+    def models_get(self, model_id: str) -> dict[str, Any]:
+        """Get a Fish voice model by ID."""
+        return self._transport.request("GET", f"/fish/model/{model_id}")
 
     def model(
         self,
@@ -148,16 +153,15 @@ class AsyncFish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
         references: list[Any] | None = None,
-        mp3_bitrate: int | None = None,
+        mp3_bitrate: Literal[64, 128, 192] | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -192,8 +196,6 @@ class AsyncFish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
@@ -210,6 +212,14 @@ class AsyncFish:
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
+
+    async def models_list(self, **extra: Any) -> dict[str, Any]:
+        """List all available Fish voice models."""
+        return await self._transport.request("GET", "/fish/model", params=extra if extra else None)
+
+    async def models_get(self, model_id: str) -> dict[str, Any]:
+        """Get a Fish voice model by ID."""
+        return await self._transport.request("GET", f"/fish/model/{model_id}")
 
     async def model(
         self,

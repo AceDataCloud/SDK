@@ -29,7 +29,7 @@ GENERATED = (
     "dreamina",
     "localization",
 )
-HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
+HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl", "grok", "gemini", "midjourney")
 
 
 @pytest.fixture

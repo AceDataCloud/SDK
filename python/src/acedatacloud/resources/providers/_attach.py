@@ -13,11 +13,14 @@ from .digitalhuman import AsyncDigitalhuman, Digitalhuman
 from .dreamina import AsyncDreamina, Dreamina
 from .fish import AsyncFish, Fish
 from .flux import AsyncFlux, Flux
+from .gemini import AsyncGemini, Gemini
+from .grok import AsyncGrok, Grok
 from .hailuo import AsyncHailuo, Hailuo
 from .happyhorse import AsyncHappyhorse, Happyhorse
 from .localization import AsyncLocalization, Localization
 from .luma import AsyncLuma, Luma
 from .maestro import AsyncMaestro, Maestro
+from .midjourney import AsyncMidjourney, Midjourney
 from .nano_banana import AsyncNanoBanana, NanoBanana
 from .producer import AsyncProducer, Producer
 from .seedance import AsyncSeedance, Seedance
@@ -33,11 +36,14 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.dreamina = AsyncDreamina(transport)
         client.fish = AsyncFish(transport)
         client.flux = AsyncFlux(transport)
+        client.gemini = AsyncGemini(transport)
+        client.grok = AsyncGrok(transport)
         client.hailuo = AsyncHailuo(transport)
         client.happyhorse = AsyncHappyhorse(transport)
         client.localization = AsyncLocalization(transport)
         client.luma = AsyncLuma(transport)
         client.maestro = AsyncMaestro(transport)
+        client.midjourney = AsyncMidjourney(transport)
         client.nano_banana = AsyncNanoBanana(transport)
         client.producer = AsyncProducer(transport)
         client.seedance = AsyncSeedance(transport)
@@ -49,11 +55,14 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.dreamina = Dreamina(transport)
         client.fish = Fish(transport)
         client.flux = Flux(transport)
+        client.gemini = Gemini(transport)
+        client.grok = Grok(transport)
         client.hailuo = Hailuo(transport)
         client.happyhorse = Happyhorse(transport)
         client.localization = Localization(transport)
         client.luma = Luma(transport)
         client.maestro = Maestro(transport)
+        client.midjourney = Midjourney(transport)
         client.nano_banana = NanoBanana(transport)
         client.producer = Producer(transport)
         client.seedance = Seedance(transport)

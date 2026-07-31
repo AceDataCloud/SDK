@@ -206,12 +206,56 @@ class Tasks {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(opts: Record<string, string> = {}): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models', { params: Object.keys(opts).length ? opts : undefined });
+  }
+}
+
+class Audio {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<unknown> {
+    const { input, model, voice, responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (model !== undefined) body.model = model;
+    if (voice !== undefined) body.voice = voice;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Realtime {
+  constructor(private baseUrl: string) {}
+
+  url(model?: string): string {
+    const url = new URL(this.baseUrl);
+    const scheme = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = new URL(`${scheme}//${url.host}/v1/realtime`);
+    if (model) wsUrl.searchParams.set('model', model);
+    return wsUrl.toString();
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly models: Models;
+  readonly audio: Audio;
+  readonly realtime: Realtime;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
@@ -219,5 +263,9 @@ export class OpenAI {
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.models = new Models(transport);
+    this.audio = new Audio(transport);
+    const baseUrl = (transport as unknown as Record<string, unknown>)._baseUrl as string ?? 'https://api.acedata.cloud';
+    this.realtime = new Realtime(baseUrl);
   }
 }
