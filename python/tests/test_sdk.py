@@ -226,6 +226,77 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+# ── OpenAI Models ─────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_openai_models_list(client):
+    mock_response = {
+        "object": "list",
+        "data": [
+            {"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"},
+            {"id": "gpt-4o-mini", "object": "model", "created": 1714500000, "owned_by": "system"},
+        ],
+    }
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.openai.models.list()
+    assert result["object"] == "list"
+    assert len(result["data"]) == 2
+    assert result["data"][0]["id"] == "gpt-4o"
+
+
+# ── OpenAI Audio Speech ───────────────────────────────────────────────
+
+
+def test_openai_audio_speech(client):
+    from unittest.mock import Mock
+    from acedatacloud.resources.openai_compat import OpenAI as CompatOpenAI
+
+    mock_transport = Mock()
+    mock_transport.request.return_value = b"fake-audio-content"
+    openai = CompatOpenAI(mock_transport)
+
+    result = openai.audio.speech.create(
+        input="Hello from AceData Cloud.",
+        model="tts-1-hd",
+        voice="nova",
+        response_format="mp3",
+    )
+
+    mock_transport.request.assert_called_once_with(
+        "POST",
+        "/v1/audio/speech",
+        json={
+            "input": "Hello from AceData Cloud.",
+            "model": "tts-1-hd",
+            "voice": "nova",
+            "response_format": "mp3",
+        },
+    )
+    assert result == b"fake-audio-content"
+
+
+# ── OpenAI Realtime URL ───────────────────────────────────────────────
+
+
+def test_openai_realtime_url(client):
+    url = client.openai.realtime.url(model="gpt-realtime")
+    assert url.startswith("wss://")
+    assert "gpt-realtime" in url
+    assert "/v1/realtime" in url
+
+
+def test_openai_realtime_url_default_model(client):
+    url = client.openai.realtime.url()
+    assert "gpt-realtime" in url
+
+
+def test_openai_realtime_url_model_v2(client):
+    url = client.openai.realtime.url(model="gpt-realtime-2")
+    assert "gpt-realtime-2" in url
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

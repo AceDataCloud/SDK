@@ -206,11 +206,61 @@ class Tasks {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class Speech {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<unknown> {
+    const { input, model, voice, responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (model !== undefined) body.model = model;
+    if (voice !== undefined) body.voice = voice;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class AudioNamespace {
+  readonly speech: Speech;
+  constructor(transport: Transport) {
+    this.speech = new Speech(transport);
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport) {}
+
+  url(opts: { model?: string } = {}): string {
+    const model = opts.model ?? 'gpt-realtime';
+    const base = (this.transport as unknown as { baseURL: string }).baseURL;
+    const wsBase = base.replace(/^https:\/\//, 'wss://').replace(/^http:\/\//, 'ws://');
+    return `${wsBase}/v1/realtime?model=${model}`;
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly models: Models;
+  readonly audio: AudioNamespace;
+  readonly realtime: Realtime;
   readonly tasks: Tasks;
 
   constructor(transport: Transport) {
@@ -218,6 +268,9 @@ export class OpenAI {
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.models = new Models(transport);
+    this.audio = new AudioNamespace(transport);
+    this.realtime = new Realtime(transport);
     this.tasks = new Tasks(transport);
   }
 }
