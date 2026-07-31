@@ -206,12 +206,93 @@ class Tasks {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport) {}
+
+  url(model: 'gpt-realtime' | 'gpt-realtime-2' = 'gpt-realtime'): string {
+    const base = this.transport.getBaseURL();
+    const wsBase = base.replace(/^https:\/\//, 'wss://').replace(/^http:\/\//, 'ws://');
+    return `${wsBase}/v1/realtime?model=${model}`;
+  }
+}
+
+class Speech {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    input: string;
+    model?: 'tts-1' | 'tts-1-hd';
+    voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+    responseFormat?: 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm';
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Uint8Array> {
+    const { input, model = 'tts-1-hd', voice = 'alloy', responseFormat = 'mp3', speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, model, voice, response_format: responseFormat, ...rest };
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.requestBytes('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Transcriptions {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    file: Buffer | Uint8Array;
+    filename?: string;
+    model?: 'whisper-1';
+    language?: string;
+    prompt?: string;
+    responseFormat?: 'json' | 'text' | 'srt' | 'verbose_json' | 'vtt';
+    temperature?: number;
+    timestampGranularities?: Array<'word' | 'segment'>;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const {
+      file,
+      filename = 'audio.mp3',
+      model = 'whisper-1',
+      language,
+      prompt,
+      responseFormat = 'json',
+      temperature,
+      timestampGranularities,
+    } = opts;
+    const data: Record<string, string> = { model, response_format: responseFormat };
+    if (language !== undefined) data.language = language;
+    if (prompt !== undefined) data.prompt = prompt;
+    if (temperature !== undefined) data.temperature = String(temperature);
+    if (timestampGranularities !== undefined) data['timestamp_granularities[]'] = timestampGranularities.join(',');
+    return this.transport.uploadForm('/v1/audio/transcriptions', file, filename, data);
+  }
+}
+
+class AudioNamespace {
+  readonly speech: Speech;
+  readonly transcriptions: Transcriptions;
+  constructor(transport: Transport) {
+    this.speech = new Speech(transport);
+    this.transcriptions = new Transcriptions(transport);
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly models: Models;
+  readonly realtime: Realtime;
+  readonly audio: AudioNamespace;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
@@ -219,5 +300,8 @@ export class OpenAI {
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.models = new Models(transport);
+    this.realtime = new Realtime(transport);
+    this.audio = new AudioNamespace(transport);
   }
 }

@@ -226,6 +226,74 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+# ── OpenAI Models ─────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_openai_models_list(client):
+    mock_response = {
+        "object": "list",
+        "data": [
+            {"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"},
+        ],
+    }
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.openai.models.list()
+    assert result["object"] == "list"
+    assert result["data"][0]["id"] == "gpt-4o"
+
+
+# ── OpenAI Realtime URL ───────────────────────────────────────────────
+
+
+def test_openai_realtime_url(client):
+    url = client.openai.realtime.url("gpt-realtime")
+    assert url == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime"
+
+
+def test_openai_realtime_url_default_model(client):
+    url = client.openai.realtime.url()
+    assert "gpt-realtime" in url
+    assert url.startswith("wss://")
+
+
+# ── OpenAI Audio Speech ───────────────────────────────────────────────
+
+
+@respx.mock
+def test_openai_audio_speech(client):
+    audio_bytes = b"fake-audio-data"
+    respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, content=audio_bytes, headers={"content-type": "audio/mpeg"})
+    )
+
+    result = client.openai.audio.speech.create(
+        input="Hello world",
+        model="tts-1-hd",
+        voice="nova",
+    )
+    assert result == audio_bytes
+
+
+# ── OpenAI Audio Transcriptions ───────────────────────────────────────
+
+
+@respx.mock
+def test_openai_audio_transcriptions(client):
+    mock_response = {"text": "Hello from the transcription."}
+    respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.openai.audio.transcriptions.create(
+        file=b"fake-audio-bytes",
+        filename="test.mp3",
+        model="whisper-1",
+    )
+    assert result["text"] == "Hello from the transcription."
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

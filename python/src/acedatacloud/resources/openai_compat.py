@@ -461,6 +461,170 @@ class _AsyncTasks:
         return await self._transport.request("POST", "/openai/tasks", json=body)
 
 
+class _Models:
+    """Namespace for openai.models."""
+
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self, **kwargs: Any) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self, **kwargs: Any) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models")
+
+
+class _Realtime:
+    """Namespace for openai.realtime — builds WebSocket URLs."""
+
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def url(self, model: str = "gpt-realtime") -> str:
+        """Return a wss:// URL for the OpenAI Realtime endpoint."""
+        base = self._transport.base_url
+        ws_base = base.replace("https://", "wss://").replace("http://", "ws://")
+        return f"{ws_base}/v1/realtime?model={model}"
+
+
+class _AsyncRealtime:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def url(self, model: str = "gpt-realtime") -> str:
+        """Return a wss:// URL for the OpenAI Realtime endpoint."""
+        base = self._transport.base_url
+        ws_base = base.replace("https://", "wss://").replace("http://", "ws://")
+        return f"{ws_base}/v1/realtime?model={model}"
+
+
+class _Speech:
+    """Namespace for openai.audio.speech."""
+
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        input: str,
+        model: str = "tts-1-hd",
+        voice: str = "alloy",
+        response_format: str = "mp3",
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        """Generate speech audio from text. Returns raw audio bytes."""
+        body: dict[str, Any] = {"input": input, "model": model, "voice": voice, "response_format": response_format}
+        if speed is not None:
+            body["speed"] = speed
+        body.update(kwargs)
+        return self._transport.request_bytes("POST", "/v1/audio/speech", json=body)
+
+
+class _AsyncSpeech:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        input: str,
+        model: str = "tts-1-hd",
+        voice: str = "alloy",
+        response_format: str = "mp3",
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        """Generate speech audio from text. Returns raw audio bytes."""
+        body: dict[str, Any] = {"input": input, "model": model, "voice": voice, "response_format": response_format}
+        if speed is not None:
+            body["speed"] = speed
+        body.update(kwargs)
+        return await self._transport.request_bytes("POST", "/v1/audio/speech", json=body)
+
+
+class _Transcriptions:
+    """Namespace for openai.audio.transcriptions."""
+
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        file: bytes,
+        filename: str = "audio.mp3",
+        model: str = "whisper-1",
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str = "json",
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Transcribe audio to text using multipart/form-data upload."""
+        data: dict[str, Any] = {"model": model, "response_format": response_format}
+        if language is not None:
+            data["language"] = language
+        if prompt is not None:
+            data["prompt"] = prompt
+        if temperature is not None:
+            data["temperature"] = str(temperature)
+        if timestamp_granularities is not None:
+            data["timestamp_granularities[]"] = timestamp_granularities
+        return self._transport.upload_form("/v1/audio/transcriptions", file, filename, data)
+
+
+class _AsyncTranscriptions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        file: bytes,
+        filename: str = "audio.mp3",
+        model: str = "whisper-1",
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str = "json",
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Transcribe audio to text using multipart/form-data upload."""
+        data: dict[str, Any] = {"model": model, "response_format": response_format}
+        if language is not None:
+            data["language"] = language
+        if prompt is not None:
+            data["prompt"] = prompt
+        if temperature is not None:
+            data["temperature"] = str(temperature)
+        if timestamp_granularities is not None:
+            data["timestamp_granularities[]"] = timestamp_granularities
+        return await self._transport.upload_form("/v1/audio/transcriptions", file, filename, data)
+
+
+class _AudioNamespace:
+    """Namespace for openai.audio (speech + transcriptions)."""
+
+    def __init__(self, transport: Any) -> None:
+        self.speech = _Speech(transport)
+        self.transcriptions = _Transcriptions(transport)
+
+
+class _AsyncAudioNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.speech = _AsyncSpeech(transport)
+        self.transcriptions = _AsyncTranscriptions(transport)
+
+
 class OpenAI:
     """Synchronous OpenAI-compatible facade."""
 
@@ -470,6 +634,9 @@ class OpenAI:
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
         self.tasks = _Tasks(transport)
+        self.models = _Models(transport)
+        self.realtime = _Realtime(transport)
+        self.audio = _AudioNamespace(transport)
 
 
 class AsyncOpenAI:
@@ -481,3 +648,7 @@ class AsyncOpenAI:
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
         self.tasks = _AsyncTasks(transport)
+        self.models = _AsyncModels(transport)
+        self.realtime = _AsyncRealtime(transport)
+        self.audio = _AsyncAudioNamespace(transport)
+

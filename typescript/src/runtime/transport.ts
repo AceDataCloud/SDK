@@ -151,6 +151,10 @@ export class Transport {
     this.headers = baseHeaders;
   }
 
+  getBaseURL(): string {
+    return this.baseURL;
+  }
+
   async request(
     method: string,
     path: string,
@@ -412,6 +416,107 @@ export class Transport {
         throw mapError(resp.status, respBody);
       }
       return (await resp.json()) as Record<string, unknown>;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async uploadForm(
+    path: string,
+    fileData: Buffer | Uint8Array,
+    filename: string,
+    data: Record<string, string> = {},
+    opts: { timeout?: number } = {}
+  ): Promise<Record<string, unknown>> {
+    const url = `${this.baseURL}${path}`;
+
+    const body = new FormData();
+    body.append('file', new Blob([fileData]), filename);
+    for (const [key, value] of Object.entries(data)) {
+      body.append(key, value);
+    }
+
+    const authHeaders: Record<string, string> = {
+      authorization: this.headers.authorization,
+      'user-agent': this.headers['user-agent'],
+    };
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), opts.timeout ?? this.timeout);
+    try {
+      let resp: Response;
+      try {
+        resp = await fetch(url, {
+          method: 'POST',
+          headers: authHeaders,
+          body,
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) throw timeoutError(error);
+        throw error;
+      }
+      clearTimeout(timer);
+
+      if (resp.status >= 400) {
+        const text = await resp.text();
+        let respBody: Record<string, unknown>;
+        try {
+          respBody = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          respBody = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(resp.status, respBody);
+      }
+      const contentType = resp.headers.get('content-type') ?? '';
+      if (contentType.includes('application/json')) {
+        return (await resp.json()) as Record<string, unknown>;
+      }
+      const text = await resp.text();
+      return { text };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async requestBytes(
+    method: string,
+    path: string,
+    opts: { json?: Record<string, unknown>; timeout?: number } = {}
+  ): Promise<Uint8Array> {
+    const url = `${this.baseURL}${path}`;
+    const headers = { ...this.headers };
+    const timeoutMs = opts.timeout ?? this.timeout;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      let resp: Response;
+      try {
+        resp = await fetch(url, {
+          method,
+          headers,
+          body: opts.json !== undefined ? JSON.stringify(opts.json) : undefined,
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) throw timeoutError(error);
+        throw error;
+      }
+      clearTimeout(timer);
+
+      if (resp.status >= 400) {
+        const text = await resp.text();
+        let respBody: Record<string, unknown>;
+        try {
+          respBody = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          respBody = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(resp.status, respBody);
+      }
+      const arrayBuf = await resp.arrayBuffer();
+      return new Uint8Array(arrayBuf);
     } finally {
       clearTimeout(timer);
     }
