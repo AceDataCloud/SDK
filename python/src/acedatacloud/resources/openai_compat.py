@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json as _json
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Literal
 
 
 class _Completions:
@@ -109,6 +109,102 @@ class _AsyncResponses:
     async def _stream(self, body: dict[str, Any]):
         async for chunk in self._transport.request_stream("POST", "/openai/responses", json=body):
             yield _json.loads(chunk)
+
+
+OpenAITranscriptionModel = Literal["whisper-1", "gpt-transcribe"]
+OpenAITranscriptionResponseFormat = Literal["json", "text", "srt", "verbose_json", "vtt"]
+
+
+class _Transcriptions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        file: str,
+        model: OpenAITranscriptionModel | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: OpenAITranscriptionResponseFormat | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"file": file, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if language is not None:
+            body["language"] = language
+        if prompt is not None:
+            body["prompt"] = prompt
+        if response_format is not None:
+            body["response_format"] = response_format
+        if temperature is not None:
+            body["temperature"] = temperature
+        if timestamp_granularities is not None:
+            body["timestamp_granularities[]"] = timestamp_granularities
+        if stream is not None:
+            body["stream"] = stream
+        if languages is not None:
+            body["languages[]"] = languages
+        if keywords is not None:
+            body["keywords[]"] = keywords
+        return self._transport.request("POST", "/v1/audio/transcriptions", json=body)
+
+
+class _AsyncTranscriptions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        file: str,
+        model: OpenAITranscriptionModel | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: OpenAITranscriptionResponseFormat | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"file": file, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if language is not None:
+            body["language"] = language
+        if prompt is not None:
+            body["prompt"] = prompt
+        if response_format is not None:
+            body["response_format"] = response_format
+        if temperature is not None:
+            body["temperature"] = temperature
+        if timestamp_granularities is not None:
+            body["timestamp_granularities[]"] = timestamp_granularities
+        if stream is not None:
+            body["stream"] = stream
+        if languages is not None:
+            body["languages[]"] = languages
+        if keywords is not None:
+            body["keywords[]"] = keywords
+        return await self._transport.request("POST", "/v1/audio/transcriptions", json=body)
+
+
+class _AudioNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.transcriptions = _Transcriptions(transport)
+
+
+class _AsyncAudioNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.transcriptions = _AsyncTranscriptions(transport)
 
 
 class _Images:
@@ -467,6 +563,7 @@ class OpenAI:
     def __init__(self, transport: Any) -> None:
         self.chat = _ChatNamespace(transport)
         self.responses = _Responses(transport)
+        self.audio = _AudioNamespace(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
         self.tasks = _Tasks(transport)
@@ -478,6 +575,7 @@ class AsyncOpenAI:
     def __init__(self, transport: Any) -> None:
         self.chat = _AsyncChatNamespace(transport)
         self.responses = _AsyncResponses(transport)
+        self.audio = _AsyncAudioNamespace(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
         self.tasks = _AsyncTasks(transport)

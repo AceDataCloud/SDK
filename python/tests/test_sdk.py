@@ -226,6 +226,36 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_audio_transcriptions(client):
+    mock_response = {"text": "hello world"}
+    route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    result = client.openai.audio.transcriptions.create(
+        file="https://example.com/audio.mp3",
+        model="gpt-transcribe",
+        response_format="json",
+        timestamp_granularities=["segment"],
+        languages=["en"],
+        keywords=["Acme"],
+        stream=False,
+    )
+
+    assert route.called
+    assert result["text"] == "hello world"
+    assert json.loads(route.calls[-1].request.read()) == {
+        "file": "https://example.com/audio.mp3",
+        "model": "gpt-transcribe",
+        "response_format": "json",
+        "timestamp_granularities[]": ["segment"],
+        "stream": False,
+        "languages[]": ["en"],
+        "keywords[]": ["Acme"],
+    }
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

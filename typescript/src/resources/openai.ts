@@ -2,6 +2,9 @@
 
 import { Transport } from '../runtime/transport';
 
+export type OpenAITranscriptionModel = 'whisper-1' | 'gpt-transcribe';
+export type OpenAITranscriptionResponseFormat = 'json' | 'text' | 'srt' | 'verbose_json' | 'vtt';
+
 class Completions {
   constructor(private transport: Transport) {}
 
@@ -82,6 +85,57 @@ class Responses {
     for await (const chunk of this.transport.requestStream('POST', '/openai/responses', { json: body })) {
       yield JSON.parse(chunk);
     }
+  }
+}
+
+class Transcriptions {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    file: string;
+    model?: OpenAITranscriptionModel;
+    language?: string;
+    prompt?: string;
+    responseFormat?: OpenAITranscriptionResponseFormat;
+    temperature?: number;
+    timestampGranularities?: string[];
+    stream?: boolean;
+    languages?: string[];
+    keywords?: string[];
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const {
+      file,
+      model,
+      language,
+      prompt,
+      responseFormat,
+      temperature,
+      timestampGranularities,
+      stream,
+      languages,
+      keywords,
+      ...rest
+    } = opts;
+    const body: Record<string, unknown> = { file, ...rest };
+    if (model !== undefined) body.model = model;
+    if (language !== undefined) body.language = language;
+    if (prompt !== undefined) body.prompt = prompt;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (temperature !== undefined) body.temperature = temperature;
+    if (timestampGranularities !== undefined) body['timestamp_granularities[]'] = timestampGranularities;
+    if (stream !== undefined) body.stream = stream;
+    if (languages !== undefined) body['languages[]'] = languages;
+    if (keywords !== undefined) body['keywords[]'] = keywords;
+    return this.transport.request('POST', '/v1/audio/transcriptions', { json: body });
+  }
+}
+
+class AudioNamespace {
+  readonly transcriptions: Transcriptions;
+
+  constructor(transport: Transport) {
+    this.transcriptions = new Transcriptions(transport);
   }
 }
 
@@ -209,6 +263,7 @@ class Tasks {
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
+  readonly audio: AudioNamespace;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
@@ -216,6 +271,7 @@ export class OpenAI {
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
     this.responses = new Responses(transport);
+    this.audio = new AudioNamespace(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
