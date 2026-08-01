@@ -5,6 +5,68 @@ from __future__ import annotations
 import json as _json
 from collections.abc import Iterator
 from typing import Any
+from urllib.parse import urlencode, urlsplit, urlunsplit
+
+import httpx
+
+from acedatacloud._runtime.transport import _map_error
+
+
+def _raw_request(
+    transport: Any,
+    method: str,
+    path: str,
+    *,
+    json: dict[str, Any] | None = None,
+    extra_headers: dict[str, str] | None = None,
+) -> httpx.Response:
+    resp = transport._client.request(
+        method,
+        f"{transport._base_url}{path}",
+        json=json,
+        headers={**transport._headers, **(extra_headers or {})},
+        timeout=transport._timeout,
+    )
+    if resp.status_code >= 400:
+        try:
+            body = resp.json()
+        except Exception:
+            body = {"error": {"code": "unknown", "message": resp.text}}
+        raise _map_error(resp.status_code, body)
+    return resp
+
+
+async def _async_raw_request(
+    transport: Any,
+    method: str,
+    path: str,
+    *,
+    json: dict[str, Any] | None = None,
+    extra_headers: dict[str, str] | None = None,
+) -> httpx.Response:
+    resp = await transport._client.request(
+        method,
+        f"{transport._base_url}{path}",
+        json=json,
+        headers={**transport._headers, **(extra_headers or {})},
+        timeout=transport._timeout,
+    )
+    if resp.status_code >= 400:
+        try:
+            body = resp.json()
+        except Exception:
+            body = {"error": {"code": "unknown", "message": resp.text}}
+        raise _map_error(resp.status_code, body)
+    return resp
+
+
+def _realtime_url(base_url: str, **params: Any) -> str:
+    parsed = urlsplit(base_url)
+    query = urlencode(
+        {key: str(value).lower() if isinstance(value, bool) else str(value) for key, value in params.items()}
+    )
+    scheme = "wss" if parsed.scheme == "https" else "ws"
+    return urlunsplit((scheme, parsed.netloc, "/v1/realtime", query, ""))
 
 
 class _Completions:
@@ -353,6 +415,188 @@ class _AsyncEmbeddings:
         return await self._transport.request("POST", "/openai/embeddings", json=body)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models")
+
+
+class _Audio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return _raw_request(
+            self._transport,
+            "POST",
+            "/v1/audio/speech",
+            json=body,
+            extra_headers={"accept": "audio/mpeg"},
+        ).content
+
+    def transcriptions(
+        self,
+        *,
+        file: str,
+        model: str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | str:
+        body: dict[str, Any] = {"file": file, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if language is not None:
+            body["language"] = language
+        if prompt is not None:
+            body["prompt"] = prompt
+        if response_format is not None:
+            body["response_format"] = response_format
+        if temperature is not None:
+            body["temperature"] = temperature
+        if timestamp_granularities is not None:
+            body["timestamp_granularities[]"] = timestamp_granularities
+        if stream is not None:
+            body["stream"] = stream
+        if languages is not None:
+            body["languages[]"] = languages
+        if keywords is not None:
+            body["keywords[]"] = keywords
+        if response_format in {"text", "srt", "vtt"}:
+            return _raw_request(
+                self._transport,
+                "POST",
+                "/v1/audio/transcriptions",
+                json=body,
+                extra_headers={"accept": "text/plain"},
+            ).text
+        return self._transport.request("POST", "/v1/audio/transcriptions", json=body)
+
+
+class _AsyncAudio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        resp = await _async_raw_request(
+            self._transport, "POST", "/v1/audio/speech", json=body, extra_headers={"accept": "audio/mpeg"}
+        )
+        return resp.content
+
+    async def transcriptions(
+        self,
+        *,
+        file: str,
+        model: str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | str:
+        body: dict[str, Any] = {"file": file, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if language is not None:
+            body["language"] = language
+        if prompt is not None:
+            body["prompt"] = prompt
+        if response_format is not None:
+            body["response_format"] = response_format
+        if temperature is not None:
+            body["temperature"] = temperature
+        if timestamp_granularities is not None:
+            body["timestamp_granularities[]"] = timestamp_granularities
+        if stream is not None:
+            body["stream"] = stream
+        if languages is not None:
+            body["languages[]"] = languages
+        if keywords is not None:
+            body["keywords[]"] = keywords
+        if response_format in {"text", "srt", "vtt"}:
+            resp = await _async_raw_request(
+                self._transport,
+                "POST",
+                "/v1/audio/transcriptions",
+                json=body,
+                extra_headers={"accept": "text/plain"},
+            )
+            return resp.text
+        return await self._transport.request("POST", "/v1/audio/transcriptions", json=body)
+
+
+class _Realtime:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def url(self, *, model: str, **kwargs: Any) -> str:
+        return _realtime_url(self._transport._base_url, model=model, **kwargs)
+
+
+class _AsyncRealtime:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def url(self, *, model: str, **kwargs: Any) -> str:
+        return _realtime_url(self._transport._base_url, model=model, **kwargs)
+
+
 class _Tasks:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
@@ -469,6 +713,9 @@ class OpenAI:
         self.responses = _Responses(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
+        self.models = _Models(transport)
+        self.audio = _Audio(transport)
+        self.realtime = _Realtime(transport)
         self.tasks = _Tasks(transport)
 
 
@@ -480,4 +727,7 @@ class AsyncOpenAI:
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
+        self.models = _AsyncModels(transport)
+        self.audio = _AsyncAudio(transport)
+        self.realtime = _AsyncRealtime(transport)
         self.tasks = _AsyncTasks(transport)

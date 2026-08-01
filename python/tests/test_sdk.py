@@ -226,6 +226,60 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_models_list(client):
+    mock_response = {
+        "object": "list",
+        "data": [{"id": "gpt-4o-mini", "object": "model", "created": 1, "owned_by": "openai"}],
+    }
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.openai.models.list()
+    assert result["data"][0]["id"] == "gpt-4o-mini"
+
+
+@respx.mock
+def test_openai_audio_speech_returns_bytes(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert request.headers["accept"] == "audio/mpeg"
+        assert payload == {"input": "Hello there", "model": "tts-1", "voice": "alloy"}
+        return httpx.Response(200, content=b"audio-bytes", headers={"content-type": "audio/mpeg"})
+
+    respx.post("https://api.acedata.cloud/v1/audio/speech").mock(side_effect=_handler)
+
+    result = client.openai.audio.speech(input="Hello there", model="tts-1", voice="alloy")
+    assert result == b"audio-bytes"
+
+
+@respx.mock
+def test_openai_audio_transcriptions_text_response(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert request.headers["accept"] == "text/plain"
+        assert payload["file"] == "https://cdn.acedata.cloud/test.mp3"
+        assert payload["timestamp_granularities[]"] == ["word"]
+        assert payload["languages[]"] == ["en"]
+        assert payload["keywords[]"] == ["sdk"]
+        return httpx.Response(200, text="hello world", headers={"content-type": "text/plain"})
+
+    respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(side_effect=_handler)
+
+    result = client.openai.audio.transcriptions(
+        file="https://cdn.acedata.cloud/test.mp3",
+        response_format="text",
+        timestamp_granularities=["word"],
+        languages=["en"],
+        keywords=["sdk"],
+    )
+    assert result == "hello world"
+
+
+def test_openai_realtime_url_uses_websocket_scheme(client):
+    result = client.openai.realtime.url(model="gpt-realtime", voice="alloy")
+    assert result == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime&voice=alloy"
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
@@ -484,6 +538,22 @@ async def test_async_openai_completions(async_client):
         messages=[{"role": "user", "content": "Hi"}],
     )
     assert result["choices"][0]["message"]["content"] == "Async!"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_openai_audio_speech(async_client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert request.headers["accept"] == "audio/mpeg"
+        assert payload["input"] == "Async hello"
+        return httpx.Response(200, content=b"async-audio", headers={"content-type": "audio/mpeg"})
+
+    respx.post("https://api.acedata.cloud/v1/audio/speech").mock(side_effect=_handler)
+
+    result = await async_client.openai.audio.speech(input="Async hello")
+    assert result == b"async-audio"
     await async_client.close()
 
 
