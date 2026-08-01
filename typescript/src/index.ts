@@ -1,6 +1,7 @@
 /** @acedatacloud/sdk — Official TypeScript SDK for AceDataCloud. */
 
 export { AceDataCloud, AceDataCloudOptions } from './client';
+export { DiscordBotClient, DiscordBotClientOptions } from './resources/discord-bot';
 
 export {
   AceDataCloudError,

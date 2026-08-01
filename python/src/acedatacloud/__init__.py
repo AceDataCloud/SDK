@@ -26,6 +26,7 @@ from acedatacloud._runtime.payment import (
 )
 from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
+from acedatacloud.resources.discord_bot import AsyncDiscordBotClient, DiscordBotClient
 from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
@@ -40,6 +41,8 @@ from acedatacloud.resources.video import VideoProvider
 __all__ = [
     "AceDataCloud",
     "AsyncAceDataCloud",
+    "AsyncDiscordBotClient",
+    "DiscordBotClient",
     "AiChatModel",
     "AudioProvider",
     "GlmModel",
