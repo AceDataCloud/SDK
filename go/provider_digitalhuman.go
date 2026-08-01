@@ -8,7 +8,6 @@ import (
 	"fmt"
 )
 
-
 // Digitalhuman is the digitalhuman provider client.
 type Digitalhuman struct {
 	t *transport
