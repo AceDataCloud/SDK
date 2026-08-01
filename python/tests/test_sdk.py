@@ -226,6 +226,80 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+# ── OpenAI Models ─────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_openai_models_list(client):
+    mock_response = {
+        "object": "list",
+        "data": [
+            {"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"},
+            {"id": "gpt-4o-mini", "object": "model", "created": 1714500000, "owned_by": "system"},
+        ],
+    }
+    respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.openai.models.list()
+    assert result["object"] == "list"
+    assert len(result["data"]) == 2
+    assert result["data"][0]["id"] == "gpt-4o"
+
+
+# ── OpenAI Audio Speech ───────────────────────────────────────────────
+
+
+@respx.mock
+def test_openai_audio_speech(client):
+    audio_bytes = b"\xff\xfbSome fake MP3 audio bytes"
+    respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, content=audio_bytes, headers={"content-type": "audio/mpeg"})
+    )
+
+    result = client.openai.audio.speech.create(
+        input="Hello from AceData Cloud.",
+        model="tts-1-hd",
+        voice="nova",
+        response_format="mp3",
+    )
+    assert isinstance(result, bytes)
+    assert result == audio_bytes
+
+
+# ── OpenAI Audio Transcriptions ───────────────────────────────────────
+
+
+@respx.mock
+def test_openai_audio_transcriptions(client):
+    mock_response = {"text": "The quick brown fox jumps over the lazy dog."}
+    respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    fake_audio = b"RIFF....WAVEfmt "
+    result = client.openai.audio.transcriptions.create(
+        file=fake_audio,
+        filename="test.wav",
+        model="whisper-1",
+    )
+    assert result["text"] == "The quick brown fox jumps over the lazy dog."
+
+
+# ── OpenAI Realtime ───────────────────────────────────────────────────
+
+
+def test_openai_realtime_url(client):
+    url = client.openai.realtime.url(model="gpt-realtime")
+    assert url.startswith("wss://")
+    assert "gpt-realtime" in url
+    assert "/v1/realtime" in url
+
+
+def test_openai_realtime_url_default_model(client):
+    url = client.openai.realtime.url()
+    assert "gpt-realtime" in url
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

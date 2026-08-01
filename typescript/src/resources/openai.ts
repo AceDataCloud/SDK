@@ -206,12 +206,108 @@ class Tasks {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class Speech {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Uint8Array> {
+    const { input, model, voice, responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (model !== undefined) body.model = model;
+    if (voice !== undefined) body.voice = voice;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.requestBytes('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Transcriptions {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    file: Uint8Array | ArrayBuffer;
+    filename?: string;
+    model?: string;
+    language?: string;
+    prompt?: string;
+    responseFormat?: string;
+    temperature?: number;
+    timestampGranularities?: string[];
+    stream?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const {
+      file,
+      filename = 'audio.mp3',
+      model,
+      language,
+      prompt,
+      responseFormat,
+      temperature,
+      timestampGranularities,
+      stream,
+    } = opts;
+    const data: Record<string, string> = {};
+    if (model !== undefined) data.model = model;
+    if (language !== undefined) data.language = language;
+    if (prompt !== undefined) data.prompt = prompt;
+    if (responseFormat !== undefined) data.response_format = responseFormat;
+    if (temperature !== undefined) data.temperature = String(temperature);
+    if (timestampGranularities !== undefined) data['timestamp_granularities[]'] = timestampGranularities.join(',');
+    if (stream !== undefined) data.stream = String(stream);
+    const fileData = file instanceof ArrayBuffer ? new Uint8Array(file) : file;
+    return this.transport.multipartRequest('POST', '/v1/audio/transcriptions', {
+      fileField: 'file',
+      fileData,
+      filename,
+      data,
+    });
+  }
+}
+
+class OpenAIAudioNamespace {
+  readonly speech: Speech;
+  readonly transcriptions: Transcriptions;
+  constructor(transport: Transport) {
+    this.speech = new Speech(transport);
+    this.transcriptions = new Transcriptions(transport);
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport) {}
+
+  url(opts: { model?: string } = {}): string {
+    const model = opts.model ?? 'gpt-realtime';
+    const base = (this.transport as unknown as { baseURL: string }).baseURL ?? 'https://api.acedata.cloud';
+    const wsBase = base.replace(/^https:\/\//, 'wss://').replace(/^http:\/\//, 'ws://');
+    return `${wsBase}/v1/realtime?model=${model}`;
+  }
+}
+
 export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
+  readonly models: Models;
+  readonly audio: OpenAIAudioNamespace;
+  readonly realtime: Realtime;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
@@ -219,5 +315,8 @@ export class OpenAI {
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
+    this.models = new Models(transport);
+    this.audio = new OpenAIAudioNamespace(transport);
+    this.realtime = new Realtime(transport);
   }
 }

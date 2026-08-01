@@ -271,6 +271,68 @@ class SyncTransport:
                         yield data
                 return
 
+    def request_bytes(
+        self,
+        method: str,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        timeout: float | None = None,
+    ) -> bytes:
+        """Send a request and return the raw response bytes (for binary responses)."""
+        url = f"{self._base_url}{path}"
+        headers = {**self._headers}
+
+        resp = self._client.request(
+            method,
+            url,
+            json=json,
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
+
+    def multipart_request(
+        self,
+        method: str,
+        path: str,
+        *,
+        file_field: str,
+        file_data: bytes,
+        filename: str,
+        data: dict[str, Any] | None = None,
+        timeout: float | None = None,
+    ) -> dict[str, Any]:
+        """Send a multipart/form-data request to the API base URL."""
+        url = f"{self._base_url}{path}"
+        headers = {k: v for k, v in self._headers.items() if k != "content-type"}
+
+        files = {file_field: (filename, file_data)}
+        resp = self._client.request(
+            method,
+            url,
+            files=files,
+            data=data or {},
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        try:
+            return resp.json()
+        except Exception:
+            return {"text": resp.text}
+
     def upload(
         self,
         path: str,
@@ -489,6 +551,68 @@ class AsyncTransport:
                             return
                         yield data
                 return
+
+    async def request_bytes(
+        self,
+        method: str,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        timeout: float | None = None,
+    ) -> bytes:
+        """Send a request and return the raw response bytes (for binary responses)."""
+        url = f"{self._base_url}{path}"
+        headers = {**self._headers}
+
+        resp = await self._client.request(
+            method,
+            url,
+            json=json,
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
+
+    async def multipart_request(
+        self,
+        method: str,
+        path: str,
+        *,
+        file_field: str,
+        file_data: bytes,
+        filename: str,
+        data: dict[str, Any] | None = None,
+        timeout: float | None = None,
+    ) -> dict[str, Any]:
+        """Send a multipart/form-data request to the API base URL."""
+        url = f"{self._base_url}{path}"
+        headers = {k: v for k, v in self._headers.items() if k != "content-type"}
+
+        files = {file_field: (filename, file_data)}
+        resp = await self._client.request(
+            method,
+            url,
+            files=files,
+            data=data or {},
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        try:
+            return resp.json()
+        except Exception:
+            return {"text": resp.text}
 
     async def upload(
         self,

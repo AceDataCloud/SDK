@@ -362,6 +362,110 @@ export class Transport {
     }
   }
 
+  async requestBytes(
+    method: string,
+    path: string,
+    opts: { json?: Record<string, unknown>; timeout?: number } = {}
+  ): Promise<Uint8Array> {
+    const url = `${this.baseURL}${path}`;
+    const headers = { ...this.headers };
+    const timeoutMs = opts.timeout ?? this.timeout;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      let resp: Response;
+      try {
+        resp = await fetch(url, {
+          method,
+          headers,
+          body: opts.json ? JSON.stringify(opts.json) : undefined,
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) throw timeoutError(error);
+        throw error;
+      }
+      clearTimeout(timer);
+
+      if (resp.status >= 400) {
+        const text = await resp.text();
+        let body: Record<string, unknown>;
+        try {
+          body = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          body = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(resp.status, body);
+      }
+      return new Uint8Array(await resp.arrayBuffer());
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async multipartRequest(
+    method: string,
+    path: string,
+    opts: {
+      fileField: string;
+      fileData: Buffer | Uint8Array;
+      filename: string;
+      data?: Record<string, string>;
+      timeout?: number;
+    }
+  ): Promise<Record<string, unknown>> {
+    const url = `${this.baseURL}${path}`;
+    const authHeaders: Record<string, string> = {
+      authorization: this.headers.authorization,
+      'user-agent': this.headers['user-agent'],
+    };
+
+    const form = new FormData();
+    form.append(opts.fileField, new Blob([opts.fileData]), opts.filename);
+    if (opts.data) {
+      for (const [key, value] of Object.entries(opts.data)) {
+        form.append(key, value);
+      }
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), opts.timeout ?? this.timeout);
+    try {
+      let resp: Response;
+      try {
+        resp = await fetch(url, {
+          method,
+          headers: authHeaders,
+          body: form,
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) throw timeoutError(error);
+        throw error;
+      }
+      clearTimeout(timer);
+
+      if (resp.status >= 400) {
+        const text = await resp.text();
+        let respBody: Record<string, unknown>;
+        try {
+          respBody = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          respBody = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(resp.status, respBody);
+      }
+      const contentType = resp.headers.get('content-type') ?? '';
+      if (contentType.includes('application/json')) {
+        return (await resp.json()) as Record<string, unknown>;
+      }
+      return { text: await resp.text() };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   async upload(
     path: string,
     fileData: Buffer | Uint8Array,
