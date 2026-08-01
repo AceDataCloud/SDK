@@ -16,9 +16,36 @@ function taskId(result: Record<string, unknown>): string {
   return typeof result?.id === 'string' ? result.id : '';
 }
 
+function buildGenerateBody(options: DigitalhumanGenerateOptions): Record<string, unknown> {
+  if (!options.videoUrl && !options.imageUrl) {
+    throw new Error('videoUrl or imageUrl is required');
+  }
+
+  const body: Record<string, unknown> = {};
+  if (options.videoUrl) body["video_url"] = options.videoUrl;
+  body["text"] = options.text ?? "\u5927\u5bb6\u597d\uff0c\u8fd9\u662f\u79bb\u7ebf\u751f\u6210\u7684\u6570\u5b57\u4eba\u3002";
+  body["speed"] = options.speed ?? 1.0;
+  body["steps"] = options.steps ?? 40;
+  body["engine"] = options.engine ?? "latentsync";
+  body["guidance"] = options.guidance ?? 2.0;
+  body["seam_fix"] = options.seamFix ?? true;
+  if (options.voiceId !== undefined) body["voice_id"] = options.voiceId;
+  if (options.audioUrl !== undefined) body["audio_url"] = options.audioUrl;
+  if (options.imageUrl) body["image_url"] = options.imageUrl;
+  body["resolution"] = options.resolution ?? "720p";
+  for (const [key, value] of Object.entries(options)) {
+    if (!["async", "audioUrl", "callbackUrl", "engine", "guidance", "imageUrl", "maxWait", "pollInterval", "resolution", "seamFix", "speed", "steps", "text", "videoUrl", "voiceId", "wait"].includes(key) && value !== undefined) {
+      body[key] = value;
+    }
+  }
+  if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
+  body.async = options.async ?? true;
+  return body;
+}
+
 export interface DigitalhumanGenerateOptions {
   /** Public URL of the source face video (preferred). One of video_url/image_url required. */
-  videoUrl: string;
+  videoUrl?: string;
   /** Spoken text -> TTS (requires voice_id). */
   text?: string;
   /** Audio tempo multiplier. */
@@ -72,25 +99,7 @@ export class Digitalhuman {
 
   /** Digital Human video generation API — turn a portrait plus audio or text into a talking-head video. */
   async generate(options: DigitalhumanGenerateOptions): Promise<TaskHandle> {
-    const body: Record<string, unknown> = {};
-    body["video_url"] = options.videoUrl;
-    body["text"] = options.text ?? "\u5927\u5bb6\u597d\uff0c\u8fd9\u662f\u79bb\u7ebf\u751f\u6210\u7684\u6570\u5b57\u4eba\u3002";
-    body["speed"] = options.speed ?? 1.0;
-    body["steps"] = options.steps ?? 40;
-    body["engine"] = options.engine ?? "latentsync";
-    body["guidance"] = options.guidance ?? 2.0;
-    body["seam_fix"] = options.seamFix ?? true;
-    if (options.voiceId !== undefined) body["voice_id"] = options.voiceId;
-    if (options.audioUrl !== undefined) body["audio_url"] = options.audioUrl;
-    if (options.imageUrl !== undefined) body["image_url"] = options.imageUrl;
-    body["resolution"] = options.resolution ?? "720p";
-    for (const [key, value] of Object.entries(options)) {
-      if (!["async", "audioUrl", "callbackUrl", "engine", "guidance", "imageUrl", "maxWait", "pollInterval", "resolution", "seamFix", "speed", "steps", "text", "videoUrl", "voiceId", "wait"].includes(key) && value !== undefined) {
-        body[key] = value;
-      }
-    }
-    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    const body = buildGenerateBody(options);
     const result = (await this.transport.request('POST', "/digital-human/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/digital-human/tasks", this.transport, result);
     if (options.wait) {

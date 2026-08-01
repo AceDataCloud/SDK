@@ -109,6 +109,22 @@ def test_async_is_requested_by_default(client):
     assert transport.request.call_args.kwargs["json"]["async"] is True
 
 
+def test_digitalhuman_allows_image_url_without_video_url(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.digitalhuman._transport = transport
+
+    client.digitalhuman.generate(image_url="https://cdn.example.com/avatar.jpg")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["image_url"] == "https://cdn.example.com/avatar.jpg"
+    assert "video_url" not in body
+
+
+def test_digitalhuman_requires_video_or_image_url(client):
+    with pytest.raises(ValueError, match="video_url or image_url is required"):
+        client.digitalhuman.generate()
+
+
 def test_model_enum_is_typed(client):
     """A wrong model name should be a type error, not a runtime 400."""
     hints = typing.get_type_hints(type(client.flux).generate)

@@ -3,7 +3,10 @@
 
 package acedatacloud
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 
 // Digitalhuman is the digitalhuman provider client.
@@ -45,7 +48,9 @@ type DigitalhumanGenerateRequest struct {
 
 func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
-	body["video_url"] = r.VideoURL
+	if r.VideoURL != "" {
+		body["video_url"] = r.VideoURL
+	}
 	if r.Text != "" {
 		body["text"] = r.Text
 	} else {
@@ -101,8 +106,18 @@ func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	return body
 }
 
+func (r DigitalhumanGenerateRequest) validate() error {
+	if r.VideoURL == "" && r.ImageURL == "" {
+		return fmt.Errorf("video_url or image_url is required")
+	}
+	return nil
+}
+
 // Generate Digital Human video generation API — turn a portrait plus audio or text into a talking-head video.
 func (c *Digitalhuman) Generate(ctx context.Context, req DigitalhumanGenerateRequest) (*TaskHandle, error) {
+	if err := req.validate(); err != nil {
+		return nil, err
+	}
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   "/digital-human/videos",
