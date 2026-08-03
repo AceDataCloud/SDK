@@ -271,6 +271,45 @@ class SyncTransport:
                         yield data
                 return
 
+    def request_raw(
+        self,
+        method: str,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+        timeout: float | None = None,
+        extra_headers: dict[str, str] | None = None,
+    ) -> bytes:
+        """Send a request and return the raw response body.
+
+        Some endpoints answer with something other than JSON — `/v1/audio/speech`
+        returns `audio/mpeg`, `/v1/audio/transcriptions` can return `text/plain`
+        — and some take `multipart/form-data` rather than a JSON body.
+        """
+        url = f"{self._base_url}{path}"
+        headers = {**self._headers, "accept": "*/*", **(extra_headers or {})}
+        if files is not None:
+            headers.pop("content-type", None)
+
+        resp = self._client.request(
+            method,
+            url,
+            json=json,
+            files=files,
+            data=data,
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
+
     def upload(
         self,
         path: str,
@@ -489,6 +528,45 @@ class AsyncTransport:
                             return
                         yield data
                 return
+
+    async def request_raw(
+        self,
+        method: str,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+        timeout: float | None = None,
+        extra_headers: dict[str, str] | None = None,
+    ) -> bytes:
+        """Send a request and return the raw response body.
+
+        Some endpoints answer with something other than JSON — `/v1/audio/speech`
+        returns `audio/mpeg`, `/v1/audio/transcriptions` can return `text/plain`
+        — and some take `multipart/form-data` rather than a JSON body.
+        """
+        url = f"{self._base_url}{path}"
+        headers = {**self._headers, "accept": "*/*", **(extra_headers or {})}
+        if files is not None:
+            headers.pop("content-type", None)
+
+        resp = await self._client.request(
+            method,
+            url,
+            json=json,
+            files=files,
+            data=data,
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
 
     async def upload(
         self,

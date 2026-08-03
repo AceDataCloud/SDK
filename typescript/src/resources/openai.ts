@@ -164,6 +164,119 @@ class Embeddings {
   }
 }
 
+export type SpeechModel = 'tts-1' | 'tts-1-hd';
+export type SpeechVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+export type SpeechResponseFormat = 'mp3' | 'opus' | 'aac' | 'flac' | 'wav' | 'pcm';
+export type TranscriptionModel = 'whisper-1' | 'gpt-transcribe';
+export type TranscriptionResponseFormat = 'json' | 'text' | 'srt' | 'verbose_json' | 'vtt';
+export type TimestampGranularity = 'word' | 'segment';
+
+class Speech {
+  constructor(private transport: Transport) {}
+
+  /** Synthesize speech, resolving to the raw audio bytes. */
+  async create(opts: {
+    input: string;
+    model?: SpeechModel | string;
+    voice?: SpeechVoice | string;
+    responseFormat?: SpeechResponseFormat | string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<Uint8Array> {
+    const { input, model, voice, responseFormat, speed, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (model !== undefined) body.model = model;
+    if (voice !== undefined) body.voice = voice;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (speed !== undefined) body.speed = speed;
+    return this.transport.requestRaw('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Transcriptions {
+  constructor(private transport: Transport) {}
+
+  /** Transcribe an audio file. `file` is the audio payload to upload. */
+  async create(opts: {
+    file: Uint8Array | Buffer | Blob;
+    filename?: string;
+    model?: TranscriptionModel | string;
+    language?: string;
+    prompt?: string;
+    responseFormat?: TranscriptionResponseFormat | string;
+    temperature?: number;
+    timestampGranularities?: Array<TimestampGranularity | string>;
+    stream?: boolean;
+    languages?: string[];
+    keywords?: string[];
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const {
+      file,
+      filename,
+      model,
+      language,
+      prompt,
+      responseFormat,
+      temperature,
+      timestampGranularities,
+      stream,
+      languages,
+      keywords,
+      ...rest
+    } = opts;
+
+    const form = new FormData();
+    const blob = file instanceof Blob ? file : new Blob([file]);
+    form.append('file', blob, filename ?? 'audio.mp3');
+    if (model !== undefined) form.append('model', String(model));
+    if (language !== undefined) form.append('language', language);
+    if (prompt !== undefined) form.append('prompt', prompt);
+    if (responseFormat !== undefined) form.append('response_format', String(responseFormat));
+    if (temperature !== undefined) form.append('temperature', String(temperature));
+    for (const granularity of timestampGranularities ?? []) {
+      form.append('timestamp_granularities[]', String(granularity));
+    }
+    if (stream !== undefined) form.append('stream', String(stream));
+    for (const value of languages ?? []) form.append('languages[]', value);
+    for (const value of keywords ?? []) form.append('keywords[]', value);
+    for (const [key, value] of Object.entries(rest)) {
+      if (value !== undefined) form.append(key, String(value));
+    }
+
+    const raw = await this.transport.requestRaw('POST', '/v1/audio/transcriptions', { form });
+    const text = new TextDecoder().decode(raw);
+    // `response_format` other than json/verbose_json answers with plain text.
+    try {
+      const parsed = JSON.parse(text) as unknown;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      // fall through
+    }
+    return { text };
+  }
+}
+
+class AudioNamespace {
+  readonly speech: Speech;
+  readonly transcriptions: Transcriptions;
+  constructor(transport: Transport) {
+    this.speech = new Speech(transport);
+    this.transcriptions = new Transcriptions(transport);
+  }
+}
+
+class Models {
+  constructor(private transport: Transport) {}
+
+  /** List the models the token may call. */
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -211,6 +324,8 @@ export class OpenAI {
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly audio: AudioNamespace;
+  readonly models: Models;
   readonly tasks: Tasks;
 
   constructor(transport: Transport) {
@@ -218,6 +333,8 @@ export class OpenAI {
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.audio = new AudioNamespace(transport);
+    this.models = new Models(transport);
     this.tasks = new Tasks(transport);
   }
 }

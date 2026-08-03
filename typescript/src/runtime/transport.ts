@@ -362,6 +362,54 @@ export class Transport {
     }
   }
 
+  async requestRaw(
+    method: string,
+    path: string,
+    opts: {
+      json?: Record<string, unknown>;
+      form?: FormData;
+      timeout?: number;
+      headers?: Record<string, string>;
+    } = {}
+  ): Promise<Uint8Array> {
+    const url = `${this.baseURL}${path}`;
+    const headers: Record<string, string> = { ...this.headers, accept: '*/*', ...(opts.headers ?? {}) };
+    // fetch derives the multipart boundary itself; a preset content-type breaks it.
+    if (opts.form) delete headers['content-type'];
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), opts.timeout ?? this.timeout);
+    try {
+      let resp: Response;
+      try {
+        resp = await fetch(url, {
+          method,
+          headers,
+          body: opts.form ?? (opts.json ? JSON.stringify(opts.json) : undefined),
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) throw timeoutError(error);
+        throw error;
+      }
+
+      if (resp.status >= 400) {
+        const text = await resp.text();
+        let respBody: Record<string, unknown>;
+        try {
+          respBody = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          respBody = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(resp.status, respBody);
+      }
+
+      return new Uint8Array(await resp.arrayBuffer());
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   async upload(
     path: string,
     fileData: Buffer | Uint8Array,

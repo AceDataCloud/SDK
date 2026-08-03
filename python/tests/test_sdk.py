@@ -226,6 +226,98 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_models_list(client):
+    respx.get("https://api.acedata.cloud/openai/models").mock(
+        return_value=httpx.Response(200, json={"data": [{"id": "gpt-4o"}]})
+    )
+
+    result = client.openai.models.list()
+    assert result["data"][0]["id"] == "gpt-4o"
+
+
+@respx.mock
+def test_openai_audio_speech_returns_bytes(client):
+    route = respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, content=b"ID3-audio", headers={"content-type": "audio/mpeg"})
+    )
+
+    result = client.openai.audio.speech.create(
+        input="Hello from AceData Cloud.",
+        model="tts-1-hd",
+        voice="nova",
+        response_format="mp3",
+        speed=1.25,
+    )
+
+    assert result == b"ID3-audio"
+    body = json.loads(route.calls[0].request.content)
+    assert body == {
+        "input": "Hello from AceData Cloud.",
+        "model": "tts-1-hd",
+        "voice": "nova",
+        "response_format": "mp3",
+        "speed": 1.25,
+    }
+
+
+@respx.mock
+def test_openai_audio_transcriptions_sends_multipart(client):
+    route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json={"text": "Hello."})
+    )
+
+    result = client.openai.audio.transcriptions.create(
+        file=b"fake-audio",
+        filename="sample.mp3",
+        model="gpt-transcribe",
+        language="en",
+        timestamp_granularities=["word"],
+    )
+
+    assert result["text"] == "Hello."
+    request = route.calls[0].request
+    assert request.headers["content-type"].startswith("multipart/form-data")
+    payload = request.content.decode("utf-8", errors="replace")
+    assert "sample.mp3" in payload
+    assert "gpt-transcribe" in payload
+    assert "timestamp_granularities[]" in payload
+
+
+@respx.mock
+def test_openai_audio_transcriptions_plain_text_response(client):
+    respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, content=b"Hello there.", headers={"content-type": "text/plain"})
+    )
+
+    result = client.openai.audio.transcriptions.create(file=b"fake-audio", response_format="text")
+    assert result == {"text": "Hello there."}
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_openai_audio_speech(async_client):
+    respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, content=b"ID3-audio", headers={"content-type": "audio/mpeg"})
+    )
+
+    result = await async_client.openai.audio.speech.create(input="Hello")
+    assert result == b"ID3-audio"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_openai_audio_transcriptions(async_client):
+    respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json={"text": "Hello."})
+    )
+
+    result = await async_client.openai.audio.transcriptions.create(file=b"fake-audio")
+    assert result["text"] == "Hello."
+    await async_client.close()
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

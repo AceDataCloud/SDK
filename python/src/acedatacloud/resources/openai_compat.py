@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import json as _json
+import os
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Literal
 
 
 class _Completions:
@@ -353,6 +354,238 @@ class _AsyncEmbeddings:
         return await self._transport.request("POST", "/openai/embeddings", json=body)
 
 
+SpeechModel = Literal["tts-1", "tts-1-hd"]
+SpeechVoice = Literal["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
+SpeechResponseFormat = Literal["mp3", "opus", "aac", "flac", "wav", "pcm"]
+TranscriptionModel = Literal["whisper-1", "gpt-transcribe"]
+TranscriptionResponseFormat = Literal["json", "text", "srt", "verbose_json", "vtt"]
+TimestampGranularity = Literal["word", "segment"]
+
+
+def _speech_body(
+    input: str,
+    model: str | None,
+    voice: str | None,
+    response_format: str | None,
+    speed: float | None,
+    kwargs: dict[str, Any],
+) -> dict[str, Any]:
+    body: dict[str, Any] = {"input": input, **kwargs}
+    if model is not None:
+        body["model"] = model
+    if voice is not None:
+        body["voice"] = voice
+    if response_format is not None:
+        body["response_format"] = response_format
+    if speed is not None:
+        body["speed"] = speed
+    return body
+
+
+def _transcription_parts(
+    file: str | bytes,
+    filename: str | None,
+    model: str | None,
+    language: str | None,
+    prompt: str | None,
+    response_format: str | None,
+    temperature: float | None,
+    timestamp_granularities: list[str] | None,
+    stream: bool | None,
+    languages: list[str] | None,
+    keywords: list[str] | None,
+    kwargs: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Build the multipart parts for `/v1/audio/transcriptions`."""
+    if isinstance(file, str):
+        fname = filename or os.path.basename(file)
+        with open(file, "rb") as handle:
+            file_data = handle.read()
+    else:
+        file_data = file
+        fname = filename or "audio.mp3"
+
+    data: dict[str, Any] = {}
+    if model is not None:
+        data["model"] = model
+    if language is not None:
+        data["language"] = language
+    if prompt is not None:
+        data["prompt"] = prompt
+    if response_format is not None:
+        data["response_format"] = response_format
+    if temperature is not None:
+        data["temperature"] = str(temperature)
+    if timestamp_granularities is not None:
+        data["timestamp_granularities[]"] = list(timestamp_granularities)
+    if stream is not None:
+        data["stream"] = "true" if stream else "false"
+    if languages is not None:
+        data["languages[]"] = list(languages)
+    if keywords is not None:
+        data["keywords[]"] = list(keywords)
+    data.update(kwargs)
+    return {"file": (fname, file_data)}, data
+
+
+def _decode_transcription(raw: bytes) -> dict[str, Any]:
+    """`response_format` other than json/verbose_json answers with plain text."""
+    text = raw.decode("utf-8", errors="replace")
+    try:
+        parsed = _json.loads(text)
+    except ValueError:
+        return {"text": text}
+    if isinstance(parsed, dict):
+        return parsed
+    return {"text": text}
+
+
+class _Speech:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        input: str,
+        model: SpeechModel | str | None = None,
+        voice: SpeechVoice | str | None = None,
+        response_format: SpeechResponseFormat | str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        """Synthesize speech, returning the raw audio bytes."""
+        body = _speech_body(input, model, voice, response_format, speed, kwargs)
+        return self._transport.request_raw("POST", "/v1/audio/speech", json=body)
+
+
+class _AsyncSpeech:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        input: str,
+        model: SpeechModel | str | None = None,
+        voice: SpeechVoice | str | None = None,
+        response_format: SpeechResponseFormat | str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        """Synthesize speech, returning the raw audio bytes."""
+        body = _speech_body(input, model, voice, response_format, speed, kwargs)
+        return await self._transport.request_raw("POST", "/v1/audio/speech", json=body)
+
+
+class _Transcriptions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        file: str | bytes,
+        filename: str | None = None,
+        model: TranscriptionModel | str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: TranscriptionResponseFormat | str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[TimestampGranularity] | list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Transcribe an audio file. `file` is a path or the raw bytes."""
+        files, data = _transcription_parts(
+            file,
+            filename,
+            model,
+            language,
+            prompt,
+            response_format,
+            temperature,
+            timestamp_granularities,
+            stream,
+            languages,
+            keywords,
+            kwargs,
+        )
+        raw = self._transport.request_raw("POST", "/v1/audio/transcriptions", files=files, data=data)
+        return _decode_transcription(raw)
+
+
+class _AsyncTranscriptions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        file: str | bytes,
+        filename: str | None = None,
+        model: TranscriptionModel | str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: TranscriptionResponseFormat | str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[TimestampGranularity] | list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Transcribe an audio file. `file` is a path or the raw bytes."""
+        files, data = _transcription_parts(
+            file,
+            filename,
+            model,
+            language,
+            prompt,
+            response_format,
+            temperature,
+            timestamp_granularities,
+            stream,
+            languages,
+            keywords,
+            kwargs,
+        )
+        raw = await self._transport.request_raw("POST", "/v1/audio/transcriptions", files=files, data=data)
+        return _decode_transcription(raw)
+
+
+class _AudioNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.speech = _Speech(transport)
+        self.transcriptions = _Transcriptions(transport)
+
+
+class _AsyncAudioNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.speech = _AsyncSpeech(transport)
+        self.transcriptions = _AsyncTranscriptions(transport)
+
+
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self) -> dict[str, Any]:
+        """List the models the token may call."""
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self) -> dict[str, Any]:
+        """List the models the token may call."""
+        return await self._transport.request("GET", "/openai/models")
+
+
 class _Tasks:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
@@ -469,6 +702,8 @@ class OpenAI:
         self.responses = _Responses(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
+        self.audio = _AudioNamespace(transport)
+        self.models = _Models(transport)
         self.tasks = _Tasks(transport)
 
 
@@ -480,4 +715,6 @@ class AsyncOpenAI:
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
+        self.audio = _AsyncAudioNamespace(transport)
+        self.models = _AsyncModels(transport)
         self.tasks = _AsyncTasks(transport)
