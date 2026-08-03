@@ -29,6 +29,8 @@ type SunoGenerateRequest struct {
 	Prompt map[string]any
 	// Audio ID used for generating additional audio based on existing audio. This field is required when `action` is
 	AudioID string
+	// Target length of the generated track in seconds, ranging from 10 to 360. Only effective when `action` is `gene
+	Duration int
 	// The "Weirdness" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with higher v
 	Weirdness float64
 	// A list of reference audio URLs for inspiration, requiring 1 to 4 publicly accessible audio addresses. This fie
@@ -102,6 +104,9 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	body["prompt"] = r.Prompt
 	if r.AudioID != "" {
 		body["audio_id"] = r.AudioID
+	}
+	if r.Duration != 0 {
+		body["duration"] = r.Duration
 	}
 	if r.Weirdness != 0 {
 		body["weirdness"] = r.Weirdness

@@ -70,6 +70,7 @@ class Suno:
         custom: bool | None = None,
         prompt: dict[str, Any] | None = None,
         audio_id: str | None = None,
+        duration: int | None = None,
         weirdness: float | None = None,
         audio_urls: list[str] | None = None,
         persona_id: str | None = None,
@@ -112,6 +113,8 @@ class Suno:
         body["prompt"] = prompt if prompt is not None else "A song for Christmas"
         if audio_id is not None:
             body["audio_id"] = audio_id
+        if duration is not None:
+            body["duration"] = duration
         if weirdness is not None:
             body["weirdness"] = weirdness
         body["audio_urls"] = (
@@ -409,6 +412,7 @@ class AsyncSuno:
         custom: bool | None = None,
         prompt: dict[str, Any] | None = None,
         audio_id: str | None = None,
+        duration: int | None = None,
         weirdness: float | None = None,
         audio_urls: list[str] | None = None,
         persona_id: str | None = None,
@@ -451,6 +455,8 @@ class AsyncSuno:
         body["prompt"] = prompt if prompt is not None else "A song for Christmas"
         if audio_id is not None:
             body["audio_id"] = audio_id
+        if duration is not None:
+            body["duration"] = duration
         if weirdness is not None:
             body["weirdness"] = weirdness
         body["audio_urls"] = (
