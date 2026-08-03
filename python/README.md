@@ -52,7 +52,7 @@ asyncio.run(main())
 
 | Resource | Description |
 |----------|-------------|
-| `client.openai` | OpenAI-compatible chat completions and responses |
+| `client.openai` | OpenAI-compatible chat completions, responses, audio and models |
 | `client.chat` | Native chat messages |
 | `client.images` | Image generation (Flux, Seedream, Nano Banana, etc.) |
 | `client.audio` | Music generation (Suno) |

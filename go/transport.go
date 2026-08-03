@@ -201,6 +201,43 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 	return nil, &TransportError{&APIError{Message: "request failed after retries"}}
 }
 
+// doRaw executes a request with a caller-supplied body and returns the raw
+// response bytes. Some endpoints answer with something other than JSON
+// (`/v1/audio/speech` returns `audio/mpeg`) or expect `multipart/form-data`
+// (`/v1/audio/transcriptions`).
+func (t *transport) doRaw(ctx context.Context, method, path, contentType string, body []byte) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, method, t.opts.baseURL+path, bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	for k, v := range t.headers {
+		req.Header.Set(k, v)
+	}
+	req.Header.Set("Accept", "*/*")
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
+	}
+
+	resp, err := t.httpClient.Do(req)
+	if err != nil {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return nil, &TimeoutError{&APIError{Message: err.Error(), ErrCode: "timeout"}}
+		}
+		return nil, &TransportError{&APIError{Message: err.Error()}}
+	}
+	respBody, _ := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		parsed := map[string]any{}
+		if err := json.Unmarshal(respBody, &parsed); err != nil {
+			parsed = map[string]any{"error": map[string]any{"code": "unknown", "message": string(respBody)}}
+		}
+		return nil, mapError(resp.StatusCode, parsed)
+	}
+	return respBody, nil
+}
+
 // stream executes a POST and yields SSE data chunks via the returned channel.
 // The channel is closed when the stream ends or an error occurs; errors are
 // reported via the returned error channel.

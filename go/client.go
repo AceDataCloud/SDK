@@ -47,7 +47,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	return c, nil
 }
 
-// OpenAI returns the OpenAI-compatible resource (“/v1/chat/completions“,
+// OpenAI returns the OpenAI-compatible resource (“/openai/chat/completions“,
 // “/openai/responses“).
 func (c *Client) OpenAI() *OpenAIResource { return c.openai }
 
