@@ -33,6 +33,8 @@ export interface SunoGenerateOptions {
   prompt?: Record<string, unknown>;
   /** Audio ID used for generating additional audio based on existing audio. This field is required when `action` is `extend` or `concat`. */
   audioId?: string;
+  /** Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is mainly used for generation in custom mode (`custom` is `true`); some models or actions may not support it, in which case the value is ignored or an error is returned. It is a target only — the finished length is reported by the `duration` field in the response and may differ slightly. */
+  duration?: number;
   /** The "Weirdness" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with higher values resulting in more creative and experimental outputs. It is only effective in custom mode. */
   weirdness?: number;
   /** A list of reference audio URLs for inspiration, requiring 1 to 4 publicly accessible audio addresses. This field is mandatory when `action` is `inspo`. */
@@ -227,6 +229,7 @@ export class Suno {
     if (options.custom !== undefined) body["custom"] = options.custom;
     body["prompt"] = options.prompt ?? "A song for Christmas";
     if (options.audioId !== undefined) body["audio_id"] = options.audioId;
+    if (options.duration !== undefined) body["duration"] = options.duration;
     if (options.weirdness !== undefined) body["weirdness"] = options.weirdness;
     body["audio_urls"] = options.audioUrls ?? ["https://cdn1.suno.ai/b481b17a-bf50-4e10-8adc-4d5635050893.mp3"];
     if (options.personaId !== undefined) body["persona_id"] = options.personaId;
@@ -248,7 +251,7 @@ export class Suno {
     if (options.underpaintingStart !== undefined) body["underpainting_start"] = options.underpaintingStart;
     if (options.replaceSectionStart !== undefined) body["replace_section_start"] = options.replaceSectionStart;
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "styleNegative", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
+      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "styleNegative", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
