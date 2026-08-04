@@ -39,6 +39,10 @@ SunoAction = Literal[
     "samples",
     "inspo",
 ]
+SunoLyricsModel = Literal[
+    "default",
+    "remi-v1",
+]
 
 
 def _task_id(result: Any) -> str:
@@ -346,7 +350,7 @@ class Suno:
     def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: SunoLyricsModel,
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
@@ -688,7 +692,7 @@ class AsyncSuno:
     async def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: SunoLyricsModel,
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
