@@ -21,6 +21,7 @@ client
 │   ├── kling       # every Kling parameter, validated
 │   ├── veo         # generate / upsample / extend / reshoot / objects
 │   ├── glm
+│   ├── gemini      # chat completions, videos, native v1beta generateContent
 │   └── openai      # OpenAI-compatible completions & responses
 │
 ├── ── modality axis — pick a provider at call time ──

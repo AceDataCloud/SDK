@@ -17,6 +17,7 @@ type Client struct {
 	search   *SearchResource
 	face     *FaceResource
 	shorturl *ShortURLResource
+	gemini   *GeminiResource
 
 	// providers holds the generated provider-axis clients, one per service.
 	providers *providers
@@ -44,6 +45,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.providers = newProviders(tr)
 	c.face = &FaceResource{t: tr}
 	c.shorturl = &ShortURLResource{t: tr}
+	c.gemini = &GeminiResource{t: tr}
 	return c, nil
 }
 
@@ -75,3 +77,6 @@ func (c *Client) Face() *FaceResource { return c.face }
 
 // ShortURL returns the short URL resource.
 func (c *Client) ShortURL() *ShortURLResource { return c.shorturl }
+
+// Gemini returns the Gemini resource (chat completions, videos, native v1beta).
+func (c *Client) Gemini() *GeminiResource { return c.gemini }
