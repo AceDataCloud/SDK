@@ -195,6 +195,33 @@ class Suno:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/suno/persona", json=body)
 
+    def persona_list(
+        self,
+        *,
+        user_id: str,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> dict[str, Any]:
+        """Suno Persona List API, list personas created for a given user."""
+        params: dict[str, Any] = {"user_id": user_id}
+        if limit is not None:
+            params["limit"] = limit
+        if offset is not None:
+            params["offset"] = offset
+        return self._transport.request("GET", "/suno/persona", params=params)
+
+    def persona_delete(
+        self,
+        *,
+        persona_id: str,
+        user_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Suno Persona Delete API, delete a previously created persona."""
+        params: dict[str, Any] = {"persona_id": persona_id}
+        if user_id is not None:
+            params["user_id"] = user_id
+        return self._transport.request("DELETE", "/suno/persona", params=params)
+
     def mp4(
         self,
         *,
@@ -536,6 +563,33 @@ class AsyncSuno:
         if callback_url is not None:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/suno/persona", json=body)
+
+    async def persona_list(
+        self,
+        *,
+        user_id: str,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> dict[str, Any]:
+        """Suno Persona List API, list personas created for a given user."""
+        params: dict[str, Any] = {"user_id": user_id}
+        if limit is not None:
+            params["limit"] = limit
+        if offset is not None:
+            params["offset"] = offset
+        return await self._transport.request("GET", "/suno/persona", params=params)
+
+    async def persona_delete(
+        self,
+        *,
+        persona_id: str,
+        user_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Suno Persona Delete API, delete a previously created persona."""
+        params: dict[str, Any] = {"persona_id": persona_id}
+        if user_id is not None:
+            params["user_id"] = user_id
+        return await self._transport.request("DELETE", "/suno/persona", params=params)
 
     async def mp4(
         self,

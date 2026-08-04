@@ -104,6 +104,22 @@ export interface SunoPersonaOptions {
   [key: string]: unknown;
 }
 
+export interface SunoPersonaListOptions {
+  /** The user ID whose personas should be listed. */
+  userId: string;
+  /** Maximum number of items to return. */
+  limit?: number;
+  /** Offset for pagination. */
+  offset?: number;
+}
+
+export interface SunoPersonaDeleteOptions {
+  /** The persona to delete. */
+  personaId: string;
+  /** The user ID that owns the persona. */
+  userId?: string;
+}
+
 export interface SunoMp4Options {
   /** Used to obtain the song ID for the corresponding MP4 of the song. */
   audioId: string;
@@ -281,6 +297,21 @@ export class Suno {
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
     return (await this.transport.request('POST', "/suno/persona", { json: body })) as Record<string, unknown>;
+  }
+
+  /** Suno Persona List API, list personas created for a given user. */
+  async personaList(options: SunoPersonaListOptions): Promise<Record<string, unknown>> {
+    const params: Record<string, string> = { user_id: options.userId };
+    if (options.limit !== undefined) params.limit = String(options.limit);
+    if (options.offset !== undefined) params.offset = String(options.offset);
+    return (await this.transport.request('GET', "/suno/persona", { params })) as Record<string, unknown>;
+  }
+
+  /** Suno Persona Delete API, delete a previously created persona. */
+  async personaDelete(options: SunoPersonaDeleteOptions): Promise<Record<string, unknown>> {
+    const params: Record<string, string> = { persona_id: options.personaId };
+    if (options.userId !== undefined) params.user_id = options.userId;
+    return (await this.transport.request('DELETE', "/suno/persona", { params })) as Record<string, unknown>;
   }
 
   /** Suno MP4 API, get MP4 file link via audio_id. */

@@ -3,7 +3,11 @@
 
 package acedatacloud
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"net/url"
+)
 
 
 // Suno is the suno provider client.
@@ -245,6 +249,63 @@ func (c *Suno) Persona(ctx context.Context, req SunoPersonaRequest) (map[string]
 		Method: "POST",
 		Path:   "/suno/persona",
 		Body:   req.toBody(),
+	})
+}
+
+// SunoPersonaListRequest is the input to suno.PersonaList.
+type SunoPersonaListRequest struct {
+	// The user ID whose personas should be listed.
+	UserID string
+	// Maximum number of items to return.
+	Limit int
+	// Offset for pagination.
+	Offset int
+}
+
+func (r SunoPersonaListRequest) toQuery() url.Values {
+	q := url.Values{}
+	q.Set("user_id", r.UserID)
+	if r.Limit != 0 {
+		q.Set("limit", fmt.Sprintf("%d", r.Limit))
+	}
+	if r.Offset != 0 {
+		q.Set("offset", fmt.Sprintf("%d", r.Offset))
+	}
+	return q
+}
+
+// PersonaList Suno Persona List API, list personas created for a given user.
+func (c *Suno) PersonaList(ctx context.Context, req SunoPersonaListRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/suno/persona",
+		Query:  req.toQuery(),
+	})
+}
+
+// SunoPersonaDeleteRequest is the input to suno.PersonaDelete.
+type SunoPersonaDeleteRequest struct {
+	// The persona to delete.
+	PersonaID string
+	// The user ID that owns the persona.
+	UserID string
+}
+
+func (r SunoPersonaDeleteRequest) toQuery() url.Values {
+	q := url.Values{}
+	q.Set("persona_id", r.PersonaID)
+	if r.UserID != "" {
+		q.Set("user_id", r.UserID)
+	}
+	return q
+}
+
+// PersonaDelete Suno Persona Delete API, delete a previously created persona.
+func (c *Suno) PersonaDelete(ctx context.Context, req SunoPersonaDeleteRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "DELETE",
+		Path:   "/suno/persona",
+		Query:  req.toQuery(),
 	})
 }
 

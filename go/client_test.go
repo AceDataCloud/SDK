@@ -407,3 +407,58 @@ func TestTransientErrorKeepsWaiting(t *testing.T) {
 		t.Errorf("taskStatus = %q, want empty (still running)", got)
 	}
 }
+
+func TestSuno_PersonaList(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/suno/persona" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		if r.Method != http.MethodGet {
+			t.Errorf("unexpected method %s", r.Method)
+		}
+		q := r.URL.Query()
+		if q.Get("user_id") != "user-1" || q.Get("limit") != "10" || q.Get("offset") != "5" {
+			t.Errorf("unexpected query: %v", q)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"items":[],"count":0}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	_, err := c.Suno().PersonaList(context.Background(), SunoPersonaListRequest{
+		UserID: "user-1",
+		Limit:  10,
+		Offset: 5,
+	})
+	if err != nil {
+		t.Fatalf("PersonaList: %v", err)
+	}
+}
+
+func TestSuno_PersonaDelete(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/suno/persona" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		if r.Method != http.MethodDelete {
+			t.Errorf("unexpected method %s", r.Method)
+		}
+		q := r.URL.Query()
+		if q.Get("persona_id") != "p-1" || q.Get("user_id") != "user-1" {
+			t.Errorf("unexpected query: %v", q)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"success":true}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	_, err := c.Suno().PersonaDelete(context.Background(), SunoPersonaDeleteRequest{
+		PersonaID: "p-1",
+		UserID:    "user-1",
+	})
+	if err != nil {
+		t.Fatalf("PersonaDelete: %v", err)
+	}
+}
