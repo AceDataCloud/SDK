@@ -33,7 +33,7 @@ export interface SunoGenerateOptions {
   prompt?: Record<string, unknown>;
   /** Audio ID used for generating additional audio based on existing audio. This field is required when `action` is `extend` or `concat`. */
   audioId?: string;
-  /** Target length of the generated track in seconds, ranging from 10 to 360. Only effective when `action` is `generate`, `custom` is `true`, and `model` is `chirp-v5-5`. */
+  /** Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is mainly used for generation in custom mode (`custom` is `true`); some models or actions may not support it, in which case the value is ignored or an error is returned. It is a target only — the finished length is reported by the `duration` field in the response and may differ slightly. */
   duration?: number;
   /** The "Weirdness" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with higher values resulting in more creative and experimental outputs. It is only effective in custom mode. */
   weirdness?: number;

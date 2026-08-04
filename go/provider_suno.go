@@ -29,7 +29,7 @@ type SunoGenerateRequest struct {
 	Prompt map[string]any
 	// Audio ID used for generating additional audio based on existing audio. This field is required when `action` is
 	AudioID string
-	// Target length of the generated track in seconds, ranging from 10 to 360. Only effective when `action` is `gene
+	// Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is main
 	Duration int
 	// The "Weirdness" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with higher v
 	Weirdness float64
