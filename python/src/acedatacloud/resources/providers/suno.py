@@ -81,7 +81,7 @@ class Suno:
         lyric_prompt: dict[str, Any] | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
-        style_negative: str | None = None,
+        negative_tags: str | None = None,
         style_influence: float | None = None,
         mashup_audio_ids: list[str] | None = None,
         overpainting_end: float | None = None,
@@ -136,8 +136,8 @@ class Suno:
             body["vocal_gender"] = vocal_gender
         if samples_start is not None:
             body["samples_start"] = samples_start
-        if style_negative is not None:
-            body["style_negative"] = style_negative
+        if negative_tags is not None:
+            body["negative_tags"] = negative_tags
         if style_influence is not None:
             body["style_influence"] = style_influence
         if mashup_audio_ids is not None:
@@ -423,7 +423,7 @@ class AsyncSuno:
         lyric_prompt: dict[str, Any] | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
-        style_negative: str | None = None,
+        negative_tags: str | None = None,
         style_influence: float | None = None,
         mashup_audio_ids: list[str] | None = None,
         overpainting_end: float | None = None,
@@ -478,8 +478,8 @@ class AsyncSuno:
             body["vocal_gender"] = vocal_gender
         if samples_start is not None:
             body["samples_start"] = samples_start
-        if style_negative is not None:
-            body["style_negative"] = style_negative
+        if negative_tags is not None:
+            body["negative_tags"] = negative_tags
         if style_influence is not None:
             body["style_influence"] = style_influence
         if mashup_audio_ids is not None:
