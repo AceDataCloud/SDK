@@ -248,6 +248,113 @@ export class Transport {
     }
   }
 
+  buildURL(path: string, opts: { params?: Record<string, string>; websocket?: boolean } = {}): string {
+    let base = this.baseURL;
+    if (opts.websocket) {
+      base = base.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
+    }
+    let url = `${base}${path}`;
+    if (opts.params) {
+      const qs = new URLSearchParams(opts.params).toString();
+      url += `?${qs}`;
+    }
+    return url;
+  }
+
+  async requestBytes(
+    method: string,
+    path: string,
+    opts: { json?: Record<string, unknown>; timeout?: number; headers?: Record<string, string> } = {}
+  ): Promise<ArrayBuffer> {
+    const url = this.buildURL(path);
+    const headers = { ...this.headers, ...(opts.headers ?? {}) };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), opts.timeout ?? this.timeout);
+    try {
+      let resp: Response;
+      try {
+        resp = await fetch(url, {
+          method,
+          headers,
+          body: opts.json ? JSON.stringify(opts.json) : undefined,
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) throw timeoutError(error);
+        throw error;
+      }
+      if (resp.status >= 400) {
+        const text = await resp.text();
+        let body: Record<string, unknown>;
+        try {
+          body = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          body = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(resp.status, body);
+      }
+      return resp.arrayBuffer();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async multipart(
+    path: string,
+    fileData: Buffer | Uint8Array,
+    filename: string,
+    opts: { fields?: Record<string, unknown>; timeout?: number } = {}
+  ): Promise<Record<string, unknown> | string> {
+    const url = this.buildURL(path);
+    const body = new FormData();
+    body.append('file', new Blob([fileData]), filename);
+    for (const [key, value] of Object.entries(opts.fields ?? {})) {
+      if (value === undefined || value === null) continue;
+      if (Array.isArray(value)) {
+        for (const item of value) body.append(key, String(item));
+      } else {
+        body.append(key, String(value));
+      }
+    }
+    const headers: Record<string, string> = {
+      authorization: this.headers.authorization,
+      'user-agent': this.headers['user-agent'],
+      accept: this.headers.accept,
+    };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), opts.timeout ?? this.timeout);
+    try {
+      let resp: Response;
+      try {
+        resp = await fetch(url, {
+          method: 'POST',
+          headers,
+          body,
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) throw timeoutError(error);
+        throw error;
+      }
+      if (resp.status >= 400) {
+        const text = await resp.text();
+        let respBody: Record<string, unknown>;
+        try {
+          respBody = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          respBody = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(resp.status, respBody);
+      }
+      if (resp.headers.get('content-type')?.includes('application/json')) {
+        return (await resp.json()) as Record<string, unknown>;
+      }
+      return resp.text();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   async *requestStream(
     method: string,
     path: string,

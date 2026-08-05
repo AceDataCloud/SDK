@@ -164,6 +164,88 @@ class Embeddings {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class Speech {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<ArrayBuffer> {
+    const { input, responseFormat, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    return this.transport.requestBytes('POST', '/v1/audio/speech', { json: body });
+  }
+}
+
+class Transcriptions {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    file: Buffer | Uint8Array;
+    filename?: string;
+    model?: string;
+    language?: string;
+    prompt?: string;
+    responseFormat?: string;
+    temperature?: number;
+    timestampGranularities?: string[];
+    stream?: boolean;
+    languages?: string[];
+    keywords?: string[];
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown> | string> {
+    const {
+      file,
+      filename,
+      responseFormat,
+      timestampGranularities,
+      languages,
+      keywords,
+      ...rest
+    } = opts;
+    const fields: Record<string, unknown> = { ...rest };
+    if (responseFormat !== undefined) fields.response_format = responseFormat;
+    if (timestampGranularities !== undefined) fields['timestamp_granularities[]'] = timestampGranularities;
+    if (languages !== undefined) fields['languages[]'] = languages;
+    if (keywords !== undefined) fields['keywords[]'] = keywords;
+    return this.transport.multipart('/v1/audio/transcriptions', file, filename ?? 'audio', { fields });
+  }
+}
+
+class Audio {
+  readonly speech: Speech;
+  readonly transcriptions: Transcriptions;
+
+  constructor(transport: Transport) {
+    this.speech = new Speech(transport);
+    this.transcriptions = new Transcriptions(transport);
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport) {}
+
+  url(opts: { model?: string } = {}): string {
+    return this.transport.buildURL('/v1/realtime', {
+      params: { model: opts.model ?? 'gpt-realtime' },
+      websocket: true,
+    });
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -211,6 +293,9 @@ export class OpenAI {
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly models: Models;
+  readonly audio: Audio;
+  readonly realtime: Realtime;
   readonly tasks: Tasks;
 
   constructor(transport: Transport) {
@@ -218,6 +303,9 @@ export class OpenAI {
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.models = new Models(transport);
+    this.audio = new Audio(transport);
+    this.realtime = new Realtime(transport);
     this.tasks = new Tasks(transport);
   }
 }

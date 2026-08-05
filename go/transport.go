@@ -10,6 +10,7 @@ import (
 	"io"
 	"math"
 	"math/rand"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -199,6 +200,119 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 		return nil, lastErr
 	}
 	return nil, &TransportError{&APIError{Message: "request failed after retries"}}
+}
+
+func (t *transport) doBytes(ctx context.Context, r requestOpts) ([]byte, error) {
+	base := t.opts.baseURL
+	if r.Platform {
+		base = t.opts.platformURL
+	}
+	fullURL := base + r.Path
+	if len(r.Query) > 0 {
+		fullURL += "?" + r.Query.Encode()
+	}
+	var bodyBytes []byte
+	if r.Body != nil {
+		var err error
+		bodyBytes, err = json.Marshal(r.Body)
+		if err != nil {
+			return nil, fmt.Errorf("marshal body: %w", err)
+		}
+	}
+	req, err := http.NewRequestWithContext(ctx, r.Method, fullURL, bytes.NewReader(bodyBytes))
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	for k, v := range t.headers {
+		req.Header.Set(k, v)
+	}
+	for k, v := range r.ExtraHeaders {
+		req.Header.Set(k, v)
+	}
+	resp, err := t.httpClient.Do(req)
+	if err != nil {
+		return nil, &TransportError{&APIError{Message: err.Error()}}
+	}
+	defer resp.Body.Close()
+	respBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode >= 400 {
+		parsed := map[string]any{}
+		if err := json.Unmarshal(respBody, &parsed); err != nil {
+			parsed = map[string]any{"error": map[string]any{"code": "unknown", "message": string(respBody)}}
+		}
+		return nil, mapError(resp.StatusCode, parsed)
+	}
+	return respBody, nil
+}
+
+type multipartRequest struct {
+	Path     string
+	File     []byte
+	Filename string
+	Fields   map[string]any
+}
+
+func (t *transport) doMultipart(ctx context.Context, r multipartRequest) (any, error) {
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	part, err := writer.CreateFormFile("file", r.Filename)
+	if err != nil {
+		return nil, fmt.Errorf("create form file: %w", err)
+	}
+	if _, err := part.Write(r.File); err != nil {
+		return nil, fmt.Errorf("write form file: %w", err)
+	}
+	for key, value := range r.Fields {
+		switch typed := value.(type) {
+		case nil:
+			continue
+		case []string:
+			for _, item := range typed {
+				if err := writer.WriteField(key, item); err != nil {
+					return nil, fmt.Errorf("write form field: %w", err)
+				}
+			}
+		default:
+			if err := writer.WriteField(key, fmt.Sprint(value)); err != nil {
+				return nil, fmt.Errorf("write form field: %w", err)
+			}
+		}
+	}
+	if err := writer.Close(); err != nil {
+		return nil, fmt.Errorf("close multipart writer: %w", err)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, t.opts.baseURL+r.Path, &body)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	for k, v := range t.headers {
+		if strings.EqualFold(k, "Content-Type") {
+			continue
+		}
+		req.Header.Set(k, v)
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	resp, err := t.httpClient.Do(req)
+	if err != nil {
+		return nil, &TransportError{&APIError{Message: err.Error()}}
+	}
+	defer resp.Body.Close()
+	respBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode >= 400 {
+		parsed := map[string]any{}
+		if err := json.Unmarshal(respBody, &parsed); err != nil {
+			parsed = map[string]any{"error": map[string]any{"code": "unknown", "message": string(respBody)}}
+		}
+		return nil, mapError(resp.StatusCode, parsed)
+	}
+	if strings.Contains(resp.Header.Get("Content-Type"), "application/json") {
+		parsed := map[string]any{}
+		if err := json.Unmarshal(respBody, &parsed); err != nil {
+			return nil, fmt.Errorf("parse response: %w", err)
+		}
+		return parsed, nil
+	}
+	return string(respBody), nil
 }
 
 // stream executes a POST and yields SSE data chunks via the returned channel.

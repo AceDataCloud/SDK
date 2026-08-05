@@ -35,7 +35,7 @@ func TestNewClient_WithToken(t *testing.T) {
 
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/chat/completions" {
+		if r.URL.Path != "/openai/chat/completions" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
 		if r.Header.Get("Authorization") != "Bearer token-abc" {
@@ -61,6 +61,77 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 	if res["id"] != "c1" {
 		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAIModelsAudioAndRealtime(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/openai/models":
+			_, _ = w.Write([]byte(`{"data":[{"id":"gpt-realtime"}]}`))
+		case "/v1/audio/speech":
+			var body map[string]any
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			if body["input"] != "hello" || body["response_format"] != "mp3" {
+				t.Fatalf("bad speech body: %+v", body)
+			}
+			w.Header().Set("Content-Type", "audio/mpeg")
+			_, _ = w.Write([]byte("audio"))
+		case "/v1/audio/transcriptions":
+			if err := r.ParseMultipartForm(1 << 20); err != nil {
+				t.Fatalf("parse multipart: %v", err)
+			}
+			if got := r.FormValue("model"); got != "whisper-1" {
+				t.Fatalf("bad model field: %q", got)
+			}
+			if got := r.MultipartForm.Value["timestamp_granularities[]"]; len(got) != 1 || got[0] != "word" {
+				t.Fatalf("bad timestamp granularities: %+v", got)
+			}
+			if _, _, err := r.FormFile("file"); err != nil {
+				t.Fatalf("missing file: %v", err)
+			}
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"text":"hello"}`))
+		default:
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	models, err := c.OpenAI().Models().List(context.Background())
+	if err != nil {
+		t.Fatalf("models list: %v", err)
+	}
+	if models["data"] == nil {
+		t.Fatalf("bad models response: %+v", models)
+	}
+	audio, err := c.OpenAI().Audio().Speech().Create(context.Background(), AudioSpeechRequest{
+		Input:          "hello",
+		Model:          "tts-1",
+		ResponseFormat: "mp3",
+	})
+	if err != nil {
+		t.Fatalf("speech create: %v", err)
+	}
+	if string(audio) != "audio" {
+		t.Fatalf("bad audio: %q", string(audio))
+	}
+	transcription, err := c.OpenAI().Audio().Transcriptions().Create(context.Background(), AudioTranscriptionRequest{
+		File:                   []byte("wav"),
+		Filename:               "sample.wav",
+		Model:                  "whisper-1",
+		TimestampGranularities: []string{"word"},
+	})
+	if err != nil {
+		t.Fatalf("transcription create: %v", err)
+	}
+	if transcription.(map[string]any)["text"] != "hello" {
+		t.Fatalf("bad transcription: %+v", transcription)
+	}
+	wantURL := strings.Replace(srv.URL, "http://", "ws://", 1) + "/v1/realtime?model=gpt-realtime-2"
+	if got := c.OpenAI().Realtime().URL("gpt-realtime-2"); got != wantURL {
+		t.Fatalf("bad realtime URL: %s", got)
 	}
 }
 

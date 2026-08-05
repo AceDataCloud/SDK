@@ -226,6 +226,38 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_models_audio_and_realtime(client):
+    respx.get("https://api.acedata.cloud/openai/models").mock(
+        return_value=httpx.Response(200, json={"data": [{"id": "gpt-realtime"}]})
+    )
+    speech = respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, content=b"audio", headers={"content-type": "audio/mpeg"})
+    )
+    transcription = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json={"text": "hello"})
+    )
+
+    assert client.openai.models.list()["data"][0]["id"] == "gpt-realtime"
+    assert client.openai.audio.speech.create(input="hello", model="tts-1", response_format="mp3") == b"audio"
+    result = client.openai.audio.transcriptions.create(
+        file=b"wav",
+        filename="sample.wav",
+        model="whisper-1",
+        timestamp_granularities=["word"],
+    )
+
+    assert result == {"text": "hello"}
+    assert speech.calls.last.request.read() == b'{"input":"hello","model":"tts-1","response_format":"mp3"}'
+    body = transcription.calls.last.request.read()
+    assert b'name="file"; filename="sample.wav"' in body
+    assert b'name="model"\r\n\r\nwhisper-1' in body
+    assert b'name="timestamp_granularities[]"\r\n\r\nword' in body
+    assert client.openai.realtime.url(model="gpt-realtime-2") == (
+        "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2"
+    )
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

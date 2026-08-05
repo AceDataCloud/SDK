@@ -204,6 +204,72 @@ class SyncTransport:
 
             return resp.json()
 
+    def request_bytes(
+        self,
+        method: str,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
+        timeout: float | None = None,
+        extra_headers: dict[str, str] | None = None,
+    ) -> bytes:
+        base = self._base_url
+        url = f"{base}{path}"
+        headers = {**self._headers, **(extra_headers or {})}
+        resp = self._client.request(
+            method,
+            url,
+            json=json,
+            params=params,
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
+
+    def multipart(
+        self,
+        path: str,
+        file_data: bytes,
+        filename: str,
+        *,
+        data: dict[str, Any] | None = None,
+        timeout: float | None = None,
+    ) -> dict[str, Any] | str:
+        url = f"{self._base_url}{path}"
+        headers = {k: v for k, v in self._headers.items() if k != "content-type"}
+        form_data: dict[str, Any] = {}
+        for key, value in (data or {}).items():
+            if value is None:
+                continue
+            if isinstance(value, list):
+                form_data[key] = [str(item) for item in value]
+            else:
+                form_data[key] = str(value)
+
+        resp = self._client.post(
+            url,
+            data=form_data,
+            files={"file": (filename, file_data)},
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        if "application/json" in resp.headers.get("content-type", ""):
+            return resp.json()
+        return resp.text
+
     def request_stream(
         self,
         method: str,
@@ -418,6 +484,72 @@ class AsyncTransport:
                 raise _map_error(resp.status_code, body)
 
             return resp.json()
+
+    async def request_bytes(
+        self,
+        method: str,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
+        timeout: float | None = None,
+        extra_headers: dict[str, str] | None = None,
+    ) -> bytes:
+        base = self._base_url
+        url = f"{base}{path}"
+        headers = {**self._headers, **(extra_headers or {})}
+        resp = await self._client.request(
+            method,
+            url,
+            json=json,
+            params=params,
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
+
+    async def multipart(
+        self,
+        path: str,
+        file_data: bytes,
+        filename: str,
+        *,
+        data: dict[str, Any] | None = None,
+        timeout: float | None = None,
+    ) -> dict[str, Any] | str:
+        url = f"{self._base_url}{path}"
+        headers = {k: v for k, v in self._headers.items() if k != "content-type"}
+        form_data: dict[str, Any] = {}
+        for key, value in (data or {}).items():
+            if value is None:
+                continue
+            if isinstance(value, list):
+                form_data[key] = [str(item) for item in value]
+            else:
+                form_data[key] = str(value)
+
+        resp = await self._client.post(
+            url,
+            data=form_data,
+            files={"file": (filename, file_data)},
+            headers=headers,
+            timeout=timeout or self._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        if "application/json" in resp.headers.get("content-type", ""):
+            return resp.json()
+        return resp.text
 
     async def request_stream(
         self,
