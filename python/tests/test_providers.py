@@ -119,6 +119,29 @@ def test_model_enum_is_typed(client):
     assert "flux-dev" in typing.get_args(literal)
 
 
+def test_seedream_serializes_the_current_schema(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.seedream._transport = transport
+
+    client.seedream.generate(
+        model="doubao-seedream-5-0-pro-260628",
+        prompt="a cat",
+        image=["https://example.com/reference.png"],
+        sequential_image_generation="auto",
+        sequential_image_generation_options={"max_images": 2},
+        response_format="b64_json",
+        tools=[{"type": "web_search"}],
+    )
+
+    body = transport.request.call_args.kwargs["json"]
+    assert body["model"] == "doubao-seedream-5-0-pro-260628"
+    assert body["sequential_image_generation"] == "auto"
+    assert body["sequential_image_generation_options"] == {"max_images": 2}
+    assert "seed" not in body
+    assert "guidance_scale" not in body
+
+
 def test_extra_parameters_pass_through(client):
     """A parameter added upstream must be reachable before the SDK is regenerated."""
     transport = Mock()
