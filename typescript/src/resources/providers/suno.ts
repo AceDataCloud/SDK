@@ -56,7 +56,7 @@ export interface SunoGenerateOptions {
   /** Add a default start time for the uploaded audio sample, with a default value of 0. */
   samplesStart?: number;
   /** Styles of description that are not desired in music generation. */
-  styleNegative?: string;
+  negativeTags?: string;
   /** The "Style Influence" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with higher values being closer to the selected style. It is only effective in custom mode. */
   styleInfluence?: number;
   /** Audio ID list for mixing and mashup. This field is required when `action` is `mashup`. */
@@ -240,7 +240,7 @@ export class Suno {
     if (options.lyricPrompt !== undefined) body["lyric_prompt"] = options.lyricPrompt;
     if (options.vocalGender !== undefined) body["vocal_gender"] = options.vocalGender;
     if (options.samplesStart !== undefined) body["samples_start"] = options.samplesStart;
-    if (options.styleNegative !== undefined) body["style_negative"] = options.styleNegative;
+    if (options.negativeTags !== undefined) body["negative_tags"] = options.negativeTags;
     if (options.styleInfluence !== undefined) body["style_influence"] = options.styleInfluence;
     if (options.mashupAudioIds !== undefined) body["mashup_audio_ids"] = options.mashupAudioIds;
     if (options.overpaintingEnd !== undefined) body["overpainting_end"] = options.overpaintingEnd;
@@ -251,7 +251,7 @@ export class Suno {
     if (options.underpaintingStart !== undefined) body["underpainting_start"] = options.underpaintingStart;
     if (options.replaceSectionStart !== undefined) body["replace_section_start"] = options.replaceSectionStart;
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "styleNegative", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
+      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "negativeTags", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }

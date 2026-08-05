@@ -52,7 +52,7 @@ type SunoGenerateRequest struct {
 	// Add a default start time for the uploaded audio sample, with a default value of 0.
 	SamplesStart float64
 	// Styles of description that are not desired in music generation.
-	StyleNegative string
+	NegativeTags string
 	// The "Style Influence" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with hi
 	StyleInfluence float64
 	// Audio ID list for mixing and mashup. This field is required when `action` is `mashup`.
@@ -134,8 +134,8 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	if r.SamplesStart != 0 {
 		body["samples_start"] = r.SamplesStart
 	}
-	if r.StyleNegative != "" {
-		body["style_negative"] = r.StyleNegative
+	if r.NegativeTags != "" {
+		body["negative_tags"] = r.NegativeTags
 	}
 	if r.StyleInfluence != 0 {
 		body["style_influence"] = r.StyleInfluence
