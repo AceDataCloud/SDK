@@ -3,8 +3,11 @@
 
 package acedatacloud
 
-import "context"
-
+import (
+	"context"
+	"net/url"
+	"strconv"
+)
 
 // Suno is the suno provider client.
 type Suno struct {
@@ -245,6 +248,53 @@ func (c *Suno) Persona(ctx context.Context, req SunoPersonaRequest) (map[string]
 		Method: "POST",
 		Path:   "/suno/persona",
 		Body:   req.toBody(),
+	})
+}
+
+// SunoListPersonasRequest is the input to suno.ListPersonas.
+type SunoListPersonasRequest struct {
+	// UserID is the user whose personas to list.
+	UserID string
+	// Limit is the maximum number of personas to return.
+	Limit int
+	// Offset is the number of personas to skip.
+	Offset int
+}
+
+// ListPersonas lists Suno personas for a user.
+func (c *Suno) ListPersonas(ctx context.Context, req SunoListPersonasRequest) (map[string]any, error) {
+	params := url.Values{"user_id": {req.UserID}}
+	if req.Limit != 0 {
+		params.Set("limit", strconv.Itoa(req.Limit))
+	}
+	if req.Offset != 0 {
+		params.Set("offset", strconv.Itoa(req.Offset))
+	}
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/suno/persona",
+		Query:  params,
+	})
+}
+
+// SunoDeletePersonaRequest is the input to suno.DeletePersona.
+type SunoDeletePersonaRequest struct {
+	// PersonaID is the persona to delete.
+	PersonaID string
+	// UserID optionally identifies the persona owner.
+	UserID string
+}
+
+// DeletePersona deletes a Suno persona.
+func (c *Suno) DeletePersona(ctx context.Context, req SunoDeletePersonaRequest) (map[string]any, error) {
+	params := url.Values{"persona_id": {req.PersonaID}}
+	if req.UserID != "" {
+		params.Set("user_id", req.UserID)
+	}
+	return c.t.do(ctx, requestOpts{
+		Method: "DELETE",
+		Path:   "/suno/persona",
+		Query:  params,
 	})
 }
 
@@ -528,6 +578,16 @@ func (c *Suno) Style(ctx context.Context, req SunoStyleRequest) (map[string]any,
 		Body:   req.toBody(),
 	})
 }
+
+// SunoLyricsModel identifies a model supported by suno.Lyrics.
+type SunoLyricsModel string
+
+const (
+	// SunoLyricsModelDefault is the default lyrics model.
+	SunoLyricsModelDefault SunoLyricsModel = "default"
+	// SunoLyricsModelRemiV1 is the Remi lyrics model.
+	SunoLyricsModelRemiV1 SunoLyricsModel = "remi-v1"
+)
 
 // SunoLyricsRequest is the input to suno.Lyrics.
 type SunoLyricsRequest struct {

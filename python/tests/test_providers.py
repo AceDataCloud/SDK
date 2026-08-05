@@ -138,8 +138,29 @@ def test_every_provider_has_a_callable_method(client, name):
 
 def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
-    for method in ("generate", "lyrics", "wav", "mp4"):
+    for method in ("generate", "lyrics", "wav", "mp4", "list_personas", "delete_persona"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_suno_persona_list_and_delete_use_documented_query_parameters(client):
+    transport = Mock()
+    transport.request.return_value = {"success": True}
+    client.suno._transport = transport
+
+    client.suno.list_personas(user_id="user-1", limit=25, offset=5)
+    transport.request.assert_called_with(
+        "GET", "/suno/persona", params={"user_id": "user-1", "limit": 25, "offset": 5}
+    )
+
+    client.suno.delete_persona(persona_id="persona-1", user_id="user-1")
+    transport.request.assert_called_with(
+        "DELETE", "/suno/persona", params={"persona_id": "persona-1", "user_id": "user-1"}
+    )
+
+
+def test_suno_lyrics_model_is_typed_to_the_documented_enum(client):
+    hints = typing.get_type_hints(type(client.suno).lyrics)
+    assert set(typing.get_args(hints["model"])) == {"default", "remi-v1"}
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):

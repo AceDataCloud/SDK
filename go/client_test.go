@@ -64,6 +64,43 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 }
 
+func TestSunoPersonaListAndDelete(t *testing.T) {
+	requests := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		if r.URL.Path != "/suno/persona" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		switch requests {
+		case 1:
+			if r.Method != http.MethodGet || r.URL.Query().Get("user_id") != "user-1" ||
+				r.URL.Query().Get("limit") != "25" || r.URL.Query().Get("offset") != "5" {
+				t.Errorf("unexpected list request: %s %s", r.Method, r.URL.RawQuery)
+			}
+		case 2:
+			if r.Method != http.MethodDelete || r.URL.Query().Get("persona_id") != "persona-1" ||
+				r.URL.Query().Get("user_id") != "user-1" {
+				t.Errorf("unexpected delete request: %s %s", r.Method, r.URL.RawQuery)
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"success":true}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token"), WithBaseURL(srv.URL))
+	if _, err := c.Suno().ListPersonas(context.Background(), SunoListPersonasRequest{
+		UserID: "user-1", Limit: 25, Offset: 5,
+	}); err != nil {
+		t.Fatalf("ListPersonas: %v", err)
+	}
+	if _, err := c.Suno().DeletePersona(context.Background(), SunoDeletePersonaRequest{
+		PersonaID: "persona-1", UserID: "user-1",
+	}); err != nil {
+		t.Fatalf("DeletePersona: %v", err)
+	}
+}
+
 func TestTransport_RetriesOn503(t *testing.T) {
 	attempts := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

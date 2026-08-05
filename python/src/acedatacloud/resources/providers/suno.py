@@ -39,6 +39,7 @@ SunoAction = Literal[
     "samples",
     "inspo",
 ]
+SunoLyricsModel = Literal["default", "remi-v1"]
 
 
 def _task_id(result: Any) -> str:
@@ -195,6 +196,33 @@ class Suno:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/suno/persona", json=body)
 
+    def list_personas(
+        self,
+        *,
+        user_id: str,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> dict[str, Any]:
+        """List Suno personas for a user."""
+        params: dict[str, Any] = {"user_id": user_id}
+        if limit is not None:
+            params["limit"] = limit
+        if offset is not None:
+            params["offset"] = offset
+        return self._transport.request("GET", "/suno/persona", params=params)
+
+    def delete_persona(
+        self,
+        *,
+        persona_id: str,
+        user_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Delete a Suno persona."""
+        params: dict[str, Any] = {"persona_id": persona_id}
+        if user_id is not None:
+            params["user_id"] = user_id
+        return self._transport.request("DELETE", "/suno/persona", params=params)
+
     def mp4(
         self,
         *,
@@ -346,7 +374,7 @@ class Suno:
     def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: SunoLyricsModel,
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
@@ -537,6 +565,33 @@ class AsyncSuno:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/suno/persona", json=body)
 
+    async def list_personas(
+        self,
+        *,
+        user_id: str,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> dict[str, Any]:
+        """List Suno personas for a user."""
+        params: dict[str, Any] = {"user_id": user_id}
+        if limit is not None:
+            params["limit"] = limit
+        if offset is not None:
+            params["offset"] = offset
+        return await self._transport.request("GET", "/suno/persona", params=params)
+
+    async def delete_persona(
+        self,
+        *,
+        persona_id: str,
+        user_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Delete a Suno persona."""
+        params: dict[str, Any] = {"persona_id": persona_id}
+        if user_id is not None:
+            params["user_id"] = user_id
+        return await self._transport.request("DELETE", "/suno/persona", params=params)
+
     async def mp4(
         self,
         *,
@@ -688,7 +743,7 @@ class AsyncSuno:
     async def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: SunoLyricsModel,
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,

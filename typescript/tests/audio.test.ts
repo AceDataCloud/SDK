@@ -1,4 +1,5 @@
 import { Audio } from '../src/resources/audio';
+import { Suno } from '../src/resources/providers/suno';
 
 describe('Audio resource', () => {
   it('uses fish tts endpoint with text body and model header', async () => {
@@ -54,5 +55,20 @@ describe('Audio resource', () => {
       },
     });
     expect(request).toHaveBeenNthCalledWith(2, 'GET', '/fish/model/voice-1');
+  });
+
+  it('lists and deletes Suno personas with documented query parameters', async () => {
+    const request = jest.fn().mockResolvedValue({ success: true });
+    const suno = new Suno({ request } as any);
+
+    await suno.listPersonas({ userId: 'user-1', limit: 25, offset: 5 });
+    await suno.deletePersona({ personaId: 'persona-1', userId: 'user-1' });
+
+    expect(request).toHaveBeenNthCalledWith(1, 'GET', '/suno/persona', {
+      params: { user_id: 'user-1', limit: '25', offset: '5' },
+    });
+    expect(request).toHaveBeenNthCalledWith(2, 'DELETE', '/suno/persona', {
+      params: { persona_id: 'persona-1', user_id: 'user-1' },
+    });
   });
 });
