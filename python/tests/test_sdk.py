@@ -208,6 +208,24 @@ def test_openai_chat_completions(client):
     assert result["usage"]["total_tokens"] == 15
 
 
+@respx.mock
+def test_glm_chat_completions_supports_latest_models(client):
+    route = respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
+        return_value=httpx.Response(200, json={"id": "glm-1", "choices": []})
+    )
+
+    result = client.glm.chat.completions.create(
+        model="glm-5.2",
+        messages=[{"role": "user", "content": "Hi"}],
+    )
+
+    assert result["id"] == "glm-1"
+    assert json.loads(route.calls.last.request.content) == {
+        "model": "glm-5.2",
+        "messages": [{"role": "user", "content": "Hi"}],
+    }
+
+
 # ── OpenAI Responses ─────────────────────────────────────────────────
 
 

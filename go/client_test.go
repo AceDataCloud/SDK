@@ -64,6 +64,34 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 }
 
+func TestGLMChatCompletions_Create(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/glm/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != string(GLMModel52) {
+			t.Errorf("bad model: %v", body["model"])
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"glm-1","choices":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.GLM().Chat().Completions().Create(context.Background(), GLMChatCompletionRequest{
+		Model:    GLMModel52,
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "glm-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
 func TestTransport_RetriesOn503(t *testing.T) {
 	attempts := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
