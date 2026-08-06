@@ -31,6 +31,77 @@ func TestNewClient_WithToken(t *testing.T) {
 	if c.OpenAI() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
 	}
+	if c.AiChat() == nil || c.AiChat2() == nil {
+		t.Fatal("aichat resources must be non-nil")
+	}
+}
+
+func TestAiChat_Create(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat/conversations" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != string(AiChatModelGpt56Sol) || body["question"] != "Hi" {
+			t.Errorf("bad body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"answer":"ok"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.AiChat().Create(context.Background(), AiChatCreateRequest{
+		Model:    AiChatModelGpt56Sol,
+		Question: "Hi",
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["answer"] != "ok" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestAiChat2_Create(t *testing.T) {
+	async := true
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat2/conversations" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != string(AiChat2ModelClaudeSonnet5) || body["action"] != string(AiChat2ActionChat) {
+			t.Errorf("bad body: %+v", body)
+		}
+		if body["async"] != true {
+			t.Errorf("missing async flag: %+v", body)
+		}
+		if body["model_group"] != string(AiChat2ModelGroupClaude) {
+			t.Errorf("bad model group: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"conversation-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.AiChat2().Create(context.Background(), AiChat2CreateRequest{
+		Model:             AiChat2ModelClaudeSonnet5,
+		Action:            AiChat2ActionChat,
+		Message:           []AiChat2MessagePart{{"type": "text", "text": "Hi"}},
+		Async:             &async,
+		AllowedMCPServers: []string{"server-1"},
+		UnattendedPolicy:  &AiChat2UnattendedPolicy{ExpiresAt: 123},
+		ModelGroup:        AiChat2ModelGroupClaude,
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "conversation-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
 }
 
 func TestChatCompletions_Create(t *testing.T) {

@@ -226,6 +226,50 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+# ── AI Chat ───────────────────────────────────────────────────────────
+
+
+@respx.mock
+def test_aichat_accepts_latest_models(client):
+    respx.post("https://api.acedata.cloud/aichat/conversations").mock(
+        return_value=httpx.Response(200, json={"answer": "ok"})
+    )
+
+    result = client.aichat.create(model="gpt-5.6-sol", question="Hi")
+
+    assert result["answer"] == "ok"
+
+
+@respx.mock
+def test_aichat2_conversations_body(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload == {
+            "model": "claude-sonnet-5",
+            "action": "chat",
+            "message": [{"type": "text", "text": "Hi"}],
+            "async": True,
+            "allowed_mcp_servers": ["server-1"],
+            "unattended_policy": {"expires_at": 123},
+            "model_group": "claude",
+        }
+        return httpx.Response(200, json={"id": "conversation-1"})
+
+    respx.post("https://api.acedata.cloud/aichat2/conversations").mock(side_effect=_handler)
+
+    result = client.aichat2.create(
+        model="claude-sonnet-5",
+        action="chat",
+        message=[{"type": "text", "text": "Hi"}],
+        async_=True,
+        allowed_mcp_servers=["server-1"],
+        unattended_policy={"expires_at": 123},
+        model_group="claude",
+    )
+
+    assert result["id"] == "conversation-1"
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
