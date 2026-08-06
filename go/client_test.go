@@ -64,6 +64,38 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 }
 
+func TestKimiChatCompletions_Create(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/kimi/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "kimi-k3" {
+			t.Errorf("bad model: %v", body["model"])
+		}
+		if body["reasoning_effort"] != "max" {
+			t.Errorf("missing reasoning_effort: %v", body["reasoning_effort"])
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"kimi-1","choices":[{"message":{"role":"assistant","content":"hi"}}]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.Kimi().Chat().Completions().Create(context.Background(), KimiChatCompletionRequest{
+		Model:    KimiModelK3,
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+		Extra:    map[string]any{"reasoning_effort": "max"},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "kimi-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
 func TestTransport_RetriesOn503(t *testing.T) {
 	attempts := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

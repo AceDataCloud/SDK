@@ -208,6 +208,25 @@ def test_openai_chat_completions(client):
     assert result["usage"]["total_tokens"] == 15
 
 
+@respx.mock
+def test_kimi_chat_completions(client):
+    def _handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content.decode("utf-8"))
+        assert payload["model"] == "kimi-k3"
+        assert payload["messages"] == [{"role": "user", "content": "Hi"}]
+        assert payload["reasoning_effort"] == "max"
+        return httpx.Response(200, json={"choices": [{"message": {"content": "Hello from Kimi"}}]})
+
+    respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(side_effect=_handler)
+
+    result = client.kimi.chat.completions.create(
+        model="kimi-k3",
+        messages=[{"role": "user", "content": "Hi"}],
+        reasoning_effort="max",
+    )
+    assert result["choices"][0]["message"]["content"] == "Hello from Kimi"
+
+
 # ── OpenAI Responses ─────────────────────────────────────────────────
 
 
