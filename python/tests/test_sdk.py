@@ -44,6 +44,24 @@ def test_default_api_base_uses_x402_host():
 
 
 @respx.mock
+def test_glm_chat_completions_uses_latest_model_enum_path():
+    route = respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
+        return_value=httpx.Response(200, json={"id": "glm-1"})
+    )
+    client = AceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
+
+    result = client.glm.chat.completions.create(
+        model="glm-5.2",
+        messages=[{"role": "user", "content": "hi"}],
+    )
+
+    assert result["id"] == "glm-1"
+    assert route.called
+    assert json.loads(route.calls.last.request.content)["model"] == "glm-5.2"
+    client.close()
+
+
+@respx.mock
 @pytest.mark.asyncio
 async def test_async_default_api_base_uses_x402_host():
     route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(

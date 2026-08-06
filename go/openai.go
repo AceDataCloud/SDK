@@ -68,6 +68,80 @@ func (r ResponsesRequest) toBody() map[string]any {
 	return body
 }
 
+// OpenAITaskRetrieveRequest is the input to openai.tasks.retrieve.
+type OpenAITaskRetrieveRequest struct {
+	ID      string
+	TraceID string
+	Extra   map[string]any
+}
+
+func (r OpenAITaskRetrieveRequest) toBody() map[string]any {
+	body := map[string]any{"action": "retrieve"}
+	if r.ID != "" {
+		body["id"] = r.ID
+	}
+	if r.TraceID != "" {
+		body["trace_id"] = r.TraceID
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// OpenAITaskRetrieveBatchRequest is the input to openai.tasks.retrieve_batch.
+type OpenAITaskRetrieveBatchRequest struct {
+	IDs           []string
+	TraceIDs      []string
+	ApplicationID string
+	UserID        string
+	Type          string
+	Offset        int
+	Limit         int
+	CreatedAtMin  int64
+	CreatedAtMax  int64
+	Extra         map[string]any
+}
+
+func (r OpenAITaskRetrieveBatchRequest) toBody() map[string]any {
+	body := map[string]any{"action": "retrieve_batch"}
+	if len(r.IDs) > 0 {
+		body["ids"] = r.IDs
+	}
+	if len(r.TraceIDs) > 0 {
+		body["trace_ids"] = r.TraceIDs
+	}
+	if r.ApplicationID != "" {
+		body["application_id"] = r.ApplicationID
+	}
+	if r.UserID != "" {
+		body["user_id"] = r.UserID
+	}
+	if r.Type != "" {
+		body["type"] = r.Type
+	}
+	if r.Offset != 0 {
+		body["offset"] = r.Offset
+	}
+	if r.Limit != 0 {
+		body["limit"] = r.Limit
+	}
+	if r.CreatedAtMin != 0 {
+		body["created_at_min"] = r.CreatedAtMin
+	}
+	if r.CreatedAtMax != 0 {
+		body["created_at_max"] = r.CreatedAtMax
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
 // OpenAIResource groups the OpenAI-compatible endpoints.
 type OpenAIResource struct {
 	t *transport
@@ -78,6 +152,9 @@ func (o *OpenAIResource) Chat() *OpenAIChat { return &OpenAIChat{t: o.t} }
 
 // Responses returns the responses sub-namespace.
 func (o *OpenAIResource) Responses() *OpenAIResponses { return &OpenAIResponses{t: o.t} }
+
+// Tasks returns the OpenAI tasks sub-namespace.
+func (o *OpenAIResource) Tasks() *OpenAITasks { return &OpenAITasks{t: o.t} }
 
 // OpenAIChat exposes “/v1/chat/completions“.
 type OpenAIChat struct{ t *transport }
@@ -117,6 +194,19 @@ func (r *OpenAIResponses) Create(ctx context.Context, req ResponsesRequest) (map
 func (r *OpenAIResponses) CreateStream(ctx context.Context, req ResponsesRequest) (<-chan map[string]any, <-chan error) {
 	req.Stream = true
 	return streamDecode(r.t, "/openai/responses", req.toBody())
+}
+
+// OpenAITasks exposes “/openai/tasks“.
+type OpenAITasks struct{ t *transport }
+
+// Retrieve fetches one OpenAI task.
+func (t *OpenAITasks) Retrieve(ctx context.Context, req OpenAITaskRetrieveRequest) (map[string]any, error) {
+	return t.t.do(ctx, requestOpts{Method: "POST", Path: "/openai/tasks", Body: req.toBody()})
+}
+
+// RetrieveBatch fetches multiple OpenAI tasks.
+func (t *OpenAITasks) RetrieveBatch(ctx context.Context, req OpenAITaskRetrieveBatchRequest) (map[string]any, error) {
+	return t.t.do(ctx, requestOpts{Method: "POST", Path: "/openai/tasks", Body: req.toBody()})
 }
 
 // streamDecode wraps transport.stream and parses each SSE data line as JSON.

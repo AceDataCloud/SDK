@@ -28,7 +28,7 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.Glm() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
 	}
 }
@@ -60,6 +60,59 @@ func TestChatCompletions_Create(t *testing.T) {
 		t.Fatalf("Create: %v", err)
 	}
 	if res["id"] != "c1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestGlmChatCompletions_Create(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/glm/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != string(GlmModel52) {
+			t.Errorf("bad model: %v", body["model"])
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"glm-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.Glm().Chat().Completions().Create(context.Background(), ChatCompletionRequest{
+		Model:    string(GlmModel52),
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "glm-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAITasks_Retrieve(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/openai/tasks" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["action"] != "retrieve" || body["id"] != "task-1" {
+			t.Errorf("bad body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"task-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Tasks().Retrieve(context.Background(), OpenAITaskRetrieveRequest{ID: "task-1"})
+	if err != nil {
+		t.Fatalf("Retrieve: %v", err)
+	}
+	if res["id"] != "task-1" {
 		t.Fatalf("bad response: %+v", res)
 	}
 }
