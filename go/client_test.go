@@ -28,8 +28,39 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.Glm() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestGlmChatCompletions_Create(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/glm/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != string(GlmModel52) {
+			t.Errorf("bad model: %v", body["model"])
+		}
+		if body["reasoning_effort"] != "high" {
+			t.Errorf("missing extra parameter: %v", body)
+		}
+		_, _ = w.Write([]byte(`{"id":"glm-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.Glm().Chat().Completions().Create(context.Background(), GlmCompletionRequest{
+		Model:    GlmModel52,
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+		Extra:    map[string]any{"reasoning_effort": "high"},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "glm-1" {
+		t.Fatalf("bad response: %+v", res)
 	}
 }
 

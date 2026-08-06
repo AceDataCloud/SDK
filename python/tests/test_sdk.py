@@ -16,6 +16,7 @@ from acedatacloud._runtime.errors import (
     RateLimitError,
     ValidationError,
 )
+from acedatacloud.resources.glm import GlmModel
 
 
 @pytest.fixture
@@ -224,6 +225,29 @@ def test_openai_responses(client):
         input="Hello",
     )
     assert result["id"] == "resp-123"
+
+
+@respx.mock
+def test_glm_chat_completions_supports_latest_model(client):
+    route = respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
+        return_value=httpx.Response(200, json={"id": "glm-1"})
+    )
+
+    result = client.glm.chat.completions.create(
+        model="glm-5.2",
+        messages=[{"role": "user", "content": "Hi"}],
+        reasoning_effort="high",
+    )
+
+    assert result["id"] == "glm-1"
+    assert json.loads(route.calls.last.request.content) == {
+        "model": "glm-5.2",
+        "messages": [{"role": "user", "content": "Hi"}],
+        "reasoning_effort": "high",
+    }
+    assert "glm-5.2" in GlmModel.__args__
+    assert "glm-5" in GlmModel.__args__
+    assert "glm-5-turbo" in GlmModel.__args__
 
 
 # ── Chat Messages (Claude Native) ────────────────────────────────────
