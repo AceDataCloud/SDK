@@ -28,8 +28,44 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestCaptchaEndpoints(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.URL.Path {
+		case "/captcha/recognition/hcaptcha":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-recognition-task"}`))
+		case "/captcha/token/hcaptcha":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-token-task"}`))
+		case "/captcha/tasks":
+			_, _ = w.Write([]byte(`{"status":"succeeded"}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.Captcha().Recognition().HCaptcha(context.Background(), CaptchaRecognitionHCaptchaRequest{
+		Queries:  []string{"cat", "dog"},
+		Question: "Choose cats",
+		Async:    true,
+	}); err != nil {
+		t.Fatalf("Recognition HCaptcha: %v", err)
+	}
+	if _, err := c.Captcha().Token().HCaptcha(context.Background(), CaptchaTokenHCaptchaRequest{
+		WebsiteKey: "site-key",
+		WebsiteURL: "https://accounts.hcaptcha.com/demo",
+		Async:      true,
+	}); err != nil {
+		t.Fatalf("Token HCaptcha: %v", err)
+	}
+	if _, err := c.Captcha().Tasks().Retrieve(context.Background(), "task-1", nil); err != nil {
+		t.Fatalf("Tasks Retrieve: %v", err)
 	}
 }
 

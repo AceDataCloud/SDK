@@ -370,6 +370,30 @@ def test_tasks_get(client):
     assert result["response"]["status"] == "succeeded"
 
 
+@respx.mock
+def test_captcha_hcaptcha(client):
+    respx.post("https://api.acedata.cloud/captcha/recognition/hcaptcha").mock(
+        return_value=httpx.Response(200, json={"task_id": "captcha-1"})
+    )
+    respx.post("https://api.acedata.cloud/captcha/token/hcaptcha").mock(
+        return_value=httpx.Response(200, json={"task_id": "captcha-2"})
+    )
+    respx.post("https://api.acedata.cloud/captcha/tasks").mock(
+        return_value=httpx.Response(200, json={"task_id": "captcha-2", "status": "succeeded"})
+    )
+
+    recognition = client.captcha.recognition.hcaptcha(queries=["cat"], question="pick cat")
+    token = client.captcha.token.hcaptcha(
+        website_key="site-key",
+        website_url="https://accounts.hcaptcha.com/demo",
+    )
+    task = client.captcha.tasks.retrieve(task_id="captcha-2")
+
+    assert recognition["task_id"] == "captcha-1"
+    assert token["task_id"] == "captcha-2"
+    assert task["status"] == "succeeded"
+
+
 # ── Platform Management ───────────────────────────────────────────────
 
 

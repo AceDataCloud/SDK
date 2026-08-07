@@ -10,6 +10,7 @@ type Client struct {
 
 	openai   *OpenAIResource
 	chat     *ChatResource
+	captcha  *CaptchaResource
 	images   *ImagesResource
 	tasks    *TasksResource
 	video    *VideoResource
@@ -36,6 +37,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	c := &Client{transport: tr}
 	c.openai = &OpenAIResource{t: tr}
 	c.chat = &ChatResource{t: tr}
+	c.captcha = &CaptchaResource{t: tr}
 	c.images = &ImagesResource{t: tr}
 	c.tasks = &TasksResource{t: tr}
 	c.video = &VideoResource{t: tr}
@@ -54,6 +56,9 @@ func (c *Client) OpenAI() *OpenAIResource { return c.openai }
 // Chat returns the native chat resource (“/v1/messages“ — Anthropic
 // Messages API shape).
 func (c *Client) Chat() *ChatResource { return c.chat }
+
+// Captcha returns the captcha resource (“/captcha/*“).
+func (c *Client) Captcha() *CaptchaResource { return c.captcha }
 
 // Images returns the image generation resource.
 func (c *Client) Images() *ImagesResource { return c.images }
