@@ -13,7 +13,7 @@ import asyncio
 import time
 from typing import Any
 
-_DONE = {"succeed", "succeeded", "success", "completed", "complete", "finished"}
+_DONE = {"succeed", "succeeded", "success", "completed", "complete", "finished", "ready"}
 _FAILED = {"failed", "failure", "error", "cancelled", "canceled", "rejected"}
 
 
@@ -92,6 +92,8 @@ def task_status(state: dict[str, Any]) -> str:
     words = _status_words(response)
     if any(w in _FAILED for w in words):
         return "failed"
+    if "ready" in words:
+        return "succeeded"
     if any(w in _DONE for w in words):
         # A terminal word with no artifact means the job ended without output.
         return "succeeded" if artifact_urls(state) else "failed"
@@ -189,15 +191,22 @@ class _HandleBase:
         poll_endpoint: str,
         transport: Any,
         submitted: dict[str, Any] | None = None,
+        *,
+        poll_id_field: str = "id",
+        poll_action: str | None = "retrieve",
     ) -> None:
         self.id = task_id
         self._poll_endpoint = poll_endpoint
         self._transport = transport
+        self._poll_id_field = poll_id_field
+        self._poll_action = poll_action
         self._result: dict[str, Any] | None = None
         # A submission that already carried the artifact is a finished task. The
         # caller should not have to detect that and skip .wait() themselves.
-        if submitted is not None and artifact_urls({"response": submitted}):
-            self._result = {"response": submitted}
+        if submitted is not None:
+            state = {"response": submitted}
+            if artifact_urls(state) or task_status(state) in ("succeeded", "failed"):
+                self._result = state
 
     @property
     def done(self) -> bool:
@@ -216,6 +225,12 @@ class _HandleBase:
             self._result = state
         return status
 
+    def _poll_body(self) -> dict[str, Any]:
+        body: dict[str, Any] = {self._poll_id_field: self.id}
+        if self._poll_action is not None:
+            body["action"] = self._poll_action
+        return body
+
 
 class TaskHandle(_HandleBase):
     """Synchronous handle for a long-running task."""
@@ -231,7 +246,7 @@ class TaskHandle(_HandleBase):
         state = self._transport.request(
             "POST",
             self._poll_endpoint,
-            json={"id": self.id, "action": "retrieve"},
+            json=self._poll_body(),
         )
         self._accept(state)
         return state
@@ -271,7 +286,7 @@ class AsyncTaskHandle(_HandleBase):
         state = await self._transport.request(
             "POST",
             self._poll_endpoint,
-            json={"id": self.id, "action": "retrieve"},
+            json=self._poll_body(),
         )
         self._accept(state)
         return state

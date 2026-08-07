@@ -22,6 +22,7 @@ var serviceTaskEndpoints = map[string]string{
 	"pika":        "/pika/tasks",
 	"pixverse":    "/pixverse/tasks",
 	"webextrator": "/webextrator/tasks",
+	"captcha":     "/captcha/tasks",
 }
 
 // TasksResource groups cross-service task retrieval operations.
@@ -30,6 +31,13 @@ type TasksResource struct{ t *transport }
 // Get fetches a single task snapshot.
 func (r *TasksResource) Get(ctx context.Context, service, taskID string) (map[string]any, error) {
 	endpoint := endpointFor(service)
+	if service == "captcha" {
+		return r.t.do(ctx, requestOpts{
+			Method: "POST",
+			Path:   endpoint,
+			Body:   map[string]any{"task_id": taskID},
+		})
+	}
 	return r.t.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   endpoint,
@@ -39,6 +47,10 @@ func (r *TasksResource) Get(ctx context.Context, service, taskID string) (map[st
 
 // Wait polls a task until it reaches a terminal state or maxWait elapses.
 func (r *TasksResource) Wait(ctx context.Context, service, taskID string, pollInterval, maxWait time.Duration) (map[string]any, error) {
+	if service == "captcha" {
+		handle := newTaskHandleWithPoll(taskID, endpointFor(service), r.t, nil, "task_id", nil)
+		return handle.Wait(ctx, pollInterval, maxWait)
+	}
 	handle := &TaskHandle{
 		ID:           taskID,
 		pollEndpoint: endpointFor(service),

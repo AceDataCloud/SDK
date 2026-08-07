@@ -18,7 +18,12 @@ export interface TaskHandleOptions {
   maxWait?: number;
 }
 
-const DONE = new Set(['succeed', 'succeeded', 'success', 'completed', 'complete', 'finished']);
+export interface TaskHandlePollOptions {
+  pollIdField?: string;
+  pollAction?: string | null;
+}
+
+const DONE = new Set(['succeed', 'succeeded', 'success', 'completed', 'complete', 'finished', 'ready']);
 const FAILED = new Set(['failed', 'failure', 'error', 'cancelled', 'canceled', 'rejected']);
 
 function statusWords(node: unknown, depth = 0): string[] {
@@ -131,6 +136,7 @@ export function taskStatus(state: Record<string, unknown>): 'succeeded' | 'faile
 
   const words = statusWords(response);
   if (words.some((w) => FAILED.has(w))) return 'failed';
+  if (words.includes('ready')) return 'succeeded';
   if (words.some((w) => DONE.has(w))) {
     // A terminal word with no artifact means the job ended without output.
     return artifactUrls(state).length > 0 ? 'succeeded' : 'failed';
@@ -164,6 +170,8 @@ export class TaskHandle {
   readonly id: string;
   private pollEndpoint: string;
   private transport: Transport;
+  private pollIdField: string;
+  private pollAction: string | null;
   private _result: Record<string, unknown> | null = null;
 
   constructor(
@@ -171,14 +179,20 @@ export class TaskHandle {
     pollEndpoint: string,
     transport: Transport,
     submitted?: Record<string, unknown>,
+    pollOptions: TaskHandlePollOptions = {},
   ) {
     this.id = taskId;
     this.pollEndpoint = pollEndpoint;
     this.transport = transport;
+    this.pollIdField = pollOptions.pollIdField ?? 'id';
+    this.pollAction = pollOptions.pollAction === undefined ? 'retrieve' : pollOptions.pollAction;
     // A submission that already carried the artifact is a finished task. The
     // caller should not have to detect that and skip wait() themselves.
-    if (submitted && artifactUrls({ response: submitted }).length > 0) {
-      this._result = { response: submitted };
+    if (submitted) {
+      const state = { response: submitted };
+      if (artifactUrls(state).length > 0 || taskStatus(state) !== '') {
+        this._result = state;
+      }
     }
   }
 
@@ -204,7 +218,7 @@ export class TaskHandle {
    */
   async get(): Promise<Record<string, unknown>> {
     const state = await this.transport.request('POST', this.pollEndpoint, {
-      json: { id: this.id, action: 'retrieve' },
+      json: this.pollBody(),
     });
     this.accept(state);
     return state;
@@ -215,6 +229,12 @@ export class TaskHandle {
     if (status === 'succeeded' || status === 'failed') {
       this._result = state;
     }
+  }
+
+  private pollBody(): Record<string, unknown> {
+    const body: Record<string, unknown> = { [this.pollIdField]: this.id };
+    if (this.pollAction !== null) body.action = this.pollAction;
+    return body;
   }
 
   async isCompleted(): Promise<boolean> {

@@ -6,6 +6,7 @@ import { AiChat } from './resources/aichat';
 import { Chat } from './resources/chat';
 import { Images } from './resources/images';
 import { Audio } from './resources/audio';
+import { Captcha } from './resources/captcha';
 import { Video } from './resources/video';
 import { Search } from './resources/search';
 import { Tasks } from './resources/tasks';
@@ -52,6 +53,7 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  readonly captcha: Captcha;
 
   private transport: Transport;
 
@@ -82,6 +84,7 @@ export class AceDataCloud {
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);
+    this.captcha = new Captcha(this.transport);
     // Provider axis: one namespace per service, generated from the specs.
     attachProviders(this as unknown as Record<string, unknown>, this.transport);
   }

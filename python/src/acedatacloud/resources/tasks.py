@@ -23,6 +23,7 @@ _SERVICE_TASK_ENDPOINTS = {
     "pika": "/pika/tasks",
     "pixverse": "/pixverse/tasks",
     "webextrator": "/webextrator/tasks",
+    "captcha": "/captcha/tasks",
 }
 
 
@@ -39,6 +40,8 @@ class Tasks:
         service: str = "suno",
     ) -> dict[str, Any]:
         endpoint = _SERVICE_TASK_ENDPOINTS.get(service, f"/{service}/tasks")
+        if service == "captcha":
+            return self._transport.request("POST", endpoint, json={"task_id": task_id})
         return self._transport.request(
             "POST",
             endpoint,
@@ -54,6 +57,9 @@ class Tasks:
         max_wait: float = 600.0,
     ) -> dict[str, Any]:
         endpoint = _SERVICE_TASK_ENDPOINTS.get(service, f"/{service}/tasks")
+        if service == "captcha":
+            handle = TaskHandle(task_id, endpoint, self._transport, poll_id_field="task_id", poll_action=None)
+            return handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         handle = TaskHandle(task_id, endpoint, self._transport)
         return handle.wait(poll_interval=poll_interval, max_wait=max_wait)
 
@@ -71,6 +77,8 @@ class AsyncTasks:
         service: str = "suno",
     ) -> dict[str, Any]:
         endpoint = _SERVICE_TASK_ENDPOINTS.get(service, f"/{service}/tasks")
+        if service == "captcha":
+            return await self._transport.request("POST", endpoint, json={"task_id": task_id})
         return await self._transport.request(
             "POST",
             endpoint,
@@ -86,5 +94,8 @@ class AsyncTasks:
         max_wait: float = 600.0,
     ) -> dict[str, Any]:
         endpoint = _SERVICE_TASK_ENDPOINTS.get(service, f"/{service}/tasks")
+        if service == "captcha":
+            handle = AsyncTaskHandle(task_id, endpoint, self._transport, poll_id_field="task_id", poll_action=None)
+            return await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         handle = AsyncTaskHandle(task_id, endpoint, self._transport)
         return await handle.wait(poll_interval=poll_interval, max_wait=max_wait)

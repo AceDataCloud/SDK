@@ -20,6 +20,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   pika: '/pika/tasks',
   pixverse: '/pixverse/tasks',
   webextrator: '/webextrator/tasks',
+  captcha: '/captcha/tasks',
 };
 
 export class Tasks {
@@ -28,6 +29,9 @@ export class Tasks {
   async get(taskId: string, opts: { service?: string } = {}): Promise<Record<string, unknown>> {
     const service = opts.service ?? 'suno';
     const endpoint = SERVICE_TASK_ENDPOINTS[service] ?? `/${service}/tasks`;
+    if (service === 'captcha') {
+      return this.transport.request('POST', endpoint, { json: { task_id: taskId } });
+    }
     return this.transport.request('POST', endpoint, {
       json: { id: taskId, action: 'retrieve' },
     });
@@ -39,6 +43,13 @@ export class Tasks {
   ): Promise<Record<string, unknown>> {
     const service = opts.service ?? 'suno';
     const endpoint = SERVICE_TASK_ENDPOINTS[service] ?? `/${service}/tasks`;
+    if (service === 'captcha') {
+      const handle = new TaskHandle(taskId, endpoint, this.transport, undefined, {
+        pollIdField: 'task_id',
+        pollAction: null,
+      });
+      return handle.wait({ pollInterval: opts.pollInterval, maxWait: opts.maxWait });
+    }
     const handle = new TaskHandle(taskId, endpoint, this.transport);
     return handle.wait({ pollInterval: opts.pollInterval, maxWait: opts.maxWait });
   }

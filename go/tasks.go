@@ -14,6 +14,8 @@ type TaskHandle struct {
 	ID           string
 	pollEndpoint string
 	transport    *transport
+	pollIDField  string
+	pollAction   *string
 	last         map[string]any
 	done         bool
 }
@@ -23,11 +25,35 @@ type TaskHandle struct {
 // so Wait returns immediately instead of polling for something already here.
 func newTaskHandle(id, pollEndpoint string, tr *transport, submitted map[string]any) *TaskHandle {
 	h := &TaskHandle{ID: id, pollEndpoint: pollEndpoint, transport: tr}
-	if submitted != nil && len(ArtifactURLs(map[string]any{"response": submitted})) > 0 {
-		h.last = map[string]any{"response": submitted}
-		h.done = true
+	if submitted != nil {
+		state := map[string]any{"response": submitted}
+		if len(ArtifactURLs(state)) > 0 || terminalStatus(state) {
+			h.last = state
+			h.done = true
+		}
 	}
 	return h
+}
+
+func newTaskHandleWithPoll(id, pollEndpoint string, tr *transport, submitted map[string]any, pollIDField string, pollAction *string) *TaskHandle {
+	h := newTaskHandle(id, pollEndpoint, tr, submitted)
+	h.pollIDField = pollIDField
+	h.pollAction = pollAction
+	return h
+}
+
+func (h *TaskHandle) pollBody() map[string]any {
+	field := h.pollIDField
+	if field == "" {
+		field = "id"
+	}
+	body := map[string]any{field: h.ID}
+	if h.pollAction != nil {
+		body["action"] = *h.pollAction
+	} else if h.pollIDField == "" {
+		body["action"] = "retrieve"
+	}
+	return body
 }
 
 // Done reports whether the task has already reached a terminal state.
@@ -48,7 +74,7 @@ func (h *TaskHandle) Get(ctx context.Context) (map[string]any, error) {
 	state, err := h.transport.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   h.pollEndpoint,
-		Body:   map[string]any{"id": h.ID, "action": "retrieve"},
+		Body:   h.pollBody(),
 	})
 	if err != nil {
 		return nil, err
@@ -111,7 +137,7 @@ func (h *TaskHandle) Wait(ctx context.Context, pollInterval, maxWait time.Durati
 
 var doneWords = map[string]bool{
 	"succeed": true, "succeeded": true, "success": true,
-	"completed": true, "complete": true, "finished": true,
+	"completed": true, "complete": true, "finished": true, "ready": true,
 }
 
 var failedWords = map[string]bool{
@@ -143,6 +169,11 @@ func taskStatus(state map[string]any) string {
 	for _, w := range words {
 		if failedWords[w] {
 			return "failed"
+		}
+	}
+	for _, w := range words {
+		if w == "ready" {
+			return "succeeded"
 		}
 	}
 	for _, w := range words {

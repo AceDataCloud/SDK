@@ -28,7 +28,7 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.Chat() == nil || c.Images() == nil || c.Tasks() == nil || c.Captcha() == nil {
 		t.Fatal("resources must be non-nil")
 	}
 }
@@ -333,6 +333,78 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 	resp := res["response"].(map[string]any)
 	if resp["url"] != "https://cdn/x.png" {
 		t.Fatalf("bad url: %+v", resp)
+	}
+}
+
+func TestCaptchaTokenHCaptcha(t *testing.T) {
+	var bodies []map[string]any
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/captcha/token/hcaptcha" && r.URL.Path != "/captcha/tasks" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		bodies = append(bodies, body)
+		w.Header().Set("Content-Type", "application/json")
+		if r.URL.Path == "/captcha/token/hcaptcha" {
+			_, _ = w.Write([]byte(`{"task_id":"captcha-1","status":"processing"}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"status":"ready","token":"ok"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	handle, _, err := c.Captcha().Token().HCaptcha(context.Background(), HCaptchaTokenRequest{
+		WebsiteKey: "site-key",
+		WebsiteURL: "https://example.com",
+		Async:      true,
+	})
+	if err != nil {
+		t.Fatalf("HCaptcha: %v", err)
+	}
+	if handle == nil || handle.ID != "captcha-1" {
+		t.Fatalf("expected captcha handle, got %+v", handle)
+	}
+	if _, err := handle.Get(context.Background()); err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if bodies[0]["website_key"] != "site-key" || bodies[0]["website_url"] != "https://example.com" || bodies[0]["async"] != true {
+		t.Fatalf("bad submit body: %+v", bodies[0])
+	}
+	if _, ok := bodies[1]["action"]; ok || bodies[1]["task_id"] != "captcha-1" {
+		t.Fatalf("bad poll body: %+v", bodies[1])
+	}
+	if !handle.Done() {
+		t.Fatal("ready captcha task should be done")
+	}
+}
+
+func TestCaptchaRecognitionHCaptchaSync(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/captcha/recognition/hcaptcha" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["question"] != "Click cats" || body["async"] != false {
+			t.Fatalf("bad body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"solution":{"label":"cat"}}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	handle, result, err := c.Captcha().Recognition().HCaptcha(context.Background(), HCaptchaRecognitionRequest{
+		Queries:  []string{"image"},
+		Question: "Click cats",
+	})
+	if err != nil {
+		t.Fatalf("HCaptcha: %v", err)
+	}
+	if handle != nil || result["solution"] == nil {
+		t.Fatalf("expected sync result, handle=%+v result=%+v", handle, result)
 	}
 }
 

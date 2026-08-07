@@ -17,6 +17,7 @@ type Client struct {
 	search   *SearchResource
 	face     *FaceResource
 	shorturl *ShortURLResource
+	captcha  *CaptchaResource
 
 	// providers holds the generated provider-axis clients, one per service.
 	providers *providers
@@ -44,6 +45,10 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.providers = newProviders(tr)
 	c.face = &FaceResource{t: tr}
 	c.shorturl = &ShortURLResource{t: tr}
+	c.captcha = &CaptchaResource{
+		recognition: &CaptchaRecognitionResource{t: tr},
+		token:       &CaptchaTokenResource{t: tr},
+	}
 	return c, nil
 }
 
@@ -75,3 +80,6 @@ func (c *Client) Face() *FaceResource { return c.face }
 
 // ShortURL returns the short URL resource.
 func (c *Client) ShortURL() *ShortURLResource { return c.shorturl }
+
+// Captcha returns the captcha resource.
+func (c *Client) Captcha() *CaptchaResource { return c.captcha }
