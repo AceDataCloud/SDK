@@ -25,6 +25,7 @@ GENERATED = (
     "luma",
     "happyhorse",
     "maestro",
+    "minimax",
     "digitalhuman",
     "dreamina",
     "localization",
@@ -127,6 +128,20 @@ def test_extra_parameters_pass_through(client):
 
     client.flux.generate(action="generate", prompt="a cat", brand_new_flag=True)
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
+
+
+def test_minimax_uses_minimax_endpoints_and_defaults(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.minimax._transport = transport
+
+    client.minimax.generate()
+    assert transport.request.call_args.args[:2] == ("POST", "/minimax/videos")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["model"] == "minimax-h3"
+    assert body["ratio"] == "16:9"
+    assert body["duration"] == 4
+    assert body["async"] is True
 
 
 @pytest.mark.parametrize("name", GENERATED)
