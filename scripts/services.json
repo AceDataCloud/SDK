@@ -369,5 +369,16 @@
    }
   ],
   "tasks": null
+ },
+ "minimax": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "minimax",
+    "path": "/minimax/videos",
+    "name": "Minimax Videos"
+   }
+  ],
+  "tasks": "/minimax/tasks"
  }
 }

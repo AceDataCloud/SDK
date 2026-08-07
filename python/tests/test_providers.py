@@ -25,6 +25,7 @@ GENERATED = (
     "luma",
     "happyhorse",
     "maestro",
+    "minimax",
     "digitalhuman",
     "dreamina",
     "localization",
@@ -97,6 +98,18 @@ def test_caller_value_beats_the_spec_default(client):
 
     client.flux.generate(action="generate", prompt="a cat", size="512x512")
     assert transport.request.call_args.kwargs["json"]["size"] == "512x512"
+
+
+def test_minimax_uses_the_new_endpoint_and_defaults(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.minimax._transport = transport
+
+    client.minimax.generate(prompt="a cat running")
+    method, path = transport.request.call_args.args
+    body = transport.request.call_args.kwargs["json"]
+    assert (method, path) == ("POST", "/minimax/videos")
+    assert body["model"] == "minimax-h3"
 
 
 def test_async_is_requested_by_default(client):
