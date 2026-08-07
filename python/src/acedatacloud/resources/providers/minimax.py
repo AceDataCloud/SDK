@@ -11,8 +11,6 @@ from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-
-
 MinimaxRatio = Literal[
     "adaptive",
     "21:9",
@@ -31,8 +29,8 @@ def _task_id(result: Any) -> str:
     if result.get("task_id"):
         return str(result["task_id"])
     data = result.get("data")
-    if isinstance(data, dict) and data.get('task_id'):
-        return str(data['task_id'])
+    if isinstance(data, dict) and data.get("task_id"):
+        return str(data["task_id"])
     return str(result.get("id") or "")
 
 
