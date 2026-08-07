@@ -15,6 +15,7 @@ _SERVICE_TASK_ENDPOINTS = {
     "seedance": "/seedance/tasks",
     "sora": "/sora/tasks",
     "luma": "/luma/tasks",
+    "minimax": "/minimax/tasks",
     "veo": "/veo/tasks",
     "flux": "/flux/tasks",
     "kling": "/kling/tasks",

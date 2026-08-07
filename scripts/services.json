@@ -359,6 +359,17 @@
   ],
   "tasks": null
  },
+ "minimax": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "minimax",
+    "path": "/minimax/videos",
+    "name": "MiniMax H3 Video Generation API"
+   }
+  ],
+  "tasks": "/minimax/tasks"
+ },
  "localization": {
   "category": "Web & Data",
   "endpoints": [

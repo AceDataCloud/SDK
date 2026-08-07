@@ -69,6 +69,38 @@ func TestCaptchaEndpoints(t *testing.T) {
 	}
 }
 
+func TestMinimaxGenerate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/minimax/videos" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "MiniMax-H3" || body["resolution"] != "2K" || body["duration"] != float64(5) {
+			t.Fatalf("unexpected body: %#v", body)
+		}
+		if body["aigc_watermark"] != false || body["async"] != true {
+			t.Fatalf("missing defaults: %#v", body)
+		}
+		_, _ = w.Write([]byte(`{"task_id":"minimax-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	handle, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{
+		Model:      "MiniMax-H3",
+		Content:    []any{map[string]any{"type": "text", "text": "A cat walks"}},
+		Resolution: "2K",
+		Duration:   5,
+	})
+	if err != nil || handle.ID != "minimax-1" {
+		t.Fatalf("Generate: handle=%#v err=%v", handle, err)
+	}
+	if _, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{Duration: 3}); err == nil {
+		t.Fatal("expected out-of-range duration to fail")
+	}
+}
+
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/v1/chat/completions" {

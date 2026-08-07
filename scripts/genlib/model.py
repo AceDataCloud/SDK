@@ -71,6 +71,21 @@ def summary(spec: dict) -> str:
     return ""
 
 
+def returns_task_id(spec: dict) -> bool:
+    """Whether a POST response submits a task even without an ``async`` field."""
+    for methods in (spec.get("paths") or {}).values():
+        for method, operation in (methods or {}).items():
+            if method.lower() != "post":
+                continue
+            responses = operation.get("responses") or {}
+            for response in responses.values():
+                content = (response.get("content") or {}).get("application/json") or {}
+                schema = content.get("schema") or {}
+                if "task_id" in (schema.get("properties") or {}):
+                    return True
+    return False
+
+
 class Param:
     def __init__(self, name: str, schema: dict, required: bool) -> None:
         self.name = name
@@ -162,7 +177,7 @@ class Endpoint:
         props: dict[str, dict] = schema.get("properties") or {}
         self.summary = summary(spec)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
-        self.pollable = "async" in props
+        self.pollable = "async" in props or returns_task_id(spec)
 
     @property
     def callable_params(self) -> list[Param]:

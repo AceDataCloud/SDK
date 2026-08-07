@@ -1,4 +1,42 @@
 import { TaskHandle, taskStatus } from '../src/runtime/tasks';
+import { Minimax } from '../src/resources/providers/minimax';
+
+describe('Minimax provider', () => {
+  it('submits documented video requests and returns a task handle', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'minimax-1' });
+    const minimax = new Minimax({ request } as any);
+
+    const handle = await minimax.generate({
+      model: 'MiniMax-H3',
+      content: [{ type: 'text', text: 'A cat walks' }],
+      resolution: '2K',
+      duration: 5,
+    });
+
+    expect(handle.id).toBe('minimax-1');
+    expect(request).toHaveBeenCalledWith('POST', '/minimax/videos', {
+      json: {
+        model: 'MiniMax-H3',
+        content: [{ type: 'text', text: 'A cat walks' }],
+        resolution: '2K',
+        duration: 5,
+        aigc_watermark: false,
+        async: true,
+      },
+    });
+  });
+
+  it('rejects durations outside the documented range', async () => {
+    const minimax = new Minimax({ request: jest.fn() } as any);
+
+    await expect(minimax.generate({
+      model: 'MiniMax-H3',
+      content: [{ type: 'text', text: 'A cat walks' }],
+      resolution: '2K',
+      duration: 3,
+    })).rejects.toThrow('duration must be between 4 and 15 seconds');
+  });
+});
 
 describe('TaskHandle', () => {
   it('waits through accepted responses and completes on success data without status', async () => {
