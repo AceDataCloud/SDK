@@ -1,0 +1,489 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MiniMax H3 Video Generation",
+    "version": "1.0.0",
+    "description": "API reference for MiniMax H3 Video Generation on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    },
+    "schemas": {
+      "MediaUrl": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Minimax Videos Media Url"
+          }
+        }
+      },
+      "VideoTask": {
+        "type": "object",
+        "required": [
+          "id",
+          "model",
+          "status",
+          "task_type",
+          "modality"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "MiniMax-H3"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/TaskError"
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "resolution": {
+            "type": "string",
+            "enum": [
+              "768P",
+              "2K"
+            ]
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/TaskUsage"
+          },
+          "ratio": {
+            "type": "string"
+          },
+          "task_type": {
+            "type": "string",
+            "enum": [
+              "generation"
+            ]
+          },
+          "modality": {
+            "type": "string",
+            "enum": [
+              "video"
+            ]
+          }
+        }
+      },
+      "TaskUsage": {
+        "type": "object",
+        "properties": {
+          "total_seconds": {
+            "type": "integer"
+          },
+          "input_seconds": {
+            "type": "integer"
+          },
+          "output_seconds": {
+            "type": "integer"
+          },
+          "input_image_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "TaskError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/minimax/videos": {
+      "post": {
+        "summary": "Minimax Videos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "model",
+                  "content",
+                  "resolution",
+                  "duration"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "MiniMax-H3"
+                    ],
+                    "example": "MiniMax-H3",
+                    "description": "Minimax Videos Model"
+                  },
+                  "content": {
+                    "type": "array",
+                    "minItems": 1,
+                    "description": "Minimax Videos Content",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "type"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "text",
+                            "image_url",
+                            "video_url",
+                            "audio_url"
+                          ],
+                          "description": "Minimax Videos Content Type"
+                        },
+                        "text": {
+                          "type": "string",
+                          "maxLength": 7000,
+                          "description": "Minimax Videos Content Text"
+                        },
+                        "image_url": {
+                          "$ref": "#/components/schemas/MediaUrl"
+                        },
+                        "video_url": {
+                          "$ref": "#/components/schemas/MediaUrl"
+                        },
+                        "audio_url": {
+                          "$ref": "#/components/schemas/MediaUrl"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "first_frame",
+                            "last_frame",
+                            "reference_image",
+                            "reference_video",
+                            "reference_audio"
+                          ],
+                          "description": "Minimax Videos Content Role"
+                        }
+                      }
+                    }
+                  },
+                  "resolution": {
+                    "type": "string",
+                    "enum": [
+                      "768P",
+                      "2K"
+                    ],
+                    "description": "Minimax Videos Resolution"
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "minimum": 4,
+                    "maximum": 15,
+                    "description": "Minimax Videos Duration"
+                  },
+                  "ratio": {
+                    "type": "string",
+                    "enum": [
+                      "adaptive",
+                      "21:9",
+                      "16:9",
+                      "4:3",
+                      "1:1",
+                      "3:4",
+                      "9:16"
+                    ],
+                    "description": "Minimax Videos Ratio"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Minimax Videos Callback Url"
+                  },
+                  "aigc_watermark": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Minimax Videos Aigc Watermark"
+                  }
+                },
+                "example": {
+                  "model": "MiniMax-H3",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "让画面中的人物自然移动，镜头缓慢推进"
+                    },
+                    {
+                      "type": "image_url",
+                      "image_url": {
+                        "url": "https://cdn.acedata.cloud/b1c82e4937.png"
+                      },
+                      "role": "first_frame"
+                    }
+                  ],
+                  "resolution": "2K",
+                  "duration": 5,
+                  "ratio": "adaptive"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Minimax Videos Response 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "task_id"
+                  ],
+                  "properties": {
+                    "task_id": {
+                      "type": "string",
+                      "description": "Minimax Videos Response 200 Task Id"
+                    }
+                  },
+                  "example": {
+                    "task_id": "c0f63a98-a7dc-4a09-a1fb-46d32b312a28"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Minimax Videos Response 400"
+          },
+          "401": {
+            "description": "Minimax Videos Response 401"
+          },
+          "402": {
+            "description": "Minimax Videos Response 402"
+          },
+          "422": {
+            "description": "Minimax Videos Response 422"
+          },
+          "429": {
+            "description": "Minimax Videos Response 429"
+          },
+          "500": {
+            "description": "Minimax Videos Response 500"
+          }
+        }
+      }
+    },
+    "/minimax/tasks": {
+      "post": {
+        "summary": "Minimax Tasks",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "retrieve",
+                      "retrieve_batch",
+                      "delete"
+                    ],
+                    "default": "retrieve",
+                    "description": "Minimax Tasks Action"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Minimax Tasks Id"
+                  },
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Minimax Tasks Ids"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Minimax Tasks Limit"
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "description": "Minimax Tasks Offset"
+                  },
+                  "created_at_min": {
+                    "type": "number",
+                    "description": "Minimax Tasks Created At Min"
+                  },
+                  "created_at_max": {
+                    "type": "number",
+                    "description": "Minimax Tasks Created At Max"
+                  }
+                },
+                "example": {
+                  "action": "retrieve",
+                  "id": "c0f63a98-a7dc-4a09-a1fb-46d32b312a28"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Minimax Tasks Response 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "task"
+                      ],
+                      "properties": {
+                        "task": {
+                          "$ref": "#/components/schemas/VideoTask"
+                        }
+                      },
+                      "example": {
+                        "task": {
+                          "id": "c0f63a98-a7dc-4a09-a1fb-46d32b312a28",
+                          "model": "MiniMax-H3",
+                          "status": "succeeded",
+                          "created_at": 1785125529,
+                          "updated_at": 1785125946,
+                          "content": {
+                            "url": "https://cdn.acedata.cloud/minimax/c0f63a98-a7dc-4a09-a1fb-46d32b312a28.mp4"
+                          },
+                          "resolution": "2K",
+                          "duration": 5,
+                          "usage": {
+                            "total_seconds": 5,
+                            "input_seconds": 0,
+                            "output_seconds": 5,
+                            "input_image_count": 1
+                          },
+                          "ratio": "adaptive",
+                          "task_type": "generation",
+                          "modality": "video"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "items",
+                        "total"
+                      ],
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/VideoTask"
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "deleted"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "deleted": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Minimax Tasks Response 400"
+          },
+          "401": {
+            "description": "Minimax Tasks Response 401"
+          },
+          "429": {
+            "description": "Minimax Tasks Response 429"
+          },
+          "500": {
+            "description": "Minimax Tasks Response 500"
+          }
+        }
+      }
+    }
+  }
+}
