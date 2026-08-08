@@ -32,6 +32,13 @@ export type { ImageProvider } from './resources/images';
 export type { VideoProvider } from './resources/video';
 export type { VeoModel } from './resources/veo';
 export type {
+  GeminiChatModel,
+  GeminiContentModel,
+  GeminiVideoAspectRatio,
+  GeminiVideoModel,
+  GeminiVideoResolution,
+} from './resources/providers/gemini';
+export type {
   KlingCameraControl,
   KlingGenerateOptions,
   KlingModel,

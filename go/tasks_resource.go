@@ -9,6 +9,7 @@ var serviceTaskEndpoints = map[string]string{
 	"suno":        "/suno/tasks",
 	"producer":    "/producer/tasks",
 	"fish":        "/fish/tasks",
+	"gemini":      "/gemini/tasks",
 	"nano-banana": "/nano-banana/tasks",
 	"seedream":    "/seedream/tasks",
 	"seedance":    "/seedance/tasks",

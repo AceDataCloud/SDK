@@ -20,6 +20,7 @@ import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
 import { ShortUrl } from './resources/shorturl';
 import { attachProviders } from './resources/providers';
+import { Gemini } from './resources/providers/gemini';
 
 export interface AceDataCloudOptions {
   apiToken?: string;
@@ -54,6 +55,7 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  readonly gemini: Gemini;
 
   private transport: Transport;
 
@@ -87,5 +89,6 @@ export class AceDataCloud {
     this.shorturl = new ShortUrl(this.transport);
     // Provider axis: one namespace per service, generated from the specs.
     attachProviders(this as unknown as Record<string, unknown>, this.transport);
+    this.gemini = (this as unknown as { gemini: Gemini }).gemini;
   }
 }

@@ -28,7 +28,7 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil || c.Gemini() == nil {
 		t.Fatal("resources must be non-nil")
 	}
 }
@@ -441,5 +441,60 @@ func TestTransientErrorKeepsWaiting(t *testing.T) {
 	}
 	if got := taskStatus(state); got != "" {
 		t.Errorf("taskStatus = %q, want empty (still running)", got)
+	}
+}
+
+func TestGeminiEndpoints(t *testing.T) {
+	var seen []string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		seen = append(seen, r.URL.String())
+		w.Header().Set("Content-Type", "application/json")
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		switch r.URL.Path {
+		case "/gemini/chat/completions":
+			if body["model"] != "gemini-3.1-pro" || body["reasoning_effort"] != "medium" {
+				t.Fatalf("bad chat body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"id":"chat-1"}`))
+		case "/v1beta/models/gemini-2.5-flash:generateContent":
+			if _, ok := body["generationConfig"]; !ok {
+				t.Fatalf("missing generationConfig: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"candidates":[]}`))
+		case "/gemini/videos":
+			if body["model"] != "omni-flash" || body["aspect_ratio"] != "16:9" || body["resolution"] != "720p" || body["async"] != true {
+				t.Fatalf("bad video body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"task_id":"gemini-video-task"}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.Gemini().Chat().Completions().Create(context.Background(), GeminiChatCompletionRequest{
+		Model:    GeminiChatModelGemini31Pro,
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	}); err != nil {
+		t.Fatalf("Gemini chat: %v", err)
+	}
+	if _, err := c.Gemini().GenerateContent(context.Background(), GeminiGenerateContentRequest{
+		Model:            GeminiContentModelGemini25Flash,
+		Contents:         []map[string]any{{"parts": []any{map[string]any{"text": "hi"}}}},
+		GenerationConfig: map[string]any{"temperature": 0},
+	}); err != nil {
+		t.Fatalf("Gemini generate content: %v", err)
+	}
+	handle, err := c.Gemini().Videos().Generate(context.Background(), GeminiVideoGenerateRequest{Prompt: "a kitten"})
+	if err != nil {
+		t.Fatalf("Gemini video: %v", err)
+	}
+	if handle.ID != "gemini-video-task" {
+		t.Fatalf("bad handle id: %s", handle.ID)
+	}
+	if strings.Join(seen, ",") != "/gemini/chat/completions,/v1beta/models/gemini-2.5-flash:generateContent,/gemini/videos" {
+		t.Fatalf("unexpected paths: %v", seen)
 	}
 }

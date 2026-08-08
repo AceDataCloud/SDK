@@ -20,6 +20,7 @@ GENERATED = (
     "suno",
     "producer",
     "fish",
+    "gemini",
     "hailuo",
     "wan",
     "luma",
@@ -127,6 +128,57 @@ def test_extra_parameters_pass_through(client):
 
     client.flux.generate(action="generate", prompt="a cat", brand_new_flag=True)
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
+
+
+def test_gemini_chat_completions_match_docs_path(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "chat-1"}
+    client.gemini._transport = transport
+    client.gemini.chat.completions._transport = transport
+
+    client.gemini.chat.completions.create(
+        model="gemini-3.1-pro",
+        messages=[{"role": "user", "content": "hi"}],
+    )
+
+    transport.request.assert_called_once()
+    assert transport.request.call_args.args[:2] == ("POST", "/gemini/chat/completions")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["model"] == "gemini-3.1-pro"
+    assert body["reasoning_effort"] == "medium"
+
+
+def test_gemini_native_generate_content_uses_model_path(client):
+    transport = Mock()
+    transport.request.return_value = {"candidates": []}
+    client.gemini._transport = transport
+
+    client.gemini.generate_content(
+        model="gemini-2.5-flash",
+        contents=[{"parts": [{"text": "hi"}]}],
+        generation_config={"temperature": 0},
+    )
+
+    assert transport.request.call_args.args[:2] == ("POST", "/v1beta/models/gemini-2.5-flash:generateContent")
+    assert transport.request.call_args.kwargs["json"]["generationConfig"] == {"temperature": 0}
+
+
+def test_gemini_video_returns_task_handle_with_spec_defaults(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "gemini-video-task"}
+    client.gemini.videos._transport = transport
+
+    handle = client.gemini.videos.generate(prompt="a kitten")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "gemini-video-task"
+    assert handle._poll_endpoint == "/gemini/tasks"
+    assert transport.request.call_args.args[:2] == ("POST", "/gemini/videos")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["model"] == "omni-flash"
+    assert body["aspect_ratio"] == "16:9"
+    assert body["resolution"] == "720p"
+    assert body["async"] is True
 
 
 @pytest.mark.parametrize("name", GENERATED)

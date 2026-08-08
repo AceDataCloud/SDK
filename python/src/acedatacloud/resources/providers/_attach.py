@@ -13,6 +13,7 @@ from .digitalhuman import AsyncDigitalhuman, Digitalhuman
 from .dreamina import AsyncDreamina, Dreamina
 from .fish import AsyncFish, Fish
 from .flux import AsyncFlux, Flux
+from .gemini import AsyncGemini, Gemini
 from .hailuo import AsyncHailuo, Hailuo
 from .happyhorse import AsyncHappyhorse, Happyhorse
 from .localization import AsyncLocalization, Localization
@@ -33,6 +34,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.dreamina = AsyncDreamina(transport)
         client.fish = AsyncFish(transport)
         client.flux = AsyncFlux(transport)
+        client.gemini = AsyncGemini(transport)
         client.hailuo = AsyncHailuo(transport)
         client.happyhorse = AsyncHappyhorse(transport)
         client.localization = AsyncLocalization(transport)
@@ -49,6 +51,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.dreamina = Dreamina(transport)
         client.fish = Fish(transport)
         client.flux = Flux(transport)
+        client.gemini = Gemini(transport)
         client.hailuo = Hailuo(transport)
         client.happyhorse = Happyhorse(transport)
         client.localization = Localization(transport)

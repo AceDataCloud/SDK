@@ -8,6 +8,8 @@ from .fish import AsyncFish as AsyncFish
 from .fish import Fish as Fish
 from .flux import AsyncFlux as AsyncFlux
 from .flux import Flux as Flux
+from .gemini import AsyncGemini as AsyncGemini
+from .gemini import Gemini as Gemini
 from .hailuo import AsyncHailuo as AsyncHailuo
 from .hailuo import Hailuo as Hailuo
 from .happyhorse import AsyncHappyhorse as AsyncHappyhorse
@@ -40,6 +42,8 @@ __all__ = [
     "AsyncFish",
     "Flux",
     "AsyncFlux",
+    "Gemini",
+    "AsyncGemini",
     "Hailuo",
     "AsyncHailuo",
     "Happyhorse",
