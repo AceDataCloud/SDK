@@ -69,6 +69,62 @@ func TestCaptchaEndpoints(t *testing.T) {
 	}
 }
 
+func TestClaudeProviderChatCompletions(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/v1/chat/completions" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != string(ClaudeOpus48) {
+			t.Fatalf("bad model: %v", body["model"])
+		}
+		if body["reasoning_effort"] != "medium" {
+			t.Fatalf("missing default reasoning_effort: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"chat-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.Claude().Chat().Completions().Create(context.Background(), ClaudeChatCompletionRequest{
+		Model:    ClaudeOpus48,
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "chat-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestGeminiProviderVideoDefaults(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/gemini/videos" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "omni-flash" || body["aspect_ratio"] != "16:9" || body["resolution"] != "720p" || body["async"] != true {
+			t.Fatalf("bad defaults: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"task_id":"gemini-task"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	handle, err := c.Gemini().Videos().Generate(context.Background(), GeminiVideoRequest{Prompt: "A kitten in a garden"})
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	if handle.ID != "gemini-task" {
+		t.Fatalf("bad task id: %s", handle.ID)
+	}
+}
+
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/v1/chat/completions" {

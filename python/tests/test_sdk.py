@@ -262,6 +262,44 @@ def test_chat_count_tokens(client):
     assert result["input_tokens"] == 42
 
 
+@respx.mock
+def test_claude_provider_chat_completions(client):
+    route = respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+        return_value=httpx.Response(200, json={"id": "chat-1"})
+    )
+
+    result = client.claude.chat.completions.create(
+        model="claude-opus-4-8",
+        messages=[{"role": "user", "content": "Hi"}],
+        max_tokens=10,
+    )
+
+    assert result["id"] == "chat-1"
+    body = json.loads(route.calls.last.request.content)
+    assert body["model"] == "claude-opus-4-8"
+    assert body["max_tokens"] == 10
+    assert body["reasoning_effort"] == "medium"
+
+
+@respx.mock
+def test_gemini_provider_video_generate_defaults(client):
+    route = respx.post("https://api.acedata.cloud/gemini/videos").mock(
+        return_value=httpx.Response(200, json={"task_id": "gemini-task"})
+    )
+
+    handle = client.gemini.videos.generate(prompt="A kitten in a garden")
+
+    assert handle.id == "gemini-task"
+    body = json.loads(route.calls.last.request.content)
+    assert body == {
+        "prompt": "A kitten in a garden",
+        "model": "omni-flash",
+        "aspect_ratio": "16:9",
+        "resolution": "720p",
+        "async": True,
+    }
+
+
 # ── Image Generation ──────────────────────────────────────────────────
 
 

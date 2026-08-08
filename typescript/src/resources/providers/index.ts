@@ -1,9 +1,11 @@
 /** Provider-axis clients, generated from the platform OpenAPI specs. */
 
 export { Digitalhuman } from './digitalhuman';
+export { Claude } from './claude';
 export { Dreamina } from './dreamina';
 export { Fish } from './fish';
 export { Flux } from './flux';
+export { Gemini } from './gemini';
 export { Hailuo } from './hailuo';
 export { Happyhorse } from './happyhorse';
 export { Localization } from './localization';
@@ -17,10 +19,12 @@ export { Suno } from './suno';
 export { Wan } from './wan';
 
 import { Transport } from '../../runtime/transport';
+import { Claude } from './claude';
 import { Digitalhuman } from './digitalhuman';
 import { Dreamina } from './dreamina';
 import { Fish } from './fish';
 import { Flux } from './flux';
+import { Gemini } from './gemini';
 import { Hailuo } from './hailuo';
 import { Happyhorse } from './happyhorse';
 import { Localization } from './localization';
@@ -35,10 +39,12 @@ import { Wan } from './wan';
 
 /** Bind every generated provider client onto `client`. */
 export function attachProviders(client: Record<string, unknown>, transport: Transport): void {
+  client.claude = new Claude(transport);
   client.digitalhuman = new Digitalhuman(transport);
   client.dreamina = new Dreamina(transport);
   client.fish = new Fish(transport);
   client.flux = new Flux(transport);
+  client.gemini = new Gemini(transport);
   client.hailuo = new Hailuo(transport);
   client.happyhorse = new Happyhorse(transport);
   client.localization = new Localization(transport);

@@ -3,7 +3,6 @@
 
 package acedatacloud
 
-
 // taskIDFrom pulls a task id out of a submission response.
 func taskIDFrom(result map[string]any) string {
 	if s, ok := result["task_id"].(string); ok && s != "" {
@@ -22,42 +21,49 @@ func taskIDFrom(result map[string]any) string {
 
 // providers holds the provider-axis clients, one per service.
 type providers struct {
+	claude       *Claude
 	digitalhuman *Digitalhuman
-	dreamina *Dreamina
-	fish *Fish
-	flux *Flux
-	hailuo *Hailuo
-	happyhorse *Happyhorse
+	dreamina     *Dreamina
+	fish         *Fish
+	flux         *Flux
+	gemini       *Gemini
+	hailuo       *Hailuo
+	happyhorse   *Happyhorse
 	localization *Localization
-	luma *Luma
-	maestro *Maestro
-	nanobanana *NanoBanana
-	producer *Producer
-	seedance *Seedance
-	seedream *Seedream
-	suno *Suno
-	wan *Wan
+	luma         *Luma
+	maestro      *Maestro
+	nanobanana   *NanoBanana
+	producer     *Producer
+	seedance     *Seedance
+	seedream     *Seedream
+	suno         *Suno
+	wan          *Wan
 }
 
 func newProviders(tr *transport) *providers {
 	return &providers{
+		claude:       &Claude{t: tr},
 		digitalhuman: &Digitalhuman{t: tr},
-		dreamina: &Dreamina{t: tr},
-		fish: &Fish{t: tr},
-		flux: &Flux{t: tr},
-		hailuo: &Hailuo{t: tr},
-		happyhorse: &Happyhorse{t: tr},
+		dreamina:     &Dreamina{t: tr},
+		fish:         &Fish{t: tr},
+		flux:         &Flux{t: tr},
+		gemini:       &Gemini{t: tr},
+		hailuo:       &Hailuo{t: tr},
+		happyhorse:   &Happyhorse{t: tr},
 		localization: &Localization{t: tr},
-		luma: &Luma{t: tr},
-		maestro: &Maestro{t: tr},
-		nanobanana: &NanoBanana{t: tr},
-		producer: &Producer{t: tr},
-		seedance: &Seedance{t: tr},
-		seedream: &Seedream{t: tr},
-		suno: &Suno{t: tr},
-		wan: &Wan{t: tr},
+		luma:         &Luma{t: tr},
+		maestro:      &Maestro{t: tr},
+		nanobanana:   &NanoBanana{t: tr},
+		producer:     &Producer{t: tr},
+		seedance:     &Seedance{t: tr},
+		seedream:     &Seedream{t: tr},
+		suno:         &Suno{t: tr},
+		wan:          &Wan{t: tr},
 	}
 }
+
+// Claude returns the claude provider client.
+func (c *Client) Claude() *Claude { return c.providers.claude }
 
 // Digitalhuman returns the digitalhuman provider client.
 func (c *Client) Digitalhuman() *Digitalhuman { return c.providers.digitalhuman }
@@ -70,6 +76,9 @@ func (c *Client) Fish() *Fish { return c.providers.fish }
 
 // Flux returns the flux provider client.
 func (c *Client) Flux() *Flux { return c.providers.flux }
+
+// Gemini returns the gemini provider client.
+func (c *Client) Gemini() *Gemini { return c.providers.gemini }
 
 // Hailuo returns the hailuo provider client.
 func (c *Client) Hailuo() *Hailuo { return c.providers.hailuo }
@@ -103,4 +112,3 @@ func (c *Client) Suno() *Suno { return c.providers.suno }
 
 // Wan returns the wan provider client.
 func (c *Client) Wan() *Wan { return c.providers.wan }
-
