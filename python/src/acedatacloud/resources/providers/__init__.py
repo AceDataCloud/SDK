@@ -18,6 +18,8 @@ from .luma import AsyncLuma as AsyncLuma
 from .luma import Luma as Luma
 from .maestro import AsyncMaestro as AsyncMaestro
 from .maestro import Maestro as Maestro
+from .minimax import AsyncMinimax as AsyncMinimax
+from .minimax import Minimax as Minimax
 from .nano_banana import AsyncNanoBanana as AsyncNanoBanana
 from .nano_banana import NanoBanana as NanoBanana
 from .producer import AsyncProducer as AsyncProducer
@@ -50,6 +52,8 @@ __all__ = [
     "AsyncLuma",
     "Maestro",
     "AsyncMaestro",
+    "Minimax",
+    "AsyncMinimax",
     "NanoBanana",
     "AsyncNanoBanana",
     "Producer",

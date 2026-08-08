@@ -306,6 +306,17 @@
   ],
   "tasks": "/hailuo/tasks"
  },
+ "minimax": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "minimax",
+    "path": "/minimax/videos",
+    "name": "MiniMax H3 Video Generation"
+   }
+  ],
+  "tasks": "/minimax/tasks"
+ },
  "happyhorse": {
   "category": "AI Video",
   "endpoints": [
