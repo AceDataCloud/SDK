@@ -29,8 +29,8 @@ def _task_id(result: Any) -> str:
     if result.get("task_id"):
         return str(result["task_id"])
     data = result.get("data")
-    if isinstance(data, dict) and data.get('task_id'):
-        return str(data['task_id'])
+    if isinstance(data, dict) and data.get("task_id"):
+        return str(data["task_id"])
     return str(result.get("id") or "")
 
 
