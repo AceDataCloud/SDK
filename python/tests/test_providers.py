@@ -25,6 +25,7 @@ GENERATED = (
     "luma",
     "happyhorse",
     "maestro",
+    "minimax",
     "digitalhuman",
     "dreamina",
     "localization",
@@ -127,6 +128,50 @@ def test_extra_parameters_pass_through(client):
 
     client.flux.generate(action="generate", prompt="a cat", brand_new_flag=True)
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
+
+
+def test_minimax_generate_matches_docs_shape(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "minimax-1"}
+    client.minimax._transport = transport
+
+    handle = client.minimax.generate(
+        model="MiniMax-H3",
+        content=[
+            {"type": "text", "text": "let the subject move naturally"},
+            {
+                "type": "image_url",
+                "image_url": {"url": "https://cdn.example.com/frame.png"},
+                "role": "first_frame",
+            },
+        ],
+        resolution="2K",
+        duration=5,
+        ratio="adaptive",
+        aigc_watermark=False,
+    )
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "minimax-1"
+    transport.request.assert_called_once_with(
+        "POST",
+        "/minimax/videos",
+        json={
+            "model": "MiniMax-H3",
+            "content": [
+                {"type": "text", "text": "let the subject move naturally"},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": "https://cdn.example.com/frame.png"},
+                    "role": "first_frame",
+                },
+            ],
+            "resolution": "2K",
+            "duration": 5,
+            "ratio": "adaptive",
+            "aigc_watermark": False,
+        },
+    )
 
 
 @pytest.mark.parametrize("name", GENERATED)

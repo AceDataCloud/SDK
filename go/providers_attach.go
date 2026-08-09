@@ -31,6 +31,7 @@ type providers struct {
 	localization *Localization
 	luma *Luma
 	maestro *Maestro
+	minimax *Minimax
 	nanobanana *NanoBanana
 	producer *Producer
 	seedance *Seedance
@@ -50,6 +51,7 @@ func newProviders(tr *transport) *providers {
 		localization: &Localization{t: tr},
 		luma: &Luma{t: tr},
 		maestro: &Maestro{t: tr},
+		minimax: &Minimax{t: tr},
 		nanobanana: &NanoBanana{t: tr},
 		producer: &Producer{t: tr},
 		seedance: &Seedance{t: tr},
@@ -86,6 +88,9 @@ func (c *Client) Luma() *Luma { return c.providers.luma }
 // Maestro returns the maestro provider client.
 func (c *Client) Maestro() *Maestro { return c.providers.maestro }
 
+// Minimax returns the minimax provider client.
+func (c *Client) Minimax() *Minimax { return c.providers.minimax }
+
 // NanoBanana returns the nano-banana provider client.
 func (c *Client) NanoBanana() *NanoBanana { return c.providers.nanobanana }
 
@@ -103,4 +108,3 @@ func (c *Client) Suno() *Suno { return c.providers.suno }
 
 // Wan returns the wan provider client.
 func (c *Client) Wan() *Wan { return c.providers.wan }
-

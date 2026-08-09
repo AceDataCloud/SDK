@@ -443,3 +443,52 @@ func TestTransientErrorKeepsWaiting(t *testing.T) {
 		t.Errorf("taskStatus = %q, want empty (still running)", got)
 	}
 }
+
+func TestMinimaxGenerateRequestShape(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/minimax/videos" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode body: %v", err)
+		}
+		if body["model"] != "MiniMax-H3" || body["resolution"] != "2K" || body["duration"] != float64(5) {
+			t.Fatalf("bad body: %+v", body)
+		}
+		if body["ratio"] != "adaptive" || body["aigc_watermark"] != false {
+			t.Fatalf("missing optional fields: %+v", body)
+		}
+		content, ok := body["content"].([]any)
+		if !ok || len(content) != 2 {
+			t.Fatalf("bad content: %+v", body["content"])
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"task_id":"minimax-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	watermark := false
+	handle, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{
+		Model:      MinimaxModelH3,
+		Resolution: MinimaxResolution2K,
+		Duration:   5,
+		Ratio:      MinimaxRatioAdaptive,
+		Content: []MinimaxContentItem{
+			{Type: MinimaxContentText, Text: "let the subject move naturally"},
+			{
+				Type:     MinimaxContentImageURL,
+				ImageURL: &MinimaxMediaURL{URL: "https://cdn.example.com/frame.png"},
+				Role:     MinimaxRoleFirstFrame,
+			},
+		},
+		AIGCWatermark: &watermark,
+	})
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	if handle == nil || handle.ID != "minimax-1" {
+		t.Fatalf("bad handle: %+v", handle)
+	}
+}
