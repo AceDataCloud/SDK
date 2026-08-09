@@ -85,20 +85,10 @@ class Param:
         return self.name in CONTROL
 
     def default(self) -> Any:
-        """What to send when the caller omits it.
-
-        A spec's `required` list understates what upstreams enforce — /flux/images
-        rejects a request with no `size` while not declaring it required — so an
-        `example` is worth forwarding. But an example that contradicts the
-        property's own enum is simply wrong (flux documents `model` with the
-        example "generate", an action value), so the enum wins.
-        """
+        """Return a valid schema default, never an illustrative example."""
         enum = self.enum
         if "default" in self.schema and (not enum or self.schema["default"] in enum):
             return self.schema["default"]
-        example = self.schema.get("example")
-        if example is not None and (not enum or example in enum):
-            return example
         return None
 
     def py_type(self) -> str:

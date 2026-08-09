@@ -100,6 +100,41 @@ def test_caller_value_beats_the_spec_default(client):
     assert transport.request.call_args.kwargs["json"]["size"] == "512x512"
 
 
+def test_seedream_omits_example_only_size(client):
+    transport = Mock()
+    transport.request.return_value = {
+        "success": True,
+        "task_id": "seedream-1",
+        "data": [{"image_url": "https://cdn.example.com/seedream.png"}],
+    }
+    client.seedream._transport = transport
+
+    handle = client.seedream.generate(model="doubao-seedream-5-0-260128", prompt="a cat")
+
+    body = transport.request.call_args.kwargs["json"]
+    assert "size" not in body
+    assert handle.done
+    assert handle.urls() == ["https://cdn.example.com/seedream.png"]
+
+
+def test_seedream_sends_explicit_size(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "seedream-1"}
+    client.seedream._transport = transport
+
+    client.seedream.generate(model="doubao-seedream-5-0-260128", prompt="a cat", size="4K")
+
+    assert transport.request.call_args.kwargs["json"]["size"] == "4K"
+
+
+def test_seedream_size_type_excludes_adaptive(client):
+    hints = typing.get_type_hints(type(client.seedream).generate)
+    size = hints["size"]
+    literal = next((arg for arg in typing.get_args(size) if typing.get_origin(arg) is typing.Literal), None)
+    assert literal is not None
+    assert "adaptive" not in typing.get_args(literal)
+
+
 def test_async_is_requested_by_default(client):
     """Otherwise a slow generation holds the HTTP connection open."""
     transport = Mock()

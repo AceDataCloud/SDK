@@ -23,8 +23,8 @@ export interface SeedreamGenerateOptions {
   prompt: string;
   /** Generate a random seed for image generation. The supported range is [-1, 2147483647], with a default value of `-1`. **Only `doubao-seedream-3.0-t2i` supports this parameter** (according to the official Volcengine documentation), other models do not accept this parameter. */
   seed?: number;
-  /** Generate image dimensions or aspect ratios. Supports preset options (`1K`/`2K`/`3K`/`4K`), `adaptive` (adaptive reference image size), or explicit `<width>x<height>` format (e.g., `1024x1024`). **Different models support different preset options**: `doubao-seedream-5.0-pro` supports `1K`/`2K`; `doubao-seedream-5.0-lite` supports `2K`/`3K`/`4K`; `doubao-seedream-4.5` only supports `2K`/`4K`; `doubao-seedream-4.0` supports `1K`/`2K`/`4K`; `doubao-seedream-3.0-t2i` and `doubao-seedream-3.0-i2i` **do not support** any preset options and must receive explicit `<width>x<height>` values. */
-  size?: "1K" | "2K" | "3K" | "4K" | "adaptive";
+  /** Generate image dimensions or aspect ratios. Supports preset options (`1K`/`2K`/`3K`/`4K`), or explicit `<width>x<height>` format (e.g., `1024x1024`). **Different models support different preset options**: `doubao-seedream-5.0-pro` supports `1K`/`2K`; `doubao-seedream-5.0-lite` supports `2K`/`3K`/`4K`; `doubao-seedream-4.5` only supports `2K`/`4K`; `doubao-seedream-4.0` supports `1K`/`2K`/`4K`; `doubao-seedream-3.0-t2i` and `doubao-seedream-3.0-i2i` **do not support** any preset options and must receive explicit `<width>x<height>` values. */
+  size?: "1K" | "2K" | "3K" | "4K";
   /** Reference image links for image editing are required, supporting accessible http/https URLs, or base64 encoded image strings in the format `data:image/png;base64,iVBORw0KG...`. Each image must not exceed 10MB in size. This parameter is mandatory when using image-to-image models (such as `doubao-seededit-3.0-i2i`). */
   image?: string[];
   /** List of tools that can be called by the model. Currently, only `web_search` is supported. Applicable only to `doubao-seedream-5.0-lite`. */
@@ -66,7 +66,7 @@ export class Seedream {
     body["model"] = options.model;
     body["prompt"] = options.prompt;
     if (options.seed !== undefined) body["seed"] = options.seed;
-    body["size"] = options.size ?? "2K";
+    if (options.size !== undefined) body["size"] = options.size;
     if (options.image !== undefined) body["image"] = options.image;
     if (options.tools !== undefined) body["tools"] = options.tools;
     if (options.stream !== undefined) body["stream"] = options.stream;
