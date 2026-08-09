@@ -351,8 +351,28 @@ def test_search_google(client):
     }
     respx.post("https://api.acedata.cloud/serp/google").mock(return_value=httpx.Response(200, json=mock_response))
 
-    result = client.search.google(query="example")
+    result = client.search.google(
+        query="example",
+        type="images",
+        page=2,
+        range="qdr:w",
+        number=20,
+        image_size="4mp",
+    )
     assert result["organic"][0]["title"] == "Example"
+    assert json.loads(respx.calls.last.request.content) == {
+        "query": "example",
+        "type": "images",
+        "page": 2,
+        "range": "qdr:w",
+        "number": 20,
+        "image_size": "4mp",
+    }
+
+
+def test_search_google_rejects_image_size_for_non_image_search(client):
+    with pytest.raises(ValueError, match="only valid when type is 'images'"):
+        client.search.google(query="example", image_size="4mp")
 
 
 # ── Tasks ─────────────────────────────────────────────────────────────

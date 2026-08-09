@@ -33,6 +33,40 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 }
 
+func TestSearchGoogle(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/serp/google" {
+			t.Errorf("unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatal(err)
+		}
+		if body["type"] != "images" || body["page"] != float64(2) || body["range"] != "qdr:w" ||
+			body["number"] != float64(20) || body["image_size"] != "4mp" {
+			t.Errorf("unexpected body: %#v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"images":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.Search().Google(context.Background(), SearchRequest{
+		Query:     "example",
+		Type:      string(SearchTypeImages),
+		Page:      2,
+		Range:     SearchRangeQDRWeek,
+		Number:    20,
+		ImageSize: ImageSize4MP,
+	}); err != nil {
+		t.Fatalf("Search Google: %v", err)
+	}
+	if _, err := c.Search().Google(context.Background(), SearchRequest{Query: "example", ImageSize: ImageSize4MP}); err == nil {
+		t.Fatal("expected image_size validation error")
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
