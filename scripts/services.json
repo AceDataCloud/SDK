@@ -31,6 +31,17 @@
   ],
   "tasks": "/maestro/tasks"
  },
+ "minimax": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "minimax",
+    "path": "/minimax/videos",
+    "name": "Minimax Videos"
+   }
+  ],
+  "tasks": "/minimax/tasks"
+ },
  "openai": {
   "category": "AI Chat",
   "endpoints": [

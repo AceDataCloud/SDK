@@ -106,6 +106,8 @@ class Param:
             return "Literal[" + ", ".join(json.dumps(e) for e in self.enum) + "]"
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
+            if item == "object":
+                return "list[dict[str, Any]]"
             return f"list[{PY_TYPES.get(item, 'Any')}]"
         if self.type == "object":
             return "dict[str, Any]"
@@ -116,6 +118,8 @@ class Param:
             return " | ".join(json.dumps(e) for e in self.enum)
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
+            if item == "object":
+                return "Array<Record<string, unknown>>"
             return f"{TS_TYPES.get(item, 'unknown')}[]"
         if self.type == "object":
             return "Record<string, unknown>"
@@ -124,6 +128,8 @@ class Param:
     def go_type(self) -> str:
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
+            if item == "object":
+                return "[]map[string]any"
             return f"[]{GO_TYPES.get(item, 'any')}"
         if self.type == "object":
             return "map[string]any"
@@ -182,6 +188,9 @@ class Service:
             if not spec_file.exists():
                 continue
             self.endpoints.append(Endpoint(alias, ep["path"], json.loads(spec_file.read_text())))
+        if self.tasks_path:
+            for endpoint in self.endpoints:
+                endpoint.pollable = True
         self._name_methods()
 
     def _name_methods(self) -> None:
