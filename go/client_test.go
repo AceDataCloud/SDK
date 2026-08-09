@@ -66,6 +66,43 @@ func TestMinimaxGenerate(t *testing.T) {
 	}
 }
 
+func TestVeoGenerate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/veo/videos" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["action"] != "ingredients2video" || body["model"] != "veo31-fast-ingredients" {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		if body["aspect_ratio"] != "16:9" || body["resolution"] != "1080p" {
+			t.Errorf("unexpected video options: %+v", body)
+		}
+		if body["async"] != true {
+			t.Errorf("expected async request: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"task_id":"veo-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Veo().Generate(context.Background(), VeoGenerateRequest{
+		Action:      VeoActionIngredientsToVideo,
+		Model:       VeoModelVeo31FastIngredients,
+		Prompt:      "A rotating mug",
+		Resolution:  VeoResolution1080P,
+		AspectRatio: VeoAspectRatio16x9,
+		ImageURLs:   []string{"https://example.com/mug.png"},
+	})
+	if err != nil {
+		t.Fatalf("Veo Generate: %v", err)
+	}
+	if task.ID != "veo-1" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

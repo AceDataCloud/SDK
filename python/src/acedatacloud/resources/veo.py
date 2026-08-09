@@ -4,7 +4,21 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
+from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
+
 VeoModel = Literal["veo3", "veo3-fast", "veo31-fast", "veo31", "veo31-fast-ingredients"]
+
+
+def _task_id(result: Any) -> str:
+    """Task ids appear at the top level or nested under `data`."""
+    if not isinstance(result, dict):
+        return ""
+    if result.get("task_id"):
+        return str(result["task_id"])
+    data = result.get("data")
+    if isinstance(data, dict) and data.get("task_id"):
+        return str(data["task_id"])
+    return str(result.get("id") or "")
 
 
 class Veo:
@@ -18,7 +32,7 @@ class Veo:
         *,
         action: Literal["text2video", "image2video", "ingredients2video", "get1080p"],
         prompt: str | None = None,
-        model: str | None = None,
+        model: VeoModel | None = None,
         resolution: Literal["4k", "1080p", "gif"] | None = None,
         video_id: str | None = None,
         translation: bool | None = None,
@@ -26,8 +40,11 @@ class Veo:
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
         **kwargs: Any,
-    ) -> dict[str, Any]:
+    ) -> TaskHandle:
         body: dict[str, Any] = {"action": action, **kwargs}
         if prompt is not None:
             body["prompt"] = prompt
@@ -45,9 +62,12 @@ class Veo:
             body["image_urls"] = image_urls
         if callback_url is not None:
             body["callback_url"] = callback_url
-        if async_ is not None:
-            body["async"] = async_
-        return self._transport.request("POST", "/veo/videos", json=body)
+        body["async"] = True if async_ is None else async_
+        result = self._transport.request("POST", "/veo/videos", json=body)
+        handle = TaskHandle(_task_id(result), "/veo/tasks", self._transport, submitted=result)
+        if wait:
+            handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
 
     def upsample(
         self,
@@ -134,7 +154,7 @@ class AsyncVeo:
         *,
         action: Literal["text2video", "image2video", "ingredients2video", "get1080p"],
         prompt: str | None = None,
-        model: str | None = None,
+        model: VeoModel | None = None,
         resolution: Literal["4k", "1080p", "gif"] | None = None,
         video_id: str | None = None,
         translation: bool | None = None,
@@ -142,8 +162,11 @@ class AsyncVeo:
         image_urls: list[str] | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
         **kwargs: Any,
-    ) -> dict[str, Any]:
+    ) -> AsyncTaskHandle:
         body: dict[str, Any] = {"action": action, **kwargs}
         if prompt is not None:
             body["prompt"] = prompt
@@ -161,9 +184,12 @@ class AsyncVeo:
             body["image_urls"] = image_urls
         if callback_url is not None:
             body["callback_url"] = callback_url
-        if async_ is not None:
-            body["async"] = async_
-        return await self._transport.request("POST", "/veo/videos", json=body)
+        body["async"] = True if async_ is None else async_
+        result = await self._transport.request("POST", "/veo/videos", json=body)
+        handle = AsyncTaskHandle(_task_id(result), "/veo/tasks", self._transport, submitted=result)
+        if wait:
+            await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
 
     async def upsample(
         self,

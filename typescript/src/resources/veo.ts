@@ -1,6 +1,7 @@
 /** Veo-specific video generation and editing resources. */
 
 import { Transport } from '../runtime/transport';
+import { TaskHandle } from '../runtime/tasks';
 
 export type VeoModel = 'veo3' | 'veo3-fast' | 'veo31-fast' | 'veo31' | 'veo31-fast-ingredients' | (string & {});
 
@@ -18,9 +19,27 @@ export class Veo {
     imageUrls?: string[];
     callbackUrl?: string;
     async?: boolean;
+    wait?: boolean;
+    pollInterval?: number;
+    maxWait?: number;
     [key: string]: unknown;
-  }): Promise<Record<string, unknown>> {
-    const { action, prompt, model, resolution, videoId, translation, aspectRatio, imageUrls, callbackUrl, ...rest } = opts;
+  }): Promise<TaskHandle> {
+    const {
+      action,
+      prompt,
+      model,
+      resolution,
+      videoId,
+      translation,
+      aspectRatio,
+      imageUrls,
+      callbackUrl,
+      async: async_,
+      wait,
+      pollInterval,
+      maxWait,
+      ...rest
+    } = opts;
     const body: Record<string, unknown> = { action, ...rest };
     if (prompt !== undefined) body.prompt = prompt;
     if (model !== undefined) body.model = model;
@@ -30,7 +49,13 @@ export class Veo {
     if (aspectRatio !== undefined) body.aspect_ratio = aspectRatio;
     if (imageUrls !== undefined) body.image_urls = imageUrls;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
-    return this.transport.request('POST', '/veo/videos', { json: body });
+    body.async = async_ ?? true;
+    const result = (await this.transport.request('POST', '/veo/videos', { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), '/veo/tasks', this.transport, result);
+    if (wait) {
+      await handle.wait({ pollInterval, maxWait });
+    }
+    return handle;
   }
 
   async upsample(opts: {
@@ -90,4 +115,11 @@ export class Veo {
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     return this.transport.request('POST', '/veo/objects', { json: body });
   }
+}
+
+function taskId(result: Record<string, unknown>): string {
+  if (typeof result?.task_id === 'string') return result.task_id;
+  const data = result?.data as Record<string, unknown> | undefined;
+  if (data && typeof data.task_id === 'string') return data.task_id;
+  return typeof result?.id === 'string' ? result.id : '';
 }

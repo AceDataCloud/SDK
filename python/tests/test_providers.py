@@ -136,6 +136,34 @@ def test_minimax_generate_builds_a_task_handle(client):
     }
 
 
+def test_veo_generate_matches_latest_spec(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "veo-1"}
+    client.veo._transport = transport
+
+    handle = client.veo.generate(
+        action="ingredients2video",
+        model="veo31-fast-ingredients",
+        prompt="A rotating mug",
+        resolution="1080p",
+        aspect_ratio="16:9",
+        image_urls=["https://example.com/mug.png"],
+    )
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "veo-1"
+    assert transport.request.call_args.args == ("POST", "/veo/videos")
+    assert transport.request.call_args.kwargs["json"] == {
+        "action": "ingredients2video",
+        "prompt": "A rotating mug",
+        "model": "veo31-fast-ingredients",
+        "resolution": "1080p",
+        "aspect_ratio": "16:9",
+        "image_urls": ["https://example.com/mug.png"],
+        "async": True,
+    }
+
+
 def test_model_enum_is_typed(client):
     """A wrong model name should be a type error, not a runtime 400."""
     hints = typing.get_type_hints(type(client.flux).generate)
