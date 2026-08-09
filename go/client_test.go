@@ -33,6 +33,39 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 }
 
+func TestMinimaxGenerate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/minimax/videos" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "MiniMax-H3" || body["resolution"] != "2K" || body["duration"] != float64(5) {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		if body["async"] != true {
+			t.Errorf("expected async request: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"task_id":"minimax-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{
+		Model:      "MiniMax-H3",
+		Content:    []map[string]any{{"type": "text", "text": "A cat"}},
+		Resolution: "2K",
+		Duration:   5,
+		Ratio:      "16:9",
+	})
+	if err != nil {
+		t.Fatalf("Minimax Generate: %v", err)
+	}
+	if task.ID != "minimax-1" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

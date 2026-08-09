@@ -25,6 +25,7 @@ GENERATED = (
     "luma",
     "happyhorse",
     "maestro",
+    "minimax",
     "digitalhuman",
     "dreamina",
     "localization",
@@ -107,6 +108,32 @@ def test_async_is_requested_by_default(client):
 
     client.flux.generate(action="generate", prompt="a cat")
     assert transport.request.call_args.kwargs["json"]["async"] is True
+
+
+def test_minimax_generate_builds_a_task_handle(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "minimax-1"}
+    client.minimax._transport = transport
+
+    handle = client.minimax.generate(
+        model="MiniMax-H3",
+        content=[{"type": "text", "text": "A cat"}],
+        resolution="2K",
+        duration=5,
+        ratio="16:9",
+    )
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "minimax-1"
+    assert transport.request.call_args.args == ("POST", "/minimax/videos")
+    assert transport.request.call_args.kwargs["json"] == {
+        "model": "MiniMax-H3",
+        "content": [{"type": "text", "text": "A cat"}],
+        "resolution": "2K",
+        "duration": 5,
+        "ratio": "16:9",
+        "async": True,
+    }
 
 
 def test_model_enum_is_typed(client):
