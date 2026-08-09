@@ -25,6 +25,7 @@ GENERATED = (
     "luma",
     "happyhorse",
     "maestro",
+    "minimax",
     "digitalhuman",
     "dreamina",
     "localization",
@@ -127,6 +128,24 @@ def test_extra_parameters_pass_through(client):
 
     client.flux.generate(action="generate", prompt="a cat", brand_new_flag=True)
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
+
+
+def test_minimax_generate_returns_a_task_handle_with_defaults(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "t-1"}
+    client.minimax._transport = transport
+
+    handle = client.minimax.generate(
+        model="MiniMax-H3",
+        content=[{"type": "text", "text": "a cat running"}],
+        resolution="768P",
+        duration=6,
+    )
+
+    assert isinstance(handle, TaskHandle)
+    body = transport.request.call_args.kwargs["json"]
+    assert body["aigc_watermark"] is False
+    assert body["async"] is True
 
 
 @pytest.mark.parametrize("name", GENERATED)

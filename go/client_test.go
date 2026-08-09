@@ -31,6 +31,9 @@ func TestNewClient_WithToken(t *testing.T) {
 	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
 	}
+	if c.Minimax() == nil {
+		t.Fatal("provider minimax must be non-nil")
+	}
 }
 
 func TestCaptchaEndpoints(t *testing.T) {
@@ -343,6 +346,7 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 			_, _ = w.Write([]byte(`{"task_id":"img-1"}`))
 			return
 		}
+
 		if r.URL.Path == "/nano-banana/tasks" {
 			_, _ = w.Write([]byte(`{"response":{"status":"succeeded","url":"https://cdn/x.png"}}`))
 			return
@@ -369,6 +373,59 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 	resp := res["response"].(map[string]any)
 	if resp["url"] != "https://cdn/x.png" {
 		t.Fatalf("bad url: %+v", resp)
+	}
+}
+
+func TestMinimaxGenerateReturnsTaskHandleAndUsesTaskEndpoint(t *testing.T) {
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		w.Header().Set("Content-Type", "application/json")
+		switch r.URL.Path {
+		case "/minimax/videos":
+			var body map[string]any
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+				t.Fatalf("decode body: %v", err)
+			}
+			if body["aigc_watermark"] != false {
+				t.Fatalf("expected default aigc_watermark=false, got %v", body["aigc_watermark"])
+			}
+			if body["async"] != true {
+				t.Fatalf("expected default async=true, got %v", body["async"])
+			}
+			_, _ = w.Write([]byte(`{"task_id":"mx-1"}`))
+		case "/minimax/tasks":
+			_, _ = w.Write([]byte(`{"response":{"status":"succeeded","video_url":"https://cdn.example/mx.mp4"}}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	handle, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{
+		Model:      "MiniMax-H3",
+		Content:    []any{map[string]any{"type": "text", "text": "A cat is running"}},
+		Resolution: "768P",
+		Duration:   6,
+	})
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	if handle == nil || handle.ID != "mx-1" {
+		t.Fatalf("expected handle id mx-1, got %+v", handle)
+	}
+
+	res, err := handle.Wait(context.Background(), 5*time.Millisecond, 1*time.Second)
+	if err != nil {
+		t.Fatalf("Wait: %v", err)
+	}
+	resp := res["response"].(map[string]any)
+	if resp["status"] != "succeeded" {
+		t.Fatalf("bad status: %+v", resp)
+	}
+	if calls != 2 {
+		t.Fatalf("expected 2 requests, got %d", calls)
 	}
 }
 
