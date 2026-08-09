@@ -369,6 +369,31 @@ func TestTaskHandle_WaitCompletes(t *testing.T) {
 	}
 }
 
+func TestTasks_GetMinimax(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/minimax/tasks" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		b, _ := io.ReadAll(r.Body)
+		if !strings.Contains(string(b), `"id":"minimax-1"`) || !strings.Contains(string(b), `"action":"retrieve"`) {
+			t.Errorf("bad body: %s", b)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"response":{"status":"succeeded"}}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.Tasks().Get(context.Background(), "minimax", "minimax-1")
+	if err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	resp := res["response"].(map[string]any)
+	if resp["status"] != "succeeded" {
+		t.Fatalf("bad status: %+v", resp)
+	}
+}
+
 func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

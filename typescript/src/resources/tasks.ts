@@ -14,6 +14,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   luma: '/luma/tasks',
   veo: '/veo/tasks',
   flux: '/flux/tasks',
+  minimax: '/minimax/tasks',
   kling: '/kling/tasks',
   hailuo: '/hailuo/tasks',
   wan: '/wan/tasks',

@@ -371,6 +371,15 @@ def test_tasks_get(client):
 
 
 @respx.mock
+def test_tasks_get_minimax(client):
+    mock_response = {"id": "minimax-1", "response": {"status": "succeeded"}}
+    respx.post("https://api.acedata.cloud/minimax/tasks").mock(return_value=httpx.Response(200, json=mock_response))
+
+    result = client.tasks.get("minimax-1", service="minimax")
+    assert result["response"]["status"] == "succeeded"
+
+
+@respx.mock
 def test_captcha_hcaptcha(client):
     respx.post("https://api.acedata.cloud/captcha/recognition/hcaptcha").mock(
         return_value=httpx.Response(200, json={"task_id": "captcha-1"})

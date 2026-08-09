@@ -1,4 +1,5 @@
 import { TaskHandle, taskStatus } from '../src/runtime/tasks';
+import { Tasks } from '../src/resources/tasks';
 
 describe('TaskHandle', () => {
   it('waits through accepted responses and completes on success data without status', async () => {
@@ -118,5 +119,18 @@ describe('success:false without finished_at', () => {
   it('keeps waiting on a bare string error', () => {
     expect(taskStatus({ response: { success: false, error: 'temporary' } })).toBe('');
     expect(taskStatus({ response: { success: false, error: null } })).toBe('');
+  });
+});
+
+describe('cross-service tasks', () => {
+  it('routes minimax task retrieval to the documented endpoint', async () => {
+    const request = jest.fn().mockResolvedValue({ response: { status: 'succeeded' } });
+    const tasks = new Tasks({ request } as never);
+
+    await tasks.get('minimax-1', { service: 'minimax' });
+
+    expect(request).toHaveBeenCalledWith('POST', '/minimax/tasks', {
+      json: { id: 'minimax-1', action: 'retrieve' },
+    });
   });
 });
