@@ -66,6 +66,19 @@ func TestMinimaxGenerate(t *testing.T) {
 	}
 }
 
+func TestMinimaxGenerateRejectsInvalidContent(t *testing.T) {
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL("https://example.com"))
+	_, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{
+		Model:      "MiniMax-H3",
+		Content:    []map[string]any{{"type": "video_url", "video_url": map[string]any{"url": "https://example.com/ref.mp4"}}},
+		Resolution: "2K",
+		Duration:   5,
+	})
+	if err == nil || !strings.Contains(err.Error(), "role='reference_video'") {
+		t.Fatalf("expected minimax content validation error, got: %v", err)
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

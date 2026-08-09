@@ -7,7 +7,7 @@ model upstream reaches the SDK without anyone retyping it.
 
 from __future__ import annotations
 
-from typing import Any, Literal  # noqa: F401
+from typing import Any, Literal, TypedDict  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
@@ -20,6 +20,81 @@ MinimaxRatio = Literal[
     "3:4",
     "9:16",
 ]
+
+
+class MinimaxMediaUrl(TypedDict):
+    url: str
+
+
+class MinimaxTextContent(TypedDict):
+    type: Literal["text"]
+    text: str
+
+
+class _MinimaxImageContentRequired(TypedDict):
+    type: Literal["image_url"]
+    image_url: MinimaxMediaUrl
+
+
+class MinimaxImageContent(_MinimaxImageContentRequired, total=False):
+    role: Literal["first_frame", "last_frame", "reference_image"]
+
+
+class MinimaxVideoContent(TypedDict):
+    type: Literal["video_url"]
+    video_url: MinimaxMediaUrl
+    role: Literal["reference_video"]
+
+
+class MinimaxAudioContent(TypedDict):
+    type: Literal["audio_url"]
+    audio_url: MinimaxMediaUrl
+    role: Literal["reference_audio"]
+
+
+MinimaxContentItem = MinimaxTextContent | MinimaxImageContent | MinimaxVideoContent | MinimaxAudioContent
+
+
+def _validate_content_item(item: dict[str, Any]) -> None:
+    kind = item.get("type")
+    if kind == "text":
+        text = item.get("text")
+        if not isinstance(text, str) or not text:
+            raise ValueError("minimax.content item with type='text' requires non-empty text")
+        return
+    if kind == "image_url":
+        if not isinstance(item.get("image_url"), dict) or not isinstance(item["image_url"].get("url"), str):
+            raise ValueError("minimax.content item with type='image_url' requires image_url.url")
+        role = item.get("role")
+        if role is not None and role not in {"first_frame", "last_frame", "reference_image"}:
+            raise ValueError(
+                "minimax.content item with type='image_url' role must be first_frame, last_frame, or reference_image"
+            )
+        return
+    if kind == "video_url":
+        if not isinstance(item.get("video_url"), dict) or not isinstance(item["video_url"].get("url"), str):
+            raise ValueError("minimax.content item with type='video_url' requires video_url.url")
+        if item.get("role") != "reference_video":
+            raise ValueError("minimax.content item with type='video_url' requires role='reference_video'")
+        return
+    if kind == "audio_url":
+        if not isinstance(item.get("audio_url"), dict) or not isinstance(item["audio_url"].get("url"), str):
+            raise ValueError("minimax.content item with type='audio_url' requires audio_url.url")
+        if item.get("role") != "reference_audio":
+            raise ValueError("minimax.content item with type='audio_url' requires role='reference_audio'")
+        return
+    raise ValueError("minimax.content item type must be one of: text, image_url, video_url, audio_url")
+
+
+def _validate_generate_args(content: list[dict[str, Any]], duration: int) -> None:
+    if not content:
+        raise ValueError("minimax.content must contain at least one item")
+    for item in content:
+        if not isinstance(item, dict):
+            raise ValueError("minimax.content items must be objects")
+        _validate_content_item(item)
+    if duration < 4 or duration > 15:
+        raise ValueError("minimax.duration must be between 4 and 15 seconds")
 
 
 def _task_id(result: Any) -> str:
@@ -44,7 +119,7 @@ class Minimax:
         self,
         *,
         model: Literal["MiniMax-H3"],
-        content: list[dict[str, Any]],
+        content: list[MinimaxContentItem],
         resolution: Literal["768P", "2K"],
         duration: int,
         ratio: MinimaxRatio | None = None,
@@ -56,6 +131,7 @@ class Minimax:
         **extra: Any,
     ) -> TaskHandle:
         """Minimax Videos"""
+        _validate_generate_args(content, duration)
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
@@ -84,7 +160,7 @@ class AsyncMinimax:
         self,
         *,
         model: Literal["MiniMax-H3"],
-        content: list[dict[str, Any]],
+        content: list[MinimaxContentItem],
         resolution: Literal["768P", "2K"],
         duration: int,
         ratio: MinimaxRatio | None = None,
@@ -96,6 +172,7 @@ class AsyncMinimax:
         **extra: Any,
     ) -> AsyncTaskHandle:
         """Minimax Videos"""
+        _validate_generate_args(content, duration)
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content

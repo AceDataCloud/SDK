@@ -136,6 +136,21 @@ def test_minimax_generate_builds_a_task_handle(client):
     }
 
 
+def test_minimax_rejects_invalid_content_shape(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "minimax-1"}
+    client.minimax._transport = transport
+
+    with pytest.raises(ValueError, match="role='reference_video'"):
+        client.minimax.generate(
+            model="MiniMax-H3",
+            content=[{"type": "video_url", "video_url": {"url": "https://example.com/ref.mp4"}}],
+            resolution="2K",
+            duration=5,
+        )
+    assert transport.request.call_count == 0
+
+
 def test_model_enum_is_typed(client):
     """A wrong model name should be a type error, not a runtime 400."""
     hints = typing.get_type_hints(type(client.flux).generate)

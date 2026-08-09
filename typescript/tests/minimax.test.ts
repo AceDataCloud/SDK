@@ -27,4 +27,19 @@ describe('Minimax provider', () => {
       },
     });
   });
+
+  it('rejects invalid content entries before sending request', async () => {
+    const request = jest.fn();
+    const minimax = new Minimax({ request } as any);
+
+    await expect(
+      minimax.generate({
+        model: 'MiniMax-H3',
+        content: [{ type: 'video_url', video_url: { url: 'https://example.com/ref.mp4' } } as any],
+        resolution: '2K',
+        duration: 5,
+      }),
+    ).rejects.toThrow("role='reference_video'");
+    expect(request).not.toHaveBeenCalled();
+  });
 });
