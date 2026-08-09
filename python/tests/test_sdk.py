@@ -355,6 +355,30 @@ def test_search_google(client):
     assert result["organic"][0]["title"] == "Example"
 
 
+@respx.mock
+def test_search_google_with_new_params(client):
+    route = respx.post("https://api.acedata.cloud/serp/google").mock(
+        return_value=httpx.Response(200, json={"ok": True})
+    )
+
+    client.search.google(
+        query="example",
+        type="images",
+        range="qdr:d",
+        number=20,
+        image_size="4mp",
+    )
+
+    assert route.called
+    assert json.loads(route.calls[0].request.content) == {
+        "query": "example",
+        "type": "images",
+        "range": "qdr:d",
+        "number": 20,
+        "image_size": "4mp",
+    }
+
+
 # ── Tasks ─────────────────────────────────────────────────────────────
 
 
@@ -519,6 +543,32 @@ async def test_async_search(async_client):
 
     result = await async_client.search.google(query="async test")
     assert result["organic"][0]["title"] == "Async Example"
+    await async_client.close()
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_search_with_new_params(async_client):
+    route = respx.post("https://api.acedata.cloud/serp/google").mock(
+        return_value=httpx.Response(200, json={"ok": True})
+    )
+
+    await async_client.search.google(
+        query="async test",
+        type="videos",
+        range="qdr:w",
+        number=5,
+        image_size="20mp",
+    )
+
+    assert route.called
+    assert json.loads(route.calls[0].request.content) == {
+        "query": "async test",
+        "type": "videos",
+        "range": "qdr:w",
+        "number": 5,
+        "image_size": "20mp",
+    }
     await async_client.close()
 
 

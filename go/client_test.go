@@ -100,6 +100,37 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 }
 
+func TestSearchGoogle_WithNewParams(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/serp/google" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["query"] != "example" || body["type"] != "images" {
+			t.Fatalf("unexpected query/type body: %+v", body)
+		}
+		if body["range"] != "qdr:d" || body["number"] != float64(20) || body["image_size"] != "4mp" {
+			t.Fatalf("missing new params in body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	_, err := c.Search().Google(context.Background(), SearchRequest{
+		Query:     "example",
+		Type:      SearchTypeImages,
+		Range:     SearchRangeQdrD,
+		Number:    20,
+		ImageSize: SearchImageSize4MP,
+	})
+	if err != nil {
+		t.Fatalf("Google: %v", err)
+	}
+}
+
 func TestTransport_RetriesOn503(t *testing.T) {
 	attempts := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
