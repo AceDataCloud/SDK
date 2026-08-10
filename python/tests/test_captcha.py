@@ -38,6 +38,12 @@ def test_sync_captcha_serialization() -> None:
         async_=True,
     )
     captcha.tasks.retrieve(task_id="task-1")
+    captcha.recognition.recaptcha2(image="base64", question="cars", async_=True)
+    captcha.token.recaptcha3(
+        website_key="site-key",
+        website_url="https://example.com",
+        page_action="submit",
+    )
 
     assert transport.calls == [
         (
@@ -57,6 +63,16 @@ def test_sync_captcha_serialization() -> None:
             },
         ),
         ("POST", "/captcha/tasks", {"task_id": "task-1"}),
+        ("POST", "/captcha/recognition/recaptcha2", {"image": "base64", "question": "cars", "async": True}),
+        (
+            "POST",
+            "/captcha/token/recaptcha3",
+            {
+                "website_key": "site-key",
+                "website_url": "https://example.com",
+                "page_action": "submit",
+            },
+        ),
     ]
 
 
@@ -68,6 +84,7 @@ async def test_async_captcha_serialization() -> None:
     await captcha.recognition.hcaptcha(async_=False)
     await captcha.token.hcaptcha(website_key="site-key", website_url="https://accounts.hcaptcha.com/demo")
     await captcha.tasks.retrieve(task_id="task-1")
+    await captcha.token.recaptcha2(website_key="site-key", website_url="https://example.com", proxy="proxy")
 
     assert transport.calls == [
         ("POST", "/captcha/recognition/hcaptcha", {"async": False}),
@@ -80,4 +97,9 @@ async def test_async_captcha_serialization() -> None:
             },
         ),
         ("POST", "/captcha/tasks", {"task_id": "task-1"}),
+        (
+            "POST",
+            "/captcha/token/recaptcha2",
+            {"website_key": "site-key", "website_url": "https://example.com", "proxy": "proxy"},
+        ),
     ]

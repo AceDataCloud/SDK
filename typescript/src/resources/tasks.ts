@@ -20,6 +20,11 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   pika: '/pika/tasks',
   pixverse: '/pixverse/tasks',
   webextrator: '/webextrator/tasks',
+  dreamina: '/dreamina/tasks',
+  happyhorse: '/happyhorse/tasks',
+  midjourney: '/midjourney/tasks',
+  openai: '/openai/tasks',
+  qrart: '/qrart/tasks',
   captcha: '/captcha/tasks',
 };
 

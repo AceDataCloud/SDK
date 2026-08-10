@@ -17,6 +17,18 @@ class Recognition {
     if (question !== undefined) body.question = question;
     return this.transport.request('POST', '/captcha/recognition/hcaptcha', { json: body });
   }
+
+  recaptcha2(opts: {
+    image: string;
+    question: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { image, question, ...rest } = opts;
+    return this.transport.request('POST', '/captcha/recognition/recaptcha2', {
+      json: { image, question, ...rest },
+    });
+  }
 }
 
 class Token {
@@ -39,6 +51,32 @@ class Token {
     if (rqdata !== undefined) body.rqdata = rqdata;
     if (proxy !== undefined) body.proxy = proxy;
     return this.transport.request('POST', '/captcha/token/hcaptcha', { json: body });
+  }
+
+  recaptcha2(opts: {
+    websiteKey: string;
+    websiteUrl: string;
+    proxy?: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { websiteKey, websiteUrl, proxy, ...rest } = opts;
+    const body: Record<string, unknown> = { website_key: websiteKey, website_url: websiteUrl, ...rest };
+    if (proxy !== undefined) body.proxy = proxy;
+    return this.transport.request('POST', '/captcha/token/recaptcha2', { json: body });
+  }
+
+  recaptcha3(opts: {
+    websiteKey: string;
+    websiteUrl: string;
+    pageAction: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { websiteKey, websiteUrl, pageAction, ...rest } = opts;
+    return this.transport.request('POST', '/captcha/token/recaptcha3', {
+      json: { website_key: websiteKey, website_url: websiteUrl, page_action: pageAction, ...rest },
+    });
   }
 }
 

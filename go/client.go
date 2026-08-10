@@ -8,16 +8,21 @@ package acedatacloud
 type Client struct {
 	transport *transport
 
-	openai   *OpenAIResource
-	chat     *ChatResource
-	captcha  *CaptchaResource
-	images   *ImagesResource
-	tasks    *TasksResource
-	video    *VideoResource
-	audio    *AudioResource
-	search   *SearchResource
-	face     *FaceResource
-	shorturl *ShortURLResource
+	openai      *OpenAIResource
+	chat        *ChatResource
+	captcha     *CaptchaResource
+	images      *ImagesResource
+	tasks       *TasksResource
+	video       *VideoResource
+	audio       *AudioResource
+	search      *SearchResource
+	face        *FaceResource
+	shorturl    *ShortURLResource
+	webextrator *WebExtratorResource
+	midjourney  *MidjourneyResource
+	qrart       *QrartResource
+	tiktok      *TiktokResource
+	tw          *TwResource
 
 	// providers holds the generated provider-axis clients, one per service.
 	providers *providers
@@ -46,10 +51,15 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.providers = newProviders(tr)
 	c.face = &FaceResource{t: tr}
 	c.shorturl = &ShortURLResource{t: tr}
+	c.webextrator = &WebExtratorResource{t: tr}
+	c.midjourney = &MidjourneyResource{t: tr}
+	c.qrart = &QrartResource{t: tr}
+	c.tiktok = &TiktokResource{t: tr}
+	c.tw = &TwResource{t: tr}
 	return c, nil
 }
 
-// OpenAI returns the OpenAI-compatible resource (“/v1/chat/completions“,
+// OpenAI returns the OpenAI-compatible resource (“/openai/chat/completions“,
 // “/openai/responses“).
 func (c *Client) OpenAI() *OpenAIResource { return c.openai }
 
@@ -80,3 +90,18 @@ func (c *Client) Face() *FaceResource { return c.face }
 
 // ShortURL returns the short URL resource.
 func (c *Client) ShortURL() *ShortURLResource { return c.shorturl }
+
+// WebExtrator returns the web extraction resource.
+func (c *Client) WebExtrator() *WebExtratorResource { return c.webextrator }
+
+// Midjourney returns the Midjourney resource.
+func (c *Client) Midjourney() *MidjourneyResource { return c.midjourney }
+
+// Qrart returns the QRArt resource.
+func (c *Client) Qrart() *QrartResource { return c.qrart }
+
+// Tiktok returns the TikTok data resource.
+func (c *Client) Tiktok() *TiktokResource { return c.tiktok }
+
+// Tw returns the X/Twitter data resource.
+func (c *Client) Tw() *TwResource { return c.tw }

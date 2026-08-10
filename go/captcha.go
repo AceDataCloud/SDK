@@ -53,6 +53,17 @@ func (r *CaptchaRecognition) HCaptcha(ctx context.Context, req CaptchaRecognitio
 	})
 }
 
+// Recaptcha2 calls POST /captcha/recognition/recaptcha2.
+func (r *CaptchaRecognition) Recaptcha2(ctx context.Context, image, question string, extra map[string]any) (map[string]any, error) {
+	body := map[string]any{"image": image, "question": question}
+	for k, v := range extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return r.t.do(ctx, requestOpts{Method: "POST", Path: "/captcha/recognition/recaptcha2", Body: body})
+}
+
 // CaptchaToken exposes captcha token endpoints.
 type CaptchaToken struct{ t *transport }
 
@@ -95,6 +106,28 @@ func (r *CaptchaToken) HCaptcha(ctx context.Context, req CaptchaTokenHCaptchaReq
 		Path:   "/captcha/token/hcaptcha",
 		Body:   req.toBody(),
 	})
+}
+
+// Recaptcha2 calls POST /captcha/token/recaptcha2.
+func (r *CaptchaToken) Recaptcha2(ctx context.Context, websiteKey, websiteURL string, extra map[string]any) (map[string]any, error) {
+	body := map[string]any{"website_key": websiteKey, "website_url": websiteURL}
+	for k, v := range extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return r.t.do(ctx, requestOpts{Method: "POST", Path: "/captcha/token/recaptcha2", Body: body})
+}
+
+// Recaptcha3 calls POST /captcha/token/recaptcha3.
+func (r *CaptchaToken) Recaptcha3(ctx context.Context, websiteKey, websiteURL, pageAction string, extra map[string]any) (map[string]any, error) {
+	body := map[string]any{"website_key": websiteKey, "website_url": websiteURL, "page_action": pageAction}
+	for k, v := range extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return r.t.do(ctx, requestOpts{Method: "POST", Path: "/captcha/token/recaptcha3", Body: body})
 }
 
 // CaptchaTasks exposes captcha task retrieval.

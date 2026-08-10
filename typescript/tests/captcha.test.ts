@@ -49,4 +49,27 @@ describe('Captcha resource', () => {
       json: { task_id: 'task-1' },
     });
   });
+
+  it('calls recaptcha endpoints', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'captcha-3' });
+    const captcha = new Captcha({ request } as any);
+
+    await captcha.recognition.recaptcha2({ image: 'base64', question: 'cars', async: true });
+    expect(request).toHaveBeenCalledWith('POST', '/captcha/recognition/recaptcha2', {
+      json: { image: 'base64', question: 'cars', async: true },
+    });
+
+    await captcha.token.recaptcha3({
+      websiteKey: 'site-key',
+      websiteUrl: 'https://example.com',
+      pageAction: 'submit',
+    });
+    expect(request).toHaveBeenCalledWith('POST', '/captcha/token/recaptcha3', {
+      json: {
+        website_key: 'site-key',
+        website_url: 'https://example.com',
+        page_action: 'submit',
+      },
+    });
+  });
 });

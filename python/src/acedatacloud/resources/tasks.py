@@ -24,6 +24,11 @@ _SERVICE_TASK_ENDPOINTS = {
     "pixverse": "/pixverse/tasks",
     "webextrator": "/webextrator/tasks",
     "captcha": "/captcha/tasks",
+    "dreamina": "/dreamina/tasks",
+    "happyhorse": "/happyhorse/tasks",
+    "midjourney": "/midjourney/tasks",
+    "openai": "/openai/tasks",
+    "qrart": "/qrart/tasks",
 }
 
 

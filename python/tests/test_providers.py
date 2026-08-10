@@ -30,7 +30,7 @@ GENERATED = (
     "dreamina",
     "localization",
 )
-HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
+HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl", "midjourney", "qrart", "tiktok", "tw")
 
 
 @pytest.fixture
@@ -189,6 +189,52 @@ def test_extra_parameters_pass_through(client):
 
     client.flux.generate(action="generate", prompt="a cat", brand_new_flag=True)
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
+
+
+def test_midjourney_imagine_uses_docs_endpoint(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "mj-1"}
+    client.midjourney._transport = transport
+
+    handle = client.midjourney.imagine(prompt="a cat")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "mj-1"
+    assert transport.request.call_args.args == ("POST", "/midjourney/imagine")
+    assert transport.request.call_args.kwargs["json"] == {"prompt": "a cat", "async": True}
+
+
+def test_qrart_generate_uses_docs_endpoint(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "qr-1"}
+    client.qrart._transport = transport
+
+    handle = client.qrart.generate(type="link", prompt="floral", content="https://example.com")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "qr-1"
+    assert transport.request.call_args.args == ("POST", "/qrart/generate")
+    assert transport.request.call_args.kwargs["json"] == {
+        "type": "link",
+        "prompt": "floral",
+        "content": "https://example.com",
+        "async": True,
+    }
+
+
+def test_tiktok_and_tw_use_docs_endpoints(client):
+    transport = Mock()
+    transport.request.return_value = {"ok": True}
+    client.tiktok._transport = transport
+    client.tw._transport = transport
+
+    client.tiktok.video(video_url="https://www.tiktok.com/@u/video/1")
+    assert transport.request.call_args.args == ("POST", "/tiktok/video")
+    assert transport.request.call_args.kwargs["json"] == {"video_url": "https://www.tiktok.com/@u/video/1"}
+
+    client.tw.posts(user_id="123")
+    assert transport.request.call_args.args == ("POST", "/x/posts")
+    assert transport.request.call_args.kwargs["json"] == {"user_id": "123"}
 
 
 @pytest.mark.parametrize("name", GENERATED)

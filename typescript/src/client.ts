@@ -16,9 +16,13 @@ import { OpenAI } from './resources/openai';
 import { Glm } from './resources/glm';
 import { Veo } from './resources/veo';
 import { Kling } from './resources/kling';
+import { Midjourney } from './resources/midjourney';
 import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
+import { Qrart } from './resources/qrart';
 import { ShortUrl } from './resources/shorturl';
+import { Tiktok } from './resources/tiktok';
+import { Tw } from './resources/tw';
 import { attachProviders } from './resources/providers';
 
 export interface AceDataCloudOptions {
@@ -54,6 +58,10 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  readonly midjourney: Midjourney;
+  readonly qrart: Qrart;
+  readonly tiktok: Tiktok;
+  readonly tw: Tw;
 
   private transport: Transport;
 
@@ -85,6 +93,10 @@ export class AceDataCloud {
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);
+    this.midjourney = new Midjourney(this.transport);
+    this.qrart = new Qrart(this.transport);
+    this.tiktok = new Tiktok(this.transport);
+    this.tw = new Tw(this.transport);
     // Provider axis: one namespace per service, generated from the specs.
     attachProviders(this as unknown as Record<string, unknown>, this.transport);
   }

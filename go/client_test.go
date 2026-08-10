@@ -145,9 +145,10 @@ func TestCaptchaEndpoints(t *testing.T) {
 
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/chat/completions" {
+		if r.URL.Path != "/openai/chat/completions" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
+
 		if r.Header.Get("Authorization") != "Bearer token-abc" {
 			t.Errorf("missing auth header")
 		}
@@ -171,6 +172,50 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 	if res["id"] != "c1" {
 		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestDocsSyncResources(t *testing.T) {
+	seen := map[string]map[string]any{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		seen[r.URL.Path] = body
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"task_id":"task-1","ok":true}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.Midjourney().Imagine(context.Background(), map[string]any{"prompt": "a cat"}); err != nil {
+		t.Fatalf("Midjourney Imagine: %v", err)
+	}
+	if seen["/midjourney/imagine"]["async"] != true {
+		t.Fatalf("midjourney async default missing: %+v", seen["/midjourney/imagine"])
+	}
+	if _, err := c.Qrart().Generate(context.Background(), map[string]any{"type": "link", "prompt": "floral"}); err != nil {
+		t.Fatalf("Qrart Generate: %v", err)
+	}
+	if seen["/qrart/generate"]["async"] != true {
+		t.Fatalf("qrart async default missing: %+v", seen["/qrart/generate"])
+	}
+	if _, err := c.Tiktok().Video(context.Background(), "https://www.tiktok.com/@u/video/1", nil); err != nil {
+		t.Fatalf("Tiktok Video: %v", err)
+	}
+	if seen["/tiktok/video"]["video_url"] != "https://www.tiktok.com/@u/video/1" {
+		t.Fatalf("bad tiktok body: %+v", seen["/tiktok/video"])
+	}
+	if _, err := c.Tw().Posts(context.Background(), "123", nil); err != nil {
+		t.Fatalf("Tw Posts: %v", err)
+	}
+	if seen["/x/posts"]["user_id"] != "123" {
+		t.Fatalf("bad tw body: %+v", seen["/x/posts"])
+	}
+	if _, err := c.WebExtrator().Extract(context.Background(), "https://example.com", nil); err != nil {
+		t.Fatalf("WebExtrator Extract: %v", err)
+	}
+	if seen["/webextrator/extract"]["url"] != "https://example.com" {
+		t.Fatalf("bad webextrator body: %+v", seen["/webextrator/extract"])
 	}
 }
 

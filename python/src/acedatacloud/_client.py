@@ -18,12 +18,16 @@ from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
 from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
+from acedatacloud.resources.midjourney import AsyncMidjourney, Midjourney
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
 from acedatacloud.resources.platform import AsyncPlatform, Platform
 from acedatacloud.resources.providers import _attach as _providers
+from acedatacloud.resources.qrart import AsyncQrart, Qrart
 from acedatacloud.resources.search import AsyncSearch, Search
 from acedatacloud.resources.shorturl import AsyncShortUrl, ShortUrl
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
+from acedatacloud.resources.tiktok import AsyncTiktok, Tiktok
+from acedatacloud.resources.tw import AsyncTw, Tw
 from acedatacloud.resources.veo import AsyncVeo, Veo
 from acedatacloud.resources.video import AsyncVideo, Video
 from acedatacloud.resources.webextrator import AsyncWebExtrator, WebExtrator
@@ -72,6 +76,10 @@ class AceDataCloud:
         self.webextrator = WebExtrator(self._transport)
         self.face = Face(self._transport)
         self.shorturl = ShortUrl(self._transport)
+        self.midjourney = Midjourney(self._transport)
+        self.qrart = Qrart(self._transport)
+        self.tiktok = Tiktok(self._transport)
+        self.tw = Tw(self._transport)
         # Provider axis: one namespace per service, generated from the specs.
         _providers.attach(self, self._transport, is_async=False)
 
@@ -125,6 +133,10 @@ class AsyncAceDataCloud:
         self.webextrator = AsyncWebExtrator(self._transport)
         self.face = AsyncFace(self._transport)
         self.shorturl = AsyncShortUrl(self._transport)
+        self.midjourney = AsyncMidjourney(self._transport)
+        self.qrart = AsyncQrart(self._transport)
+        self.tiktok = AsyncTiktok(self._transport)
+        self.tw = AsyncTw(self._transport)
         # Provider axis: one namespace per service, generated from the specs.
         _providers.attach(self, self._transport, is_async=True)
 
