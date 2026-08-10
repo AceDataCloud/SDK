@@ -20,6 +20,7 @@ GENERATED = (
     "suno",
     "producer",
     "fish",
+    "gemini",
     "hailuo",
     "wan",
     "luma",
@@ -30,7 +31,7 @@ GENERATED = (
     "dreamina",
     "localization",
 )
-HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
+HAND_WRITTEN = ("kling", "kimi", "veo", "openai", "webextrator", "shorturl")
 
 
 @pytest.fixture
@@ -134,6 +135,34 @@ def test_minimax_generate_builds_a_task_handle(client):
         "ratio": "16:9",
         "async": True,
     }
+
+
+def test_gemini_videos_builds_a_task_handle(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "gemini-1"}
+    client.gemini._transport = transport
+
+    handle = client.gemini.videos(prompt="A kitten")
+
+    assert isinstance(handle, TaskHandle)
+    assert transport.request.call_args.args == ("POST", "/gemini/videos")
+    assert transport.request.call_args.kwargs["json"] == {
+        "prompt": "A kitten",
+        "model": "omni-flash",
+        "aspect_ratio": "16:9",
+        "resolution": "720p",
+        "async": True,
+    }
+
+
+def test_kimi_uses_its_documented_chat_endpoint(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "kimi-1"}
+    client.kimi.chat.completions._transport = transport
+
+    client.kimi.chat.completions.create(model="kimi-k3", messages=[{"role": "user", "content": "Hi"}])
+
+    assert transport.request.call_args.args == ("POST", "/kimi/chat/completions")
 
 
 def test_model_enum_is_typed(client):

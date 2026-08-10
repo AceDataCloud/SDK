@@ -66,6 +66,39 @@ func TestMinimaxGenerate(t *testing.T) {
 	}
 }
 
+func TestGeminiAndKimiEndpoints(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		switch r.URL.Path {
+		case "/gemini/videos":
+			if body["model"] != "omni-flash" || body["async"] != true {
+				t.Errorf("unexpected Gemini body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"task_id":"gemini-1"}`))
+		case "/kimi/chat/completions":
+			if body["model"] != "kimi-k3" {
+				t.Errorf("unexpected Kimi body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"id":"kimi-1"}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Gemini().Videos(context.Background(), GeminiVideosRequest{Prompt: "A kitten"})
+	if err != nil || task.ID != "gemini-1" {
+		t.Fatalf("Gemini Videos: task=%v err=%v", task, err)
+	}
+	if _, err = c.Kimi().Chat().Completions().Create(context.Background(), KimiChatRequest{
+		Model: "kimi-k3", Messages: []map[string]any{{"role": "user", "content": "Hi"}},
+	}); err != nil {
+		t.Fatalf("Kimi Create: %v", err)
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

@@ -3,6 +3,7 @@
 export { Digitalhuman } from './digitalhuman';
 export { Dreamina } from './dreamina';
 export { Fish } from './fish';
+export { Gemini } from './gemini';
 export { Flux } from './flux';
 export { Hailuo } from './hailuo';
 export { Happyhorse } from './happyhorse';
@@ -21,6 +22,7 @@ import { Transport } from '../../runtime/transport';
 import { Digitalhuman } from './digitalhuman';
 import { Dreamina } from './dreamina';
 import { Fish } from './fish';
+import { Gemini } from './gemini';
 import { Flux } from './flux';
 import { Hailuo } from './hailuo';
 import { Happyhorse } from './happyhorse';
@@ -40,6 +42,7 @@ export function attachProviders(client: Record<string, unknown>, transport: Tran
   client.digitalhuman = new Digitalhuman(transport);
   client.dreamina = new Dreamina(transport);
   client.fish = new Fish(transport);
+  client.gemini = new Gemini(transport);
   client.flux = new Flux(transport);
   client.hailuo = new Hailuo(transport);
   client.happyhorse = new Happyhorse(transport);

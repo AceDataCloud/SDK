@@ -2,8 +2,6 @@
 // Regenerate with: python scripts/generate_providers.py
 
 package acedatacloud
-
-
 // taskIDFrom pulls a task id out of a submission response.
 func taskIDFrom(result map[string]any) string {
 	if s, ok := result["task_id"].(string); ok && s != "" {
@@ -25,6 +23,7 @@ type providers struct {
 	digitalhuman *Digitalhuman
 	dreamina *Dreamina
 	fish *Fish
+	gemini *Gemini
 	flux *Flux
 	hailuo *Hailuo
 	happyhorse *Happyhorse
@@ -45,6 +44,7 @@ func newProviders(tr *transport) *providers {
 		digitalhuman: &Digitalhuman{t: tr},
 		dreamina: &Dreamina{t: tr},
 		fish: &Fish{t: tr},
+		gemini: &Gemini{t: tr},
 		flux: &Flux{t: tr},
 		hailuo: &Hailuo{t: tr},
 		happyhorse: &Happyhorse{t: tr},
@@ -69,6 +69,9 @@ func (c *Client) Dreamina() *Dreamina { return c.providers.dreamina }
 
 // Fish returns the fish provider client.
 func (c *Client) Fish() *Fish { return c.providers.fish }
+
+// Gemini returns the Gemini provider client.
+func (c *Client) Gemini() *Gemini { return c.providers.gemini }
 
 // Flux returns the flux provider client.
 func (c *Client) Flux() *Flux { return c.providers.flux }

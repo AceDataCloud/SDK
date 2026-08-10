@@ -23,6 +23,7 @@ var serviceTaskEndpoints = map[string]string{
 	"pixverse":    "/pixverse/tasks",
 	"webextrator": "/webextrator/tasks",
 	"captcha":     "/captcha/tasks",
+	"gemini":      "/gemini/tasks",
 }
 
 // TasksResource groups cross-service task retrieval operations.
