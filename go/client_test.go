@@ -104,7 +104,7 @@ func TestCaptchaEndpoints(t *testing.T) {
 
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/chat/completions" {
+		if r.URL.Path != "/openai/chat/completions" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
 		if r.Header.Get("Authorization") != "Bearer token-abc" {
@@ -130,6 +130,79 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 	if res["id"] != "c1" {
 		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAIModelsAudioAndRealtime(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/openai/models":
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"data":[{"id":"gpt-4o-mini"}]}`))
+		case "/v1/audio/speech":
+			var body map[string]any
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			if body["input"] != "hello" || body["voice"] != "nova" || body["response_format"] != "mp3" {
+				t.Errorf("unexpected speech body: %+v", body)
+			}
+			w.Header().Set("Content-Type", "audio/mpeg")
+			_, _ = w.Write([]byte("audio-bytes"))
+		case "/v1/audio/transcriptions":
+			if err := r.ParseMultipartForm(1024); err != nil {
+				t.Fatalf("ParseMultipartForm: %v", err)
+			}
+			if r.FormValue("model") != "whisper-1" {
+				t.Errorf("unexpected transcription model: %s", r.FormValue("model"))
+			}
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"text":"hello"}`))
+		default:
+			t.Fatalf("unexpected path %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	models, err := c.OpenAI().Models().List(context.Background())
+	if err != nil {
+		t.Fatalf("Models List: %v", err)
+	}
+	data := models["data"].([]any)
+	if data[0].(map[string]any)["id"] != "gpt-4o-mini" {
+		t.Fatalf("bad models response: %+v", models)
+	}
+
+	audio, err := c.OpenAI().Audio().Speech(context.Background(), SpeechRequest{
+		Input:          "hello",
+		Voice:          "nova",
+		ResponseFormat: "mp3",
+	})
+	if err != nil {
+		t.Fatalf("Speech: %v", err)
+	}
+	if string(audio) != "audio-bytes" {
+		t.Fatalf("bad audio response: %q", audio)
+	}
+
+	transcript, err := c.OpenAI().Audio().Transcriptions(context.Background(), TranscriptionRequest{
+		File:     []byte("abc"),
+		Filename: "sample.wav",
+		Model:    "whisper-1",
+	})
+	if err != nil {
+		t.Fatalf("Transcriptions: %v", err)
+	}
+	if transcript.(map[string]any)["text"] != "hello" {
+		t.Fatalf("bad transcription response: %+v", transcript)
+	}
+
+	realtimeURL, err := c.OpenAI().Realtime().URL("")
+	if err != nil {
+		t.Fatalf("Realtime URL: %v", err)
+	}
+	expectedRealtimeURL := strings.Replace(srv.URL, "http", "ws", 1) + "/v1/realtime?model=gpt-realtime-2.1"
+	if realtimeURL != expectedRealtimeURL {
+		t.Fatalf("bad realtime url: %s", realtimeURL)
 	}
 }
 

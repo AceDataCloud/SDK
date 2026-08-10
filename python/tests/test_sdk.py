@@ -226,6 +226,30 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_models_audio_and_realtime_helpers(client):
+    models_route = respx.get("https://api.acedata.cloud/openai/models").mock(
+        return_value=httpx.Response(200, json={"data": [{"id": "gpt-4o-mini"}]})
+    )
+    speech_route = respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, content=b"audio-bytes", headers={"content-type": "audio/mpeg"})
+    )
+    transcription_route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json={"text": "hello"})
+    )
+
+    assert client.openai.models.list()["data"][0]["id"] == "gpt-4o-mini"
+    assert client.openai.audio.speech(input="hello", voice="nova", response_format="mp3") == b"audio-bytes"
+    assert client.openai.audio.transcriptions(file=b"abc", filename="sample.wav", model="whisper-1") == {
+        "text": "hello"
+    }
+    assert client.openai.realtime.url() == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1"
+
+    assert models_route.called
+    assert json.loads(speech_route.calls.last.request.content)["voice"] == "nova"
+    assert transcription_route.called
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

@@ -1,6 +1,6 @@
 /** OpenAI-compatible facade resources. */
 
-import { Transport } from '../runtime/transport';
+import { mapError, Transport } from '../runtime/transport';
 
 class Completions {
   constructor(private transport: Transport) {}
@@ -146,6 +146,127 @@ class Images {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
+class Audio {
+  constructor(private transport: Transport) {}
+
+  async speech(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<ArrayBuffer> {
+    const { input, responseFormat, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    return this.fetchRaw('/v1/audio/speech', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  }
+
+  async transcriptions(opts: {
+    file: Buffer | Uint8Array;
+    filename?: string;
+    model?: string;
+    language?: string;
+    prompt?: string;
+    responseFormat?: string;
+    temperature?: number;
+    timestampGranularities?: string[];
+    stream?: boolean;
+    languages?: string[];
+    keywords?: string[];
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown> | string> {
+    const {
+      file,
+      filename = 'audio',
+      responseFormat,
+      timestampGranularities,
+      languages,
+      keywords,
+      ...rest
+    } = opts;
+    const form = new FormData();
+    form.append('file', new Blob([file]), filename);
+    for (const [key, value] of Object.entries(rest)) {
+      if (value !== undefined) form.append(key, String(value));
+    }
+    if (responseFormat !== undefined) form.append('response_format', responseFormat);
+    for (const value of timestampGranularities ?? []) form.append('timestamp_granularities[]', value);
+    for (const value of languages ?? []) form.append('languages[]', value);
+    for (const value of keywords ?? []) form.append('keywords[]', value);
+
+    const data = await this.fetchResponse('/v1/audio/transcriptions', {
+      method: 'POST',
+      body: form,
+    });
+    const contentType = data.headers.get('content-type') ?? '';
+    if (contentType.startsWith('text/plain')) return data.text();
+    return (await data.json()) as Record<string, unknown>;
+  }
+
+  private async fetchRaw(path: string, init: RequestInit): Promise<ArrayBuffer> {
+    const response = await this.fetchResponse(path, init);
+    return response.arrayBuffer();
+  }
+
+  private async fetchResponse(path: string, init: RequestInit): Promise<Response> {
+    const transport = this.transport as unknown as {
+      baseURL: string;
+      headers: Record<string, string>;
+      timeout: number;
+    };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), transport.timeout);
+    try {
+      const headers = { ...transport.headers, ...(init.headers as Record<string, string> | undefined) };
+      if (init.body instanceof FormData) delete headers['content-type'];
+      const response = await fetch(`${transport.baseURL}${path}`, {
+        ...init,
+        headers,
+        signal: controller.signal,
+      });
+      if (response.status >= 400) {
+        const text = await response.text();
+        let body: Record<string, unknown>;
+        try {
+          body = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          body = { error: { code: 'unknown', message: text } };
+        }
+        throw mapError(response.status, body);
+      }
+      return response;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport) {}
+
+  url(opts: { model?: string } = {}): string {
+    const transport = this.transport as unknown as { baseURL: string };
+    const url = new URL('/v1/realtime', transport.baseURL);
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    url.searchParams.set('model', opts.model ?? 'gpt-realtime-2.1');
+    return url.toString();
+  }
+}
+
 class Embeddings {
   constructor(private transport: Transport) {}
 
@@ -210,6 +331,9 @@ export class OpenAI {
   readonly chat: ChatNamespace;
   readonly responses: Responses;
   readonly images: Images;
+  readonly models: Models;
+  readonly audio: Audio;
+  readonly realtime: Realtime;
   readonly embeddings: Embeddings;
   readonly tasks: Tasks;
 
@@ -217,6 +341,9 @@ export class OpenAI {
     this.chat = new ChatNamespace(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
+    this.models = new Models(transport);
+    this.audio = new Audio(transport);
+    this.realtime = new Realtime(transport);
     this.embeddings = new Embeddings(transport);
     this.tasks = new Tasks(transport);
   }

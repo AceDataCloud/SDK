@@ -5,6 +5,9 @@ from __future__ import annotations
 import json as _json
 from collections.abc import Iterator
 from typing import Any
+from urllib.parse import urlencode, urlparse, urlunparse
+
+from acedatacloud._runtime.transport import _map_error
 
 
 class _Completions:
@@ -311,6 +314,229 @@ class _AsyncImages:
         return await self._transport.request("POST", "/openai/images/edits", json=body)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models")
+
+
+class _Audio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return self._raw_post("/v1/audio/speech", json=body)
+
+    def transcriptions(
+        self,
+        *,
+        file: bytes,
+        filename: str = "audio",
+        model: str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | str:
+        data: dict[str, Any] = {**kwargs}
+        if model is not None:
+            data["model"] = model
+        if language is not None:
+            data["language"] = language
+        if prompt is not None:
+            data["prompt"] = prompt
+        if response_format is not None:
+            data["response_format"] = response_format
+        if temperature is not None:
+            data["temperature"] = str(temperature)
+        if stream is not None:
+            data["stream"] = "true" if stream else "false"
+        for name, values in (
+            ("timestamp_granularities[]", timestamp_granularities),
+            ("languages[]", languages),
+            ("keywords[]", keywords),
+        ):
+            if values is not None:
+                data[name] = values
+
+        headers = {k: v for k, v in self._transport._headers.items() if k != "content-type"}
+        url = f"{self._transport._base_url}/v1/audio/transcriptions"
+        resp = self._transport._client.post(
+            url,
+            data=data,
+            files={"file": (filename, file)},
+            headers=headers,
+            timeout=self._transport._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        if resp.headers.get("content-type", "").startswith("text/plain"):
+            return resp.text
+        return resp.json()
+
+    def _raw_post(self, path: str, *, json: dict[str, Any]) -> bytes:
+        url = f"{self._transport._base_url}{path}"
+        resp = self._transport._client.post(
+            url,
+            json=json,
+            headers=self._transport._headers,
+            timeout=self._transport._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
+
+
+class _AsyncAudio:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def speech(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return await self._raw_post("/v1/audio/speech", json=body)
+
+    async def transcriptions(
+        self,
+        *,
+        file: bytes,
+        filename: str = "audio",
+        model: str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | str:
+        data: dict[str, Any] = {**kwargs}
+        if model is not None:
+            data["model"] = model
+        if language is not None:
+            data["language"] = language
+        if prompt is not None:
+            data["prompt"] = prompt
+        if response_format is not None:
+            data["response_format"] = response_format
+        if temperature is not None:
+            data["temperature"] = str(temperature)
+        if stream is not None:
+            data["stream"] = "true" if stream else "false"
+        for name, values in (
+            ("timestamp_granularities[]", timestamp_granularities),
+            ("languages[]", languages),
+            ("keywords[]", keywords),
+        ):
+            if values is not None:
+                data[name] = values
+
+        headers = {k: v for k, v in self._transport._headers.items() if k != "content-type"}
+        url = f"{self._transport._base_url}/v1/audio/transcriptions"
+        resp = await self._transport._client.post(
+            url,
+            data=data,
+            files={"file": (filename, file)},
+            headers=headers,
+            timeout=self._transport._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        if resp.headers.get("content-type", "").startswith("text/plain"):
+            return resp.text
+        return resp.json()
+
+    async def _raw_post(self, path: str, *, json: dict[str, Any]) -> bytes:
+        url = f"{self._transport._base_url}{path}"
+        resp = await self._transport._client.post(
+            url,
+            json=json,
+            headers=self._transport._headers,
+            timeout=self._transport._timeout,
+        )
+        if resp.status_code >= 400:
+            try:
+                body = resp.json()
+            except Exception:
+                body = {"error": {"code": "unknown", "message": resp.text}}
+            raise _map_error(resp.status_code, body)
+        return resp.content
+
+
+class _Realtime:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def url(self, *, model: str = "gpt-realtime-2.1") -> str:
+        parsed = urlparse(self._transport._base_url)
+        scheme = "wss" if parsed.scheme == "https" else "ws"
+        query = urlencode({"model": model})
+        return urlunparse((scheme, parsed.netloc, "/v1/realtime", "", query, ""))
+
+
 class _Embeddings:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
@@ -468,6 +694,9 @@ class OpenAI:
         self.chat = _ChatNamespace(transport)
         self.responses = _Responses(transport)
         self.images = _Images(transport)
+        self.models = _Models(transport)
+        self.audio = _Audio(transport)
+        self.realtime = _Realtime(transport)
         self.embeddings = _Embeddings(transport)
         self.tasks = _Tasks(transport)
 
@@ -479,5 +708,8 @@ class AsyncOpenAI:
         self.chat = _AsyncChatNamespace(transport)
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
+        self.models = _AsyncModels(transport)
+        self.audio = _AsyncAudio(transport)
+        self.realtime = _Realtime(transport)
         self.embeddings = _AsyncEmbeddings(transport)
         self.tasks = _AsyncTasks(transport)
