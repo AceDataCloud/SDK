@@ -156,7 +156,7 @@ class Producer:
     def lyrics(
         self,
         *,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
@@ -280,7 +280,7 @@ class AsyncProducer:
     async def lyrics(
         self,
         *,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:

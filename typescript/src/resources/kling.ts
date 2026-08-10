@@ -1,6 +1,7 @@
 /** Kling-specific video generation resources. */
 
 import { Transport } from '../runtime/transport';
+import { TaskHandle } from '../runtime/tasks';
 
 export const KLING_MODELS = [
   'kling-v1',
@@ -39,10 +40,14 @@ export interface KlingReferenceVideo {
   keepOriginalSound?: 'yes' | 'no';
 }
 
+export interface KlingWatermarkInfo {
+  enabled?: boolean;
+}
+
 export interface KlingGenerateOptions {
   action: 'text2video' | 'image2video' | 'extend';
   mode?: 'std' | 'pro' | '4k';
-  model: KlingModel;
+  model?: KlingModel;
   prompt?: string;
   duration?: number;
   generateAudio?: boolean;
@@ -58,6 +63,16 @@ export interface KlingGenerateOptions {
   videoList?: KlingReferenceVideo[];
   negativePrompt?: string;
   startImageUrl?: string;
+  wait?: boolean;
+  pollInterval?: number;
+  maxWait?: number;
+}
+
+function taskId(result: Record<string, unknown>): string {
+  if (typeof result?.task_id === 'string') return result.task_id;
+  const data = result?.data as Record<string, unknown> | undefined;
+  if (data && typeof data.task_id === 'string') return data.task_id;
+  return typeof result?.id === 'string' ? result.id : '';
 }
 
 function isHttpUrl(value: string): boolean {
@@ -70,10 +85,11 @@ function isHttpUrl(value: string): boolean {
 }
 
 function validateGenerateOptions(opts: KlingGenerateOptions): void {
-  if (!KLING_MODELS.includes(opts.model)) {
+  const model = opts.model ?? 'kling-v1';
+  if (!KLING_MODELS.includes(model)) {
     throw new Error(`model must be one of: ${KLING_MODELS.join(', ')}`);
   }
-  const isV3 = opts.model === 'kling-v3' || opts.model === 'kling-v3-omni';
+  const isV3 = model === 'kling-v3' || model === 'kling-v3-omni';
   const hasReferences = Boolean(opts.imageList?.length || opts.videoList?.length);
 
   if (opts.imageList !== undefined && opts.imageList.length === 0) {
@@ -113,40 +129,40 @@ function validateGenerateOptions(opts: KlingGenerateOptions): void {
   if (isV3 && opts.duration !== undefined && (opts.duration < 3 || opts.duration > 15)) {
     throw new Error('Kling V3 duration must be between 3 and 15 seconds');
   }
-  if (!isV3 && opts.model !== 'kling-o1' && opts.duration !== undefined && ![5, 10].includes(opts.duration)) {
+  if (!isV3 && model !== 'kling-o1' && opts.duration !== undefined && ![5, 10].includes(opts.duration)) {
     throw new Error('This Kling model supports only 5- or 10-second generation');
   }
-  if (opts.model === 'kling-o1' && opts.duration !== undefined && opts.duration !== 5) {
+  if (model === 'kling-o1' && opts.duration !== undefined && opts.duration !== 5) {
     throw new Error('kling-o1 supports only 5-second generation');
   }
-  if (opts.model === 'kling-o1' && opts.mode !== undefined && !['std', 'pro'].includes(opts.mode)) {
+  if (model === 'kling-o1' && opts.mode !== undefined && !['std', 'pro'].includes(opts.mode)) {
     throw new Error('kling-o1 supports only std and pro modes');
   }
   if (opts.mode === '4k' && !isV3) {
     throw new Error('4k mode requires kling-v3 or kling-v3-omni');
   }
-  if (opts.action === 'extend' && !['kling-v1', 'kling-v1-6', 'kling-v2-5-turbo'].includes(opts.model)) {
+  if (opts.action === 'extend' && !['kling-v1', 'kling-v1-6', 'kling-v2-5-turbo'].includes(model)) {
     throw new Error('extend requires kling-v1, kling-v1-6, or kling-v2-5-turbo');
   }
   if (opts.action === 'extend' && hasReferences) {
     throw new Error('imageList and videoList are not supported with extend');
   }
-  if (hasReferences && opts.model !== 'kling-o1' && opts.model !== 'kling-v3-omni') {
+  if (hasReferences && model !== 'kling-o1' && model !== 'kling-v3-omni') {
     throw new Error('Omni references require kling-o1 or kling-v3-omni');
   }
   if (hasReferences && opts.mode === '4k') {
     throw new Error('4k cannot be combined with Omni references');
   }
-  if ((opts.model === 'kling-o1' || hasReferences) && (opts.negativePrompt !== undefined || opts.cameraControl !== undefined || opts.cfgScale !== undefined)) {
+  if ((model === 'kling-o1' || hasReferences) && (opts.negativePrompt !== undefined || opts.cameraControl !== undefined || opts.cfgScale !== undefined)) {
     throw new Error('Kling O1 and Omni references do not support negativePrompt, cameraControl, or cfgScale');
   }
-  if (opts.model === 'kling-o1' && opts.generateAudio) {
+  if (model === 'kling-o1' && opts.generateAudio) {
     throw new Error('kling-o1 does not support generateAudio');
   }
-  if (opts.generateAudio && !isV3 && opts.model !== 'kling-v2-6') {
+  if (opts.generateAudio && !isV3 && model !== 'kling-v2-6') {
     throw new Error('generateAudio requires a V3 model or kling-v2-6 pro mode');
   }
-  if (opts.generateAudio && opts.model === 'kling-v2-6' && opts.mode !== 'pro') {
+  if (opts.generateAudio && model === 'kling-v2-6' && opts.mode !== 'pro') {
     throw new Error('kling-v2-6 supports generateAudio only in pro mode');
   }
   if (opts.generateAudio && opts.videoList?.length) {
@@ -194,12 +210,12 @@ function validateGenerateOptions(opts: KlingGenerateOptions): void {
 export class Kling {
   constructor(private transport: Transport) {}
 
-  async generate(opts: KlingGenerateOptions): Promise<Record<string, unknown>> {
+  async generate(opts: KlingGenerateOptions): Promise<TaskHandle> {
     validateGenerateOptions(opts);
     const {
       action,
       mode,
-      model,
+      model = 'kling-v1',
       prompt,
       duration,
       generateAudio,
@@ -216,7 +232,7 @@ export class Kling {
       negativePrompt,
       startImageUrl,
     } = opts;
-    const body: Record<string, unknown> = { action };
+    const body: Record<string, unknown> = { action, model };
     if (mode !== undefined) body.mode = mode;
     if (model !== undefined) body.model = model;
     if (prompt !== undefined) body.prompt = prompt;
@@ -226,7 +242,7 @@ export class Kling {
     if (cfgScale !== undefined) body.cfg_scale = cfgScale;
     if (aspectRatio !== undefined) body.aspect_ratio = aspectRatio;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
-    if (asyncMode !== undefined) body.async = asyncMode;
+    body.async = asyncMode ?? true;
     if (timeout !== undefined) body.timeout = timeout;
     if (endImageUrl !== undefined) body.end_image_url = endImageUrl;
     if (cameraControl !== undefined) body.camera_control = cameraControl;
@@ -242,7 +258,12 @@ export class Kling {
     }
     if (negativePrompt !== undefined) body.negative_prompt = negativePrompt;
     if (startImageUrl !== undefined) body.start_image_url = startImageUrl;
-    return this.transport.request('POST', '/kling/videos', { json: body });
+    const result = (await this.transport.request('POST', '/kling/videos', { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), '/kling/tasks', this.transport, result);
+    if (opts.wait) {
+      await handle.wait({ pollInterval: opts.pollInterval, maxWait: opts.maxWait });
+    }
+    return handle;
   }
 
   async motion(opts: {
@@ -250,12 +271,20 @@ export class Kling {
     imageUrl: string;
     videoUrl: string;
     characterOrientation: 'image' | 'video';
+    modelName?: 'kling-v2-6' | 'kling-v3';
     keepOriginalSound?: 'yes' | 'no';
+    watermarkInfo?: KlingWatermarkInfo;
     prompt?: string;
     callbackUrl?: string;
     async?: boolean;
-  }): Promise<Record<string, unknown>> {
-    const { mode, imageUrl, videoUrl, characterOrientation, keepOriginalSound, prompt, callbackUrl } = opts;
+    wait?: boolean;
+    pollInterval?: number;
+    maxWait?: number;
+  }): Promise<TaskHandle> {
+    const { mode, imageUrl, videoUrl, characterOrientation, modelName, keepOriginalSound, watermarkInfo, prompt, callbackUrl } = opts;
+    if (modelName !== undefined && !['kling-v2-6', 'kling-v3'].includes(modelName)) {
+      throw new Error('modelName must be kling-v2-6 or kling-v3');
+    }
     if (!['std', 'pro'].includes(mode)) throw new Error('mode must be std or pro');
     if (!isHttpUrl(imageUrl)) throw new Error('imageUrl must be an HTTP URL');
     if (!isHttpUrl(videoUrl)) throw new Error('videoUrl must be an HTTP URL');
@@ -265,17 +294,122 @@ export class Kling {
     if (keepOriginalSound !== undefined && !['yes', 'no'].includes(keepOriginalSound)) {
       throw new Error('keepOriginalSound must be yes or no');
     }
+    if (watermarkInfo !== undefined && typeof watermarkInfo.enabled !== 'boolean') {
+      throw new Error('watermarkInfo.enabled must be a boolean');
+    }
     if (callbackUrl && !isHttpUrl(callbackUrl)) throw new Error('callbackUrl must be an HTTP URL');
     const body: Record<string, unknown> = {
       mode,
       image_url: imageUrl,
       video_url: videoUrl,
       character_orientation: characterOrientation,
+      async: opts.async ?? true,
     };
+    if (modelName !== undefined) body.model_name = modelName;
     if (keepOriginalSound !== undefined) body.keep_original_sound = keepOriginalSound;
+    if (watermarkInfo !== undefined) body.watermark_info = watermarkInfo;
     if (prompt !== undefined) body.prompt = prompt;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
-    if (opts.async !== undefined) body.async = opts.async;
-    return this.transport.request('POST', '/kling/motion', { json: body });
+    const result = (await this.transport.request('POST', '/kling/motion', { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), '/kling/tasks', this.transport, result);
+    if (opts.wait) {
+      await handle.wait({ pollInterval: opts.pollInterval, maxWait: opts.maxWait });
+    }
+    return handle;
+  }
+
+  async lipSync(opts: {
+    mode: 'audio2video' | 'text2video';
+    videoId?: string;
+    videoUrl?: string;
+    audioUrl?: string;
+    audioType?: 'url' | 'file';
+    audioFile?: string;
+    text?: string;
+    voiceId?: string;
+    voiceLanguage?: 'zh' | 'en';
+    voiceSpeed?: number;
+    callbackUrl?: string;
+    async?: boolean;
+    wait?: boolean;
+    pollInterval?: number;
+    maxWait?: number;
+  }): Promise<TaskHandle> {
+    const audioType = opts.audioType ?? 'url';
+    if (!['audio2video', 'text2video'].includes(opts.mode)) throw new Error('mode must be audio2video or text2video');
+    if (Boolean(opts.videoId) === Boolean(opts.videoUrl)) throw new Error('exactly one of videoId or videoUrl is required');
+    if (opts.videoUrl && !isHttpUrl(opts.videoUrl)) throw new Error('videoUrl must be an HTTP URL');
+    if (opts.callbackUrl && !isHttpUrl(opts.callbackUrl)) throw new Error('callbackUrl must be an HTTP URL');
+    if (!['url', 'file'].includes(audioType)) throw new Error('audioType must be url or file');
+    if (opts.mode === 'audio2video' && audioType === 'url' && !opts.audioUrl) {
+      throw new Error('audioUrl is required when mode is audio2video and audioType is url');
+    }
+    if (opts.mode === 'audio2video' && audioType === 'file' && !opts.audioFile) {
+      throw new Error('audioFile is required when mode is audio2video and audioType is file');
+    }
+    if (opts.audioUrl && !isHttpUrl(opts.audioUrl)) throw new Error('audioUrl must be an HTTP URL');
+    if (opts.mode === 'text2video' && (!opts.text || !opts.voiceId)) {
+      throw new Error('text and voiceId are required when mode is text2video');
+    }
+    if (opts.voiceLanguage !== undefined && !['zh', 'en'].includes(opts.voiceLanguage)) {
+      throw new Error('voiceLanguage must be zh or en');
+    }
+    if (opts.voiceSpeed !== undefined && (opts.voiceSpeed < 0.8 || opts.voiceSpeed > 2.0)) {
+      throw new Error('voiceSpeed must be between 0.8 and 2.0');
+    }
+    const body: Record<string, unknown> = { mode: opts.mode, async: opts.async ?? true, audio_type: audioType };
+    if (opts.videoId !== undefined) body.video_id = opts.videoId;
+    if (opts.videoUrl !== undefined) body.video_url = opts.videoUrl;
+    if (opts.audioUrl !== undefined) body.audio_url = opts.audioUrl;
+    if (opts.audioFile !== undefined) body.audio_file = opts.audioFile;
+    if (opts.text !== undefined) body.text = opts.text;
+    if (opts.voiceId !== undefined) body.voice_id = opts.voiceId;
+    if (opts.voiceLanguage !== undefined) body.voice_language = opts.voiceLanguage;
+    if (opts.voiceSpeed !== undefined) body.voice_speed = opts.voiceSpeed;
+    if (opts.callbackUrl !== undefined) body.callback_url = opts.callbackUrl;
+    const result = (await this.transport.request('POST', '/kling/lip-sync', { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), '/kling/tasks', this.transport, result);
+    if (opts.wait) {
+      await handle.wait({ pollInterval: opts.pollInterval, maxWait: opts.maxWait });
+    }
+    return handle;
+  }
+
+  async talkingPhoto(opts: {
+    imageUrl: string;
+    audioUrl: string;
+    prompt?: string;
+    model?: 'kling-v1' | 'kling-v1-6' | 'kling-v2-master' | 'kling-v2-1-master' | 'kling-v2-5-turbo' | 'kling-v2-6';
+    duration?: 5 | 10;
+    mode?: 'std' | 'pro';
+    callbackUrl?: string;
+    async?: boolean;
+    wait?: boolean;
+    pollInterval?: number;
+    maxWait?: number;
+  }): Promise<TaskHandle> {
+    const talkingModels = ['kling-v1', 'kling-v1-6', 'kling-v2-master', 'kling-v2-1-master', 'kling-v2-5-turbo', 'kling-v2-6'];
+    if (!isHttpUrl(opts.imageUrl)) throw new Error('imageUrl must be an HTTP URL');
+    if (!isHttpUrl(opts.audioUrl)) throw new Error('audioUrl must be an HTTP URL');
+    if (opts.model !== undefined && !talkingModels.includes(opts.model)) throw new Error(`model must be one of: ${talkingModels.join(', ')}`);
+    if (opts.duration !== undefined && ![5, 10].includes(opts.duration)) throw new Error('duration must be 5 or 10');
+    if (opts.mode !== undefined && !['std', 'pro'].includes(opts.mode)) throw new Error('mode must be std or pro');
+    if (opts.callbackUrl && !isHttpUrl(opts.callbackUrl)) throw new Error('callbackUrl must be an HTTP URL');
+    const body: Record<string, unknown> = {
+      image_url: opts.imageUrl,
+      audio_url: opts.audioUrl,
+      async: opts.async ?? true,
+    };
+    if (opts.prompt !== undefined) body.prompt = opts.prompt;
+    if (opts.model !== undefined) body.model = opts.model;
+    if (opts.duration !== undefined) body.duration = opts.duration;
+    if (opts.mode !== undefined) body.mode = opts.mode;
+    if (opts.callbackUrl !== undefined) body.callback_url = opts.callbackUrl;
+    const result = (await this.transport.request('POST', '/kling/talking-photo', { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), '/kling/tasks', this.transport, result);
+    if (opts.wait) {
+      await handle.wait({ pollInterval: opts.pollInterval, maxWait: opts.maxWait });
+    }
+    return handle;
   }
 }

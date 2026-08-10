@@ -79,6 +79,17 @@ async def test_async_generation_returns_an_async_handle():
     assert isinstance(await client.flux.generate(action="generate", prompt="a cat"), AsyncTaskHandle)
 
 
+def test_producer_lyrics_prompt_is_a_string(client):
+    transport = Mock()
+    transport.request.return_value = {"lyrics": "snow falls"}
+    client.producer._transport = transport
+
+    client.producer.lyrics(prompt="A song about winter")
+
+    assert transport.request.call_args.args[:2] == ("POST", "/producer/lyrics")
+    assert transport.request.call_args.kwargs["json"]["prompt"] == "A song about winter"
+
+
 def test_de_facto_required_parameter_is_sent(client):
     """/flux/images rejects a request with no `size` while not declaring it
     required. The spec carries an example, so the SDK forwards it."""

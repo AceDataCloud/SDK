@@ -84,7 +84,7 @@ export interface ProducerGenerateOptions {
 
 export interface ProducerLyricsOptions {
   /** Prompts for generating lyrics. */
-  prompt: Record<string, unknown>;
+  prompt: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;

@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Producer is the producer provider client.
 type Producer struct {
 	t *transport
@@ -230,7 +229,7 @@ func (c *Producer) Generate(ctx context.Context, req ProducerGenerateRequest) (*
 // ProducerLyricsRequest is the input to producer.Lyrics.
 type ProducerLyricsRequest struct {
 	// Prompts for generating lyrics.
-	Prompt map[string]any
+	Prompt string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.

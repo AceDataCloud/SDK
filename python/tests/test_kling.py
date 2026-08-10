@@ -9,7 +9,9 @@ from acedatacloud import (
     KlingModel,
     KlingReferenceImage,
     KlingReferenceVideo,
+    KlingWatermarkInfo,
 )
+from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 from acedatacloud.resources.kling import AsyncKling, Kling
 
 
@@ -36,10 +38,12 @@ def test_public_kling_types_are_importable() -> None:
     camera: KlingCameraControl = {"type": "simple"}
     image: KlingReferenceImage = {"image_url": "https://example.com/ref.jpg"}
     video: KlingReferenceVideo = {"video_url": "https://example.com/ref.mp4"}
+    watermark: KlingWatermarkInfo = {"enabled": True}
     assert model == "kling-o1"
     assert camera["type"] == "simple"
     assert image["image_url"].endswith("ref.jpg")
     assert video["video_url"].endswith("ref.mp4")
+    assert watermark["enabled"] is True
 
 
 def test_sync_generate_serializes_canonical_omni_request() -> None:
@@ -64,7 +68,8 @@ def test_sync_generate_serializes_canonical_omni_request() -> None:
         ],
     )
 
-    assert result == {"task_id": "task-kling"}
+    assert isinstance(result, TaskHandle)
+    assert result.id == "task-kling"
     assert transport.calls == [
         (
             "POST",
@@ -116,9 +121,10 @@ def test_sync_motion_uses_closed_serialization() -> None:
         image_url="https://example.com/subject.jpg",
         video_url="https://example.com/motion.mp4",
         character_orientation="image",
+        model_name="kling-v3",
         keep_original_sound="yes",
+        watermark_info={"enabled": True},
         prompt="follow the motion",
-        async_=True,
     )
 
     assert transport.calls == [
@@ -130,7 +136,9 @@ def test_sync_motion_uses_closed_serialization() -> None:
                 "image_url": "https://example.com/subject.jpg",
                 "video_url": "https://example.com/motion.mp4",
                 "character_orientation": "image",
+                "model_name": "kling-v3",
                 "keep_original_sound": "yes",
+                "watermark_info": {"enabled": True},
                 "prompt": "follow the motion",
                 "async": True,
             },
@@ -152,6 +160,76 @@ async def test_async_motion_uses_same_validation() -> None:
         )
 
     assert transport.calls == []
+
+
+def test_generate_defaults_model_and_async_request() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    handle = client.generate(action="text2video", prompt="test")
+
+    assert isinstance(handle, TaskHandle)
+    assert transport.calls[0][2]["model"] == "kling-v1"
+    assert transport.calls[0][2]["async"] is True
+
+
+def test_lip_sync_and_talking_photo_serialize_new_endpoints() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    lip = client.lip_sync(
+        mode="audio2video",
+        video_url="https://example.com/source.mp4",
+        audio_url="https://example.com/voice.mp3",
+        voice_language="en",
+        voice_speed=1.2,
+    )
+    talking = client.talking_photo(
+        image_url="https://example.com/face.jpg",
+        audio_url="https://example.com/voice.mp3",
+        model="kling-v2-6",
+        duration=5,
+        mode="pro",
+    )
+
+    assert isinstance(lip, TaskHandle)
+    assert isinstance(talking, TaskHandle)
+    assert transport.calls[-2] == (
+        "POST",
+        "/kling/lip-sync",
+        {
+            "mode": "audio2video",
+            "async": True,
+            "video_url": "https://example.com/source.mp4",
+            "audio_url": "https://example.com/voice.mp3",
+            "audio_type": "url",
+            "voice_language": "en",
+            "voice_speed": 1.2,
+        },
+    )
+    assert transport.calls[-1] == (
+        "POST",
+        "/kling/talking-photo",
+        {
+            "image_url": "https://example.com/face.jpg",
+            "audio_url": "https://example.com/voice.mp3",
+            "async": True,
+            "model": "kling-v2-6",
+            "duration": 5,
+            "mode": "pro",
+        },
+    )
+
+
+@pytest.mark.asyncio
+async def test_async_lip_sync_returns_async_task_handle() -> None:
+    transport = AsyncTransport()
+    client = AsyncKling(transport)
+
+    handle = await client.lip_sync(mode="text2video", video_id="video-1", text="hello", voice_id="voice")
+
+    assert isinstance(handle, AsyncTaskHandle)
+    assert transport.calls[0][1] == "/kling/lip-sync"
 
 
 def test_generate_rejects_invalid_contract_before_transport() -> None:

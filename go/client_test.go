@@ -28,8 +28,89 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil || c.Kling() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestKlingProviderEndpoints(t *testing.T) {
+	paths := []string{}
+	bodies := []map[string]any{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		paths = append(paths, r.URL.Path)
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		bodies = append(bodies, body)
+		_, _ = w.Write([]byte(`{"task_id":"task-kling"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Kling().Generate(context.Background(), KlingGenerateRequest{
+		Action: "text2video",
+		Prompt: "test",
+	})
+	if err != nil {
+		t.Fatalf("Kling Generate: %v", err)
+	}
+
+	if task.ID != "task-kling" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+	_, err = c.Kling().Motion(context.Background(), KlingMotionRequest{
+		Mode:                 "pro",
+		ImageURL:             "https://example.com/subject.jpg",
+		VideoURL:             "https://example.com/motion.mp4",
+		CharacterOrientation: "image",
+		ModelName:            "kling-v3",
+		WatermarkInfo:        map[string]any{"enabled": true},
+	})
+	if err != nil {
+		t.Fatalf("Kling Motion: %v", err)
+	}
+	_, err = c.Kling().LipSync(context.Background(), KlingLipSyncRequest{
+		Mode:     "audio2video",
+		VideoURL: "https://example.com/source.mp4",
+		AudioURL: "https://example.com/voice.mp3",
+	})
+	if err != nil {
+		t.Fatalf("Kling LipSync: %v", err)
+	}
+	_, err = c.Kling().TalkingPhoto(context.Background(), KlingTalkingPhotoRequest{
+		ImageURL: "https://example.com/face.jpg",
+		AudioURL: "https://example.com/voice.mp3",
+		Model:    "kling-v2-6",
+		Duration: 5,
+		Mode:     "pro",
+	})
+	if err != nil {
+		t.Fatalf("Kling TalkingPhoto: %v", err)
+	}
+
+	wantPaths := []string{"/kling/videos", "/kling/motion", "/kling/lip-sync", "/kling/talking-photo"}
+	for i, want := range wantPaths {
+		if paths[i] != want {
+			t.Fatalf("path %d = %q, want %q", i, paths[i], want)
+		}
+	}
+	if bodies[0]["model"] != "kling-v1" || bodies[0]["async"] != true {
+		t.Fatalf("generate defaults missing: %+v", bodies[0])
+	}
+	if bodies[1]["model_name"] != "kling-v3" {
+		t.Fatalf("motion model_name missing: %+v", bodies[1])
+	}
+	if bodies[2]["audio_type"] != "url" || bodies[2]["async"] != true {
+		t.Fatalf("lip-sync defaults missing: %+v", bodies[2])
+	}
+	if bodies[3]["duration"] != float64(5) || bodies[3]["mode"] != "pro" {
+		t.Fatalf("talking photo body mismatch: %+v", bodies[3])
+	}
+}
+
+func TestProducerLyricsPromptString(t *testing.T) {
+	body := ProducerLyricsRequest{Prompt: "A song about winter"}.toBody()
+	if body["prompt"] != "A song about winter" {
+		t.Fatalf("producer lyrics prompt mismatch: %+v", body)
 	}
 }
 

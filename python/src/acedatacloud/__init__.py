@@ -33,6 +33,7 @@ from acedatacloud.resources.kling import (
     KlingModel,
     KlingReferenceImage,
     KlingReferenceVideo,
+    KlingWatermarkInfo,
 )
 from acedatacloud.resources.veo import VeoModel
 from acedatacloud.resources.video import VideoProvider
@@ -48,6 +49,7 @@ __all__ = [
     "KlingModel",
     "KlingReferenceImage",
     "KlingReferenceVideo",
+    "KlingWatermarkInfo",
     "VideoProvider",
     "VeoModel",
     "AceDataCloudError",

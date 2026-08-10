@@ -37,5 +37,6 @@ export type {
   KlingModel,
   KlingReferenceImage,
   KlingReferenceVideo,
+  KlingWatermarkInfo,
 } from './resources/kling';
 export type { AudioProvider } from './resources/audio';
