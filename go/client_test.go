@@ -28,8 +28,84 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.AiChat() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestAiChatV2Create(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat2/conversations" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "glm-5.2" || body["action"] != "chat" || body["model_group"] != "glm" || body["async"] != false {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"id":"conversation-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	async := false
+	res, err := c.AiChat().CreateV2(context.Background(), AiChatV2CreateRequest{
+		Model:         "glm-5.2",
+		Action:        "chat",
+		Question:      "hello",
+		ModelGroup:    "glm",
+		AllowedSkills: []string{"web"},
+		Async:         &async,
+	})
+	if err != nil {
+		t.Fatalf("AiChat CreateV2: %v", err)
+	}
+	if res["id"] != "conversation-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestFishGenerateAndModelsSync(t *testing.T) {
+	requests := []string{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests = append(requests, r.Method+" "+r.URL.String())
+		switch r.URL.Path {
+		case "/fish/tts":
+			if r.Header.Get("model") != "s2.1-pro" {
+				t.Errorf("missing model header: %q", r.Header.Get("model"))
+			}
+			var body map[string]any
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			if body["mp3_bitrate"] != float64(128) || body["text"] != "hello" {
+				t.Errorf("unexpected body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"task_id":"fish-1"}`))
+		case "/fish/model":
+			if r.URL.Query().Get("page_size") != "20" || r.URL.Query().Get("self") != "true" || r.URL.Query().Get("title") != "voice" {
+				t.Errorf("unexpected query: %s", r.URL.RawQuery)
+			}
+			_, _ = w.Write([]byte(`{"items":[]}`))
+		case "/fish/model/voice-1":
+			_, _ = w.Write([]byte(`{"id":"voice-1"}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.Fish().Generate(context.Background(), FishGenerateRequest{Text: "hello", Model: "s2.1-pro", Mp3Bitrate: 128}); err != nil {
+		t.Fatalf("Fish Generate: %v", err)
+	}
+	self := true
+	if _, err := c.Fish().Models(context.Background(), FishModelsRequest{PageSize: 20, Self: &self, Title: "voice"}); err != nil {
+		t.Fatalf("Fish Models: %v", err)
+	}
+	if _, err := c.Fish().GetModel(context.Background(), "voice-1"); err != nil {
+		t.Fatalf("Fish GetModel: %v", err)
+	}
+	if len(requests) != 3 {
+		t.Fatalf("expected 3 requests, got %d", len(requests))
 	}
 }
 

@@ -191,6 +191,57 @@ def test_extra_parameters_pass_through(client):
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
 
 
+def test_aichat_v2_endpoint_builds_current_body(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "conversation-1"}
+    client.aichat._transport = transport
+
+    client.aichat.create_v2(
+        model="glm-5.2",
+        action="chat",
+        question="hello",
+        model_group="glm",
+        allowed_skills=["web"],
+        async_=False,
+    )
+
+    assert transport.request.call_args.args == ("POST", "/aichat2/conversations")
+    assert transport.request.call_args.kwargs["json"] == {
+        "model": "glm-5.2",
+        "action": "chat",
+        "question": "hello",
+        "model_group": "glm",
+        "allowed_skills": ["web"],
+        "async": False,
+    }
+
+
+def test_fish_generate_sends_model_header(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "fish-1"}
+    client.fish._transport = transport
+
+    client.fish.generate(text="hello", model="s2.1-pro", mp3_bitrate=128)
+
+    assert transport.request.call_args.args == ("POST", "/fish/tts")
+    assert transport.request.call_args.kwargs["json"]["mp3_bitrate"] == 128
+    assert transport.request.call_args.kwargs["extra_headers"] == {"model": "s2.1-pro"}
+
+
+def test_fish_models_query_endpoint(client):
+    transport = Mock()
+    transport.request.return_value = {"items": []}
+    client.fish._transport = transport
+
+    client.fish.models(page_size=20, self_=True, title="voice")
+    client.fish.get_model("voice-1")
+
+    first, second = transport.request.call_args_list
+    assert first.args == ("GET", "/fish/model")
+    assert first.kwargs["params"] == {"page_size": 20, "title": "voice", "self": True}
+    assert second.args == ("GET", "/fish/model/voice-1")
+
+
 @pytest.mark.parametrize("name", GENERATED)
 def test_every_provider_has_a_callable_method(client, name):
     provider = getattr(client, name)

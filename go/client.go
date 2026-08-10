@@ -9,6 +9,7 @@ type Client struct {
 	transport *transport
 
 	openai   *OpenAIResource
+	aichat   *AiChatResource
 	chat     *ChatResource
 	captcha  *CaptchaResource
 	images   *ImagesResource
@@ -36,6 +37,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	}
 	c := &Client{transport: tr}
 	c.openai = &OpenAIResource{t: tr}
+	c.aichat = &AiChatResource{t: tr}
 	c.chat = &ChatResource{t: tr}
 	c.captcha = &CaptchaResource{t: tr}
 	c.images = &ImagesResource{t: tr}
@@ -52,6 +54,9 @@ func NewClient(opts ...Option) (*Client, error) {
 // OpenAI returns the OpenAI-compatible resource (“/v1/chat/completions“,
 // “/openai/responses“).
 func (c *Client) OpenAI() *OpenAIResource { return c.openai }
+
+// AiChat returns the AceDataCloud AI chat resource.
+func (c *Client) AiChat() *AiChatResource { return c.aichat }
 
 // Chat returns the native chat resource (“/v1/messages“ — Anthropic
 // Messages API shape).

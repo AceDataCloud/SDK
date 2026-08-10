@@ -34,17 +34,17 @@ class Fish:
         self,
         *,
         text: str,
+        model: Literal["s1", "s2-pro", "s2.1-pro"] | None = None,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
         references: list[Any] | None = None,
-        mp3_bitrate: int | None = None,
+        mp3_bitrate: Literal[64, 128, 192] | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -79,8 +79,6 @@ class Fish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
@@ -92,11 +90,43 @@ class Fish:
         if callback_url is not None:
             body["callback_url"] = callback_url
         body["async"] = True if async_ is None else async_
-        result = self._transport.request("POST", "/fish/tts", json=body)
+        headers = {"model": model} if model is not None else None
+        result = self._transport.request("POST", "/fish/tts", json=body, extra_headers=headers)
         handle = TaskHandle(_task_id(result), "/fish/tasks", self._transport, submitted=result)
         if wait:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
+
+    def models(
+        self,
+        *,
+        page_size: int | None = None,
+        page_number: int | None = None,
+        title: str | None = None,
+        tag: str | None = None,
+        self_: bool | None = None,
+        author_id: str | None = None,
+        language: str | None = None,
+        title_language: str | None = None,
+        sort_by: str | None = None,
+    ) -> dict[str, Any]:
+        """Fish Audio model query API."""
+        params = {
+            "page_size": page_size,
+            "page_number": page_number,
+            "title": title,
+            "tag": tag,
+            "self": self_,
+            "author_id": author_id,
+            "language": language,
+            "title_language": title_language,
+            "sort_by": sort_by,
+        }
+        return self._transport.request("GET", "/fish/model", params={k: v for k, v in params.items() if v is not None})
+
+    def get_model(self, id: str) -> dict[str, Any]:
+        """Fish Audio model detail API."""
+        return self._transport.request("GET", f"/fish/model/{id}")
 
     def model(
         self,
@@ -147,17 +177,17 @@ class AsyncFish:
         self,
         *,
         text: str,
+        model: Literal["s1", "s2-pro", "s2.1-pro"] | None = None,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
         references: list[Any] | None = None,
-        mp3_bitrate: int | None = None,
+        mp3_bitrate: Literal[64, 128, 192] | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -192,8 +222,6 @@ class AsyncFish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
@@ -205,11 +233,45 @@ class AsyncFish:
         if callback_url is not None:
             body["callback_url"] = callback_url
         body["async"] = True if async_ is None else async_
-        result = await self._transport.request("POST", "/fish/tts", json=body)
+        headers = {"model": model} if model is not None else None
+        result = await self._transport.request("POST", "/fish/tts", json=body, extra_headers=headers)
         handle = AsyncTaskHandle(_task_id(result), "/fish/tasks", self._transport, submitted=result)
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
+
+    async def models(
+        self,
+        *,
+        page_size: int | None = None,
+        page_number: int | None = None,
+        title: str | None = None,
+        tag: str | None = None,
+        self_: bool | None = None,
+        author_id: str | None = None,
+        language: str | None = None,
+        title_language: str | None = None,
+        sort_by: str | None = None,
+    ) -> dict[str, Any]:
+        """Fish Audio model query API."""
+        params = {
+            "page_size": page_size,
+            "page_number": page_number,
+            "title": title,
+            "tag": tag,
+            "self": self_,
+            "author_id": author_id,
+            "language": language,
+            "title_language": title_language,
+            "sort_by": sort_by,
+        }
+        return await self._transport.request(
+            "GET", "/fish/model", params={k: v for k, v in params.items() if v is not None}
+        )
+
+    async def get_model(self, id: str) -> dict[str, Any]:
+        """Fish Audio model detail API."""
+        return await self._transport.request("GET", f"/fish/model/{id}")
 
     async def model(
         self,

@@ -3,8 +3,11 @@
 
 package acedatacloud
 
-import "context"
-
+import (
+	"context"
+	"net/url"
+	"strconv"
+)
 
 // Fish is the fish provider client.
 type Fish struct {
@@ -15,6 +18,8 @@ type Fish struct {
 type FishGenerateRequest struct {
 	// Text content to be synthesized. Required, must be a non-empty string.
 	Text string
+	// Model is the Fish model family passed in the request header.
+	Model string
 	// Top-p nucleus sampling parameter, controls output diversity.
 	TopP float64
 	// Output audio format, default is `mp3`.
@@ -35,8 +40,6 @@ type FishGenerateRequest struct {
 	Temperature float64
 	// The chunk length passed to the upstream synthesizer.
 	ChunkLength int
-	// Opus bitrate when `format=opus`.
-	OpusBitrate int
 	// Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios.
 	ReferenceID string
 	// Maximum number of new tokens generated.
@@ -84,9 +87,6 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	if r.ChunkLength != 0 {
 		body["chunk_length"] = r.ChunkLength
 	}
-	if r.OpusBitrate != 0 {
-		body["opus_bitrate"] = r.OpusBitrate
-	}
 	if r.ReferenceID != "" {
 		body["reference_id"] = r.ReferenceID
 	} else {
@@ -118,15 +118,82 @@ func (r FishGenerateRequest) toBody() map[string]any {
 
 // Generate Fish Audio text-to-speech API — convert text into natural speech using a chosen voice model.
 func (c *Fish) Generate(ctx context.Context, req FishGenerateRequest) (*TaskHandle, error) {
+	headers := map[string]string{}
+	if req.Model != "" {
+		headers["model"] = req.Model
+	}
 	result, err := c.t.do(ctx, requestOpts{
-		Method: "POST",
-		Path:   "/fish/tts",
-		Body:   req.toBody(),
+		Method:       "POST",
+		Path:         "/fish/tts",
+		Body:         req.toBody(),
+		ExtraHeaders: headers,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return newTaskHandle(taskIDFrom(result), "/fish/tasks", c.t, result), nil
+}
+
+// FishModelsRequest is the input to fish.Models.
+type FishModelsRequest struct {
+	PageSize      int
+	PageNumber    int
+	Title         string
+	Tag           string
+	Self          *bool
+	AuthorID      string
+	Language      string
+	TitleLanguage string
+	SortBy        string
+}
+
+func (r FishModelsRequest) query() url.Values {
+	q := url.Values{}
+	if r.PageSize != 0 {
+		q.Set("page_size", strconv.Itoa(r.PageSize))
+	}
+	if r.PageNumber != 0 {
+		q.Set("page_number", strconv.Itoa(r.PageNumber))
+	}
+	if r.Title != "" {
+		q.Set("title", r.Title)
+	}
+	if r.Tag != "" {
+		q.Set("tag", r.Tag)
+	}
+	if r.Self != nil {
+		q.Set("self", strconv.FormatBool(*r.Self))
+	}
+	if r.AuthorID != "" {
+		q.Set("author_id", r.AuthorID)
+	}
+	if r.Language != "" {
+		q.Set("language", r.Language)
+	}
+	if r.TitleLanguage != "" {
+		q.Set("title_language", r.TitleLanguage)
+	}
+	if r.SortBy != "" {
+		q.Set("sort_by", r.SortBy)
+	}
+	return q
+}
+
+// Models queries Fish Audio models.
+func (c *Fish) Models(ctx context.Context, req FishModelsRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/fish/model",
+		Query:  req.query(),
+	})
+}
+
+// GetModel retrieves a Fish Audio model by id.
+func (c *Fish) GetModel(ctx context.Context, id string) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/fish/model/" + url.PathEscape(id),
+	})
 }
 
 // FishModelRequest is the input to fish.Model.
@@ -147,7 +214,7 @@ type FishModelRequest struct {
 	Description string
 	// If it is `true`, the upstream service will generate a sample voice after the training is completed.
 	GenerateSample bool
-	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before 
+	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before
 	EnhanceAudioQuality bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
