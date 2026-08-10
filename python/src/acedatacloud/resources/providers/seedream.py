@@ -11,13 +11,6 @@ from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-SeedreamSize = Literal[
-    "1K",
-    "2K",
-    "3K",
-    "4K",
-    "adaptive",
-]
 SeedreamModel = Literal[
     "doubao-seedream-5-0-pro-260628",
     "doubao-seedream-5-0-260128",
@@ -52,7 +45,7 @@ class Seedream:
         model: SeedreamModel,
         prompt: str,
         seed: int | None = None,
-        size: SeedreamSize | None = None,
+        size: Literal["1K", "2K", "3K", "4K"] | None = None,
         image: list[str] | None = None,
         tools: list[Any] | None = None,
         stream: bool | None = None,
@@ -78,7 +71,8 @@ class Seedream:
         body["prompt"] = prompt
         if seed is not None:
             body["seed"] = seed
-        body["size"] = size if size is not None else "2K"
+        if size is not None:
+            body["size"] = size
         if image is not None:
             body["image"] = image
         if tools is not None:
@@ -122,7 +116,7 @@ class AsyncSeedream:
         model: SeedreamModel,
         prompt: str,
         seed: int | None = None,
-        size: SeedreamSize | None = None,
+        size: Literal["1K", "2K", "3K", "4K"] | None = None,
         image: list[str] | None = None,
         tools: list[Any] | None = None,
         stream: bool | None = None,
@@ -148,7 +142,8 @@ class AsyncSeedream:
         body["prompt"] = prompt
         if seed is not None:
             body["seed"] = seed
-        body["size"] = size if size is not None else "2K"
+        if size is not None:
+            body["size"] = size
         if image is not None:
             body["image"] = image
         if tools is not None:

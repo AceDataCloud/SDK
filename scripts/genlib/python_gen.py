@@ -82,7 +82,7 @@ def _default_consts(svc: Service) -> tuple[dict[str, str], list[str]]:
 
 def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] | None = None,
           method: str = "") -> str:
-    """Build the request body, filling anything the spec suggests a value for."""
+    """Build the request body, applying only explicit schema defaults."""
     out: list[str] = [f"{indent}body: dict[str, Any] = {{}}"]
     for p in params:
         name = py_param(p.name)
@@ -99,9 +99,6 @@ def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] 
             out.append(f"{indent}if {name} is not None:")
             out.append(f'{indent}    body["{p.name}"] = {name}')
         else:
-            # A spec's `required` list understates what upstreams enforce —
-            # /flux/images rejects a request with no `size` while not declaring
-            # it required — so forward the spec's own suggestion.
             line = f'{indent}body["{p.name}"] = {name} if {name} is not None else {_py_literal(default)}'
             if len(line) <= 116:
                 out.append(line)

@@ -33,6 +33,47 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 }
 
+func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/seedream/images" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if _, ok := body["size"]; ok {
+			t.Errorf("example-only size must be omitted: %+v", body)
+		}
+		if body["model"] != "doubao-seedream-5-0-260128" || body["prompt"] != "a cat" {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"success":true,"task_id":"seedream-1","data":[{"image_url":"https://cdn.example.com/seedream.png"}]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Seedream().Generate(context.Background(), SeedreamGenerateRequest{
+		Model:  "doubao-seedream-5-0-260128",
+		Prompt: "a cat",
+	})
+	if err != nil {
+		t.Fatalf("Seedream Generate: %v", err)
+	}
+	if task.ID != "seedream-1" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+	if got := task.URLs(); len(got) != 1 || got[0] != "https://cdn.example.com/seedream.png" {
+		t.Fatalf("unexpected array response URLs: %+v", got)
+	}
+}
+
+func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
+	body := SeedreamGenerateRequest{Size: "4K"}.toBody()
+	if body["size"] != "4K" {
+		t.Fatalf("explicit size missing: %+v", body)
+	}
+}
+
 func TestMinimaxGenerate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/minimax/videos" {

@@ -54,8 +54,6 @@ def _body(ep, indent: str = "    ") -> list[str]:
         if default is None:
             out.append(f"{indent}if (options.{prop} !== undefined) body[{json.dumps(p.name)}] = options.{prop};")
         else:
-            # A spec's `required` list understates what upstreams enforce, so
-            # forward the spec's own suggestion when the caller omits it.
             out.append(
                 f"{indent}body[{json.dumps(p.name)}] = options.{prop} ?? {_ts_literal(default)};"
             )
