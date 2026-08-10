@@ -165,8 +165,30 @@ def test_every_provider_has_a_callable_method(client, name):
 
 def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
-    for method in ("generate", "lyrics", "wav", "mp4"):
+    for method in ("generate", "lyrics", "wav", "mp4", "list_persona", "delete_persona"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_suno_uses_current_prompt_shapes_and_persona_endpoints(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "suno-1"}
+    client.suno._transport = transport
+
+    client.suno.generate(prompt="a synthwave carol", lyric_prompt="winter lights")
+    assert transport.request.call_args.args == ("POST", "/suno/audios")
+    assert transport.request.call_args.kwargs["json"]["prompt"] == "a synthwave carol"
+    assert transport.request.call_args.kwargs["json"]["lyric_prompt"] == "winter lights"
+
+    client.suno.lyrics(model="remi-v1", prompt="write about winter")
+    assert transport.request.call_args.kwargs["json"]["prompt"] == "write about winter"
+
+    client.suno.list_persona(user_id="user-1", limit=10, offset=5)
+    assert transport.request.call_args.args == ("GET", "/suno/persona")
+    assert transport.request.call_args.kwargs["params"] == {"user_id": "user-1", "limit": 10, "offset": 5}
+
+    client.suno.delete_persona(persona_id="persona-1", user_id="user-1")
+    assert transport.request.call_args.args == ("DELETE", "/suno/persona")
+    assert transport.request.call_args.kwargs["params"] == {"persona_id": "persona-1", "user_id": "user-1"}
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):

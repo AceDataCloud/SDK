@@ -3,8 +3,11 @@
 
 package acedatacloud
 
-import "context"
-
+import (
+	"context"
+	"net/url"
+	"strconv"
+)
 
 // Suno is the suno provider client.
 type Suno struct {
@@ -19,14 +22,14 @@ type SunoGenerateRequest struct {
 	Model string
 	// Music style description. `chirp-v3-5` and `chirp-v4` up to 200 characters; `chirp-v4-5` and above (including `
 	Style string
-	// Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including 
+	// Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including
 	Title string
 	// Types of operations for generating music. `generate`: Generate audio based on prompts; `extend`: Continue gene
 	Action string
 	// Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise,
 	Custom bool
 	// The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 50
-	Prompt map[string]any
+	Prompt string
 	// Audio ID used for generating additional audio based on existing audio. This field is required when `action` is
 	AudioID string
 	// Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is main
@@ -46,7 +49,7 @@ type SunoGenerateRequest struct {
 	// Pure accompaniment mode (no lyrics), default is `false`. When set to `true`, the lyrics filled in above will b
 	Instrumental bool
 	// Prompts for automatically generating lyrics, effective only when `custom` is `true` and `lyric` is empty.
-	LyricPrompt map[string]any
+	LyricPrompt string
 	// Voice gender preference, selectable values are `'m'` (male voice) or `'f'` (female voice). Models `chirp-v4-5`
 	VocalGender string
 	// Add a default start time for the uploaded audio sample, with a default value of 0.
@@ -101,7 +104,11 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 		body["action"] = "generate"
 	}
 	body["custom"] = r.Custom
-	body["prompt"] = r.Prompt
+	if r.Prompt != "" {
+		body["prompt"] = r.Prompt
+	} else {
+		body["prompt"] = "A song for Christmas"
+	}
 	if r.AudioID != "" {
 		body["audio_id"] = r.AudioID
 	}
@@ -125,7 +132,7 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 		body["audio_weight"] = r.AudioWeight
 	}
 	body["instrumental"] = r.Instrumental
-	if r.LyricPrompt != nil {
+	if r.LyricPrompt != "" {
 		body["lyric_prompt"] = r.LyricPrompt
 	}
 	if r.VocalGender != "" {
@@ -245,6 +252,63 @@ func (c *Suno) Persona(ctx context.Context, req SunoPersonaRequest) (map[string]
 		Method: "POST",
 		Path:   "/suno/persona",
 		Body:   req.toBody(),
+	})
+}
+
+// SunoListPersonaRequest is the input to suno.ListPersona.
+type SunoListPersonaRequest struct {
+	// UserID identifies the user whose singer styles should be listed.
+	UserID string
+	// Limit optionally limits the number of results. Defaults to 50 upstream.
+	Limit int
+	// Offset optionally skips results. Defaults to 0 upstream.
+	Offset int
+}
+
+func (r SunoListPersonaRequest) query() url.Values {
+	q := url.Values{}
+	q.Set("user_id", r.UserID)
+	if r.Limit != 0 {
+		q.Set("limit", strconv.Itoa(r.Limit))
+	}
+	if r.Offset != 0 {
+		q.Set("offset", strconv.Itoa(r.Offset))
+	}
+	return q
+}
+
+// ListPersona Suno singer style API, list singer styles for a user.
+func (c *Suno) ListPersona(ctx context.Context, req SunoListPersonaRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/suno/persona",
+		Query:  req.query(),
+	})
+}
+
+// SunoDeletePersonaRequest is the input to suno.DeletePersona.
+type SunoDeletePersonaRequest struct {
+	// PersonaID identifies the singer style to delete.
+	PersonaID string
+	// UserID optionally scopes the deletion to a user.
+	UserID string
+}
+
+func (r SunoDeletePersonaRequest) query() url.Values {
+	q := url.Values{}
+	q.Set("persona_id", r.PersonaID)
+	if r.UserID != "" {
+		q.Set("user_id", r.UserID)
+	}
+	return q
+}
+
+// DeletePersona Suno singer style API, delete a singer style.
+func (c *Suno) DeletePersona(ctx context.Context, req SunoDeletePersonaRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "DELETE",
+		Path:   "/suno/persona",
+		Query:  req.query(),
 	})
 }
 
@@ -534,7 +598,7 @@ type SunoLyricsRequest struct {
 	// The model used for generating lyrics has a default value of `default`, with optional values including `default
 	Model string
 	// Prompts for generating lyrics, describing the desired theme or style of the lyrics.
-	Prompt map[string]any
+	Prompt string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.

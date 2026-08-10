@@ -66,6 +66,68 @@ func TestMinimaxGenerate(t *testing.T) {
 	}
 }
 
+func TestSunoSpecSync(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch {
+		case r.Method == http.MethodPost && r.URL.Path == "/suno/audios":
+			var body map[string]any
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			if body["prompt"] != "a synthwave carol" || body["lyric_prompt"] != "winter lights" {
+				t.Errorf("unexpected generate body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"task_id":"suno-1"}`))
+		case r.Method == http.MethodPost && r.URL.Path == "/suno/lyrics":
+			var body map[string]any
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			if body["model"] != "remi-v1" || body["prompt"] != "write about winter" {
+				t.Errorf("unexpected lyrics body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"ok":true}`))
+		case r.Method == http.MethodGet && r.URL.Path == "/suno/persona":
+			if r.URL.Query().Get("user_id") != "user-1" || r.URL.Query().Get("limit") != "10" || r.URL.Query().Get("offset") != "5" {
+				t.Errorf("unexpected list persona query: %s", r.URL.RawQuery)
+			}
+			_, _ = w.Write([]byte(`{"ok":true}`))
+		case r.Method == http.MethodDelete && r.URL.Path == "/suno/persona":
+			if r.URL.Query().Get("persona_id") != "persona-1" || r.URL.Query().Get("user_id") != "user-1" {
+				t.Errorf("unexpected delete persona query: %s", r.URL.RawQuery)
+			}
+			_, _ = w.Write([]byte(`{"ok":true}`))
+		default:
+			t.Fatalf("unexpected request: %s %s", r.Method, r.URL.String())
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.Suno().Generate(context.Background(), SunoGenerateRequest{
+		Prompt:      "a synthwave carol",
+		LyricPrompt: "winter lights",
+	}); err != nil {
+		t.Fatalf("Suno Generate: %v", err)
+	}
+	if _, err := c.Suno().Lyrics(context.Background(), SunoLyricsRequest{
+		Model:  "remi-v1",
+		Prompt: "write about winter",
+	}); err != nil {
+		t.Fatalf("Suno Lyrics: %v", err)
+	}
+	if _, err := c.Suno().ListPersona(context.Background(), SunoListPersonaRequest{
+		UserID: "user-1",
+		Limit:  10,
+		Offset: 5,
+	}); err != nil {
+		t.Fatalf("Suno ListPersona: %v", err)
+	}
+	if _, err := c.Suno().DeletePersona(context.Background(), SunoDeletePersonaRequest{
+		PersonaID: "persona-1",
+		UserID:    "user-1",
+	}); err != nil {
+		t.Fatalf("Suno DeletePersona: %v", err)
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

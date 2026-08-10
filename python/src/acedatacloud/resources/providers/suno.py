@@ -39,6 +39,7 @@ SunoAction = Literal[
     "samples",
     "inspo",
 ]
+SunoLyricsModel = Literal["default", "remi-v1"]
 
 
 def _task_id(result: Any) -> str:
@@ -68,7 +69,7 @@ class Suno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -78,7 +79,7 @@ class Suno:
         samples_end: float | None = None,
         audio_weight: float | None = None,
         instrumental: bool | None = None,
-        lyric_prompt: dict[str, Any] | None = None,
+        lyric_prompt: str | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
         negative_tags: str | None = None,
@@ -194,6 +195,33 @@ class Suno:
         if callback_url is not None:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/suno/persona", json=body)
+
+    def list_persona(
+        self,
+        *,
+        user_id: str,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> dict[str, Any]:
+        """Suno singer style API, list singer styles for a user."""
+        params: dict[str, Any] = {"user_id": user_id}
+        if limit is not None:
+            params["limit"] = limit
+        if offset is not None:
+            params["offset"] = offset
+        return self._transport.request("GET", "/suno/persona", params=params)
+
+    def delete_persona(
+        self,
+        *,
+        persona_id: str,
+        user_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Suno singer style API, delete a singer style."""
+        params: dict[str, Any] = {"persona_id": persona_id}
+        if user_id is not None:
+            params["user_id"] = user_id
+        return self._transport.request("DELETE", "/suno/persona", params=params)
 
     def mp4(
         self,
@@ -346,8 +374,8 @@ class Suno:
     def lyrics(
         self,
         *,
-        model: SunoModel,
-        prompt: dict[str, Any],
+        model: SunoLyricsModel,
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
@@ -410,7 +438,7 @@ class AsyncSuno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -420,7 +448,7 @@ class AsyncSuno:
         samples_end: float | None = None,
         audio_weight: float | None = None,
         instrumental: bool | None = None,
-        lyric_prompt: dict[str, Any] | None = None,
+        lyric_prompt: str | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
         negative_tags: str | None = None,
@@ -536,6 +564,33 @@ class AsyncSuno:
         if callback_url is not None:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/suno/persona", json=body)
+
+    async def list_persona(
+        self,
+        *,
+        user_id: str,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> dict[str, Any]:
+        """Suno singer style API, list singer styles for a user."""
+        params: dict[str, Any] = {"user_id": user_id}
+        if limit is not None:
+            params["limit"] = limit
+        if offset is not None:
+            params["offset"] = offset
+        return await self._transport.request("GET", "/suno/persona", params=params)
+
+    async def delete_persona(
+        self,
+        *,
+        persona_id: str,
+        user_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Suno singer style API, delete a singer style."""
+        params: dict[str, Any] = {"persona_id": persona_id}
+        if user_id is not None:
+            params["user_id"] = user_id
+        return await self._transport.request("DELETE", "/suno/persona", params=params)
 
     async def mp4(
         self,
@@ -688,8 +743,8 @@ class AsyncSuno:
     async def lyrics(
         self,
         *,
-        model: SunoModel,
-        prompt: dict[str, Any],
+        model: SunoLyricsModel,
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
