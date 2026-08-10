@@ -18,6 +18,7 @@ type Client struct {
 	search   *SearchResource
 	face     *FaceResource
 	shorturl *ShortURLResource
+	kling    *Kling
 
 	// providers holds the generated provider-axis clients, one per service.
 	providers *providers
@@ -43,6 +44,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.video = &VideoResource{t: tr}
 	c.audio = &AudioResource{t: tr}
 	c.search = &SearchResource{t: tr}
+	c.kling = &Kling{t: tr}
 	c.providers = newProviders(tr)
 	c.face = &FaceResource{t: tr}
 	c.shorturl = &ShortURLResource{t: tr}
@@ -77,6 +79,9 @@ func (c *Client) Search() *SearchResource { return c.search }
 
 // Face returns the face transformation resource.
 func (c *Client) Face() *FaceResource { return c.face }
+
+// Kling returns the Kling provider client.
+func (c *Client) Kling() *Kling { return c.kling }
 
 // ShortURL returns the short URL resource.
 func (c *Client) ShortURL() *ShortURLResource { return c.shorturl }
