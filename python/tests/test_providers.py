@@ -30,7 +30,7 @@ GENERATED = (
     "dreamina",
     "localization",
 )
-HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
+HAND_WRITTEN = ("gemini", "kling", "veo", "openai", "webextrator", "shorturl")
 
 
 @pytest.fixture
@@ -66,6 +66,16 @@ def test_generation_returns_a_task_handle(client):
     result = client.flux.generate(action="generate", prompt="a cat")
     assert isinstance(result, TaskHandle)
     assert result.id == "t-1"
+
+
+def test_gemini_video_uses_its_own_endpoint_and_task_handle(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "gemini-1"}
+    client.gemini._transport = transport
+    handle = client.gemini.generate(prompt="a cat", image_urls=["https://example.com/cat.png"])
+    assert isinstance(handle, TaskHandle)
+    assert transport.request.call_args.args == ("POST", "/gemini/videos")
+    assert transport.request.call_args.kwargs["json"]["image_urls"] == ["https://example.com/cat.png"]
 
 
 @pytest.mark.asyncio

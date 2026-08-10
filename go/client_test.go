@@ -28,8 +28,24 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
+
 	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestGeminiVideoGenerate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/gemini/videos" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"task_id": "gemini-1"})
+	}))
+	defer srv.Close()
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Gemini().Generate(context.Background(), GeminiVideoRequest{Prompt: "a cat"})
+	if err != nil || task.ID != "gemini-1" {
+		t.Fatalf("Generate = %#v, %v", task, err)
 	}
 }
 
