@@ -112,7 +112,9 @@ def test_sync_motion_uses_closed_serialization() -> None:
     client = Kling(transport)
 
     client.motion(
+        model_name="kling-v3",
         mode="pro",
+        watermark_info={"enabled": True},
         image_url="https://example.com/subject.jpg",
         video_url="https://example.com/motion.mp4",
         character_orientation="image",
@@ -127,6 +129,8 @@ def test_sync_motion_uses_closed_serialization() -> None:
             "/kling/motion",
             {
                 "mode": "pro",
+                "model_name": "kling-v3",
+                "watermark_info": {"enabled": True},
                 "image_url": "https://example.com/subject.jpg",
                 "video_url": "https://example.com/motion.mp4",
                 "character_orientation": "image",
@@ -177,6 +181,65 @@ def test_generate_rejects_invalid_contract_before_transport() -> None:
             prompt="test",
             callback_url="not-a-url",
         )
+
+    assert transport.calls == []
+
+
+def test_lip_sync_and_talking_photo_serialize_expected_payloads() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.lip_sync(
+        video_url="https://example.com/video.mp4",
+        mode="text2video",
+        text="hello",
+        voice_language="en",
+        async_=True,
+    )
+    client.talking_photo(
+        image_url="https://example.com/portrait.jpg",
+        audio_url="https://example.com/audio.mp3",
+        model="kling-v2-6",
+        duration=5,
+        mode="std",
+    )
+
+    assert transport.calls[0] == (
+        "POST",
+        "/kling/lip-sync",
+        {
+            "video_url": "https://example.com/video.mp4",
+            "mode": "text2video",
+            "text": "hello",
+            "voice_language": "en",
+            "async": True,
+        },
+    )
+    assert transport.calls[1] == (
+        "POST",
+        "/kling/talking-photo",
+        {
+            "image_url": "https://example.com/portrait.jpg",
+            "audio_url": "https://example.com/audio.mp3",
+            "model": "kling-v2-6",
+            "duration": 5,
+            "mode": "std",
+        },
+    )
+
+
+def test_lip_sync_and_talking_photo_validate_inputs_before_transport() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    with pytest.raises(ValueError, match="video_id or video_url is required"):
+        client.lip_sync(mode="text2video", text="hello")
+    with pytest.raises(ValueError, match="audio_url or audio_file is required for audio2video"):
+        client.lip_sync(mode="audio2video", video_id="video-1")
+    with pytest.raises(ValueError, match="text is required for text2video"):
+        client.lip_sync(mode="text2video", video_id="video-1")
+    with pytest.raises(ValueError, match="audio_url must be an HTTP URL"):
+        client.talking_photo(image_url="https://example.com/portrait.jpg", audio_url="not-a-url")
 
     assert transport.calls == []
 

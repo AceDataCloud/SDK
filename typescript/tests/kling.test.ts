@@ -150,7 +150,9 @@ describe('Kling resource', () => {
     const kling = new Kling({ request } as any);
 
     await kling.motion({
+      modelName: 'kling-v3',
       mode: 'pro',
+      watermarkInfo: { enabled: true },
       imageUrl: 'https://example.com/subject.jpg',
       videoUrl: 'https://example.com/motion.mp4',
       characterOrientation: 'image',
@@ -162,6 +164,8 @@ describe('Kling resource', () => {
     expect(request).toHaveBeenCalledWith('POST', '/kling/motion', {
       json: {
         mode: 'pro',
+        model_name: 'kling-v3',
+        watermark_info: { enabled: true },
         image_url: 'https://example.com/subject.jpg',
         video_url: 'https://example.com/motion.mp4',
         character_orientation: 'image',
@@ -185,6 +189,18 @@ describe('Kling resource', () => {
       })
     ).rejects.toThrow('videoUrl must be an HTTP URL');
     await expect(
+      kling.lipSync({
+        mode: 'audio2video',
+        videoId: 'video-1',
+      })
+    ).rejects.toThrow('audioUrl or audioFile is required for audio2video');
+    await expect(
+      kling.talkingPhoto({
+        imageUrl: 'https://example.com/subject.jpg',
+        audioUrl: 'not-a-url',
+      })
+    ).rejects.toThrow('audioUrl must be an HTTP URL');
+    await expect(
       kling.generate({
         action: 'text2video',
         model: 'kling-v3',
@@ -193,6 +209,45 @@ describe('Kling resource', () => {
       })
     ).rejects.toThrow('callbackUrl must be an HTTP URL');
     expect(request).not.toHaveBeenCalled();
+  });
+
+  it('serializes lip sync and talking photo requests', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-kling-extra' });
+    const kling = new Kling({ request } as any);
+
+    await kling.lipSync({
+      videoUrl: 'https://example.com/video.mp4',
+      mode: 'text2video',
+      text: 'hello',
+      voiceLanguage: 'en',
+      async: true,
+    });
+    await kling.talkingPhoto({
+      imageUrl: 'https://example.com/portrait.jpg',
+      audioUrl: 'https://example.com/audio.mp3',
+      model: 'kling-v2-6',
+      duration: 5,
+      mode: 'std',
+    });
+
+    expect(request).toHaveBeenNthCalledWith(1, 'POST', '/kling/lip-sync', {
+      json: {
+        video_url: 'https://example.com/video.mp4',
+        mode: 'text2video',
+        text: 'hello',
+        voice_language: 'en',
+        async: true,
+      },
+    });
+    expect(request).toHaveBeenNthCalledWith(2, 'POST', '/kling/talking-photo', {
+      json: {
+        image_url: 'https://example.com/portrait.jpg',
+        audio_url: 'https://example.com/audio.mp3',
+        model: 'kling-v2-6',
+        duration: 5,
+        mode: 'std',
+      },
+    });
   });
 
   it('rejects invalid reference enums and audio with video before transport', async () => {
