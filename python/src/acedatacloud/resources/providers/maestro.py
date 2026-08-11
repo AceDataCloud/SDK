@@ -1,62 +1,26 @@
-"""Maestro (maestro) — generated from the platform OpenAPI spec.
-
-Do not edit by hand: run ``python scripts/generate_providers.py``. Parameter
-names, types, enums and required-ness all come from the live spec, so adding a
-model upstream reaches the SDK without anyone retyping it.
-"""
+"""Maestro-specific video generation resources."""
 
 from __future__ import annotations
 
-from typing import Any, Literal  # noqa: F401
+from typing import Any, Literal
 
+from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
+
+MaestroAction = Literal["generate", "remix", "edit", "extend"]
+MaestroAspect = Literal["9:16", "16:9", "1:1"]
+MaestroQuality = Literal["lite", "standard", "pro"]
+MaestroScenario = Literal["auto", "narrated", "captions", "avatar", "drama"]
 MaestroStyle = Literal[
-    "auto",
-    "cinematic",
-    "glass",
-    "luxury",
-    "swiss",
-    "modern",
-    "editorial",
-    "warm",
-    "vibrant",
-    "neon",
-    "mono",
-    "pastel",
-    "bold",
-    "industrial",
-    "futuristic",
-    "retro",
+    "auto", "cinematic", "glass", "luxury", "swiss", "modern", "editorial", "warm", "vibrant",
+    "neon", "mono", "pastel", "bold", "industrial", "futuristic", "retro",
 ]
 MaestroVoice = Literal[
-    "auto",
-    "warm-female",
-    "bright-female",
-    "anchor-female",
-    "clean-female",
-    "calm-male",
-    "deep-male",
-    "documentary-male",
-    "energetic-male",
-    "storyteller-male",
-]
-MaestroAction = Literal[
-    "generate",
-    "remix",
-    "edit",
-    "extend",
-]
-MaestroScenario = Literal[
-    "auto",
-    "narrated",
-    "drama",
-    "avatar",
-    "motion",
-    "slideshow",
+    "auto", "warm-female", "bright-female", "anchor-female", "clean-female", "calm-male",
+    "deep-male", "documentary-male", "energetic-male", "storyteller-male",
 ]
 
 
 def _task_id(result: Any) -> str:
-    """Task ids appear at the top level or nested under `data`."""
     if not isinstance(result, dict):
         return ""
     if result.get("task_id"):
@@ -67,115 +31,122 @@ def _task_id(result: Any) -> str:
     return str(result.get("id") or "")
 
 
+def _build_generate_body(
+    *,
+    prompt: str,
+    action: MaestroAction | None,
+    ref_task_id: str | None,
+    file_urls: list[str] | None,
+    langs: list[str] | None,
+    aspect: MaestroAspect | None,
+    duration: int | None,
+    quality: MaestroQuality | None,
+    scenario: MaestroScenario | None,
+    style: MaestroStyle | None,
+    voice: MaestroVoice | None,
+    callback_url: str | None,
+    async_: bool | None,
+) -> dict[str, Any]:
+    selected_action = action or "generate"
+    selected_quality = quality or "standard"
+    selected_scenario = scenario or "auto"
+    selected_duration = duration if duration is not None else 30
+    selected_langs = langs if langs is not None else ["zh-cn"]
+
+    if selected_action not in {"generate", "remix", "edit", "extend"}:
+        raise ValueError("action must be generate, remix, edit, or extend")
+    if selected_quality not in {"lite", "standard", "pro"}:
+        raise ValueError("quality must be lite, standard, or pro")
+    if selected_action != "generate" and not ref_task_id:
+        raise ValueError("ref_task_id is required when action is remix, edit, or extend")
+    if not selected_langs or len(selected_langs) > 4:
+        raise ValueError("langs must contain between 1 and 4 languages")
+    if isinstance(selected_duration, bool) or not 5 <= selected_duration <= 300:
+        raise ValueError("duration must be an integer between 5 and 300")
+    if selected_quality == "lite" and (selected_duration > 30 or selected_action not in {"generate", "edit"}):
+        raise ValueError("lite supports generate/edit actions and durations up to 30 seconds")
+    if selected_quality == "standard" and (selected_duration > 120 or selected_action == "extend"):
+        raise ValueError("standard supports generate/remix/edit actions and durations up to 120 seconds")
+    allowed_scenarios = {
+        "lite": {"auto", "narrated", "captions"},
+        "standard": {"auto", "narrated", "captions", "avatar"},
+        "pro": {"auto", "narrated", "captions", "avatar", "drama"},
+    }
+    if selected_scenario not in {"auto", "narrated", "captions", "avatar", "drama"}:
+        raise ValueError("scenario must be auto, narrated, captions, avatar, or drama")
+    if selected_scenario not in allowed_scenarios[selected_quality]:
+        raise ValueError(f"{selected_scenario} scenario requires a higher quality tier")
+    if selected_scenario in {"captions", "avatar"} and not file_urls:
+        raise ValueError(f"file_urls is required for the {selected_scenario} scenario")
+
+    body: dict[str, Any] = {
+        "prompt": prompt,
+        "action": selected_action,
+        "langs": selected_langs,
+        "aspect": aspect or "9:16",
+        "duration": selected_duration,
+        "quality": selected_quality,
+        "scenario": selected_scenario,
+        "style": style or "auto",
+        "voice": voice or "auto",
+        "async": True if async_ is None else async_,
+    }
+    if ref_task_id is not None:
+        body["ref_task_id"] = ref_task_id
+    if file_urls is not None:
+        body["file_urls"] = file_urls
+    if callback_url is not None:
+        body["callback_url"] = callback_url
+    return body
+
+
 class Maestro:
-    """Synchronous maestro client."""
+    """Synchronous Maestro client."""
 
     def __init__(self, transport: Any) -> None:
         self._transport = transport
 
     def generate(
-        self,
-        *,
-        prompt: str,
-        langs: list[str] | None = None,
-        style: MaestroStyle | None = None,
-        voice: MaestroVoice | None = None,
-        action: MaestroAction | None = None,
-        aspect: Literal["9:16", "16:9", "1:1"] | None = None,
-        quality: Literal["draft", "standard", "premium"] | None = None,
-        duration: int | None = None,
-        scenario: MaestroScenario | None = None,
-        file_urls: list[str] | None = None,
-        ref_task_id: str | None = None,
-        callback_url: str | None = None,
-        **extra: Any,
-    ) -> dict[str, Any]:
-        """Maestro Video Generation API"""
-        body: dict[str, Any] = {}
-        body["prompt"] = prompt
-        body["langs"] = langs if langs is not None else ["zh-cn"]
-        body["style"] = style if style is not None else "auto"
-        body["voice"] = voice if voice is not None else "auto"
-        body["action"] = action if action is not None else "generate"
-        body["aspect"] = aspect if aspect is not None else "9:16"
-        body["quality"] = quality if quality is not None else "standard"
-        body["duration"] = duration if duration is not None else 30
-        body["scenario"] = scenario if scenario is not None else "auto"
-        if file_urls is not None:
-            body["file_urls"] = file_urls
-        if ref_task_id is not None:
-            body["ref_task_id"] = ref_task_id
-        body.update(extra)
-        if callback_url is not None:
-            body["callback_url"] = callback_url
-        return self._transport.request("POST", "/maestro/videos", json=body)
-
-    def estimates(
-        self,
-        *,
-        callback_url: str | None = None,
-        **extra: Any,
-    ) -> dict[str, Any]:
-        """Call /maestro/estimates."""
-        body: dict[str, Any] = {}
-        body.update(extra)
-        if callback_url is not None:
-            body["callback_url"] = callback_url
-        return self._transport.request("POST", "/maestro/estimates", json=body)
+        self, *, prompt: str, action: MaestroAction | None = None, ref_task_id: str | None = None,
+        file_urls: list[str] | None = None, langs: list[str] | None = None,
+        aspect: MaestroAspect | None = None, duration: int | None = None,
+        quality: MaestroQuality | None = None, scenario: MaestroScenario | None = None,
+        style: MaestroStyle | None = None, voice: MaestroVoice | None = None,
+        async_: bool | None = None, wait: bool = False, poll_interval: float = 3.0,
+        max_wait: float = 600.0, callback_url: str | None = None,
+    ) -> TaskHandle:
+        result = self._transport.request("POST", "/maestro/videos", json=_build_generate_body(
+            prompt=prompt, action=action, ref_task_id=ref_task_id, file_urls=file_urls, langs=langs,
+            aspect=aspect, duration=duration, quality=quality, scenario=scenario, style=style,
+            voice=voice, callback_url=callback_url, async_=async_,
+        ))
+        handle = TaskHandle(_task_id(result), "/maestro/tasks", self._transport, submitted=result)
+        if wait:
+            handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
 
 
 class AsyncMaestro:
-    """Asynchronous maestro client."""
+    """Asynchronous Maestro client."""
 
     def __init__(self, transport: Any) -> None:
         self._transport = transport
 
     async def generate(
-        self,
-        *,
-        prompt: str,
-        langs: list[str] | None = None,
-        style: MaestroStyle | None = None,
-        voice: MaestroVoice | None = None,
-        action: MaestroAction | None = None,
-        aspect: Literal["9:16", "16:9", "1:1"] | None = None,
-        quality: Literal["draft", "standard", "premium"] | None = None,
-        duration: int | None = None,
-        scenario: MaestroScenario | None = None,
-        file_urls: list[str] | None = None,
-        ref_task_id: str | None = None,
-        callback_url: str | None = None,
-        **extra: Any,
-    ) -> dict[str, Any]:
-        """Maestro Video Generation API"""
-        body: dict[str, Any] = {}
-        body["prompt"] = prompt
-        body["langs"] = langs if langs is not None else ["zh-cn"]
-        body["style"] = style if style is not None else "auto"
-        body["voice"] = voice if voice is not None else "auto"
-        body["action"] = action if action is not None else "generate"
-        body["aspect"] = aspect if aspect is not None else "9:16"
-        body["quality"] = quality if quality is not None else "standard"
-        body["duration"] = duration if duration is not None else 30
-        body["scenario"] = scenario if scenario is not None else "auto"
-        if file_urls is not None:
-            body["file_urls"] = file_urls
-        if ref_task_id is not None:
-            body["ref_task_id"] = ref_task_id
-        body.update(extra)
-        if callback_url is not None:
-            body["callback_url"] = callback_url
-        return await self._transport.request("POST", "/maestro/videos", json=body)
-
-    async def estimates(
-        self,
-        *,
-        callback_url: str | None = None,
-        **extra: Any,
-    ) -> dict[str, Any]:
-        """Call /maestro/estimates."""
-        body: dict[str, Any] = {}
-        body.update(extra)
-        if callback_url is not None:
-            body["callback_url"] = callback_url
-        return await self._transport.request("POST", "/maestro/estimates", json=body)
+        self, *, prompt: str, action: MaestroAction | None = None, ref_task_id: str | None = None,
+        file_urls: list[str] | None = None, langs: list[str] | None = None,
+        aspect: MaestroAspect | None = None, duration: int | None = None,
+        quality: MaestroQuality | None = None, scenario: MaestroScenario | None = None,
+        style: MaestroStyle | None = None, voice: MaestroVoice | None = None,
+        async_: bool | None = None, wait: bool = False, poll_interval: float = 3.0,
+        max_wait: float = 600.0, callback_url: str | None = None,
+    ) -> AsyncTaskHandle:
+        result = await self._transport.request("POST", "/maestro/videos", json=_build_generate_body(
+            prompt=prompt, action=action, ref_task_id=ref_task_id, file_urls=file_urls, langs=langs,
+            aspect=aspect, duration=duration, quality=quality, scenario=scenario, style=style,
+            voice=voice, callback_url=callback_url, async_=async_,
+        ))
+        handle = AsyncTaskHandle(_task_id(result), "/maestro/tasks", self._transport, submitted=result)
+        if wait:
+            await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle

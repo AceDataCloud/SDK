@@ -171,6 +171,35 @@ def test_minimax_generate_builds_a_task_handle(client):
     }
 
 
+def test_maestro_uses_current_defaults_and_task_endpoint(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "maestro-1"}
+    client.maestro._transport = transport
+
+    handle = client.maestro.generate(prompt="a video")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "maestro-1"
+    assert transport.request.call_args.args == ("POST", "/maestro/videos")
+    assert transport.request.call_args.kwargs["json"] == {
+        "prompt": "a video",
+        "action": "generate",
+        "langs": ["zh-cn"],
+        "aspect": "9:16",
+        "duration": 30,
+        "quality": "standard",
+        "scenario": "auto",
+        "style": "auto",
+        "voice": "auto",
+        "async": True,
+    }
+
+
+def test_maestro_requires_a_reference_task_for_edits(client):
+    with pytest.raises(ValueError, match="ref_task_id"):
+        client.maestro.generate(prompt="a video", action="edit")
+
+
 def test_model_enum_is_typed(client):
     """A wrong model name should be a type error, not a runtime 400."""
     hints = typing.get_type_hints(type(client.flux).generate)
