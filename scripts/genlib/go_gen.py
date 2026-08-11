@@ -40,7 +40,7 @@ def _request_struct(svc: Service, ep) -> str:
     lines.append(f"type {name} struct {{")
     for p in ep.callable_params:
         comment = p.description or ("required" if p.required else "optional")
-        lines.append(f"\t// {comment[:110]}")
+        lines.append(f"\t// {comment[:110].rstrip()}")
         lines.append(f"\t{_field_name(p.name)} {p.go_type()}")
     if ep.pollable:
         lines.append("\t// Async submits without blocking; poll the returned handle. Defaults true.")

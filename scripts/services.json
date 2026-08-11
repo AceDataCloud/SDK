@@ -22,11 +22,6 @@
     "id": "ab512c42-324c-42e6-8d79-49a5042f3548",
     "path": "/maestro/videos",
     "name": "Maestro Videos API"
-   },
-   {
-    "id": "2a5bb4f0-9f83-4ecf-b357-f29ddcc0e9c5",
-    "path": "/maestro/estimates",
-    "name": "Maestro Estimates API"
    }
   ],
   "tasks": "/maestro/tasks"
