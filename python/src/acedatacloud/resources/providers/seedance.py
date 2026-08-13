@@ -20,6 +20,7 @@ SeedanceModel = Literal[
     "doubao-seedance-2-0-260128",
     "doubao-seedance-2-0-fast-260128",
     "doubao-seedance-2-0-mini-260615",
+    "doubao-seedance-2-5-260628",
 ]
 SeedanceRatio = Literal[
     "16:9",
@@ -55,16 +56,19 @@ class Seedance:
         *,
         model: SeedanceModel,
         content: list[Any],
-        seed: int | None = None,
-        ratio: SeedanceRatio | None = None,
-        frames: int | None = None,
-        duration: int | None = None,
-        watermark: bool | None = None,
         resolution: Literal["480p", "720p", "1080p", "4k"] | None = None,
+        ratio: SeedanceRatio | None = None,
+        duration: int | None = None,
+        frames: int | None = None,
+        seed: int | None = None,
         camerafixed: bool | None = None,
+        watermark: bool | None = None,
         generate_audio: bool | None = None,
         return_last_frame: bool | None = None,
         execution_expires_after: int | None = None,
+        omni_reference_task_type: Literal["auto", "edit", "extend"] | None = None,
+        output_format: Literal["mp4", "mov"] | None = None,
+        tools: list[dict[str, Any]] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -72,29 +76,32 @@ class Seedance:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """ByteDance Seedance video generation API. Supports doubao-seedance-1-0-pro-250528,
-        doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-lite-t2v-250428,
-        and doubao-s
-        """
+        """Call /seedance/videos."""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
-        if seed is not None:
-            body["seed"] = seed
-        body["ratio"] = ratio if ratio is not None else "16:9"
-        if frames is not None:
-            body["frames"] = frames
-        if duration is not None:
-            body["duration"] = duration
-        if watermark is not None:
-            body["watermark"] = watermark
         if resolution is not None:
             body["resolution"] = resolution
+        body["ratio"] = ratio if ratio is not None else "16:9"
+        if duration is not None:
+            body["duration"] = duration
+        if frames is not None:
+            body["frames"] = frames
+        if seed is not None:
+            body["seed"] = seed
         if camerafixed is not None:
             body["camerafixed"] = camerafixed
+        if watermark is not None:
+            body["watermark"] = watermark
         body["generate_audio"] = generate_audio if generate_audio is not None else False
         body["return_last_frame"] = return_last_frame if return_last_frame is not None else False
         body["execution_expires_after"] = execution_expires_after if execution_expires_after is not None else 172800
+        if omni_reference_task_type is not None:
+            body["omni_reference_task_type"] = omni_reference_task_type
+        if output_format is not None:
+            body["output_format"] = output_format
+        if tools is not None:
+            body["tools"] = tools
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -117,16 +124,19 @@ class AsyncSeedance:
         *,
         model: SeedanceModel,
         content: list[Any],
-        seed: int | None = None,
-        ratio: SeedanceRatio | None = None,
-        frames: int | None = None,
-        duration: int | None = None,
-        watermark: bool | None = None,
         resolution: Literal["480p", "720p", "1080p", "4k"] | None = None,
+        ratio: SeedanceRatio | None = None,
+        duration: int | None = None,
+        frames: int | None = None,
+        seed: int | None = None,
         camerafixed: bool | None = None,
+        watermark: bool | None = None,
         generate_audio: bool | None = None,
         return_last_frame: bool | None = None,
         execution_expires_after: int | None = None,
+        omni_reference_task_type: Literal["auto", "edit", "extend"] | None = None,
+        output_format: Literal["mp4", "mov"] | None = None,
+        tools: list[dict[str, Any]] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -134,29 +144,32 @@ class AsyncSeedance:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """ByteDance Seedance video generation API. Supports doubao-seedance-1-0-pro-250528,
-        doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-lite-t2v-250428,
-        and doubao-s
-        """
+        """Call /seedance/videos."""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
-        if seed is not None:
-            body["seed"] = seed
-        body["ratio"] = ratio if ratio is not None else "16:9"
-        if frames is not None:
-            body["frames"] = frames
-        if duration is not None:
-            body["duration"] = duration
-        if watermark is not None:
-            body["watermark"] = watermark
         if resolution is not None:
             body["resolution"] = resolution
+        body["ratio"] = ratio if ratio is not None else "16:9"
+        if duration is not None:
+            body["duration"] = duration
+        if frames is not None:
+            body["frames"] = frames
+        if seed is not None:
+            body["seed"] = seed
         if camerafixed is not None:
             body["camerafixed"] = camerafixed
+        if watermark is not None:
+            body["watermark"] = watermark
         body["generate_audio"] = generate_audio if generate_audio is not None else False
         body["return_last_frame"] = return_last_frame if return_last_frame is not None else False
         body["execution_expires_after"] = execution_expires_after if execution_expires_after is not None else 172800
+        if omni_reference_task_type is not None:
+            body["omni_reference_task_type"] = omni_reference_task_type
+        if output_format is not None:
+            body["output_format"] = output_format
+        if tools is not None:
+            body["tools"] = tools
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

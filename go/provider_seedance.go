@@ -13,30 +13,36 @@ type Seedance struct {
 
 // SeedanceGenerateRequest is the input to seedance.Generate.
 type SeedanceGenerateRequest struct {
-	// Model ID for video generation
+	// $t(seedance_videos_model)
 	Model string
-	// Input content for video generation. Each entry must include one of `text`, `image_url`, `audio_url`, or `video
+	// $t(seedance_videos)
 	Content []any
-	// The random seed used for reproducible generation has a value range from -1 to 4294967295; -1 indicates randomn
-	Seed int
-	// Aspect ratio of the generated video
-	Ratio string
-	// The frame count for generating a video must meet 25 + 4n (such as 29, 33, 37... 361). Either duration or frame
-	Frames int
-	// The duration of the generated video, in seconds. Either duration or frames can be specified; if both are speci
-	Duration int
-	// Whether to add a watermark to the generated video.
-	Watermark bool
-	// Video resolution. The default value depends on the model used: most models default to 720p, while the lite mod
+	// $t(seedance_videos_resolution)
 	Resolution string
-	// Is the camera position fixed during the generation process?
+	// $t(seedance_videos_ratio)
+	Ratio string
+	// $t(seedance_videos_duration)
+	Duration int
+	// $t(seedance_videos_frames)
+	Frames int
+	// $t(seedance_videos_seed)
+	Seed int
+	// $t(seedance_videos_camerafixed)
 	Camerafixed bool
-	// Whether to generate audio from video. The `doubao-seedance-1-5-pro-251215` and `doubao-seedance-2-0` series mo
+	// $t(seedance_videos_watermark)
+	Watermark bool
+	// $t(seedance_videos_generate_audio)
 	GenerateAudio bool
-	// Whether to return the last frame of the generated video.
+	// $t(seedance_videos_return_last_frame)
 	ReturnLastFrame bool
-	// Task timeout threshold, unit in seconds
+	// $t(seedance_videos_execution_expires_after)
 	ExecutionExpiresAfter int
+	// $t(seedance_videos_omni_reference_task_type)
+	OmniReferenceTaskType string
+	// $t(seedance_videos_output_format)
+	OutputFormat string
+	// $t(seedance_videos_tools)
+	Tools []map[string]any
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -49,31 +55,40 @@ func (r SeedanceGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["model"] = r.Model
 	body["content"] = r.Content
-	if r.Seed != 0 {
-		body["seed"] = r.Seed
+	if r.Resolution != "" {
+		body["resolution"] = r.Resolution
 	}
 	if r.Ratio != "" {
 		body["ratio"] = r.Ratio
 	} else {
 		body["ratio"] = "16:9"
 	}
-	if r.Frames != 0 {
-		body["frames"] = r.Frames
-	}
 	if r.Duration != 0 {
 		body["duration"] = r.Duration
 	}
-	body["watermark"] = r.Watermark
-	if r.Resolution != "" {
-		body["resolution"] = r.Resolution
+	if r.Frames != 0 {
+		body["frames"] = r.Frames
+	}
+	if r.Seed != 0 {
+		body["seed"] = r.Seed
 	}
 	body["camerafixed"] = r.Camerafixed
+	body["watermark"] = r.Watermark
 	body["generate_audio"] = r.GenerateAudio
 	body["return_last_frame"] = r.ReturnLastFrame
 	if r.ExecutionExpiresAfter != 0 {
 		body["execution_expires_after"] = r.ExecutionExpiresAfter
 	} else {
 		body["execution_expires_after"] = 172800
+	}
+	if r.OmniReferenceTaskType != "" {
+		body["omni_reference_task_type"] = r.OmniReferenceTaskType
+	}
+	if r.OutputFormat != "" {
+		body["output_format"] = r.OutputFormat
+	}
+	if r.Tools != nil {
+		body["tools"] = r.Tools
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -90,7 +105,7 @@ func (r SeedanceGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate ByteDance Seedance video generation API. Supports doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-5-pro-251215,
+// Generate Call /seedance/videos.
 func (c *Seedance) Generate(ctx context.Context, req SeedanceGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
