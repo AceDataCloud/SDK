@@ -49,16 +49,72 @@ func (r ChatCompletionRequest) toBody() map[string]any {
 
 // ResponsesRequest is the input to OpenAI responses.create.
 type ResponsesRequest struct {
-	Model  string         `json:"model"`
-	Input  any            `json:"input"`
-	Stream bool           `json:"stream,omitempty"`
-	Extra  map[string]any `json:"-"`
+	Model             string           `json:"model"`
+	Input             any              `json:"input"`
+	Background        *bool            `json:"background,omitempty"`
+	Include           []string         `json:"include,omitempty"`
+	MaxOutputTokens   int              `json:"max_output_tokens,omitempty"`
+	MaxTokens         int              `json:"max_tokens,omitempty"`
+	N                 int              `json:"n,omitempty"`
+	ParallelToolCalls *bool            `json:"parallel_tool_calls,omitempty"`
+	Reasoning         map[string]any   `json:"reasoning,omitempty"`
+	ResponseFormat    map[string]any   `json:"response_format,omitempty"`
+	Store             *bool            `json:"store,omitempty"`
+	Stream            bool             `json:"stream,omitempty"`
+	StreamOptions     map[string]any   `json:"stream_options,omitempty"`
+	Temperature       *float64         `json:"temperature,omitempty"`
+	Text              map[string]any   `json:"text,omitempty"`
+	ToolChoice        any              `json:"tool_choice,omitempty"`
+	Tools             []map[string]any `json:"tools,omitempty"`
+	Extra             map[string]any   `json:"-"`
 }
 
 func (r ResponsesRequest) toBody() map[string]any {
 	body := map[string]any{"model": r.Model, "input": r.Input}
+	if r.Background != nil {
+		body["background"] = *r.Background
+	}
+	if len(r.Include) > 0 {
+		body["include"] = r.Include
+	}
+	if r.MaxOutputTokens > 0 {
+		body["max_output_tokens"] = r.MaxOutputTokens
+	}
+	if r.MaxTokens > 0 {
+		body["max_tokens"] = r.MaxTokens
+	}
+	if r.N > 0 {
+		body["n"] = r.N
+	}
+	if r.ParallelToolCalls != nil {
+		body["parallel_tool_calls"] = *r.ParallelToolCalls
+	}
+	if r.Reasoning != nil {
+		body["reasoning"] = r.Reasoning
+	}
+	if r.ResponseFormat != nil {
+		body["response_format"] = r.ResponseFormat
+	}
+	if r.Store != nil {
+		body["store"] = *r.Store
+	}
 	if r.Stream {
 		body["stream"] = true
+	}
+	if r.StreamOptions != nil {
+		body["stream_options"] = r.StreamOptions
+	}
+	if r.Temperature != nil {
+		body["temperature"] = *r.Temperature
+	}
+	if r.Text != nil {
+		body["text"] = r.Text
+	}
+	if r.ToolChoice != nil {
+		body["tool_choice"] = r.ToolChoice
+	}
+	if len(r.Tools) > 0 {
+		body["tools"] = r.Tools
 	}
 	for k, v := range r.Extra {
 		if _, exists := body[k]; !exists {

@@ -174,6 +174,43 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 }
 
+func TestResponsesRequestToBodyIncludesNewFields(t *testing.T) {
+	background := false
+	parallelToolCalls := false
+	store := true
+	temperature := 0.7
+
+	body := (ResponsesRequest{
+		Model:             "gpt-4o-mini",
+		Input:             "hello",
+		Background:        &background,
+		Include:           []string{"web_search_call.action.sources"},
+		MaxOutputTokens:   256,
+		ParallelToolCalls: &parallelToolCalls,
+		ResponseFormat:    map[string]any{"type": "json_object"},
+		Store:             &store,
+		StreamOptions:     map[string]any{"include_usage": true},
+		Temperature:       &temperature,
+		ToolChoice:        map[string]any{"type": "auto"},
+	}).toBody()
+
+	if body["max_output_tokens"] != 256 {
+		t.Fatalf("expected max_output_tokens=256, got %+v", body)
+	}
+	if body["parallel_tool_calls"] != false {
+		t.Fatalf("expected parallel_tool_calls=false, got %+v", body)
+	}
+	if body["response_format"].(map[string]any)["type"] != "json_object" {
+		t.Fatalf("expected response_format type json_object, got %+v", body)
+	}
+	if body["stream_options"].(map[string]any)["include_usage"] != true {
+		t.Fatalf("expected stream_options.include_usage=true, got %+v", body)
+	}
+	if body["tool_choice"].(map[string]any)["type"] != "auto" {
+		t.Fatalf("expected tool_choice type auto, got %+v", body)
+	}
+}
+
 func TestTransport_RetriesOn503(t *testing.T) {
 	attempts := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

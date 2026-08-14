@@ -74,10 +74,52 @@ class _Responses:
         *,
         model: str,
         input: str | list[dict[str, Any]],
+        background: bool | None = None,
+        include: list[str] | None = None,
+        max_output_tokens: int | None = None,
+        max_tokens: int | None = None,
+        n: int | None = None,
+        parallel_tool_calls: bool | None = None,
+        reasoning: dict[str, Any] | None = None,
+        response_format: dict[str, Any] | None = None,
+        store: bool | None = None,
         stream: bool = False,
+        stream_options: dict[str, Any] | None = None,
+        temperature: float | None = None,
+        text: dict[str, Any] | None = None,
+        tool_choice: str | dict[str, Any] | None = None,
+        tools: list[dict[str, Any]] | None = None,
         **kwargs: Any,
     ) -> dict[str, Any] | Iterator[dict[str, Any]]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if background is not None:
+            body["background"] = background
+        if include is not None:
+            body["include"] = include
+        if max_output_tokens is not None:
+            body["max_output_tokens"] = max_output_tokens
+        if max_tokens is not None:
+            body["max_tokens"] = max_tokens
+        if n is not None:
+            body["n"] = n
+        if parallel_tool_calls is not None:
+            body["parallel_tool_calls"] = parallel_tool_calls
+        if reasoning is not None:
+            body["reasoning"] = reasoning
+        if response_format is not None:
+            body["response_format"] = response_format
+        if store is not None:
+            body["store"] = store
+        if stream_options is not None:
+            body["stream_options"] = stream_options
+        if temperature is not None:
+            body["temperature"] = temperature
+        if text is not None:
+            body["text"] = text
+        if tool_choice is not None:
+            body["tool_choice"] = tool_choice
+        if tools is not None:
+            body["tools"] = tools
         if stream:
             body["stream"] = True
             return self._stream(body)
@@ -97,10 +139,52 @@ class _AsyncResponses:
         *,
         model: str,
         input: str | list[dict[str, Any]],
+        background: bool | None = None,
+        include: list[str] | None = None,
+        max_output_tokens: int | None = None,
+        max_tokens: int | None = None,
+        n: int | None = None,
+        parallel_tool_calls: bool | None = None,
+        reasoning: dict[str, Any] | None = None,
+        response_format: dict[str, Any] | None = None,
+        store: bool | None = None,
         stream: bool = False,
+        stream_options: dict[str, Any] | None = None,
+        temperature: float | None = None,
+        text: dict[str, Any] | None = None,
+        tool_choice: str | dict[str, Any] | None = None,
+        tools: list[dict[str, Any]] | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        if background is not None:
+            body["background"] = background
+        if include is not None:
+            body["include"] = include
+        if max_output_tokens is not None:
+            body["max_output_tokens"] = max_output_tokens
+        if max_tokens is not None:
+            body["max_tokens"] = max_tokens
+        if n is not None:
+            body["n"] = n
+        if parallel_tool_calls is not None:
+            body["parallel_tool_calls"] = parallel_tool_calls
+        if reasoning is not None:
+            body["reasoning"] = reasoning
+        if response_format is not None:
+            body["response_format"] = response_format
+        if store is not None:
+            body["store"] = store
+        if stream_options is not None:
+            body["stream_options"] = stream_options
+        if temperature is not None:
+            body["temperature"] = temperature
+        if text is not None:
+            body["text"] = text
+        if tool_choice is not None:
+            body["tool_choice"] = tool_choice
+        if tools is not None:
+            body["tools"] = tools
         if stream:
             body["stream"] = True
             return self._stream(body)

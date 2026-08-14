@@ -53,23 +53,82 @@ class Responses {
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
+    background?: boolean;
+    include?: string[];
+    maxOutputTokens?: number;
+    maxTokens?: number;
+    n?: number;
+    parallelToolCalls?: boolean;
+    reasoning?: Record<string, unknown>;
+    responseFormat?: Record<string, unknown>;
+    store?: boolean;
     stream?: false;
+    streamOptions?: Record<string, unknown>;
+    temperature?: number;
+    text?: Record<string, unknown>;
+    toolChoice?: string | Record<string, unknown>;
+    tools?: Array<Record<string, unknown>>;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
+    background?: boolean;
+    include?: string[];
+    maxOutputTokens?: number;
+    maxTokens?: number;
+    n?: number;
+    parallelToolCalls?: boolean;
+    reasoning?: Record<string, unknown>;
+    responseFormat?: Record<string, unknown>;
+    store?: boolean;
     stream: true;
+    streamOptions?: Record<string, unknown>;
+    temperature?: number;
+    text?: Record<string, unknown>;
+    toolChoice?: string | Record<string, unknown>;
+    tools?: Array<Record<string, unknown>>;
     [key: string]: unknown;
   }): Promise<AsyncGenerator<Record<string, unknown>>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
+    background?: boolean;
+    include?: string[];
+    maxOutputTokens?: number;
+    maxTokens?: number;
+    n?: number;
+    parallelToolCalls?: boolean;
+    reasoning?: Record<string, unknown>;
+    responseFormat?: Record<string, unknown>;
+    store?: boolean;
     stream?: boolean;
+    streamOptions?: Record<string, unknown>;
+    temperature?: number;
+    text?: Record<string, unknown>;
+    toolChoice?: string | Record<string, unknown>;
+    tools?: Array<Record<string, unknown>>;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
-    const { model, input, stream, ...rest } = opts;
+    const {
+      model,
+      input,
+      stream,
+      maxOutputTokens,
+      maxTokens,
+      parallelToolCalls,
+      responseFormat,
+      streamOptions,
+      toolChoice,
+      ...rest
+    } = opts;
     const body: Record<string, unknown> = { model, input, ...rest };
+    if (maxOutputTokens !== undefined) body.max_output_tokens = maxOutputTokens;
+    if (maxTokens !== undefined) body.max_tokens = maxTokens;
+    if (parallelToolCalls !== undefined) body.parallel_tool_calls = parallelToolCalls;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (streamOptions !== undefined) body.stream_options = streamOptions;
+    if (toolChoice !== undefined) body.tool_choice = toolChoice;
 
     if (stream) {
       body.stream = true;

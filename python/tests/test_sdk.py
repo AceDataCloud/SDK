@@ -217,13 +217,26 @@ def test_openai_responses(client):
         "id": "resp-123",
         "output": [{"type": "message", "content": [{"type": "output_text", "text": "Hi there"}]}],
     }
-    respx.post("https://api.acedata.cloud/openai/responses").mock(return_value=httpx.Response(200, json=mock_response))
+    route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
 
     result = client.openai.responses.create(
         model="gpt-4o",
         input="Hello",
+        max_output_tokens=64,
+        parallel_tool_calls=False,
+        response_format={"type": "json_object"},
+        stream_options={"include_usage": True},
+        tool_choice={"type": "auto"},
     )
     assert result["id"] == "resp-123"
+    payload = json.loads(route.calls.last.request.content)
+    assert payload["max_output_tokens"] == 64
+    assert payload["parallel_tool_calls"] is False
+    assert payload["response_format"] == {"type": "json_object"}
+    assert payload["stream_options"] == {"include_usage": True}
+    assert payload["tool_choice"] == {"type": "auto"}
 
 
 # ── Chat Messages (Claude Native) ────────────────────────────────────
