@@ -17,30 +17,36 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface SeedanceGenerateOptions {
-  /** Model ID for video generation */
-  model: "doubao-seedance-1-0-pro-250528" | "doubao-seedance-1-0-pro-fast-251015" | "doubao-seedance-1-5-pro-251215" | "doubao-seedance-1-0-lite-t2v-250428" | "doubao-seedance-1-0-lite-i2v-250428" | "doubao-seedance-2-0-260128" | "doubao-seedance-2-0-fast-260128" | "doubao-seedance-2-0-mini-260615";
-  /** Input content for video generation. Each entry must include one of `text`, `image_url`, `audio_url`, or `video_url` corresponding to the `type`. The meaning of other fields and whether they are required depends on the value of `type`. */
+  /** $t(seedance_videos_model) */
+  model: "doubao-seedance-1-0-pro-250528" | "doubao-seedance-1-0-pro-fast-251015" | "doubao-seedance-1-5-pro-251215" | "doubao-seedance-1-0-lite-t2v-250428" | "doubao-seedance-1-0-lite-i2v-250428" | "doubao-seedance-2-0-260128" | "doubao-seedance-2-0-fast-260128" | "doubao-seedance-2-0-mini-260615" | "doubao-seedance-2-5-260628";
+  /** $t(seedance_videos) */
   content: unknown[];
-  /** The random seed used for reproducible generation has a value range from -1 to 4294967295; -1 indicates randomness. */
-  seed?: number;
-  /** Aspect ratio of the generated video */
-  ratio?: "16:9" | "4:3" | "1:1" | "3:4" | "9:16" | "21:9" | "adaptive";
-  /** The frame count for generating a video must meet 25 + 4n (such as 29, 33, 37... 361). Either duration or frames can be specified; if both are specified, frames take priority over duration. */
-  frames?: number;
-  /** The duration of the generated video, in seconds. Either duration or frames can be specified; if both are specified, frames take priority over duration. The duration range varies for each model: Seedance 2.0 series is 4 to 15 seconds or -1, Seedance 1.5 Pro is 4 to 12 seconds or -1, and Seedance 1.0 series is 2 to 12 seconds. -1 indicates automatic duration. */
-  duration?: number;
-  /** Whether to add a watermark to the generated video. */
-  watermark?: boolean;
-  /** Video resolution. The default value depends on the model used: most models default to 720p, while the lite model defaults to 480p. Note that the supported resolutions vary by model: `4k` is only supported by doubao-seedance-2-0 (standard version); doubao-seedance-2-0-fast and doubao-seedance-2-0-mini do not support 1080p and 4k. */
+  /** $t(seedance_videos_resolution) */
   resolution?: "480p" | "720p" | "1080p" | "4k";
-  /** Is the camera position fixed during the generation process? */
+  /** $t(seedance_videos_ratio) */
+  ratio?: "16:9" | "4:3" | "1:1" | "3:4" | "9:16" | "21:9" | "adaptive";
+  /** $t(seedance_videos_duration) */
+  duration?: number;
+  /** $t(seedance_videos_frames) */
+  frames?: number;
+  /** $t(seedance_videos_seed) */
+  seed?: number;
+  /** $t(seedance_videos_camerafixed) */
   camerafixed?: boolean;
-  /** Whether to generate audio from video. The `doubao-seedance-1-5-pro-251215` and `doubao-seedance-2-0` series models support this parameter, while other models will ignore this parameter. */
+  /** $t(seedance_videos_watermark) */
+  watermark?: boolean;
+  /** $t(seedance_videos_generate_audio) */
   generateAudio?: boolean;
-  /** Whether to return the last frame of the generated video. */
+  /** $t(seedance_videos_return_last_frame) */
   returnLastFrame?: boolean;
-  /** Task timeout threshold, unit in seconds */
+  /** $t(seedance_videos_execution_expires_after) */
   executionExpiresAfter?: number;
+  /** $t(seedance_videos_omni_reference_task_type) */
+  omniReferenceTaskType?: "auto" | "edit" | "extend";
+  /** $t(seedance_videos_output_format) */
+  outputFormat?: "mp4" | "mov";
+  /** $t(seedance_videos_tools) */
+  tools?: Array<Record<string, unknown>>;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -56,23 +62,26 @@ export interface SeedanceGenerateOptions {
 export class Seedance {
   constructor(private transport: Transport) {}
 
-  /** ByteDance Seedance video generation API. Supports doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-lite-t2v-250428, and doubao-s */
+  /** Call /seedance/videos. */
   async generate(options: SeedanceGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;
     body["content"] = options.content;
-    if (options.seed !== undefined) body["seed"] = options.seed;
-    body["ratio"] = options.ratio ?? "16:9";
-    if (options.frames !== undefined) body["frames"] = options.frames;
-    if (options.duration !== undefined) body["duration"] = options.duration;
-    if (options.watermark !== undefined) body["watermark"] = options.watermark;
     if (options.resolution !== undefined) body["resolution"] = options.resolution;
+    body["ratio"] = options.ratio ?? "16:9";
+    if (options.duration !== undefined) body["duration"] = options.duration;
+    if (options.frames !== undefined) body["frames"] = options.frames;
+    if (options.seed !== undefined) body["seed"] = options.seed;
     if (options.camerafixed !== undefined) body["camerafixed"] = options.camerafixed;
+    if (options.watermark !== undefined) body["watermark"] = options.watermark;
     body["generate_audio"] = options.generateAudio ?? false;
     body["return_last_frame"] = options.returnLastFrame ?? false;
     body["execution_expires_after"] = options.executionExpiresAfter ?? 172800;
+    if (options.omniReferenceTaskType !== undefined) body["omni_reference_task_type"] = options.omniReferenceTaskType;
+    if (options.outputFormat !== undefined) body["output_format"] = options.outputFormat;
+    if (options.tools !== undefined) body["tools"] = options.tools;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "callbackUrl", "camerafixed", "content", "duration", "executionExpiresAfter", "frames", "generateAudio", "maxWait", "model", "pollInterval", "ratio", "resolution", "returnLastFrame", "seed", "wait", "watermark"].includes(key) && value !== undefined) {
+      if (!["async", "callbackUrl", "camerafixed", "content", "duration", "executionExpiresAfter", "frames", "generateAudio", "maxWait", "model", "omniReferenceTaskType", "outputFormat", "pollInterval", "ratio", "resolution", "returnLastFrame", "seed", "tools", "wait", "watermark"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
