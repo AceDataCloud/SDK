@@ -2,13 +2,14 @@
 
 import base64
 import json
+from typing import get_args
 from unittest.mock import Mock
 
 import httpx
 import pytest
 import respx
 
-from acedatacloud import AceDataCloud, AsyncAceDataCloud
+from acedatacloud import AceDataCloud, AiChatModel, AsyncAceDataCloud
 from acedatacloud._runtime.errors import (
     APIError,
     AuthenticationError,
@@ -28,6 +29,21 @@ def client():
 @pytest.fixture
 def async_client():
     return AsyncAceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
+
+
+def test_aichat_models_match_latest_spec():
+    models = set(get_args(AiChatModel))
+    assert {
+        "gpt-5.6-luna",
+        "gpt-5.6-terra",
+        "gpt-5.6-sol",
+        "gpt-5.4-mini",
+        "gpt-5.4-nano",
+        "grok-4.5",
+        "glm-5.2",
+        "glm-5",
+        "glm-5-turbo",
+    } <= models
 
 
 @respx.mock

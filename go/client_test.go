@@ -31,6 +31,37 @@ func TestNewClient_WithToken(t *testing.T) {
 	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
 	}
+	if c.AIChat() == nil {
+		t.Fatal("AIChat resource must be non-nil")
+	}
+}
+
+func TestAIChatCreate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat/conversations" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "gpt-5.6-sol" || body["question"] != "Hello" {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"conversation-1","answer":"Hi"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	result, err := c.AIChat().Create(context.Background(), AIChatRequest{
+		Model:    "gpt-5.6-sol",
+		Question: "Hello",
+	})
+	if err != nil {
+		t.Fatalf("AIChat Create: %v", err)
+	}
+	if result["answer"] != "Hi" {
+		t.Fatalf("unexpected response: %+v", result)
+	}
 }
 
 func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
