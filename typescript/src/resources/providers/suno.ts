@@ -30,7 +30,7 @@ export interface SunoGenerateOptions {
   /** Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise, it will be generated based on the prompts. */
   custom?: boolean;
   /** The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 500 characters. For custom mode, please use `lyric` and `style`. */
-  prompt?: Record<string, unknown>;
+  prompt?: string;
   /** Audio ID used for generating additional audio based on existing audio. This field is required when `action` is `extend` or `concat`. */
   audioId?: string;
   /** Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is mainly used for generation in custom mode (`custom` is `true`); some models or actions may not support it, in which case the value is ignored or an error is returned. It is a target only — the finished length is reported by the `duration` field in the response and may differ slightly. */
@@ -50,7 +50,7 @@ export interface SunoGenerateOptions {
   /** Pure accompaniment mode (no lyrics), default is `false`. When set to `true`, the lyrics filled in above will be ignored. */
   instrumental?: boolean;
   /** Prompts for automatically generating lyrics, effective only when `custom` is `true` and `lyric` is empty. */
-  lyricPrompt?: Record<string, unknown>;
+  lyricPrompt?: string;
   /** Voice gender preference, selectable values are `'m'` (male voice) or `'f'` (female voice). Models `chirp-v4-5` and above are effective; this parameter is a preference item that can increase the probability of the target gender, but it does not guarantee strict adherence. */
   vocalGender?: string;
   /** Add a default start time for the uploaded audio sample, with a default value of 0. */
@@ -136,9 +136,9 @@ export interface SunoVoxOptions {
   /** The source audio ID used to extract human voice, which is the unique identifier of the Suno audio segment to be processed. */
   audioId: string;
   /** End time point for vocal extraction (unit: seconds). */
-  vocalEnd?: number;
+  vocalEnd: number;
   /** The starting time point for vocal extraction (unit: seconds). */
-  vocalStart?: number;
+  vocalStart: number;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -190,7 +190,7 @@ export interface SunoLyricsOptions {
   /** The model used for generating lyrics has a default value of `default`, with optional values including `default` and `remi-v1`. */
   model: "default" | "remi-v1";
   /** Prompts for generating lyrics, describing the desired theme or style of the lyrics. */
-  prompt: Record<string, unknown>;
+  prompt: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;
