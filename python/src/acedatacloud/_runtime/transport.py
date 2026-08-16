@@ -134,14 +134,19 @@ class SyncTransport:
         path: str,
         *,
         json: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
         platform: bool = False,
         timeout: float | None = None,
         extra_headers: dict[str, str] | None = None,
-    ) -> dict[str, Any]:
+        response_format: str = "json",
+    ) -> dict[str, Any] | bytes | str:
         base = self._platform_base_url if platform else self._base_url
         url = f"{base}{path}"
         headers = {**self._headers, **(extra_headers or {})}
+        if files is not None:
+            headers.pop("content-type", None)
         extra_auth_headers: dict[str, str] = {}
         payment_attempted = False
 
@@ -152,6 +157,8 @@ class SyncTransport:
                     method,
                     url,
                     json=json,
+                    data=data,
+                    files=files,
                     params=params,
                     headers={**headers, **extra_auth_headers},
                     timeout=timeout or self._timeout,
@@ -185,7 +192,7 @@ class SyncTransport:
                         402,
                         {"error": {"code": "invalid_402", "message": "No payment requirements"}},
                     )
-                result = self._payment_handler({"url": url, "method": method, "body": json, "accepts": accepts})
+                result = self._payment_handler({"url": url, "method": method, "body": json or data, "accepts": accepts})
                 extra_auth_headers.update(result.get("headers", {}))
                 payment_attempted = True
                 continue
@@ -202,6 +209,10 @@ class SyncTransport:
                     continue
                 raise _map_error(resp.status_code, body)
 
+            if response_format == "bytes":
+                return resp.content
+            if response_format == "text":
+                return resp.text
             return resp.json()
 
     def request_stream(
@@ -345,16 +356,21 @@ class AsyncTransport:
         path: str,
         *,
         json: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
         platform: bool = False,
         timeout: float | None = None,
         extra_headers: dict[str, str] | None = None,
-    ) -> dict[str, Any]:
+        response_format: str = "json",
+    ) -> dict[str, Any] | bytes | str:
         import asyncio
 
         base = self._platform_base_url if platform else self._base_url
         url = f"{base}{path}"
         headers = {**self._headers, **(extra_headers or {})}
+        if files is not None:
+            headers.pop("content-type", None)
         extra_auth_headers: dict[str, str] = {}
         payment_attempted = False
 
@@ -365,6 +381,8 @@ class AsyncTransport:
                     method,
                     url,
                     json=json,
+                    data=data,
+                    files=files,
                     params=params,
                     headers={**headers, **extra_auth_headers},
                     timeout=timeout or self._timeout,
@@ -398,7 +416,9 @@ class AsyncTransport:
                         402,
                         {"error": {"code": "invalid_402", "message": "No payment requirements"}},
                     )
-                handler_result = self._payment_handler({"url": url, "method": method, "body": json, "accepts": accepts})
+                handler_result = self._payment_handler(
+                    {"url": url, "method": method, "body": json or data, "accepts": accepts}
+                )
                 if inspect.isawaitable(handler_result):
                     handler_result = await handler_result
                 extra_auth_headers.update(handler_result.get("headers", {}))
@@ -417,6 +437,10 @@ class AsyncTransport:
                     continue
                 raise _map_error(resp.status_code, body)
 
+            if response_format == "bytes":
+                return resp.content
+            if response_format == "text":
+                return resp.text
             return resp.json()
 
     async def request_stream(

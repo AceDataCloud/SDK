@@ -145,9 +145,10 @@ func TestCaptchaEndpoints(t *testing.T) {
 
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/chat/completions" {
+		if r.URL.Path != "/openai/chat/completions" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
+
 		if r.Header.Get("Authorization") != "Bearer token-abc" {
 			t.Errorf("missing auth header")
 		}
@@ -171,6 +172,65 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 	if res["id"] != "c1" {
 		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAIModelsAndAudioEndpoints(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/openai/models":
+			if r.Method != http.MethodGet {
+				t.Fatalf("expected GET models, got %s", r.Method)
+			}
+			_, _ = w.Write([]byte(`{"object":"list","data":[]}`))
+		case "/v1/audio/speech":
+			var body map[string]any
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			if body["input"] != "hello" || body["voice"] != "nova" {
+				t.Fatalf("unexpected speech body: %+v", body)
+			}
+			w.Header().Set("Content-Type", "audio/mpeg")
+			_, _ = w.Write([]byte("mp3-bytes"))
+		case "/v1/audio/transcriptions":
+			if !strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data") {
+				t.Fatalf("expected multipart content type, got %q", r.Header.Get("Content-Type"))
+			}
+			if err := r.ParseMultipartForm(1024); err != nil {
+				t.Fatal(err)
+			}
+			if r.FormValue("model") != "whisper-1" {
+				t.Fatalf("unexpected transcription model: %q", r.FormValue("model"))
+			}
+			_, _, err := r.FormFile("file")
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, _ = w.Write([]byte(`{"text":"hello"}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	models, err := c.OpenAI().Models().List(context.Background())
+	if err != nil || models["object"] != "list" {
+		t.Fatalf("Models List: result=%+v err=%v", models, err)
+	}
+	audio, err := c.OpenAI().Audio().Speech().Create(context.Background(), AudioSpeechRequest{
+		Input: "hello",
+		Voice: "nova",
+	})
+	if err != nil || string(audio) != "mp3-bytes" {
+		t.Fatalf("Speech Create: audio=%q err=%v", audio, err)
+	}
+	transcription, err := c.OpenAI().Audio().Transcriptions().Create(context.Background(), AudioTranscriptionRequest{
+		File:     []byte("audio"),
+		Filename: "audio.wav",
+		Model:    "whisper-1",
+	})
+	if err != nil || transcription["text"] != "hello" {
+		t.Fatalf("Transcriptions Create: result=%+v err=%v", transcription, err)
 	}
 }
 

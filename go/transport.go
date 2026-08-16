@@ -89,6 +89,8 @@ type requestOpts struct {
 	Method       string
 	Path         string
 	Body         any
+	RawBody      []byte
+	ContentType  string
 	Query        url.Values
 	Platform     bool
 	ExtraHeaders map[string]string
@@ -113,7 +115,9 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 	}
 
 	var bodyBytes []byte
-	if r.Body != nil {
+	if r.RawBody != nil {
+		bodyBytes = r.RawBody
+	} else if r.Body != nil {
 		var err error
 		bodyBytes, err = json.Marshal(r.Body)
 		if err != nil {
@@ -135,6 +139,9 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 		}
 		for k, v := range r.ExtraHeaders {
 			req.Header.Set(k, v)
+		}
+		if r.ContentType != "" {
+			req.Header.Set("Content-Type", r.ContentType)
 		}
 		for k, v := range extraAuth {
 			req.Header.Set(k, v)
@@ -197,6 +204,93 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 
 	if lastErr != nil {
 		return nil, lastErr
+	}
+	return nil, &TransportError{&APIError{Message: "request failed after retries"}}
+}
+
+// doBytes executes a request and returns the raw response body.
+func (t *transport) doBytes(ctx context.Context, r requestOpts) ([]byte, error) {
+	base := t.opts.baseURL
+	if r.Platform {
+		base = t.opts.platformURL
+	}
+	fullURL := base + r.Path
+	if len(r.Query) > 0 {
+		fullURL += "?" + r.Query.Encode()
+	}
+
+	var bodyBytes []byte
+	if r.RawBody != nil {
+		bodyBytes = r.RawBody
+	} else if r.Body != nil {
+		var err error
+		bodyBytes, err = json.Marshal(r.Body)
+		if err != nil {
+			return nil, fmt.Errorf("marshal body: %w", err)
+		}
+	}
+
+	extraAuth := map[string]string{}
+	paymentAttempted := false
+	for attempt := 0; attempt <= t.opts.maxRetries; attempt++ {
+		req, err := http.NewRequestWithContext(ctx, r.Method, fullURL, bytes.NewReader(bodyBytes))
+		if err != nil {
+			return nil, fmt.Errorf("build request: %w", err)
+		}
+		for k, v := range t.headers {
+			req.Header.Set(k, v)
+		}
+		for k, v := range r.ExtraHeaders {
+			req.Header.Set(k, v)
+		}
+		if r.ContentType != "" {
+			req.Header.Set("Content-Type", r.ContentType)
+		}
+		for k, v := range extraAuth {
+			req.Header.Set(k, v)
+		}
+
+		resp, err := t.httpClient.Do(req)
+		if err != nil {
+			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+				return nil, &TimeoutError{&APIError{Message: err.Error(), ErrCode: "timeout"}}
+			}
+			if attempt < t.opts.maxRetries {
+				time.Sleep(backoff(attempt))
+				continue
+			}
+			return nil, &TransportError{&APIError{Message: err.Error()}}
+		}
+
+		respBody, _ := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
+		if resp.StatusCode == http.StatusPaymentRequired && t.opts.paymentHandler != nil && !paymentAttempted {
+			accepts, err := parsePaymentRequired(resp, respBody)
+			if err != nil {
+				return nil, err
+			}
+			result, err := t.opts.paymentHandler.Handle(ctx, PaymentContext{URL: fullURL, Method: r.Method, Body: r.Body, Accepts: accepts})
+			if err != nil {
+				return nil, fmt.Errorf("payment handler: %w", err)
+			}
+			for k, v := range result.Headers {
+				extraAuth[k] = v
+			}
+			paymentAttempted = true
+			continue
+		}
+		if resp.StatusCode >= 400 {
+			parsed := map[string]any{}
+			if err := json.Unmarshal(respBody, &parsed); err != nil {
+				parsed = map[string]any{"error": map[string]any{"code": "unknown", "message": string(respBody)}}
+			}
+			if retryStatus[resp.StatusCode] && attempt < t.opts.maxRetries {
+				time.Sleep(backoff(attempt))
+				continue
+			}
+			return nil, mapError(resp.StatusCode, parsed)
+		}
+		return respBody, nil
 	}
 	return nil, &TransportError{&APIError{Message: "request failed after retries"}}
 }

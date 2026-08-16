@@ -65,6 +65,22 @@ class _AsyncChatNamespace:
         self.completions = _AsyncCompletions(transport)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models")
+
+
 class _Responses:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
@@ -353,6 +369,168 @@ class _AsyncEmbeddings:
         return await self._transport.request("POST", "/openai/embeddings", json=body)
 
 
+class _Speech:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return self._transport.request("POST", "/v1/audio/speech", json=body, response_format="bytes")
+
+
+class _Transcriptions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def create(
+        self,
+        *,
+        file: bytes,
+        filename: str,
+        model: str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | str:
+        data: dict[str, Any] = {**kwargs}
+        if model is not None:
+            data["model"] = model
+        if language is not None:
+            data["language"] = language
+        if prompt is not None:
+            data["prompt"] = prompt
+        if response_format is not None:
+            data["response_format"] = response_format
+        if temperature is not None:
+            data["temperature"] = temperature
+        if timestamp_granularities is not None:
+            data["timestamp_granularities[]"] = timestamp_granularities
+        if stream is not None:
+            data["stream"] = stream
+        if languages is not None:
+            data["languages[]"] = languages
+        if keywords is not None:
+            data["keywords[]"] = keywords
+        result_format = "text" if response_format in {"text", "srt", "vtt"} else "json"
+        return self._transport.request(
+            "POST",
+            "/v1/audio/transcriptions",
+            data=data,
+            files={"file": (filename, file)},
+            response_format=result_format,
+        )
+
+
+class _AudioNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.speech = _Speech(transport)
+        self.transcriptions = _Transcriptions(transport)
+
+
+class _AsyncSpeech:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        input: str,
+        model: str | None = None,
+        voice: str | None = None,
+        response_format: str | None = None,
+        speed: float | None = None,
+        **kwargs: Any,
+    ) -> bytes:
+        body: dict[str, Any] = {"input": input, **kwargs}
+        if model is not None:
+            body["model"] = model
+        if voice is not None:
+            body["voice"] = voice
+        if response_format is not None:
+            body["response_format"] = response_format
+        if speed is not None:
+            body["speed"] = speed
+        return await self._transport.request("POST", "/v1/audio/speech", json=body, response_format="bytes")
+
+
+class _AsyncTranscriptions:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def create(
+        self,
+        *,
+        file: bytes,
+        filename: str,
+        model: str | None = None,
+        language: str | None = None,
+        prompt: str | None = None,
+        response_format: str | None = None,
+        temperature: float | None = None,
+        timestamp_granularities: list[str] | None = None,
+        stream: bool | None = None,
+        languages: list[str] | None = None,
+        keywords: list[str] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any] | str:
+        data: dict[str, Any] = {**kwargs}
+        if model is not None:
+            data["model"] = model
+        if language is not None:
+            data["language"] = language
+        if prompt is not None:
+            data["prompt"] = prompt
+        if response_format is not None:
+            data["response_format"] = response_format
+        if temperature is not None:
+            data["temperature"] = temperature
+        if timestamp_granularities is not None:
+            data["timestamp_granularities[]"] = timestamp_granularities
+        if stream is not None:
+            data["stream"] = stream
+        if languages is not None:
+            data["languages[]"] = languages
+        if keywords is not None:
+            data["keywords[]"] = keywords
+        result_format = "text" if response_format in {"text", "srt", "vtt"} else "json"
+        return await self._transport.request(
+            "POST",
+            "/v1/audio/transcriptions",
+            data=data,
+            files={"file": (filename, file)},
+            response_format=result_format,
+        )
+
+
+class _AsyncAudioNamespace:
+    def __init__(self, transport: Any) -> None:
+        self.speech = _AsyncSpeech(transport)
+        self.transcriptions = _AsyncTranscriptions(transport)
+
+
 class _Tasks:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
@@ -466,9 +644,11 @@ class OpenAI:
 
     def __init__(self, transport: Any) -> None:
         self.chat = _ChatNamespace(transport)
+        self.models = _Models(transport)
         self.responses = _Responses(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
+        self.audio = _AudioNamespace(transport)
         self.tasks = _Tasks(transport)
 
 
@@ -477,7 +657,9 @@ class AsyncOpenAI:
 
     def __init__(self, transport: Any) -> None:
         self.chat = _AsyncChatNamespace(transport)
+        self.models = _AsyncModels(transport)
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
+        self.audio = _AsyncAudioNamespace(transport)
         self.tasks = _AsyncTasks(transport)

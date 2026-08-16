@@ -156,12 +156,53 @@ export class Transport {
     path: string,
     opts: {
       json?: Record<string, unknown>;
+      body?: any;
       params?: Record<string, string>;
       platform?: boolean;
       timeout?: number;
       headers?: Record<string, string>;
+      responseType: 'arrayBuffer';
+    }
+  ): Promise<ArrayBuffer>;
+  async request(
+    method: string,
+    path: string,
+    opts: {
+      json?: Record<string, unknown>;
+      body?: any;
+      params?: Record<string, string>;
+      platform?: boolean;
+      timeout?: number;
+      headers?: Record<string, string>;
+      responseType: 'text';
+    }
+  ): Promise<string>;
+  async request(
+    method: string,
+    path: string,
+    opts?: {
+      json?: Record<string, unknown>;
+      body?: any;
+      params?: Record<string, string>;
+      platform?: boolean;
+      timeout?: number;
+      headers?: Record<string, string>;
+      responseType?: 'json';
+    }
+  ): Promise<Record<string, unknown>>;
+  async request(
+    method: string,
+    path: string,
+    opts: {
+      json?: Record<string, unknown>;
+      body?: any;
+      params?: Record<string, string>;
+      platform?: boolean;
+      timeout?: number;
+      headers?: Record<string, string>;
+      responseType?: 'json' | 'arrayBuffer' | 'text';
     } = {}
-  ): Promise<Record<string, unknown>> {
+  ): Promise<Record<string, unknown> | ArrayBuffer | string> {
     const base = opts.platform ? this.platformBaseURL : this.baseURL;
     let url = `${base}${path}`;
     if (opts.params) {
@@ -169,6 +210,9 @@ export class Transport {
       url += `?${qs}`;
     }
     const headers = { ...this.headers, ...(opts.headers ?? {}) };
+    if (opts.body instanceof FormData) {
+      delete headers['content-type'];
+    }
     const timeoutMs = opts.timeout ?? this.timeout;
 
     let lastError: Error | null = null;
@@ -182,7 +226,7 @@ export class Transport {
         const resp = await fetch(url, {
           method,
           headers: { ...headers, ...extraHeaders },
-          body: opts.json ? JSON.stringify(opts.json) : undefined,
+          body: opts.body ?? (opts.json ? JSON.stringify(opts.json) : undefined),
           signal: controller.signal,
         });
         clearTimeout(timer);
@@ -229,6 +273,8 @@ export class Transport {
           throw mapError(resp.status, body);
         }
 
+        if (opts.responseType === 'arrayBuffer') return await resp.arrayBuffer();
+        if (opts.responseType === 'text') return await resp.text();
         return (await resp.json()) as Record<string, unknown>;
       } catch (err) {
         clearTimeout(timer);

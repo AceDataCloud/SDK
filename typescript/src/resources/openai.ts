@@ -47,6 +47,14 @@ class ChatNamespace {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
 class Responses {
   constructor(private transport: Transport) {}
 
@@ -164,6 +172,77 @@ class Embeddings {
   }
 }
 
+class Speech {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<ArrayBuffer> {
+    const { input, responseFormat, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    return this.transport.request('POST', '/v1/audio/speech', { json: body, responseType: 'arrayBuffer' });
+  }
+}
+
+class Transcriptions {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    file: Blob | Buffer | Uint8Array;
+    filename?: string;
+    model?: string;
+    language?: string;
+    prompt?: string;
+    responseFormat?: string;
+    temperature?: number;
+    timestampGranularities?: string[];
+    stream?: boolean;
+    languages?: string[];
+    keywords?: string[];
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown> | string> {
+    const {
+      file,
+      filename,
+      responseFormat,
+      timestampGranularities,
+      languages,
+      keywords,
+      ...rest
+    } = opts;
+    const form = new FormData();
+    const filePart = file instanceof Blob ? file : new Blob([file]);
+    form.append('file', filePart, filename);
+    for (const [key, value] of Object.entries(rest)) {
+      if (value !== undefined) form.append(key, String(value));
+    }
+    if (responseFormat !== undefined) form.append('response_format', responseFormat);
+    for (const value of timestampGranularities ?? []) form.append('timestamp_granularities[]', value);
+    for (const value of languages ?? []) form.append('languages[]', value);
+    for (const value of keywords ?? []) form.append('keywords[]', value);
+
+    if (responseFormat === 'text' || responseFormat === 'srt' || responseFormat === 'vtt') {
+      return this.transport.request('POST', '/v1/audio/transcriptions', { body: form, responseType: 'text' });
+    }
+    return this.transport.request('POST', '/v1/audio/transcriptions', { body: form });
+  }
+}
+
+class AudioNamespace {
+  readonly speech: Speech;
+  readonly transcriptions: Transcriptions;
+  constructor(transport: Transport) {
+    this.speech = new Speech(transport);
+    this.transcriptions = new Transcriptions(transport);
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -208,16 +287,20 @@ class Tasks {
 
 export class OpenAI {
   readonly chat: ChatNamespace;
+  readonly models: Models;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly audio: AudioNamespace;
   readonly tasks: Tasks;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
+    this.models = new Models(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.audio = new AudioNamespace(transport);
     this.tasks = new Tasks(transport);
   }
 }
