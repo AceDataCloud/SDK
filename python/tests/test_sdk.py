@@ -186,7 +186,7 @@ def test_openai_chat_completions(client):
     mock_response = {
         "id": "chatcmpl-123",
         "object": "chat.completion",
-        "model": "claude-sonnet-4-20250514",
+        "model": "claude-sonnet-5",
         "choices": [
             {
                 "index": 0,
@@ -201,7 +201,7 @@ def test_openai_chat_completions(client):
     )
 
     result = client.openai.chat.completions.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5",
         messages=[{"role": "user", "content": "Hi"}],
     )
     assert result["choices"][0]["message"]["content"] == "Hello!"
@@ -241,7 +241,7 @@ def test_chat_messages(client):
     respx.post("https://api.acedata.cloud/v1/messages").mock(return_value=httpx.Response(200, json=mock_response))
 
     result = client.chat.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5",
         messages=[{"role": "user", "content": "Hello"}],
         max_tokens=1024,
     )
@@ -256,7 +256,7 @@ def test_chat_count_tokens(client):
     )
 
     result = client.chat.messages.count_tokens(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5",
         messages=[{"role": "user", "content": "Hello"}],
     )
     assert result["input_tokens"] == 42
@@ -425,10 +425,10 @@ def test_platform_credentials_rotate(client):
 
 @respx.mock
 def test_platform_models_list(client):
-    mock = {"data": [{"id": "claude-sonnet-4-20250514", "owned_by": "anthropic"}]}
+    mock = {"data": [{"id": "claude-sonnet-5", "owned_by": "anthropic"}]}
     respx.get("https://platform.acedata.cloud/api/v1/models/").mock(return_value=httpx.Response(200, json=mock))
     result = client.platform.models.list()
-    assert result["data"][0]["id"] == "claude-sonnet-4-20250514"
+    assert result["data"][0]["id"] == "claude-sonnet-5"
 
 
 @respx.mock
@@ -504,7 +504,7 @@ async def test_async_openai_completions(async_client):
     )
 
     result = await async_client.openai.chat.completions.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-5",
         messages=[{"role": "user", "content": "Hi"}],
     )
     assert result["choices"][0]["message"]["content"] == "Async!"

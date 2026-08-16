@@ -123,7 +123,7 @@ class TestOpenAIChatCompletions:
 
     def test_multiple_models(self, client):
         """Test with different models."""
-        for model in ["gpt-4o-mini", "claude-3-5-haiku-20241022"]:
+        for model in ["gpt-4o-mini", "claude-haiku-4-5-20251001"]:
             result = client.openai.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": "Reply with just the word 'ok'."}],

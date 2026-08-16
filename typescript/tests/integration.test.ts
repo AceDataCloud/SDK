@@ -108,7 +108,7 @@ describeIf('OpenAI Chat Completions', () => {
   }, 30000);
 
   it('should work with different models', async () => {
-    for (const model of ['gpt-4o-mini', 'claude-3-5-haiku-20241022']) {
+    for (const model of ['gpt-4o-mini', 'claude-haiku-4-5-20251001']) {
       const result = await client.openai.chat.completions.create({
         model,
         messages: [{ role: 'user', content: "Reply with just the word 'ok'." }],
