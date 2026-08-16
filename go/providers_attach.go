@@ -3,7 +3,6 @@
 
 package acedatacloud
 
-
 // taskIDFrom pulls a task id out of a submission response.
 func taskIDFrom(result map[string]any) string {
 	if s, ok := result["task_id"].(string); ok && s != "" {
@@ -23,41 +22,41 @@ func taskIDFrom(result map[string]any) string {
 // providers holds the provider-axis clients, one per service.
 type providers struct {
 	digitalhuman *Digitalhuman
-	dreamina *Dreamina
-	fish *Fish
-	flux *Flux
-	hailuo *Hailuo
-	happyhorse *Happyhorse
+	dreamina     *Dreamina
+	fish         *Fish
+	flux         *Flux
+	hailuo       *Hailuo
+	happyhorse   *Happyhorse
 	localization *Localization
-	luma *Luma
-	maestro *Maestro
-	minimax *Minimax
-	nanobanana *NanoBanana
-	producer *Producer
-	seedance *Seedance
-	seedream *Seedream
-	suno *Suno
-	wan *Wan
+	luma         *Luma
+	maestro      *Maestro
+	minimax      *Minimax
+	nanobanana   *NanoBanana
+	producer     *Producer
+	seedance     *Seedance
+	seedream     *Seedream
+	suno         *Suno
+	wan          *Wan
 }
 
 func newProviders(tr *transport) *providers {
 	return &providers{
 		digitalhuman: &Digitalhuman{t: tr},
-		dreamina: &Dreamina{t: tr},
-		fish: &Fish{t: tr},
-		flux: &Flux{t: tr},
-		hailuo: &Hailuo{t: tr},
-		happyhorse: &Happyhorse{t: tr},
+		dreamina:     &Dreamina{t: tr},
+		fish:         &Fish{t: tr},
+		flux:         &Flux{t: tr},
+		hailuo:       &Hailuo{t: tr},
+		happyhorse:   &Happyhorse{t: tr},
 		localization: &Localization{t: tr},
-		luma: &Luma{t: tr},
-		maestro: &Maestro{t: tr},
-		minimax: &Minimax{t: tr},
-		nanobanana: &NanoBanana{t: tr},
-		producer: &Producer{t: tr},
-		seedance: &Seedance{t: tr},
-		seedream: &Seedream{t: tr},
-		suno: &Suno{t: tr},
-		wan: &Wan{t: tr},
+		luma:         &Luma{t: tr},
+		maestro:      &Maestro{t: tr},
+		minimax:      &Minimax{t: tr},
+		nanobanana:   &NanoBanana{t: tr},
+		producer:     &Producer{t: tr},
+		seedance:     &Seedance{t: tr},
+		seedream:     &Seedream{t: tr},
+		suno:         &Suno{t: tr},
+		wan:          &Wan{t: tr},
 	}
 }
 

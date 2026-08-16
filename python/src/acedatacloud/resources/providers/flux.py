@@ -44,9 +44,9 @@ class Flux:
     def generate(
         self,
         *,
+        size: str,
         action: Literal["generate", "edit"],
         prompt: str,
-        size: str | None = None,
         count: float | None = None,
         model: FluxModel | None = None,
         image_url: str | None = None,
@@ -59,9 +59,9 @@ class Flux:
     ) -> TaskHandle:
         """Flux AI image generation API, generates 1 image per request."""
         body: dict[str, Any] = {}
+        body["size"] = size
         body["action"] = action
         body["prompt"] = prompt
-        body["size"] = size if size is not None else "1024x1024"
         if count is not None:
             body["count"] = count
         if model is not None:
@@ -88,9 +88,9 @@ class AsyncFlux:
     async def generate(
         self,
         *,
+        size: str,
         action: Literal["generate", "edit"],
         prompt: str,
-        size: str | None = None,
         count: float | None = None,
         model: FluxModel | None = None,
         image_url: str | None = None,
@@ -103,9 +103,9 @@ class AsyncFlux:
     ) -> AsyncTaskHandle:
         """Flux AI image generation API, generates 1 image per request."""
         body: dict[str, Any] = {}
+        body["size"] = size
         body["action"] = action
         body["prompt"] = prompt
-        body["size"] = size if size is not None else "1024x1024"
         if count is not None:
             body["count"] = count
         if model is not None:

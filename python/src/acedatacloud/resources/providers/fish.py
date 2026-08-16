@@ -39,7 +39,7 @@ class Fish:
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
-        references: list[Any] | None = None,
+        references: list[dict[str, Any]] | None = None,
         mp3_bitrate: int | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
@@ -81,7 +81,8 @@ class Fish:
             body["chunk_length"] = chunk_length
         if opus_bitrate is not None:
             body["opus_bitrate"] = opus_bitrate
-        body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
+        if reference_id is not None:
+            body["reference_id"] = reference_id
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
         if min_chunk_length is not None:
@@ -152,7 +153,7 @@ class AsyncFish:
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
-        references: list[Any] | None = None,
+        references: list[dict[str, Any]] | None = None,
         mp3_bitrate: int | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
@@ -194,7 +195,8 @@ class AsyncFish:
             body["chunk_length"] = chunk_length
         if opus_bitrate is not None:
             body["opus_bitrate"] = opus_bitrate
-        body["reference_id"] = reference_id if reference_id is not None else "d7900c21663f485ab63ebdb7e5905036"
+        if reference_id is not None:
+            body["reference_id"] = reference_id
         if max_new_tokens is not None:
             body["max_new_tokens"] = max_new_tokens
         if min_chunk_length is not None:

@@ -1,0 +1,590 @@
+{
+  "paths": {
+    "/minimax/videos": {
+      "post": {
+        "summary": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "task_id": "c0f63a98-a7dc-4a09-a1fb-46d32b312a28",
+                    "trace_id": "trace_7f8c2b1a"
+                  },
+                  "required": [
+                    "task_id",
+                    "trace_id"
+                  ],
+                  "properties": {
+                    "task_id": {
+                      "type": "string",
+                      "description": "Asynchronous task ID, used to obtain status and results through the MiniMax H3 task query interface."
+                    },
+                    "trace_id": {
+                      "type": "string",
+                      "description": "Request tracking ID."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The default synchronous mode returns the complete video task; the explicit asynchronous mode returns the task identifier."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkerError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                },
+                "example": {
+                  "type": "error",
+                  "error": {
+                    "type": "bad_request_error",
+                    "message": "The request parameters are invalid.",
+                    "http_code": "400"
+                  },
+                  "request_id": "req_7f8c2b1a"
+                }
+              }
+            },
+            "description": "Parameter error."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayError"
+                },
+                "example": {
+                  "error": {
+                    "code": "invalid_token",
+                    "message": "The token is invalid."
+                  },
+                  "trace_id": "trace_7f8c2b1a"
+                }
+              }
+            },
+            "description": "Authentication failed."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GatewayError"
+                },
+                "example": {
+                  "error": {
+                    "code": "used_up",
+                    "message": "The available balance is insufficient for this request."
+                  },
+                  "trace_id": "trace_7f8c2b1a"
+                }
+              }
+            },
+            "description": "Insufficient balance, application restricted, or no access to this interface."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerError"
+                },
+                "example": {
+                  "type": "error",
+                  "error": {
+                    "type": "unprocessable_entity_error",
+                    "message": "The request did not pass content safety checks.",
+                    "http_code": "422"
+                  },
+                  "request_id": "req_7f8c2b1a"
+                }
+              }
+            },
+            "description": "Content security check failed."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkerError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                },
+                "example": {
+                  "type": "error",
+                  "error": {
+                    "type": "rate_limit_error",
+                    "message": "Too many requests. Try again later.",
+                    "http_code": "429"
+                  },
+                  "request_id": "req_7f8c2b1a"
+                }
+              }
+            },
+            "description": "Requests are too frequent."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WorkerError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/GatewayError"
+                    }
+                  ]
+                },
+                "example": {
+                  "type": "error",
+                  "error": {
+                    "type": "server_error",
+                    "message": "The service is temporarily unavailable.",
+                    "http_code": "500"
+                  },
+                  "request_id": "req_7f8c2b1a"
+                }
+              }
+            },
+            "description": "The service is temporarily unavailable."
+          }
+        },
+        "operationId": "createMinimaxVideos",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "model": "MiniMax-H3",
+                  "ratio": "adaptive",
+                  "content": [
+                    {
+                      "text": "让画面中的人物自然移动，镜头缓慢推进",
+                      "type": "text"
+                    },
+                    {
+                      "role": "first_frame",
+                      "type": "image_url",
+                      "image_url": {
+                        "url": "https://cdn.acedata.cloud/b1c82e4937.png"
+                      }
+                    }
+                  ],
+                  "duration": 5,
+                  "resolution": "2K"
+                },
+                "required": [
+                  "model",
+                  "content",
+                  "resolution",
+                  "duration"
+                ],
+                "properties": {
+                  "async": {
+                    "rank": 60,
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Set to true to immediately return the task ID without the need for a callback_url, and you can poll through the Tasks API."
+                  },
+                  "model": {
+                    "enum": [
+                      "MiniMax-H3"
+                    ],
+                    "rank": 10,
+                    "type": "string",
+                    "example": "MiniMax-H3",
+                    "description": "Model name, currently only supports the official value `MiniMax-H3`."
+                  },
+                  "ratio": {
+                    "enum": [
+                      "adaptive",
+                      "21:9",
+                      "16:9",
+                      "4:3",
+                      "1:1",
+                      "3:4",
+                      "9:16"
+                    ],
+                    "rank": 50,
+                    "type": "string",
+                    "description": "Video aspect ratio. Text-to-video is required and cannot be `adaptive`; image-to-video defaults to `adaptive`; multimodal reference is optional."
+                  },
+                  "content": {
+                    "rank": 20,
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "type",
+                            "text"
+                          ],
+                          "properties": {
+                            "text": {
+                              "type": "string",
+                              "maxLength": 7000,
+                              "minLength": 1,
+                              "description": "Video prompt words, all scenes must be filled in and not exceed 7000 characters."
+                            },
+                            "type": {
+                              "enum": [
+                                "text"
+                              ],
+                              "type": "string",
+                              "description": "Content type: text, image, video, or audio."
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "type",
+                            "image_url"
+                          ],
+                          "properties": {
+                            "role": {
+                              "enum": [
+                                "first_frame",
+                                "last_frame",
+                                "reference_image"
+                              ],
+                              "type": "string",
+                              "description": "Material usage. The first and last frames use `first_frame` / `last_frame`; reference materials use `reference_image` / `reference_video` / `reference_audio`."
+                            },
+                            "type": {
+                              "enum": [
+                                "image_url"
+                              ],
+                              "type": "string",
+                              "description": "Content type: text, image, video, or audio."
+                            },
+                            "image_url": {
+                              "$ref": "#/components/schemas/MediaUrl"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "type",
+                            "video_url",
+                            "role"
+                          ],
+                          "properties": {
+                            "role": {
+                              "enum": [
+                                "reference_video"
+                              ],
+                              "type": "string",
+                              "description": "Material usage. The first and last frames use `first_frame` / `last_frame`; reference materials use `reference_image` / `reference_video` / `reference_audio`."
+                            },
+                            "type": {
+                              "enum": [
+                                "video_url"
+                              ],
+                              "type": "string",
+                              "description": "Content type: text, image, video, or audio."
+                            },
+                            "video_url": {
+                              "$ref": "#/components/schemas/MediaUrl"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "type",
+                            "audio_url",
+                            "role"
+                          ],
+                          "properties": {
+                            "role": {
+                              "enum": [
+                                "reference_audio"
+                              ],
+                              "type": "string",
+                              "description": "Material usage. The first and last frames use `first_frame` / `last_frame`; reference materials use `reference_image` / `reference_video` / `reference_audio`."
+                            },
+                            "type": {
+                              "enum": [
+                                "audio_url"
+                              ],
+                              "type": "string",
+                              "description": "Content type: text, image, video, or audio."
+                            },
+                            "audio_url": {
+                              "$ref": "#/components/schemas/MediaUrl"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      ]
+                    },
+                    "minItems": 1,
+                    "description": "Official MiniMax H3 V2 multimodal input array. Each request must include a non-empty `text`; supports images at the beginning and end or multimodal reference materials, but the two types of scenes cannot be mixed."
+                  },
+                  "duration": {
+                    "rank": 40,
+                    "type": "integer",
+                    "maximum": 15,
+                    "minimum": 4,
+                    "description": "Video duration, required, integer between 4 and 15 seconds."
+                  },
+                  "resolution": {
+                    "enum": [
+                      "768P",
+                      "2K"
+                    ],
+                    "rank": 30,
+                    "type": "string",
+                    "description": "Video resolution, required, optional `768P` or `2K`."
+                  },
+                  "callback_url": {
+                    "rank": 70,
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Optional task status callback URL. When provided, asynchronous mode is automatically enabled, the interface immediately returns the task identifier, and the final result will be sent to this URL."
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API Server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "MediaUrl": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Media address, supports public network URL, `mm_file://{file_id}` or the corresponding media type's Base64 data URI."
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "TaskUsage": {
+        "type": "object",
+        "properties": {
+          "input_seconds": {
+            "type": "integer"
+          },
+          "total_seconds": {
+            "type": "integer"
+          },
+          "output_seconds": {
+            "type": "integer"
+          },
+          "input_image_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "VideoTask": {
+        "type": "object",
+        "required": [
+          "id",
+          "model",
+          "status",
+          "task_type",
+          "modality"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "error": {
+            "$ref": "#/components/schemas/TaskError"
+          },
+          "model": {
+            "enum": [
+              "MiniMax-H3"
+            ],
+            "type": "string"
+          },
+          "ratio": {
+            "type": "string"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/TaskUsage"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "content": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "modality": {
+            "enum": [
+              "video"
+            ],
+            "type": "string"
+          },
+          "task_type": {
+            "enum": [
+              "generation"
+            ],
+            "type": "string"
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "resolution": {
+            "enum": [
+              "768P",
+              "2K"
+            ],
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "integer"
+          }
+        }
+      },
+      "WorkerError": {
+        "type": "object",
+        "required": [
+          "type",
+          "error",
+          "request_id"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "error"
+            ],
+            "type": "string"
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "type",
+              "message",
+              "http_code"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Machine-readable error category."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable error message."
+              },
+              "http_code": {
+                "type": "string",
+                "description": "HTTP status code as a string."
+              }
+            }
+          },
+          "request_id": {
+            "type": "string",
+            "description": "Request ID for support and diagnostics."
+          }
+        }
+      },
+      "GatewayError": {
+        "type": "object",
+        "required": [
+          "error",
+          "trace_id"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Stable machine-readable error code."
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable error message."
+              }
+            }
+          },
+          "trace_id": {
+            "type": "string",
+            "description": "Request trace ID for support and diagnostics."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

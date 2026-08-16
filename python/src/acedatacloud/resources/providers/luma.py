@@ -54,7 +54,8 @@ class Luma:
         body: dict[str, Any] = {}
         body["loop"] = loop if loop is not None else False
         body["action"] = action if action is not None else "generate"
-        body["prompt"] = prompt if prompt is not None else "Astronauts shuttle from space to volcano"
+        if prompt is not None:
+            body["prompt"] = prompt
         body["timeout"] = timeout if timeout is not None else 300
         if video_id is not None:
             body["video_id"] = video_id
@@ -63,10 +64,10 @@ class Luma:
         body["enhancement"] = enhancement if enhancement is not None else True
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
-        body["end_image_url"] = end_image_url if end_image_url is not None else "https://cdn.acedata.cloud/0iad3k.png"
-        body["start_image_url"] = (
-            start_image_url if start_image_url is not None else "https://cdn.acedata.cloud/r9vsv9.png"
-        )
+        if end_image_url is not None:
+            body["end_image_url"] = end_image_url
+        if start_image_url is not None:
+            body["start_image_url"] = start_image_url
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -108,7 +109,8 @@ class AsyncLuma:
         body: dict[str, Any] = {}
         body["loop"] = loop if loop is not None else False
         body["action"] = action if action is not None else "generate"
-        body["prompt"] = prompt if prompt is not None else "Astronauts shuttle from space to volcano"
+        if prompt is not None:
+            body["prompt"] = prompt
         body["timeout"] = timeout if timeout is not None else 300
         if video_id is not None:
             body["video_id"] = video_id
@@ -117,10 +119,10 @@ class AsyncLuma:
         body["enhancement"] = enhancement if enhancement is not None else True
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
-        body["end_image_url"] = end_image_url if end_image_url is not None else "https://cdn.acedata.cloud/0iad3k.png"
-        body["start_image_url"] = (
-            start_image_url if start_image_url is not None else "https://cdn.acedata.cloud/r9vsv9.png"
-        )
+        if end_image_url is not None:
+            body["end_image_url"] = end_image_url
+        if start_image_url is not None:
+            body["start_image_url"] = start_image_url
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

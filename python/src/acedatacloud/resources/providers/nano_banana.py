@@ -80,7 +80,8 @@ class NanoBanana:
             body["image_urls"] = image_urls
         if resolution is not None:
             body["resolution"] = resolution
-        body["aspect_ratio"] = aspect_ratio if aspect_ratio is not None else "1:1"
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -128,7 +129,8 @@ class AsyncNanoBanana:
             body["image_urls"] = image_urls
         if resolution is not None:
             body["resolution"] = resolution
-        body["aspect_ratio"] = aspect_ratio if aspect_ratio is not None else "1:1"
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

@@ -63,10 +63,10 @@ export class Happyhorse {
     body["model"] = options.model ?? "happyhorse-1.1-t2v";
     body["ratio"] = options.ratio ?? "16:9";
     body["action"] = options.action ?? "generate";
-    body["prompt"] = options.prompt ?? "A cinematic white horse lifts its head, the mane moves gently in the sunrise wind, slow camera push in, warm film lighting";
+    if (options.prompt !== undefined) body["prompt"] = options.prompt;
     body["duration"] = options.duration ?? 5;
-    body["image_url"] = options.imageUrl ?? "https://cdn.acedata.cloud/b1c82e4937.png";
-    body["video_url"] = options.videoUrl ?? "https://platform2.cdn.acedata.cloud/happyhorse/27837f92-d1c1-4db4-ad9a-4e6e81d9f6c1.mp4";
+    if (options.imageUrl !== undefined) body["image_url"] = options.imageUrl;
+    if (options.videoUrl !== undefined) body["video_url"] = options.videoUrl;
     body["watermark"] = options.watermark ?? false;
     if (options.imageUrls !== undefined) body["image_urls"] = options.imageUrls;
     body["resolution"] = options.resolution ?? "1080P";

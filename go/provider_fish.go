@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Fish is the fish provider client.
 type Fish struct {
 	t *transport
@@ -26,7 +25,7 @@ type FishGenerateRequest struct {
 	// Is the input text subjected to text normalization processing by the upstream?
 	Normalize bool
 	// Inline reference audio samples will be forwarded upstream as is, for zero-shot voice cloning.
-	References []any
+	References []map[string]any
 	// MP3 bitrate when `format=mp3`.
 	Mp3Bitrate int
 	// Output the audio sampling rate (e.g., 16000, 22050, 44100).
@@ -89,8 +88,6 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	}
 	if r.ReferenceID != "" {
 		body["reference_id"] = r.ReferenceID
-	} else {
-		body["reference_id"] = "d7900c21663f485ab63ebdb7e5905036"
 	}
 	if r.MaxNewTokens != 0 {
 		body["max_new_tokens"] = r.MaxNewTokens
@@ -147,7 +144,7 @@ type FishModelRequest struct {
 	Description string
 	// If it is `true`, the upstream service will generate a sample voice after the training is completed.
 	GenerateSample bool
-	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before 
+	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before
 	EnhanceAudioQuality bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string

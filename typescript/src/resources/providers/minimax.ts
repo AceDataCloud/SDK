@@ -8,6 +8,7 @@
 import { Transport } from '../../runtime/transport';
 import { TaskHandle } from '../../runtime/tasks';
 
+
 function taskId(result: Record<string, unknown>): string {
   if (typeof result?.task_id === 'string') return result.task_id;
   const data = result?.data as Record<string, unknown> | undefined;
@@ -15,19 +16,20 @@ function taskId(result: Record<string, unknown>): string {
   return typeof result?.id === 'string' ? result.id : '';
 }
 
-
 export interface MinimaxGenerateOptions {
-  /** Minimax Videos Model */
+  /** Model name, currently only supports the official value `MiniMax-H3`. */
   model: "MiniMax-H3";
-  /** Minimax Videos Content */
+  /** Official MiniMax H3 V2 multimodal input array. Each request must include a non-empty `text`; supports images at the beginning and end or multimodal reference materials, but the two types of scenes cannot be mixed. */
   content: Array<Record<string, unknown>>;
-  /** Minimax Videos Resolution */
-  resolution: "768P" | "2K";
-  /** Minimax Videos Duration */
+  /** Video duration, required, integer between 4 and 15 seconds. */
   duration: number;
-  /** Minimax Videos Ratio */
+  /** Video resolution, required, optional `768P` or `2K`. */
+  resolution: "768P" | "2K";
+  /** Video aspect ratio. Text-to-video is required and cannot be `adaptive`; image-to-video defaults to `adaptive`; multimodal reference is optional. */
   ratio?: "adaptive" | "21:9" | "16:9" | "4:3" | "1:1" | "3:4" | "9:16";
+  /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
+  /** Wait for completion before returning the handle. */
   wait?: boolean;
   pollInterval?: number;
   maxWait?: number;
@@ -40,13 +42,13 @@ export interface MinimaxGenerateOptions {
 export class Minimax {
   constructor(private transport: Transport) {}
 
-  /** Minimax Videos */
+  /** Call /minimax/videos. */
   async generate(options: MinimaxGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;
     body["content"] = options.content;
-    body["resolution"] = options.resolution;
     body["duration"] = options.duration;
+    body["resolution"] = options.resolution;
     if (options.ratio !== undefined) body["ratio"] = options.ratio;
     for (const [key, value] of Object.entries(options)) {
       if (!["async", "callbackUrl", "content", "duration", "maxWait", "model", "pollInterval", "ratio", "resolution", "wait"].includes(key) && value !== undefined) {

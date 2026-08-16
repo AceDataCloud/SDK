@@ -68,11 +68,11 @@ export class Wan {
     body["audio"] = options.audio ?? false;
     if (options.duration !== undefined) body["duration"] = options.duration;
     if (options.audioUrl !== undefined) body["audio_url"] = options.audioUrl;
-    body["image_url"] = options.imageUrl ?? "https://cdn.acedata.cloud/r9vsv9.png";
+    if (options.imageUrl !== undefined) body["image_url"] = options.imageUrl;
     if (options.shotType !== undefined) body["shot_type"] = options.shotType;
     if (options.resolution !== undefined) body["resolution"] = options.resolution;
     body["prompt_extend"] = options.promptExtend ?? false;
-    body["negative_prompt"] = options.negativePrompt ?? "Astronauts shuttle from space to volcano";
+    if (options.negativePrompt !== undefined) body["negative_prompt"] = options.negativePrompt;
     if (options.referenceVideoUrls !== undefined) body["reference_video_urls"] = options.referenceVideoUrls;
     for (const [key, value] of Object.entries(options)) {
       if (!["action", "async", "audio", "audioUrl", "callbackUrl", "duration", "imageUrl", "maxWait", "model", "negativePrompt", "pollInterval", "prompt", "promptExtend", "referenceVideoUrls", "resolution", "shotType", "size", "wait"].includes(key) && value !== undefined) {

@@ -21,7 +21,8 @@
    {
     "id": "ab512c42-324c-42e6-8d79-49a5042f3548",
     "path": "/maestro/videos",
-    "name": "Maestro Videos API"
+    "name": "Maestro Videos API",
+    "pollable": true
    }
   ],
   "tasks": "/maestro/tasks"
@@ -30,9 +31,9 @@
   "category": "AI Video",
   "endpoints": [
    {
-    "id": "minimax",
+    "id": "64f22fd9-0efd-445e-b0b1-135682fd66d7",
     "path": "/minimax/videos",
-    "name": "Minimax Videos"
+    "name": "MiniMax H3 Videos API"
    }
   ],
   "tasks": "/minimax/tasks"

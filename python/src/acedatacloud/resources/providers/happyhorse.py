@@ -11,12 +11,6 @@ from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-_DEFAULT_GENERATE_PROMPT = (
-    "A cinematic white horse lifts its head, the mane moves gently in the sunrise wind, slow camera push "
-    "in, warm film lighting"
-)
-_DEFAULT_GENERATE_VIDEO_URL = "https://platform2.cdn.acedata.cloud/happyhorse/27837f92-d1c1-4db4-ad9a-4e6e81d9f6c1.mp4"
-
 HappyhorseModel = Literal[
     "happyhorse-1.0-t2v",
     "happyhorse-1.1-t2v",
@@ -88,10 +82,13 @@ class Happyhorse:
         body["model"] = model if model is not None else "happyhorse-1.1-t2v"
         body["ratio"] = ratio if ratio is not None else "16:9"
         body["action"] = action if action is not None else "generate"
-        body["prompt"] = prompt if prompt is not None else _DEFAULT_GENERATE_PROMPT
+        if prompt is not None:
+            body["prompt"] = prompt
         body["duration"] = duration if duration is not None else 5
-        body["image_url"] = image_url if image_url is not None else "https://cdn.acedata.cloud/b1c82e4937.png"
-        body["video_url"] = video_url if video_url is not None else _DEFAULT_GENERATE_VIDEO_URL
+        if image_url is not None:
+            body["image_url"] = image_url
+        if video_url is not None:
+            body["video_url"] = video_url
         body["watermark"] = watermark if watermark is not None else False
         if image_urls is not None:
             body["image_urls"] = image_urls
@@ -143,10 +140,13 @@ class AsyncHappyhorse:
         body["model"] = model if model is not None else "happyhorse-1.1-t2v"
         body["ratio"] = ratio if ratio is not None else "16:9"
         body["action"] = action if action is not None else "generate"
-        body["prompt"] = prompt if prompt is not None else _DEFAULT_GENERATE_PROMPT
+        if prompt is not None:
+            body["prompt"] = prompt
         body["duration"] = duration if duration is not None else 5
-        body["image_url"] = image_url if image_url is not None else "https://cdn.acedata.cloud/b1c82e4937.png"
-        body["video_url"] = video_url if video_url is not None else _DEFAULT_GENERATE_VIDEO_URL
+        if image_url is not None:
+            body["image_url"] = image_url
+        if video_url is not None:
+            body["video_url"] = video_url
         body["watermark"] = watermark if watermark is not None else False
         if image_urls is not None:
             body["image_urls"] = image_urls

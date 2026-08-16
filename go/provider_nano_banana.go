@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // NanoBanana is the nano-banana provider client.
 type NanoBanana struct {
 	t *transport
@@ -19,7 +18,7 @@ type NanoBananaGenerateRequest struct {
 	Prompt string
 	// The number of images to be generated or edited supports 1 to 4, with a default of 1. If some images fail to ge
 	Count int
-	// Models used for generating images. If not specified, the default is `nano-banana`. `nano-banana-2-lite` is an 
+	// Models used for generating images. If not specified, the default is `nano-banana`. `nano-banana-2-lite` is an
 	Model string
 	// Link to the image that needs to be edited. It can be an accessible http or https URL, or a Base64 encoded imag
 	ImageURLs []string
@@ -55,8 +54,6 @@ func (r NanoBananaGenerateRequest) toBody() map[string]any {
 	}
 	if r.AspectRatio != "" {
 		body["aspect_ratio"] = r.AspectRatio
-	} else {
-		body["aspect_ratio"] = "1:1"
 	}
 	body["async"] = true
 	if r.Async != nil {

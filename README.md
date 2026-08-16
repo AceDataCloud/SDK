@@ -83,17 +83,22 @@ In Python the hook is the same shape — any callable that returns
 `{"headers": {"X-Payment": "<base64-envelope>"}}`. See
 [python/README.md](python/README.md#paying-with-x402-instead-of-a-bearer-token).
 
-## Spec Overlays
+## Provider generation
 
-Machine-readable metadata in [spec/overlays](spec/overlays/) describing the API
-surface. **Note: nothing reads these files today** — the SDKs are hand-written
-and kept in sync from `AceDataCloud/Docs` (see
-[.github/copilot-instructions.md](.github/copilot-instructions.md)). The overlays
-are a design artifact for a generator that was planned but never built, and they
-are stale — they cover only the original nine domains.
+Most provider-axis clients are generated for Python, TypeScript, and Go from the
+pinned OpenAPI snapshots in [`scripts/specs`](scripts/specs/) and the curated
+[`scripts/services.json`](scripts/services.json) manifest:
 
-- `domains.yaml` — service domains and grouping
-- `operations.yaml` — HTTP method + path for each operation
-- `tasks.yaml` — which operations return async tasks
-- `streams.yaml` — which operations support SSE streaming
-- `uploads.yaml` — which operations accept file uploads
+```bash
+python3 scripts/generate_providers.py \
+  --manifest scripts/services.json \
+  --specs scripts/specs \
+  --languages python,typescript,go
+```
+
+Kling, OpenAI, Serp, ShortURL, WebExtrator, and Veo remain hand-written because
+they contain validation or helper behavior that the selected OpenAPI operations
+do not fully express. CI reruns the generator and requires a clean working tree.
+
+The older files in [spec/overlays](spec/overlays/) are inactive design artifacts;
+they are not generator inputs and cover only the original nine domains.

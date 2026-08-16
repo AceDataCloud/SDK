@@ -55,7 +55,7 @@ export class NanoBanana {
     if (options.model !== undefined) body["model"] = options.model;
     if (options.imageUrls !== undefined) body["image_urls"] = options.imageUrls;
     if (options.resolution !== undefined) body["resolution"] = options.resolution;
-    body["aspect_ratio"] = options.aspectRatio ?? "1:1";
+    if (options.aspectRatio !== undefined) body["aspect_ratio"] = options.aspectRatio;
     for (const [key, value] of Object.entries(options)) {
       if (!["action", "aspectRatio", "async", "callbackUrl", "count", "imageUrls", "maxWait", "model", "pollInterval", "prompt", "resolution", "wait"].includes(key) && value !== undefined) {
         body[key] = value;

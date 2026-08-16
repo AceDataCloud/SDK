@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Seedance is the seedance provider client.
 type Seedance struct {
 	t *transport
@@ -16,7 +15,7 @@ type SeedanceGenerateRequest struct {
 	// $t(seedance_videos_model)
 	Model string
 	// $t(seedance_videos)
-	Content []any
+	Content []map[string]any
 	// $t(seedance_videos_resolution)
 	Resolution string
 	// $t(seedance_videos_ratio)

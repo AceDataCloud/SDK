@@ -17,12 +17,12 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface FluxGenerateOptions {
+  /** Image size specifications. */
+  size: string;
   /** Types of operations for generating images. If it is `generate`, a new image will be created based on the prompt; if it is `edit`, the original image will be edited according to the prompt and `image_url`. */
   action: "generate" | "edit";
   /** Prompts for generating images. */
   prompt: string;
-  /** Image size specifications. */
-  size?: string;
   /** Number of generated images. */
   count?: number;
   /** Model used for generating images. */
@@ -47,9 +47,9 @@ export class Flux {
   /** Flux AI image generation API, generates 1 image per request. */
   async generate(options: FluxGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
+    body["size"] = options.size;
     body["action"] = options.action;
     body["prompt"] = options.prompt;
-    body["size"] = options.size ?? "1024x1024";
     if (options.count !== undefined) body["count"] = options.count;
     if (options.model !== undefined) body["model"] = options.model;
     if (options.imageUrl !== undefined) body["image_url"] = options.imageUrl;

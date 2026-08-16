@@ -28,7 +28,7 @@ export interface SeedreamGenerateOptions {
   /** Reference image links for image editing are required, supporting accessible http/https URLs, or base64 encoded image strings in the format `data:image/png;base64,iVBORw0KG...`. Each image must not exceed 10MB in size. This parameter is mandatory when using image-to-image models (such as `doubao-seededit-3.0-i2i`). */
   image?: string[];
   /** List of tools that can be called by the model. Currently, only `web_search` is supported. Applicable only to `doubao-seedream-5.0-lite`. */
-  tools?: unknown[];
+  tools?: Array<Record<string, unknown>>;
   /** Whether to return all images in a streaming manner, default is `false`. Only supports `doubao-seedream-5.0-lite`, `doubao-seedream-4.5`, and `doubao-seedream-4.0`. */
   stream?: boolean;
   /** Whether to add AI-generated watermark, default is `true`. */

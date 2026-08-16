@@ -23,7 +23,7 @@ type SeedreamGenerateRequest struct {
 	// Reference image links for image editing are required, supporting accessible http/https URLs, or base64 encoded
 	Image []string
 	// List of tools that can be called by the model. Currently, only `web_search` is supported. Applicable only to `
-	Tools []any
+	Tools []map[string]any
 	// Whether to return all images in a streaming manner, default is `false`. Only supports `doubao-seedream-5.0-lit
 	Stream bool
 	// Whether to add AI-generated watermark, default is `true`.

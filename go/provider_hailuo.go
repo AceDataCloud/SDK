@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Hailuo is the hailuo provider client.
 type Hailuo struct {
 	t *transport
@@ -37,8 +36,6 @@ func (r HailuoGenerateRequest) toBody() map[string]any {
 	}
 	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
-	} else {
-		body["prompt"] = "\u706b\u6c14"
 	}
 	if r.FirstImageURL != "" {
 		body["first_image_url"] = r.FirstImageURL
@@ -58,7 +55,7 @@ func (r HailuoGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Minimax Hailuo AI video generation API. Supports minimax-t2v for text-to-video, minimax-i2v for image-to-video, and minimax-i2v-director for director 
+// Generate Minimax Hailuo AI video generation API. Supports minimax-t2v for text-to-video, minimax-i2v for image-to-video, and minimax-i2v-director for director
 func (c *Hailuo) Generate(ctx context.Context, req HailuoGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

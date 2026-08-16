@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Luma is the luma provider client.
 type Luma struct {
 	t *transport
@@ -23,7 +22,7 @@ type LumaGenerateRequest struct {
 	Timeout float64
 	// The unique identifier of the generated video used for the continuation operation (`extend`). If both are speci
 	VideoID string
-	// The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time, 
+	// The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time,
 	VideoURL string
 	// Whether to enable automatic optimization enhancement for the input prompt text, suitable for use when unsure h
 	Enhancement bool
@@ -51,8 +50,6 @@ func (r LumaGenerateRequest) toBody() map[string]any {
 	}
 	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
-	} else {
-		body["prompt"] = "Astronauts shuttle from space to volcano"
 	}
 	if r.Timeout != 0 {
 		body["timeout"] = r.Timeout
@@ -71,13 +68,9 @@ func (r LumaGenerateRequest) toBody() map[string]any {
 	}
 	if r.EndImageURL != "" {
 		body["end_image_url"] = r.EndImageURL
-	} else {
-		body["end_image_url"] = "https://cdn.acedata.cloud/0iad3k.png"
 	}
 	if r.StartImageURL != "" {
 		body["start_image_url"] = r.StartImageURL
-	} else {
-		body["start_image_url"] = "https://cdn.acedata.cloud/r9vsv9.png"
 	}
 	body["async"] = true
 	if r.Async != nil {

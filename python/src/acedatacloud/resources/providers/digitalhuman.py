@@ -54,7 +54,8 @@ class Digitalhuman:
         """Digital Human video generation API — turn a portrait plus audio or text into a talking-head video."""
         body: dict[str, Any] = {}
         body["video_url"] = video_url
-        body["text"] = text if text is not None else "大家好，这是离线生成的数字人。"
+        if text is not None:
+            body["text"] = text
         body["speed"] = speed if speed is not None else 1.0
         body["steps"] = steps if steps is not None else 40
         body["engine"] = engine if engine is not None else "latentsync"
@@ -137,7 +138,8 @@ class AsyncDigitalhuman:
         """Digital Human video generation API — turn a portrait plus audio or text into a talking-head video."""
         body: dict[str, Any] = {}
         body["video_url"] = video_url
-        body["text"] = text if text is not None else "大家好，这是离线生成的数字人。"
+        if text is not None:
+            body["text"] = text
         body["speed"] = speed if speed is not None else 1.0
         body["steps"] = steps if steps is not None else 40
         body["engine"] = engine if engine is not None else "latentsync"
