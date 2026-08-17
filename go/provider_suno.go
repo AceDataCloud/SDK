@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Suno is the suno provider client.
 type Suno struct {
 	t *transport
@@ -19,7 +18,7 @@ type SunoGenerateRequest struct {
 	Model string
 	// Music style description. `chirp-v3-5` and `chirp-v4` up to 200 characters; `chirp-v4-5` and above (including `
 	Style string
-	// Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including 
+	// Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including
 	Title string
 	// Types of operations for generating music. `generate`: Generate audio based on prompts; `extend`: Continue gene
 	Action string
@@ -86,8 +85,6 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	}
 	if r.Model != "" {
 		body["model"] = r.Model
-	} else {
-		body["model"] = "chirp-v5-5"
 	}
 	if r.Style != "" {
 		body["style"] = r.Style
@@ -97,11 +94,11 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	}
 	if r.Action != "" {
 		body["action"] = r.Action
-	} else {
-		body["action"] = "generate"
 	}
 	body["custom"] = r.Custom
-	body["prompt"] = r.Prompt
+	if r.Prompt != nil {
+		body["prompt"] = r.Prompt
+	}
 	if r.AudioID != "" {
 		body["audio_id"] = r.AudioID
 	}
@@ -111,7 +108,9 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	if r.Weirdness != 0 {
 		body["weirdness"] = r.Weirdness
 	}
-	body["audio_urls"] = r.AudioURLs
+	if r.AudioURLs != nil {
+		body["audio_urls"] = r.AudioURLs
+	}
 	if r.PersonaID != "" {
 		body["persona_id"] = r.PersonaID
 	}

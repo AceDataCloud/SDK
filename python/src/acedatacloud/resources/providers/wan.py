@@ -72,15 +72,15 @@ class Wan:
             body["duration"] = duration
         if audio_url is not None:
             body["audio_url"] = audio_url
-        body["image_url"] = image_url if image_url is not None else "https://cdn.acedata.cloud/r9vsv9.png"
+        if image_url is not None:
+            body["image_url"] = image_url
         if shot_type is not None:
             body["shot_type"] = shot_type
         if resolution is not None:
             body["resolution"] = resolution
         body["prompt_extend"] = prompt_extend if prompt_extend is not None else False
-        body["negative_prompt"] = (
-            negative_prompt if negative_prompt is not None else "Astronauts shuttle from space to volcano"
-        )
+        if negative_prompt is not None:
+            body["negative_prompt"] = negative_prompt
         if reference_video_urls is not None:
             body["reference_video_urls"] = reference_video_urls
         body.update(extra)
@@ -135,15 +135,15 @@ class AsyncWan:
             body["duration"] = duration
         if audio_url is not None:
             body["audio_url"] = audio_url
-        body["image_url"] = image_url if image_url is not None else "https://cdn.acedata.cloud/r9vsv9.png"
+        if image_url is not None:
+            body["image_url"] = image_url
         if shot_type is not None:
             body["shot_type"] = shot_type
         if resolution is not None:
             body["resolution"] = resolution
         body["prompt_extend"] = prompt_extend if prompt_extend is not None else False
-        body["negative_prompt"] = (
-            negative_prompt if negative_prompt is not None else "Astronauts shuttle from space to volcano"
-        )
+        if negative_prompt is not None:
+            body["negative_prompt"] = negative_prompt
         if reference_video_urls is not None:
             body["reference_video_urls"] = reference_video_urls
         body.update(extra)

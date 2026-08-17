@@ -2,13 +2,16 @@
 
 ## Repository Structure
 
-Three SDK implementations, all hand-written (there is no code generator):
+Three SDK implementations share a provider generator:
 
 - `python/` — `acedatacloud` on PyPI
 - `typescript/` — `@acedatacloud/sdk` on npm
 - `go/` — `github.com/AceDataCloud/SDK/go`
 
-**All three must stay in step.** Go has historically lagged; do not add to that gap.
+`scripts/generate_providers.py` reads `scripts/services.json` and pinned OpenAPI
+snapshots under `scripts/specs/`. Kling, OpenAI, Serp, ShortURL, WebExtrator,
+and Veo remain hand-written exceptions. **All three languages must stay in
+step.** Go has historically lagged; do not add to that gap.
 
 ## Source of Truth
 
@@ -55,14 +58,11 @@ When Docs changes, update **the provider class** for that service:
    schema. Add new parameters; do not remove existing ones unless the API did.
 2. **Enums** — model names and other `enum` values become `Literal` types
    (Python), string unions (TypeScript), typed constants (Go).
-3. **Required-ness** — mirror the spec's `required` list, with two known traps:
-   - A spec's `required` list can **understate** what the upstream enforces.
-     `/flux/images` declares only `action` and `prompt` required yet rejects a
-     request without `size`. When a property carries an `example` but is not
-     listed required, prefer sending the example over omitting it.
-   - An `example` that **contradicts the property's own `enum` is wrong**. Flux
-     documents `model` with the example `"generate"` — an *action* value, not a
-     model. Trust the enum over the example.
+3. **Required-ness and defaults** — mirror the spec's `required` list and only
+   emit a request default when the schema defines `default`. An `example` is
+   illustrative and must never become an implicit request value. If runtime
+   requirements disagree with OpenAPI, fix the canonical contract instead of
+   teaching the generator an undocumented exception.
 4. **Paths** — verify against the OpenAPI `paths` section.
 5. **Task endpoints** — every async service polls `POST /<service>/tasks`.
 
@@ -91,7 +91,7 @@ completion differently, extend the normalizer and add a case to the tests.
   other two match.
 - Do NOT modify `runtime/transport.*` or `runtime/errors.*` unless error codes
   changed.
-- Do NOT modify CI/CD workflows.
+- Keep the deterministic provider-generation check in CI green.
 - Keep backward compatibility: add, don't remove.
 - Base URLs must be identical across languages (`x402.acedata.cloud` for the
   calling plane, `platform.acedata.cloud` for the management plane). Go drifted

@@ -7,6 +7,33 @@ on:
     branches: [main]
 
 jobs:
+  provider-generation:
+    name: Provider Generation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.24"
+
+      - name: Install formatter
+        run: pip install ruff
+
+      - name: Regenerate provider clients
+        run: |
+          python3 scripts/generate_providers.py \
+            --manifest scripts/services.json \
+            --specs scripts/specs \
+            --languages python,typescript,go
+          git diff --exit-code
+
   python-lint:
     name: Python Lint
     runs-on: ubuntu-latest

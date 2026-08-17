@@ -206,7 +206,7 @@ def write_all(services: list[Service], root: Path) -> list[Path]:
         lines.append(f"func (c *Client) {svc.class_name}() *{svc.class_name} {{ return c.providers.{attr} }}")
         lines.append("")
     path = root / "providers_attach.go"
-    path.write_text("\n".join(lines) + "\n")
+    path.write_text("\n".join(lines).rstrip() + "\n")
     written.append(path)
     target.rmdir()
     return written

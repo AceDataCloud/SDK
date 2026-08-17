@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Producer is the producer provider client.
 type Producer struct {
 	t *transport

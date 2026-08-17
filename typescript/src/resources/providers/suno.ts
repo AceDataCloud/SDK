@@ -222,16 +222,16 @@ export class Suno {
   async generate(options: SunoGenerateOptions = {}): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     if (options.lyric !== undefined) body["lyric"] = options.lyric;
-    body["model"] = options.model ?? "chirp-v5-5";
+    if (options.model !== undefined) body["model"] = options.model;
     if (options.style !== undefined) body["style"] = options.style;
     if (options.title !== undefined) body["title"] = options.title;
-    body["action"] = options.action ?? "generate";
+    if (options.action !== undefined) body["action"] = options.action;
     if (options.custom !== undefined) body["custom"] = options.custom;
-    body["prompt"] = options.prompt ?? "A song for Christmas";
+    if (options.prompt !== undefined) body["prompt"] = options.prompt;
     if (options.audioId !== undefined) body["audio_id"] = options.audioId;
     if (options.duration !== undefined) body["duration"] = options.duration;
     if (options.weirdness !== undefined) body["weirdness"] = options.weirdness;
-    body["audio_urls"] = options.audioUrls ?? ["https://cdn1.suno.ai/b481b17a-bf50-4e10-8adc-4d5635050893.mp3"];
+    if (options.audioUrls !== undefined) body["audio_urls"] = options.audioUrls;
     if (options.personaId !== undefined) body["persona_id"] = options.personaId;
     if (options.continueAt !== undefined) body["continue_at"] = options.continueAt;
     if (options.samplesEnd !== undefined) body["samples_end"] = options.samplesEnd;
@@ -251,7 +251,7 @@ export class Suno {
     if (options.underpaintingStart !== undefined) body["underpainting_start"] = options.underpaintingStart;
     if (options.replaceSectionStart !== undefined) body["replace_section_start"] = options.replaceSectionStart;
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "negativeTags", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
+      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "negativeTags", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }

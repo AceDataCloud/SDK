@@ -74,7 +74,7 @@ export class Digitalhuman {
   async generate(options: DigitalhumanGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["video_url"] = options.videoUrl;
-    body["text"] = options.text ?? "\u5927\u5bb6\u597d\uff0c\u8fd9\u662f\u79bb\u7ebf\u751f\u6210\u7684\u6570\u5b57\u4eba\u3002";
+    if (options.text !== undefined) body["text"] = options.text;
     body["speed"] = options.speed ?? 1.0;
     body["steps"] = options.steps ?? 40;
     body["engine"] = options.engine ?? "latentsync";

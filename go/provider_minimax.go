@@ -12,15 +12,15 @@ type Minimax struct {
 
 // MinimaxGenerateRequest is the input to minimax.Generate.
 type MinimaxGenerateRequest struct {
-	// Minimax Videos Model
+	// Model name, currently only supports the official value `MiniMax-H3`.
 	Model string
-	// Minimax Videos Content
+	// Official MiniMax H3 V2 multimodal input array. Each request must include a non-empty `text`; supports images a
 	Content []map[string]any
-	// Minimax Videos Resolution
-	Resolution string
-	// Minimax Videos Duration
+	// Video duration, required, integer between 4 and 15 seconds.
 	Duration int
-	// Minimax Videos Ratio
+	// Video resolution, required, optional `768P` or `2K`.
+	Resolution string
+	// Video aspect ratio. Text-to-video is required and cannot be `adaptive`; image-to-video defaults to `adaptive`;
 	Ratio string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -34,17 +34,17 @@ func (r MinimaxGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["model"] = r.Model
 	body["content"] = r.Content
-	body["resolution"] = r.Resolution
 	body["duration"] = r.Duration
+	body["resolution"] = r.Resolution
 	if r.Ratio != "" {
 		body["ratio"] = r.Ratio
-	}
-	if r.CallbackURL != "" {
-		body["callback_url"] = r.CallbackURL
 	}
 	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
+	}
+	if r.CallbackURL != "" {
+		body["callback_url"] = r.CallbackURL
 	}
 	for k, v := range r.Extra {
 		if _, exists := body[k]; !exists {
@@ -54,7 +54,7 @@ func (r MinimaxGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Minimax Videos
+// Generate Call /minimax/videos.
 func (c *Minimax) Generate(ctx context.Context, req MinimaxGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

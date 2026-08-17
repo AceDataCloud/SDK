@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Digitalhuman is the digitalhuman provider client.
 type Digitalhuman struct {
 	t *transport
@@ -48,8 +47,6 @@ func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	body["video_url"] = r.VideoURL
 	if r.Text != "" {
 		body["text"] = r.Text
-	} else {
-		body["text"] = "\u5927\u5bb6\u597d\uff0c\u8fd9\u662f\u79bb\u7ebf\u751f\u6210\u7684\u6570\u5b57\u4eba\u3002"
 	}
 	if r.Speed != 0 {
 		body["speed"] = r.Speed

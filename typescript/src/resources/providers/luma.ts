@@ -57,14 +57,14 @@ export class Luma {
     const body: Record<string, unknown> = {};
     body["loop"] = options.loop ?? false;
     body["action"] = options.action ?? "generate";
-    body["prompt"] = options.prompt ?? "Astronauts shuttle from space to volcano";
+    if (options.prompt !== undefined) body["prompt"] = options.prompt;
     body["timeout"] = options.timeout ?? 300;
     if (options.videoId !== undefined) body["video_id"] = options.videoId;
     if (options.videoUrl !== undefined) body["video_url"] = options.videoUrl;
     body["enhancement"] = options.enhancement ?? true;
     if (options.aspectRatio !== undefined) body["aspect_ratio"] = options.aspectRatio;
-    body["end_image_url"] = options.endImageUrl ?? "https://cdn.acedata.cloud/0iad3k.png";
-    body["start_image_url"] = options.startImageUrl ?? "https://cdn.acedata.cloud/r9vsv9.png";
+    if (options.endImageUrl !== undefined) body["end_image_url"] = options.endImageUrl;
+    if (options.startImageUrl !== undefined) body["start_image_url"] = options.startImageUrl;
     for (const [key, value] of Object.entries(options)) {
       if (!["action", "aspectRatio", "async", "callbackUrl", "endImageUrl", "enhancement", "loop", "maxWait", "pollInterval", "prompt", "startImageUrl", "timeout", "videoId", "videoUrl", "wait"].includes(key) && value !== undefined) {
         body[key] = value;

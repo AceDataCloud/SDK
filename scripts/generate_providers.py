@@ -26,16 +26,27 @@ from genlib.model import load  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def _format(path: Path) -> None:
+def _format_python(path: Path) -> None:
     import shutil
     import subprocess
 
     ruff = shutil.which("ruff")
     if not ruff:
-        print("ruff not on PATH; generated files left unformatted", file=sys.stderr)
+        print("ruff not on PATH; generated Python files left unformatted", file=sys.stderr)
         return
     subprocess.run([ruff, "check", "--fix", "--quiet", str(path)], check=False)
     subprocess.run([ruff, "format", "--quiet", str(path)], check=False)
+
+
+def _format_go(path: Path) -> None:
+    import shutil
+    import subprocess
+
+    gofmt = shutil.which("gofmt")
+    if not gofmt:
+        print("gofmt not on PATH; generated Go files left unformatted", file=sys.stderr)
+        return
+    subprocess.run([gofmt, "-w", str(path)], check=True)
 
 
 def main() -> int:
@@ -64,7 +75,7 @@ def main() -> int:
     # a diff sees house style, not generator quirks.
     # CI checks formatting across the whole package, so format the package —
     # formatting only the generated subtree leaves the check red.
-    _format(ROOT / "python")
+    _format_python(ROOT / "python")
 
     if "typescript" in languages:
         written = ts_gen.write_all(services, ROOT / "typescript" / "src")
@@ -73,6 +84,8 @@ def main() -> int:
 
     if "go" in languages:
         written = go_gen.write_all(services, ROOT / "go")
+        for path in written:
+            _format_go(path)
         total += len(written)
         print(f"go: {len(written)} files")
 

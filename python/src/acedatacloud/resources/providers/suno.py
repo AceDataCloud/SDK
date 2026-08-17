@@ -102,24 +102,26 @@ class Suno:
         body: dict[str, Any] = {}
         if lyric is not None:
             body["lyric"] = lyric
-        body["model"] = model if model is not None else "chirp-v5-5"
+        if model is not None:
+            body["model"] = model
         if style is not None:
             body["style"] = style
         if title is not None:
             body["title"] = title
-        body["action"] = action if action is not None else "generate"
+        if action is not None:
+            body["action"] = action
         if custom is not None:
             body["custom"] = custom
-        body["prompt"] = prompt if prompt is not None else "A song for Christmas"
+        if prompt is not None:
+            body["prompt"] = prompt
         if audio_id is not None:
             body["audio_id"] = audio_id
         if duration is not None:
             body["duration"] = duration
         if weirdness is not None:
             body["weirdness"] = weirdness
-        body["audio_urls"] = (
-            audio_urls if audio_urls is not None else ["https://cdn1.suno.ai/b481b17a-bf50-4e10-8adc-4d5635050893.mp3"]
-        )
+        if audio_urls is not None:
+            body["audio_urls"] = audio_urls
         if persona_id is not None:
             body["persona_id"] = persona_id
         if continue_at is not None:
@@ -444,24 +446,26 @@ class AsyncSuno:
         body: dict[str, Any] = {}
         if lyric is not None:
             body["lyric"] = lyric
-        body["model"] = model if model is not None else "chirp-v5-5"
+        if model is not None:
+            body["model"] = model
         if style is not None:
             body["style"] = style
         if title is not None:
             body["title"] = title
-        body["action"] = action if action is not None else "generate"
+        if action is not None:
+            body["action"] = action
         if custom is not None:
             body["custom"] = custom
-        body["prompt"] = prompt if prompt is not None else "A song for Christmas"
+        if prompt is not None:
+            body["prompt"] = prompt
         if audio_id is not None:
             body["audio_id"] = audio_id
         if duration is not None:
             body["duration"] = duration
         if weirdness is not None:
             body["weirdness"] = weirdness
-        body["audio_urls"] = (
-            audio_urls if audio_urls is not None else ["https://cdn1.suno.ai/b481b17a-bf50-4e10-8adc-4d5635050893.mp3"]
-        )
+        if audio_urls is not None:
+            body["audio_urls"] = audio_urls
         if persona_id is not None:
             body["persona_id"] = persona_id
         if continue_at is not None:

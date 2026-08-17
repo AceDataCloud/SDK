@@ -5,7 +5,6 @@ package acedatacloud
 
 import "context"
 
-
 // Flux is the flux provider client.
 type Flux struct {
 	t *transport
@@ -13,12 +12,12 @@ type Flux struct {
 
 // FluxGenerateRequest is the input to flux.Generate.
 type FluxGenerateRequest struct {
+	// Image size specifications.
+	Size string
 	// Types of operations for generating images. If it is `generate`, a new image will be created based on the promp
 	Action string
 	// Prompts for generating images.
 	Prompt string
-	// Image size specifications.
-	Size string
 	// Number of generated images.
 	Count float64
 	// Model used for generating images.
@@ -35,13 +34,9 @@ type FluxGenerateRequest struct {
 
 func (r FluxGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
+	body["size"] = r.Size
 	body["action"] = r.Action
 	body["prompt"] = r.Prompt
-	if r.Size != "" {
-		body["size"] = r.Size
-	} else {
-		body["size"] = "1024x1024"
-	}
 	if r.Count != 0 {
 		body["count"] = r.Count
 	}

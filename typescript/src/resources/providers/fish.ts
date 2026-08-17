@@ -30,7 +30,7 @@ export interface FishGenerateOptions {
   /** Is the input text subjected to text normalization processing by the upstream? */
   normalize?: boolean;
   /** Inline reference audio samples will be forwarded upstream as is, for zero-shot voice cloning. */
-  references?: unknown[];
+  references?: Array<Record<string, unknown>>;
   /** MP3 bitrate when `format=mp3`. */
   mp3Bitrate?: number;
   /** Output the audio sampling rate (e.g., 16000, 22050, 44100). */
@@ -103,7 +103,7 @@ export class Fish {
     if (options.temperature !== undefined) body["temperature"] = options.temperature;
     if (options.chunkLength !== undefined) body["chunk_length"] = options.chunkLength;
     if (options.opusBitrate !== undefined) body["opus_bitrate"] = options.opusBitrate;
-    body["reference_id"] = options.referenceId ?? "d7900c21663f485ab63ebdb7e5905036";
+    if (options.referenceId !== undefined) body["reference_id"] = options.referenceId;
     if (options.maxNewTokens !== undefined) body["max_new_tokens"] = options.maxNewTokens;
     if (options.minChunkLength !== undefined) body["min_chunk_length"] = options.minChunkLength;
     if (options.repetitionPenalty !== undefined) body["repetition_penalty"] = options.repetitionPenalty;

@@ -45,7 +45,7 @@ export class Hailuo {
     const body: Record<string, unknown> = {};
     body["action"] = options.action;
     if (options.model !== undefined) body["model"] = options.model;
-    body["prompt"] = options.prompt ?? "\u706b\u6c14";
+    if (options.prompt !== undefined) body["prompt"] = options.prompt;
     if (options.firstImageUrl !== undefined) body["first_image_url"] = options.firstImageUrl;
     for (const [key, value] of Object.entries(options)) {
       if (!["action", "async", "callbackUrl", "firstImageUrl", "maxWait", "model", "pollInterval", "prompt", "wait"].includes(key) && value !== undefined) {

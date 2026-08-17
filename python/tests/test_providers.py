@@ -63,7 +63,7 @@ def test_generation_returns_a_task_handle(client):
     transport.request.return_value = {"success": True, "task_id": "t-1"}
     client.flux._transport = transport
 
-    result = client.flux.generate(action="generate", prompt="a cat")
+    result = client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     assert isinstance(result, TaskHandle)
     assert result.id == "t-1"
 
@@ -76,19 +76,17 @@ async def test_async_generation_returns_an_async_handle():
         return {"success": True, "task_id": "t-2"}
 
     client.flux._transport = Mock(request=request)
-    assert isinstance(await client.flux.generate(action="generate", prompt="a cat"), AsyncTaskHandle)
+    assert isinstance(await client.flux.generate(action="generate", prompt="a cat", size="1024x1024"), AsyncTaskHandle)
 
 
-def test_de_facto_required_parameter_is_sent(client):
-    """/flux/images rejects a request with no `size` while not declaring it
-    required. The spec carries an example, so the SDK forwards it."""
+def test_required_flux_size_is_sent(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}
     client.flux._transport = transport
 
-    client.flux.generate(action="generate", prompt="a cat")
+    client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     body = transport.request.call_args.kwargs["json"]
-    assert body["size"], "size must be sent or the upstream 400s"
+    assert body["size"] == "1024x1024"
 
 
 def test_caller_value_beats_the_spec_default(client):
@@ -176,7 +174,7 @@ def test_async_is_requested_by_default(client):
     transport.request.return_value = {"task_id": "t-1"}
     client.flux._transport = transport
 
-    client.flux.generate(action="generate", prompt="a cat")
+    client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     assert transport.request.call_args.kwargs["json"]["async"] is True
 
 
@@ -222,7 +220,7 @@ def test_extra_parameters_pass_through(client):
     transport.request.return_value = {"task_id": "t-1"}
     client.flux._transport = transport
 
-    client.flux.generate(action="generate", prompt="a cat", brand_new_flag=True)
+    client.flux.generate(action="generate", prompt="a cat", size="1024x1024", brand_new_flag=True)
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
 
 
@@ -251,7 +249,7 @@ def test_handle_is_born_complete_when_the_server_answered_synchronously(client):
     }
     client.flux._transport = transport
 
-    handle = client.flux.generate(action="generate", prompt="a cat")
+    handle = client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     assert handle.done
     assert handle.wait() is not None
     assert handle.urls() == ["https://cdn.example.com/a.png"]
@@ -288,7 +286,7 @@ def test_get_records_a_terminal_state(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}
     client.flux._transport = transport
-    handle = client.flux.generate(action="generate", prompt="a cat")
+    handle = client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     assert not handle.done
 
     transport.request.return_value = {
@@ -311,7 +309,7 @@ def test_get_leaves_a_running_task_alone(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}
     client.flux._transport = transport
-    handle = client.flux.generate(action="generate", prompt="a cat")
+    handle = client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
 
     transport.request.return_value = {"response": {"status": "processing"}}
     handle.get()

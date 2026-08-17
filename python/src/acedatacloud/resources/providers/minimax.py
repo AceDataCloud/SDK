@@ -45,8 +45,8 @@ class Minimax:
         *,
         model: Literal["MiniMax-H3"],
         content: list[dict[str, Any]],
-        resolution: Literal["768P", "2K"],
         duration: int,
+        resolution: Literal["768P", "2K"],
         ratio: MinimaxRatio | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -55,12 +55,12 @@ class Minimax:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Minimax Videos"""
+        """Call /minimax/videos."""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
-        body["resolution"] = resolution
         body["duration"] = duration
+        body["resolution"] = resolution
         if ratio is not None:
             body["ratio"] = ratio
         body.update(extra)
@@ -85,8 +85,8 @@ class AsyncMinimax:
         *,
         model: Literal["MiniMax-H3"],
         content: list[dict[str, Any]],
-        resolution: Literal["768P", "2K"],
         duration: int,
+        resolution: Literal["768P", "2K"],
         ratio: MinimaxRatio | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -95,12 +95,12 @@ class AsyncMinimax:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Minimax Videos"""
+        """Call /minimax/videos."""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
-        body["resolution"] = resolution
         body["duration"] = duration
+        body["resolution"] = resolution
         if ratio is not None:
             body["ratio"] = ratio
         body.update(extra)

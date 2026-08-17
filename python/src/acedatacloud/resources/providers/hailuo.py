@@ -57,7 +57,8 @@ class Hailuo:
         body["action"] = action
         if model is not None:
             body["model"] = model
-        body["prompt"] = prompt if prompt is not None else "火气"
+        if prompt is not None:
+            body["prompt"] = prompt
         if first_image_url is not None:
             body["first_image_url"] = first_image_url
         body.update(extra)
@@ -98,7 +99,8 @@ class AsyncHailuo:
         body["action"] = action
         if model is not None:
             body["model"] = model
-        body["prompt"] = prompt if prompt is not None else "火气"
+        if prompt is not None:
+            body["prompt"] = prompt
         if first_image_url is not None:
             body["first_image_url"] = first_image_url
         body.update(extra)

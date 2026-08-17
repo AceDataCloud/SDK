@@ -71,6 +71,19 @@ def summary(spec: dict) -> str:
     return ""
 
 
+def _array_items_are_objects(schema: dict[str, Any]) -> bool:
+    items = schema.get("items") or {}
+    if items.get("type") == "object":
+        return True
+    for union in ("oneOf", "anyOf"):
+        variants = items.get(union)
+        if isinstance(variants, list) and variants and all(
+            isinstance(variant, dict) and variant.get("type") == "object" for variant in variants
+        ):
+            return True
+    return False
+
+
 class Param:
     def __init__(self, name: str, schema: dict, required: bool) -> None:
         self.name = name
@@ -96,7 +109,7 @@ class Param:
             return "Literal[" + ", ".join(json.dumps(e) for e in self.enum) + "]"
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
-            if item == "object":
+            if _array_items_are_objects(self.schema):
                 return "list[dict[str, Any]]"
             return f"list[{PY_TYPES.get(item, 'Any')}]"
         if self.type == "object":
@@ -108,7 +121,7 @@ class Param:
             return " | ".join(json.dumps(e) for e in self.enum)
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
-            if item == "object":
+            if _array_items_are_objects(self.schema):
                 return "Array<Record<string, unknown>>"
             return f"{TS_TYPES.get(item, 'unknown')}[]"
         if self.type == "object":
@@ -118,7 +131,7 @@ class Param:
     def go_type(self) -> str:
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
-            if item == "object":
+            if _array_items_are_objects(self.schema):
                 return "[]map[string]any"
             return f"[]{GO_TYPES.get(item, 'any')}"
         if self.type == "object":
@@ -149,7 +162,7 @@ def _method_name(path: str) -> str:
 
 
 class Endpoint:
-    def __init__(self, alias: str, path: str, spec: dict) -> None:
+    def __init__(self, alias: str, path: str, spec: dict, *, pollable: bool = False) -> None:
         self.alias = alias
         self.path = path
         self.method = _method_name(path)
@@ -158,7 +171,7 @@ class Endpoint:
         props: dict[str, dict] = schema.get("properties") or {}
         self.summary = summary(spec)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
-        self.pollable = "async" in props
+        self.pollable = "async" in props or pollable
 
     @property
     def callable_params(self) -> list[Param]:
@@ -177,10 +190,14 @@ class Service:
             spec_file = specs / f"{ep['id']}.json"
             if not spec_file.exists():
                 continue
-            self.endpoints.append(Endpoint(alias, ep["path"], json.loads(spec_file.read_text())))
-        if self.tasks_path:
-            for endpoint in self.endpoints:
-                endpoint.pollable = True
+            self.endpoints.append(
+                Endpoint(
+                    alias,
+                    ep["path"],
+                    json.loads(spec_file.read_text()),
+                    pollable=bool(ep.get("pollable")),
+                )
+            )
         self._name_methods()
 
     def _name_methods(self) -> None:

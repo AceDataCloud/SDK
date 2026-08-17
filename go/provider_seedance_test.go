@@ -5,7 +5,7 @@ import "testing"
 func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 	req := SeedanceGenerateRequest{
 		Model:                 "doubao-seedance-2-5-260628",
-		Content:               []any{map[string]any{"type": "text", "text": "Extend the scene"}},
+		Content:               []map[string]any{{"type": "text", "text": "Extend the scene"}},
 		Duration:              30,
 		Camerafixed:           true,
 		OmniReferenceTaskType: "extend",
@@ -24,7 +24,7 @@ func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 func TestSeedance20OmitsSeedance25Defaults(t *testing.T) {
 	body := (SeedanceGenerateRequest{
 		Model:   "doubao-seedance-2-0-260128",
-		Content: []any{map[string]any{"type": "text", "text": "A scene"}},
+		Content: []map[string]any{{"type": "text", "text": "A scene"}},
 	}).toBody()
 	if _, exists := body["output_format"]; exists {
 		t.Fatalf("2.0 request unexpectedly contains output_format: %#v", body)
