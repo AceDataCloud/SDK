@@ -161,6 +161,12 @@ class Endpoint:
         self.pollable = "async" in props
 
     @property
+    def async_default(self) -> bool:
+        param = next((p for p in self.params if p.name == "async"), None)
+        default = param.default() if param else None
+        return default if isinstance(default, bool) else True
+
+    @property
     def callable_params(self) -> list[Param]:
         """Required first — a Python signature cannot put a defaulted arg before one."""
         usable = [p for p in self.params if not p.is_control]

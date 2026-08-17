@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 
-from genlib.model import Param
+from genlib.model import Endpoint, Param
 
 
 def test_default_only_reads_schema_default():
@@ -34,3 +34,31 @@ def test_required_param_has_no_default():
     """Required means the caller must supply it."""
     p = Param("prompt", {"type": "string", "example": "a cat"}, required=True)
     assert p.default() is None
+
+
+def test_endpoint_reads_false_async_default():
+    endpoint = Endpoint(
+        "minimax",
+        "/minimax/videos",
+        {
+            "paths": {
+                "/minimax/videos": {
+                    "post": {
+                        "requestBody": {
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                            "async": {"type": "boolean", "default": False}
+                                        },
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    )
+    assert endpoint.async_default is False

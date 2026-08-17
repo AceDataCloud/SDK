@@ -22,7 +22,7 @@ type MinimaxGenerateRequest struct {
 	Duration int
 	// Minimax Videos Ratio
 	Ratio string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle. Defaults false.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -42,7 +42,7 @@ func (r MinimaxGenerateRequest) toBody() map[string]any {
 	if r.CallbackURL != "" {
 		body["callback_url"] = r.CallbackURL
 	}
-	body["async"] = true
+	body["async"] = false
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

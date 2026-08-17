@@ -23,7 +23,7 @@ MinimaxRatio = Literal[
 
 
 def _task_id(result: Any) -> str:
-    """Task ids appear at the top level or nested under `data`."""
+    """Task ids appear at the top level or nested under `data` or `task`."""
     if not isinstance(result, dict):
         return ""
     if result.get("task_id"):
@@ -31,6 +31,9 @@ def _task_id(result: Any) -> str:
     data = result.get("data")
     if isinstance(data, dict) and data.get("task_id"):
         return str(data["task_id"])
+    task = result.get("task")
+    if isinstance(task, dict) and task.get("id"):
+        return str(task["id"])
     return str(result.get("id") or "")
 
 
@@ -66,7 +69,7 @@ class Minimax:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        body["async"] = False if async_ is None else async_
         result = self._transport.request("POST", "/minimax/videos", json=body)
         handle = TaskHandle(_task_id(result), "/minimax/tasks", self._transport, submitted=result)
         if wait:
@@ -106,7 +109,7 @@ class AsyncMinimax:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        body["async"] = False if async_ is None else async_
         result = await self._transport.request("POST", "/minimax/videos", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/minimax/tasks", self._transport, submitted=result)
         if wait:

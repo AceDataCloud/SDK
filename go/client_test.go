@@ -84,10 +84,10 @@ func TestMinimaxGenerate(t *testing.T) {
 		if body["model"] != "MiniMax-H3" || body["resolution"] != "2K" || body["duration"] != float64(5) {
 			t.Errorf("unexpected body: %+v", body)
 		}
-		if body["async"] != true {
-			t.Errorf("expected async request: %+v", body)
+		if body["async"] != false {
+			t.Errorf("expected synchronous request by default: %+v", body)
 		}
-		_, _ = w.Write([]byte(`{"task_id":"minimax-1"}`))
+		_, _ = w.Write([]byte(`{"task":{"id":"minimax-1","status":"succeeded","content":{"url":"https://cdn.example.com/minimax.mp4"}}}`))
 	}))
 	defer srv.Close()
 
@@ -104,6 +104,39 @@ func TestMinimaxGenerate(t *testing.T) {
 	}
 	if task.ID != "minimax-1" {
 		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+	if !task.Done() {
+		t.Fatal("expected synchronous response to produce a completed task")
+	}
+	if got := task.URLs(); len(got) != 1 || got[0] != "https://cdn.example.com/minimax.mp4" {
+		t.Fatalf("unexpected task URLs: %+v", got)
+	}
+}
+
+func TestMinimaxSynchronousFailureIsTerminal(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/minimax/videos" {
+			t.Errorf("unexpected poll request to %s", r.URL.Path)
+		}
+		_, _ = w.Write([]byte(`{"task":{"id":"minimax-failed","status":"failed","error":{"code":"generation_failed","message":"Generation failed."}}}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{
+		Model:      "MiniMax-H3",
+		Content:    []map[string]any{{"type": "text", "text": "A cat"}},
+		Resolution: "2K",
+		Duration:   5,
+	})
+	if err != nil {
+		t.Fatalf("Minimax Generate: %v", err)
+	}
+	if task.ID != "minimax-failed" || !task.Done() {
+		t.Fatalf("expected completed failed task, got id=%q done=%v", task.ID, task.Done())
+	}
+	if _, err := task.Wait(context.Background(), time.Millisecond, time.Millisecond); err != nil {
+		t.Fatalf("synchronous failed task should not poll: %v", err)
 	}
 }
 

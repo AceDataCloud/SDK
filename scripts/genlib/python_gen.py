@@ -174,7 +174,9 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
     lines.append(_body(params, consts=consts, method=ep.method))
 
     if ep.pollable:
-        lines.append("        body[\"async\"] = True if async_ is None else async_")
+        lines.append(
+            f'        body["async"] = {_py_literal(ep.async_default)} if async_ is None else async_'
+        )
         lines.append(
             f'        result = {await_}self._transport.request("POST", "{ep.path}", json=body)'
         )
@@ -209,7 +211,7 @@ def render(svc: Service) -> str:
     out.append("")
     out.append("")
     out.append("def _task_id(result: Any) -> str:")
-    out.append('    """Task ids appear at the top level or nested under `data`."""')
+    out.append('    """Task ids appear at the top level or nested under `data` or `task`."""')
     out.append("    if not isinstance(result, dict):")
     out.append('        return ""')
     out.append('    if result.get("task_id"):')
@@ -217,6 +219,9 @@ def render(svc: Service) -> str:
     out.append('    data = result.get("data")')
     out.append("    if isinstance(data, dict) and data.get('task_id'):")
     out.append("        return str(data['task_id'])")
+    out.append('    task = result.get("task")')
+    out.append("    if isinstance(task, dict) and task.get('id'):")
+    out.append("        return str(task['id'])")
     out.append('    return str(result.get("id") or "")')
     out.append("")
     out.append("")

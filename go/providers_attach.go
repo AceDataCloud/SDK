@@ -14,6 +14,11 @@ func taskIDFrom(result map[string]any) string {
 			return s
 		}
 	}
+	if task, ok := result["task"].(map[string]any); ok {
+		if s, ok := task["id"].(string); ok && s != "" {
+			return s
+		}
+	}
 	if s, ok := result["id"].(string); ok {
 		return s
 	}

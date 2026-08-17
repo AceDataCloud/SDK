@@ -175,10 +175,11 @@ export class TaskHandle {
     this.id = taskId;
     this.pollEndpoint = pollEndpoint;
     this.transport = transport;
-    // A submission that already carried the artifact is a finished task. The
-    // caller should not have to detect that and skip wait() themselves.
-    if (submitted && artifactUrls({ response: submitted }).length > 0) {
-      this._result = { response: submitted };
+    // A synchronous submission is already terminal, including failures that
+    // have no artifact URL. The caller should not have to skip wait().
+    if (submitted) {
+      const state = { response: submitted };
+      if (taskStatus(state) !== '') this._result = state;
     }
   }
 

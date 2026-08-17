@@ -30,7 +30,8 @@ def _options_interface(svc: Service, ep) -> tuple[str, str]:
         doc = f"  /** {p.description} */\n" if p.description else ""
         lines.append(f"{doc}  {camel(p.name)}{optional}: {p.ts_type()};")
     if ep.pollable:
-        lines.append("  /** Submit asynchronously and poll. Defaults to true. */")
+        default = str(ep.async_default).lower()
+        lines.append(f"  /** Submit asynchronously and poll. Defaults to {default}. */")
         lines.append("  async?: boolean;")
         lines.append("  /** Wait for completion before returning the handle. */")
         lines.append("  wait?: boolean;")
@@ -84,7 +85,7 @@ def _method(svc: Service, ep) -> str:
     lines.extend(_body(ep))
 
     if ep.pollable:
-        lines.append("    body.async = options.async ?? true;")
+        lines.append(f"    body.async = options.async ?? {str(ep.async_default).lower()};")
         lines.append(
             f"    const result = (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body }})) as Record<string, unknown>;"
         )
@@ -115,6 +116,8 @@ def render(svc: Service) -> str:
         out.append("  if (typeof result?.task_id === 'string') return result.task_id;")
         out.append("  const data = result?.data as Record<string, unknown> | undefined;")
         out.append("  if (data && typeof data.task_id === 'string') return data.task_id;")
+        out.append("  const task = result?.task as Record<string, unknown> | undefined;")
+        out.append("  if (task && typeof task.id === 'string') return task.id;")
         out.append("  return typeof result?.id === 'string' ? result.id : '';")
         out.append("}")
         out.append("")

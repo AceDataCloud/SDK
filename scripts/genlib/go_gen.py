@@ -43,7 +43,8 @@ def _request_struct(svc: Service, ep) -> str:
         lines.append(f"\t// {comment[:110].rstrip()}")
         lines.append(f"\t{_field_name(p.name)} {p.go_type()}")
     if ep.pollable:
-        lines.append("\t// Async submits without blocking; poll the returned handle. Defaults true.")
+        default = str(ep.async_default).lower()
+        lines.append(f"\t// Async submits without blocking; poll the returned handle. Defaults {default}.")
         lines.append("\tAsync *bool")
     lines.append("\t// CallbackURL optionally receives the completion webhook.")
     lines.append("\tCallbackURL string")
@@ -88,7 +89,7 @@ def _to_body(struct: str, svc: Service, ep) -> str:
             lines.append(f"\tbody[{key}] = r.{field}")
 
     if ep.pollable:
-        lines.append('\tbody["async"] = true')
+        lines.append(f'\tbody["async"] = {str(ep.async_default).lower()}')
         lines.append("\tif r.Async != nil {")
         lines.append('\t\tbody["async"] = *r.Async')
         lines.append("\t}")
@@ -178,6 +179,11 @@ def write_all(services: list[Service], root: Path) -> list[Path]:
     lines.append("\t}")
     lines.append('\tif data, ok := result["data"].(map[string]any); ok {')
     lines.append('\t\tif s, ok := data["task_id"].(string); ok && s != "" {')
+    lines.append("\t\t\treturn s")
+    lines.append("\t\t}")
+    lines.append("\t}")
+    lines.append('\tif task, ok := result["task"].(map[string]any); ok {')
+    lines.append('\t\tif s, ok := task["id"].(string); ok && s != "" {')
     lines.append("\t\t\treturn s")
     lines.append("\t\t}")
     lines.append("\t}")

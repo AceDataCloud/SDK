@@ -194,10 +194,12 @@ class _HandleBase:
         self._poll_endpoint = poll_endpoint
         self._transport = transport
         self._result: dict[str, Any] | None = None
-        # A submission that already carried the artifact is a finished task. The
-        # caller should not have to detect that and skip .wait() themselves.
-        if submitted is not None and artifact_urls({"response": submitted}):
-            self._result = {"response": submitted}
+        # A synchronous submission is already terminal, including failures that
+        # have no artifact URL. The caller should not have to skip .wait().
+        if submitted is not None:
+            state = {"response": submitted}
+            if task_status(state) in ("succeeded", "failed"):
+                self._result = state
 
     @property
     def done(self) -> bool:

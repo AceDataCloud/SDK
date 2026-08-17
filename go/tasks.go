@@ -18,14 +18,17 @@ type TaskHandle struct {
 	done         bool
 }
 
-// newTaskHandle builds a handle. When the submission already carried the
-// artifact (some endpoints answer synchronously), the handle is born complete
-// so Wait returns immediately instead of polling for something already here.
+// newTaskHandle builds a handle. When the submission is already terminal,
+// including a failure without an artifact, the handle is born complete so Wait
+// returns immediately instead of polling for something already here.
 func newTaskHandle(id, pollEndpoint string, tr *transport, submitted map[string]any) *TaskHandle {
 	h := &TaskHandle{ID: id, pollEndpoint: pollEndpoint, transport: tr}
-	if submitted != nil && len(ArtifactURLs(map[string]any{"response": submitted})) > 0 {
-		h.last = map[string]any{"response": submitted}
-		h.done = true
+	if submitted != nil {
+		state := map[string]any{"response": submitted}
+		if terminalStatus(state) {
+			h.last = state
+			h.done = true
+		}
 	}
 	return h
 }
