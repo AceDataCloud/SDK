@@ -1,0 +1,1 @@
+{"paths":{"/midjourney/translate":{"post":{"summary":"Midjourney Translate","requestBody":{"content":{"application/json":{"schema":{"type":"object","required":["content"],"properties":{"content":{"type":"string","default":"generate"}}}}}}}}}}

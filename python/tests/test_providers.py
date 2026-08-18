@@ -29,6 +29,7 @@ GENERATED = (
     "digitalhuman",
     "dreamina",
     "localization",
+    "midjourney",
 )
 HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
 
@@ -66,6 +67,31 @@ def test_generation_returns_a_task_handle(client):
     result = client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     assert isinstance(result, TaskHandle)
     assert result.id == "t-1"
+
+
+def test_midjourney_imagine_serializes_documented_defaults(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "midjourney-1"}
+    client.midjourney._transport = transport
+
+    handle = client.midjourney.imagine(prompt="a cat", version="8.2")
+
+    assert isinstance(handle, TaskHandle)
+    assert transport.request.call_args.args == ("POST", "/midjourney/imagine")
+    assert transport.request.call_args.kwargs["json"] == {
+        "mode": "fast",
+        "action": "generate",
+        "prompt": "a cat",
+        "timeout": 480,
+        "translation": False,
+        "split_images": False,
+        "version": "8.2",
+        "hd": False,
+        "quality": "1",
+        "style_reference": False,
+        "moodboard": False,
+        "async": True,
+    }
 
 
 @pytest.mark.asyncio

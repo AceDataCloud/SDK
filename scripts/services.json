@@ -366,6 +366,20 @@
   ],
   "tasks": null
  },
+ "midjourney": {
+  "category": "AI Image",
+  "endpoints": [
+   {"id": "midjourney-imagine", "path": "/midjourney/imagine", "name": "Midjourney Imagine"},
+   {"id": "midjourney-seed", "path": "/midjourney/seed", "name": "Midjourney Seed"},
+   {"id": "midjourney-edits", "path": "/midjourney/edits", "name": "Midjourney Edits"},
+   {"id": "midjourney-videos", "path": "/midjourney/videos", "name": "Midjourney Videos"},
+   {"id": "midjourney-describe", "path": "/midjourney/describe", "name": "Midjourney Describe"},
+   {"id": "midjourney-shorten", "path": "/midjourney/shorten", "name": "Midjourney Shorten"},
+   {"id": "midjourney-translate", "path": "/midjourney/translate", "name": "Midjourney Translate"},
+   {"id": "midjourney-tasks", "path": "/midjourney/tasks", "name": "Midjourney Tasks"}
+  ],
+  "tasks": "/midjourney/tasks"
+ },
  "localization": {
   "category": "Web & Data",
   "endpoints": [

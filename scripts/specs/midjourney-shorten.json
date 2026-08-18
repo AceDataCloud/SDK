@@ -1,0 +1,1 @@
+{"paths":{"/midjourney/shorten":{"post":{"summary":"Midjourney Shorten","requestBody":{"content":{"application/json":{"schema":{"type":"object","required":["prompt"],"properties":{"prompt":{"type":"string"}}}}}}}}}}

@@ -1,0 +1,1 @@
+{"paths":{"/midjourney/describe":{"post":{"summary":"Midjourney Describe","requestBody":{"content":{"application/json":{"schema":{"type":"object","required":["image_url"],"properties":{"image_url":{"type":"string"}}}}}}}}}}

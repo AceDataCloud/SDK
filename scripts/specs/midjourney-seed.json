@@ -1,0 +1,1 @@
+{"paths":{"/midjourney/seed":{"post":{"summary":"Midjourney Seed","requestBody":{"content":{"application/json":{"schema":{"type":"object","required":["image_id"],"properties":{"image_id":{"type":"string"}}}}}}}}}}
