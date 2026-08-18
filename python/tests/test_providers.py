@@ -30,7 +30,7 @@ GENERATED = (
     "dreamina",
     "localization",
 )
-HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
+HAND_WRITTEN = ("aichat", "deepseek", "kling", "veo", "openai", "webextrator", "shorturl")
 
 
 @pytest.fixture
@@ -222,6 +222,57 @@ def test_extra_parameters_pass_through(client):
 
     client.flux.generate(action="generate", prompt="a cat", size="1024x1024", brand_new_flag=True)
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
+
+
+def test_aichat_syncs_latest_models_and_v2_endpoint(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "conversation-1"}
+    client.aichat._transport = transport
+
+    client.aichat.create(model="deepseek-v4-pro", question="hi")
+    assert transport.request.call_args.args == ("POST", "/aichat/conversations")
+    assert transport.request.call_args.kwargs["json"]["model"] == "deepseek-v4-pro"
+
+    client.aichat.create_v2(
+        model="deepseek-v3.2-exp",
+        action="chat",
+        question="hi",
+        allowed_skills=["web_search"],
+        async_=True,
+        limit=10,
+    )
+    assert transport.request.call_args.args == ("POST", "/aichat2/conversations")
+    assert transport.request.call_args.kwargs["json"] == {
+        "model": "deepseek-v3.2-exp",
+        "action": "chat",
+        "question": "hi",
+        "allowed_skills": ["web_search"],
+        "async": True,
+        "limit": 10,
+    }
+
+
+def test_deepseek_chat_completions_uses_service_path(client):
+    transport = Mock()
+    transport.request.return_value = {"choices": []}
+    client.deepseek.chat.completions._transport = transport
+
+    client.deepseek.chat.completions.create(
+        model="deepseek-v3.2-exp",
+        messages=[{"role": "user", "content": "hi"}],
+        reasoning_effort="high",
+        service_tier="priority",
+        max_completion_tokens=20,
+    )
+
+    assert transport.request.call_args.args == ("POST", "/deepseek/chat/completions")
+    assert transport.request.call_args.kwargs["json"] == {
+        "model": "deepseek-v3.2-exp",
+        "messages": [{"role": "user", "content": "hi"}],
+        "reasoning_effort": "high",
+        "service_tier": "priority",
+        "max_completion_tokens": 20,
+    }
 
 
 @pytest.mark.parametrize("name", GENERATED)

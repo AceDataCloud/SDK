@@ -28,8 +28,77 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.AiChat() == nil || c.Deepseek() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestAiChatCreateV2(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat2/conversations" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "deepseek-v3.2-exp" || body["action"] != "chat" || body["async"] != true {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		if got := body["allowed_skills"].([]any); len(got) != 1 || got[0] != "web_search" {
+			t.Errorf("unexpected allowed_skills: %+v", body["allowed_skills"])
+		}
+		_, _ = w.Write([]byte(`{"id":"conversation-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	async := true
+	res, err := c.AiChat().CreateV2(context.Background(), AiChatConversationV2Request{
+		Model:         "deepseek-v3.2-exp",
+		Action:        "chat",
+		Question:      "hi",
+		AllowedSkills: []string{"web_search"},
+		Async:         &async,
+	})
+	if err != nil {
+		t.Fatalf("AiChat CreateV2: %v", err)
+	}
+	if res["id"] != "conversation-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestDeepseekChatCompletionsCreate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/deepseek/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "deepseek-v3.2-exp" || body["reasoning_effort"] != "high" {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		if _, ok := body["stream"]; ok {
+			t.Errorf("non-streaming create must not send stream: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"choices":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	maxCompletionTokens := 20
+	res, err := c.Deepseek().Chat().Completions().Create(context.Background(), DeepseekChatCompletionRequest{
+		Model:               "deepseek-v3.2-exp",
+		Messages:            []map[string]any{{"role": "user", "content": "hi"}},
+		ReasoningEffort:     "high",
+		ServiceTier:         "priority",
+		MaxCompletionTokens: &maxCompletionTokens,
+	})
+	if err != nil {
+		t.Fatalf("Deepseek Create: %v", err)
+	}
+	if _, ok := res["choices"]; !ok {
+		t.Fatalf("bad response: %+v", res)
 	}
 }
 

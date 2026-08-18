@@ -4,6 +4,7 @@ import { Transport, TransportOptions } from './runtime/transport';
 import type { PaymentHandler } from './runtime/payment';
 import { AiChat } from './resources/aichat';
 import { Chat } from './resources/chat';
+import { Deepseek } from './resources/deepseek';
 import { Captcha } from './resources/captcha';
 import { Images } from './resources/images';
 import { Audio } from './resources/audio';
@@ -38,6 +39,7 @@ export interface AceDataCloudOptions {
 
 export class AceDataCloud {
   readonly aichat: AiChat;
+  readonly deepseek: Deepseek;
   readonly chat: Chat;
   readonly captcha: Captcha;
   readonly images: Images;
@@ -69,6 +71,7 @@ export class AceDataCloud {
     });
 
     this.aichat = new AiChat(this.transport);
+    this.deepseek = new Deepseek(this.transport);
     this.chat = new Chat(this.transport);
     this.captcha = new Captcha(this.transport);
     this.images = new Images(this.transport);

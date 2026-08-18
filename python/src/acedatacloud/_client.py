@@ -13,6 +13,7 @@ from acedatacloud.resources.aichat import AiChat, AsyncAiChat
 from acedatacloud.resources.audio import AsyncAudio, Audio
 from acedatacloud.resources.captcha import AsyncCaptcha, Captcha
 from acedatacloud.resources.chat import AsyncChat, Chat
+from acedatacloud.resources.deepseek import AsyncDeepseek, Deepseek
 from acedatacloud.resources.face import AsyncFace, Face
 from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
@@ -56,6 +57,7 @@ class AceDataCloud:
             payment_handler=payment_handler,
         )
         self.aichat = AiChat(self._transport)
+        self.deepseek = Deepseek(self._transport)
         self.chat = Chat(self._transport)
         self.captcha = Captcha(self._transport)
         self.images = Images(self._transport)
@@ -109,6 +111,7 @@ class AsyncAceDataCloud:
             payment_handler=payment_handler,
         )
         self.aichat = AsyncAiChat(self._transport)
+        self.deepseek = AsyncDeepseek(self._transport)
         self.chat = AsyncChat(self._transport)
         self.captcha = AsyncCaptcha(self._transport)
         self.images = AsyncImages(self._transport)

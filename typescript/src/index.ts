@@ -26,7 +26,8 @@ export type {
   PaymentRequiredBody,
 } from './runtime/payment';
 
-export type { AiChatModel } from './resources/aichat';
+export type { AiChatCreateOptions, AiChatCreateV2Options, AiChatModel, AiChatV2Model } from './resources/aichat';
+export type { DeepseekCreateOptions, DeepseekModel } from './resources/deepseek';
 export type { GlmModel } from './resources/glm';
 export type { ImageProvider } from './resources/images';
 export type { VideoProvider } from './resources/video';

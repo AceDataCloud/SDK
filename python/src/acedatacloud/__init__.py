@@ -24,8 +24,9 @@ from acedatacloud._runtime.payment import (
     PaymentRequirement,
     SyncPaymentHandler,
 )
-from acedatacloud.resources.aichat import AiChatModel
+from acedatacloud.resources.aichat import AiChatModel, AiChatV2Model
 from acedatacloud.resources.audio import AudioProvider
+from acedatacloud.resources.deepseek import DeepseekModel
 from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
@@ -41,7 +42,9 @@ __all__ = [
     "AceDataCloud",
     "AsyncAceDataCloud",
     "AiChatModel",
+    "AiChatV2Model",
     "AudioProvider",
+    "DeepseekModel",
     "GlmModel",
     "ImageProvider",
     "KlingCameraControl",
