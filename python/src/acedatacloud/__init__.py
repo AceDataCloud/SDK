@@ -30,7 +30,9 @@ from acedatacloud.resources.glm import GlmModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
     KlingCameraControl,
+    KlingLipSyncMode,
     KlingModel,
+    KlingMotionModel,
     KlingReferenceImage,
     KlingReferenceVideo,
 )
@@ -45,7 +47,9 @@ __all__ = [
     "GlmModel",
     "ImageProvider",
     "KlingCameraControl",
+    "KlingLipSyncMode",
     "KlingModel",
+    "KlingMotionModel",
     "KlingReferenceImage",
     "KlingReferenceVideo",
     "VideoProvider",

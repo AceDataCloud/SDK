@@ -172,6 +172,38 @@ describe('Kling resource', () => {
     });
   });
 
+  it('serializes lip sync and talking photo defaults', async () => {
+    const request = jest.fn().mockResolvedValue({});
+    const kling = new Kling({ request } as any);
+
+    await kling.lipSync({ mode: 'text2video', text: 'Hello' });
+    await kling.talkingPhoto({
+      imageUrl: 'https://example.com/photo.jpg',
+      audioUrl: 'https://example.com/audio.mp3',
+    });
+
+    expect(request).toHaveBeenNthCalledWith(1, 'POST', '/kling/lip-sync', {
+      json: {
+        mode: 'text2video',
+        audio_type: 'url',
+        voice_language: 'zh',
+        voice_speed: 1,
+        async: false,
+        text: 'Hello',
+      },
+    });
+    expect(request).toHaveBeenNthCalledWith(2, 'POST', '/kling/talking-photo', {
+      json: {
+        image_url: 'https://example.com/photo.jpg',
+        audio_url: 'https://example.com/audio.mp3',
+        model: 'kling-v2-1-master',
+        duration: 5,
+        mode: 'pro',
+        async: false,
+      },
+    });
+  });
+
   it('rejects malformed motion and callback URLs before transport', async () => {
     const request = jest.fn();
     const kling = new Kling({ request } as any);

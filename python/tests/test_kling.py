@@ -138,6 +138,44 @@ def test_sync_motion_uses_closed_serialization() -> None:
     ]
 
 
+def test_sync_lip_sync_and_talking_photo_use_documented_defaults() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.lip_sync(mode="text2video", text="Hello")
+    client.talking_photo(
+        image_url="https://example.com/photo.jpg",
+        audio_url="https://example.com/audio.mp3",
+    )
+
+    assert transport.calls == [
+        (
+            "POST",
+            "/kling/lip-sync",
+            {
+                "mode": "text2video",
+                "audio_type": "url",
+                "voice_language": "zh",
+                "voice_speed": 1.0,
+                "async": False,
+                "text": "Hello",
+            },
+        ),
+        (
+            "POST",
+            "/kling/talking-photo",
+            {
+                "image_url": "https://example.com/photo.jpg",
+                "audio_url": "https://example.com/audio.mp3",
+                "model": "kling-v2-1-master",
+                "duration": 5,
+                "mode": "pro",
+                "async": False,
+            },
+        ),
+    ]
+
+
 @pytest.mark.asyncio
 async def test_async_motion_uses_same_validation() -> None:
     transport = AsyncTransport()

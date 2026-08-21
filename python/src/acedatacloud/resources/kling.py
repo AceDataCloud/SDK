@@ -29,6 +29,8 @@ KlingModel = Literal[
 ]
 KlingAction = Literal["text2video", "image2video", "extend"]
 KlingMode = Literal["std", "pro", "4k"]
+KlingMotionModel = Literal["kling-v2-6", "kling-v3"]
+KlingLipSyncMode = Literal["audio2video", "text2video"]
 
 
 class KlingCameraConfig(TypedDict, total=False):
@@ -209,6 +211,7 @@ def _build_generate_body(
 
 def _build_motion_body(
     *,
+    model_name: KlingMotionModel | None,
     mode: Literal["std", "pro"],
     image_url: str,
     video_url: str,
@@ -217,6 +220,7 @@ def _build_motion_body(
     prompt: str | None,
     callback_url: str | None,
     async_: bool | None,
+    watermark_info: dict[str, bool] | None,
 ) -> dict[str, Any]:
     if mode not in {"std", "pro"}:
         raise ValueError("mode must be std or pro")
@@ -230,6 +234,8 @@ def _build_motion_body(
         raise ValueError("keep_original_sound must be yes or no")
     if callback_url and not _is_http_url(callback_url):
         raise ValueError("callback_url must be an HTTP URL")
+    if model_name is not None and model_name not in {"kling-v2-6", "kling-v3"}:
+        raise ValueError("model_name must be kling-v2-6 or kling-v3")
 
     body: dict[str, Any] = {
         "mode": mode,
@@ -238,13 +244,98 @@ def _build_motion_body(
         "character_orientation": character_orientation,
     }
     optional_fields = {
+        "model_name": model_name,
         "keep_original_sound": keep_original_sound,
         "prompt": prompt,
         "callback_url": callback_url,
         "async": async_,
+        "watermark_info": watermark_info,
     }
     body.update({key: value for key, value in optional_fields.items() if value is not None})
     return body
+
+
+def _build_lip_sync_body(
+    *,
+    mode: KlingLipSyncMode,
+    video_id: str | None,
+    video_url: str | None,
+    audio_url: str | None,
+    audio_type: Literal["url", "file"],
+    audio_file: str | None,
+    text: str | None,
+    voice_id: str | None,
+    voice_language: Literal["zh", "en"],
+    voice_speed: float,
+    callback_url: str | None,
+    async_: bool,
+) -> dict[str, Any]:
+    if mode not in {"audio2video", "text2video"}:
+        raise ValueError("mode must be audio2video or text2video")
+    if video_url is not None and not _is_http_url(video_url):
+        raise ValueError("video_url must be an HTTP URL")
+    if audio_url is not None and not _is_http_url(audio_url):
+        raise ValueError("audio_url must be an HTTP URL")
+    if callback_url is not None and not _is_http_url(callback_url):
+        raise ValueError("callback_url must be an HTTP URL")
+    if audio_type not in {"url", "file"}:
+        raise ValueError("audio_type must be url or file")
+    if voice_language not in {"zh", "en"}:
+        raise ValueError("voice_language must be zh or en")
+    if not 0.8 <= voice_speed <= 2:
+        raise ValueError("voice_speed must be between 0.8 and 2")
+    if text is not None and len(text) > 120:
+        raise ValueError("text must not exceed 120 characters")
+    body: dict[str, Any] = {
+        "mode": mode,
+        "audio_type": audio_type,
+        "voice_language": voice_language,
+        "voice_speed": voice_speed,
+        "async": async_,
+    }
+    body.update(
+        {
+            key: value
+            for key, value in {
+                "video_id": video_id,
+                "video_url": video_url,
+                "audio_url": audio_url,
+                "audio_file": audio_file,
+                "text": text,
+                "voice_id": voice_id,
+                "callback_url": callback_url,
+            }.items()
+            if value is not None
+        }
+    )
+    return body
+
+
+def _build_talking_photo_body(
+    *,
+    image_url: str,
+    audio_url: str,
+    prompt: str | None,
+    model: Literal["kling-v1", "kling-v1-6", "kling-v2-master", "kling-v2-1-master", "kling-v2-5-turbo", "kling-v2-6"],
+    duration: Literal[5, 10],
+    mode: Literal["std", "pro"],
+    callback_url: str | None,
+    async_: bool,
+) -> dict[str, Any]:
+    if not _is_http_url(image_url) or not _is_http_url(audio_url):
+        raise ValueError("image_url and audio_url must be HTTP URLs")
+    if callback_url is not None and not _is_http_url(callback_url):
+        raise ValueError("callback_url must be an HTTP URL")
+    return {
+        "image_url": image_url,
+        "audio_url": audio_url,
+        "model": model,
+        "duration": duration,
+        "mode": mode,
+        "async": async_,
+        **({"prompt": prompt} if prompt is not None else {}),
+        **({"callback_url": callback_url} if callback_url is not None else {}),
+    }
 
 
 class Kling:
@@ -300,6 +391,7 @@ class Kling:
     def motion(
         self,
         *,
+        model_name: KlingMotionModel | None = None,
         mode: Literal["std", "pro"],
         image_url: str,
         video_url: str,
@@ -308,8 +400,10 @@ class Kling:
         prompt: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        watermark_info: dict[str, bool] | None = None,
     ) -> dict[str, Any]:
         body = _build_motion_body(
+            model_name=model_name,
             mode=mode,
             image_url=image_url,
             video_url=video_url,
@@ -318,8 +412,73 @@ class Kling:
             prompt=prompt,
             callback_url=callback_url,
             async_=async_,
+            watermark_info=watermark_info,
         )
         return self._transport.request("POST", "/kling/motion", json=body)
+
+    def lip_sync(
+        self,
+        *,
+        mode: KlingLipSyncMode,
+        video_id: str | None = None,
+        video_url: str | None = None,
+        audio_url: str | None = None,
+        audio_type: Literal["url", "file"] = "url",
+        audio_file: str | None = None,
+        text: str | None = None,
+        voice_id: str | None = None,
+        voice_language: Literal["zh", "en"] = "zh",
+        voice_speed: float = 1.0,
+        callback_url: str | None = None,
+        async_: bool = False,
+    ) -> dict[str, Any]:
+        return self._transport.request(
+            "POST",
+            "/kling/lip-sync",
+            json=_build_lip_sync_body(
+                mode=mode,
+                video_id=video_id,
+                video_url=video_url,
+                audio_url=audio_url,
+                audio_type=audio_type,
+                audio_file=audio_file,
+                text=text,
+                voice_id=voice_id,
+                voice_language=voice_language,
+                voice_speed=voice_speed,
+                callback_url=callback_url,
+                async_=async_,
+            ),
+        )
+
+    def talking_photo(
+        self,
+        *,
+        image_url: str,
+        audio_url: str,
+        prompt: str | None = None,
+        model: Literal[
+            "kling-v1", "kling-v1-6", "kling-v2-master", "kling-v2-1-master", "kling-v2-5-turbo", "kling-v2-6"
+        ] = "kling-v2-1-master",
+        duration: Literal[5, 10] = 5,
+        mode: Literal["std", "pro"] = "pro",
+        callback_url: str | None = None,
+        async_: bool = False,
+    ) -> dict[str, Any]:
+        return self._transport.request(
+            "POST",
+            "/kling/talking-photo",
+            json=_build_talking_photo_body(
+                image_url=image_url,
+                audio_url=audio_url,
+                prompt=prompt,
+                model=model,
+                duration=duration,
+                mode=mode,
+                callback_url=callback_url,
+                async_=async_,
+            ),
+        )
 
 
 class AsyncKling:
@@ -375,6 +534,7 @@ class AsyncKling:
     async def motion(
         self,
         *,
+        model_name: KlingMotionModel | None = None,
         mode: Literal["std", "pro"],
         image_url: str,
         video_url: str,
@@ -383,8 +543,10 @@ class AsyncKling:
         prompt: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        watermark_info: dict[str, bool] | None = None,
     ) -> dict[str, Any]:
         body = _build_motion_body(
+            model_name=model_name,
             mode=mode,
             image_url=image_url,
             video_url=video_url,
@@ -393,5 +555,69 @@ class AsyncKling:
             prompt=prompt,
             callback_url=callback_url,
             async_=async_,
+            watermark_info=watermark_info,
         )
         return await self._transport.request("POST", "/kling/motion", json=body)
+
+    async def lip_sync(
+        self,
+        *,
+        mode: KlingLipSyncMode,
+        video_id: str | None = None,
+        video_url: str | None = None,
+        audio_url: str | None = None,
+        audio_type: Literal["url", "file"] = "url",
+        audio_file: str | None = None,
+        text: str | None = None,
+        voice_id: str | None = None,
+        voice_language: Literal["zh", "en"] = "zh",
+        voice_speed: float = 1.0,
+        callback_url: str | None = None,
+        async_: bool = False,
+    ) -> dict[str, Any]:
+        body = _build_lip_sync_body(
+            mode=mode,
+            video_id=video_id,
+            video_url=video_url,
+            audio_url=audio_url,
+            audio_type=audio_type,
+            audio_file=audio_file,
+            text=text,
+            voice_id=voice_id,
+            voice_language=voice_language,
+            voice_speed=voice_speed,
+            callback_url=callback_url,
+            async_=async_,
+        )
+        return await self._transport.request("POST", "/kling/lip-sync", json=body)
+
+    async def talking_photo(
+        self,
+        *,
+        image_url: str,
+        audio_url: str,
+        prompt: str | None = None,
+        model: Literal[
+            "kling-v1",
+            "kling-v1-6",
+            "kling-v2-master",
+            "kling-v2-1-master",
+            "kling-v2-5-turbo",
+            "kling-v2-6",
+        ] = "kling-v2-1-master",
+        duration: Literal[5, 10] = 5,
+        mode: Literal["std", "pro"] = "pro",
+        callback_url: str | None = None,
+        async_: bool = False,
+    ) -> dict[str, Any]:
+        body = _build_talking_photo_body(
+            image_url=image_url,
+            audio_url=audio_url,
+            prompt=prompt,
+            model=model,
+            duration=duration,
+            mode=mode,
+            callback_url=callback_url,
+            async_=async_,
+        )
+        return await self._transport.request("POST", "/kling/talking-photo", json=body)
