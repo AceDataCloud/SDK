@@ -26,6 +26,7 @@ GENERATED = (
     "happyhorse",
     "maestro",
     "minimax",
+    "midjourney",
     "digitalhuman",
     "dreamina",
     "localization",
@@ -212,6 +213,26 @@ def test_model_enum_is_typed(client):
     literal = next((a for a in args if typing.get_origin(a) is typing.Literal), None)
     assert literal is not None, "model should be a Literal of the spec's enum"
     assert "flux-dev" in typing.get_args(literal)
+
+
+def test_midjourney_imagine_uses_latest_version_contract(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "midjourney-1"}
+    client.midjourney._transport = transport
+
+    handle = client.midjourney.imagine(prompt="a cat", version="8.2")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "midjourney-1"
+    assert transport.request.call_args.args == ("POST", "/midjourney/imagine")
+    assert transport.request.call_args.kwargs["json"]["version"] == "8.2"
+    assert transport.request.call_args.kwargs["json"]["async"] is True
+
+
+def test_aichat_models_include_deepseek_v4_pro():
+    from acedatacloud.resources.aichat import AiChatModel
+
+    assert "deepseek-v4-pro" in typing.get_args(AiChatModel)
 
 
 def test_extra_parameters_pass_through(client):

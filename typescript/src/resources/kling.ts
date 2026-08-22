@@ -198,10 +198,10 @@ export class Kling {
     validateGenerateOptions(opts);
     const {
       action,
-      mode,
+      mode = 'std',
       model,
       prompt,
-      duration,
+      duration = 5,
       generateAudio,
       videoId,
       cfgScale,

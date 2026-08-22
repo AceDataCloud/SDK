@@ -79,6 +79,7 @@ func TestMinimaxGenerate(t *testing.T) {
 		if r.URL.Path != "/minimax/videos" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
+
 		var body map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&body)
 		if body["model"] != "MiniMax-H3" || body["resolution"] != "2K" || body["duration"] != float64(5) {
@@ -103,6 +104,33 @@ func TestMinimaxGenerate(t *testing.T) {
 		t.Fatalf("Minimax Generate: %v", err)
 	}
 	if task.ID != "minimax-1" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+}
+
+func TestMidjourneyImagineLatestVersion(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/midjourney/imagine" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["version"] != "8.2" || body["async"] != true {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"task_id":"midjourney-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Midjourney().Imagine(context.Background(), MidjourneyImagineRequest{
+		Prompt:  "a cat",
+		Version: "8.2",
+	})
+	if err != nil {
+		t.Fatalf("Midjourney Imagine: %v", err)
+	}
+	if task.ID != "midjourney-1" {
 		t.Fatalf("unexpected task id: %q", task.ID)
 	}
 }

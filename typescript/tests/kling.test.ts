@@ -1,6 +1,17 @@
 import { Kling } from '../src/resources/kling';
 
 describe('Kling resource', () => {
+  it('sends the documented mode and duration defaults', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'kling-defaults' });
+    const kling = new Kling({ request } as any);
+
+    await kling.generate({ action: 'text2video', model: 'kling-v1', prompt: 'A cat' });
+
+    expect(request.mock.calls[0][2].json).toEqual(
+      expect.objectContaining({ mode: 'std', duration: 5 }),
+    );
+  });
+
   it('serializes canonical Omni references and async polling', async () => {
     const request = jest.fn().mockResolvedValue({ task_id: 'task-kling' });
     const kling = new Kling({ request } as any);
