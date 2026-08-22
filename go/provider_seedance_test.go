@@ -10,7 +10,9 @@ func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 		Camerafixed:           true,
 		OmniReferenceTaskType: "extend",
 		OutputFormat:          "mov",
-		Tools:                 []map[string]any{{"type": "web_search"}},
+		Tools:                 []map[string]any{{"type": "web_search", "limit": 5, "sources": []string{"search_engine"}}},
+		Priority:              7,
+		SafetyIdentifier:      "anonymous-user-123",
 	}
 	body := req.toBody()
 	if body["model"] != req.Model || body["omni_reference_task_type"] != "extend" || body["output_format"] != "mov" {
@@ -18,6 +20,9 @@ func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 	}
 	if body["camerafixed"] != true || body["camera_fixed"] != nil {
 		t.Fatalf("camera field drift: %#v", body)
+	}
+	if body["priority"] != 7 || body["safety_identifier"] != "anonymous-user-123" {
+		t.Fatalf("new Seedance options missing: %#v", body)
 	}
 }
 
@@ -28,5 +33,8 @@ func TestSeedance20OmitsSeedance25Defaults(t *testing.T) {
 	}).toBody()
 	if _, exists := body["output_format"]; exists {
 		t.Fatalf("2.0 request unexpectedly contains output_format: %#v", body)
+	}
+	if body["priority"] != 0 {
+		t.Fatalf("priority default missing: %#v", body)
 	}
 }

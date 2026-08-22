@@ -687,7 +687,8 @@
                           "type": "object",
                           "required": [
                             "type",
-                            "audio_url"
+                            "audio_url",
+                            "role"
                           ],
                           "properties": {
                             "type": {
@@ -733,7 +734,8 @@
                           "type": "object",
                           "required": [
                             "type",
-                            "video_url"
+                            "video_url",
+                            "role"
                           ],
                           "properties": {
                             "type": {
@@ -877,11 +879,62 @@
                   },
                   "tools": {
                     "type": "array",
+                    "maxItems": 1,
+                    "description": "$t(seedance_videos_tools)",
                     "items": {
                       "type": "object",
-                      "additionalProperties": true
-                    },
-                    "description": "$t(seedance_videos_tools)"
+                      "required": [
+                        "type"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "web_search"
+                          ],
+                          "description": "$t(seedance_videos_tools_type)"
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 50,
+                          "default": 10,
+                          "description": "$t(seedance_videos_tools_limit)"
+                        },
+                        "max_keyword": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 50,
+                          "description": "$t(seedance_videos_tools_max_keyword)"
+                        },
+                        "sources": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "toutiao",
+                              "douyin",
+                              "moji",
+                              "search_engine"
+                            ]
+                          },
+                          "description": "$t(seedance_videos_tools_sources)"
+                        }
+                      }
+                    }
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9,
+                    "default": 0,
+                    "description": "$t(seedance_videos_priority)"
+                  },
+                  "safety_identifier": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "description": "$t(seedance_videos_safety_identifier)"
                   }
                 }
               },

@@ -12,7 +12,9 @@ describe('Seedance provider', () => {
       camerafixed: true,
       omniReferenceTaskType: 'extend',
       outputFormat: 'mov',
-      tools: [{ type: 'web_search' }],
+      tools: [{ type: 'web_search', limit: 5, sources: ['search_engine'] }],
+      priority: 7,
+      safetyIdentifier: 'anonymous-user-123',
     });
     expect(task).toBeInstanceOf(TaskHandle);
     expect(request).toHaveBeenCalledWith('POST', '/seedance/videos', {
@@ -22,7 +24,9 @@ describe('Seedance provider', () => {
         camerafixed: true,
         omni_reference_task_type: 'extend',
         output_format: 'mov',
-        tools: [{ type: 'web_search' }],
+        tools: [{ type: 'web_search', limit: 5, sources: ['search_engine'] }],
+        priority: 7,
+        safety_identifier: 'anonymous-user-123',
         async: true,
       }),
     });
@@ -37,5 +41,6 @@ describe('Seedance provider', () => {
       content: [{ type: 'text', text: 'A scene' }],
     });
     expect(request.mock.calls[0][2].json.output_format).toBeUndefined();
+    expect(request.mock.calls[0][2].json.priority).toBe(0);
   });
 });

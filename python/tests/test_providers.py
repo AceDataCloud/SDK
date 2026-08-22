@@ -110,14 +110,18 @@ def test_seedance_25_serializes_public_contract(client):
         camerafixed=True,
         omni_reference_task_type="extend",
         output_format="mov",
-        tools=[{"type": "web_search"}],
+        tools=[{"type": "web_search", "limit": 5, "sources": ["search_engine"]}],
+        priority=7,
+        safety_identifier="anonymous-user-123",
     )
 
     body = transport.request.call_args.kwargs["json"]
     assert body["model"] == "doubao-seedance-2-5-260628"
     assert body["omni_reference_task_type"] == "extend"
     assert body["output_format"] == "mov"
-    assert body["tools"] == [{"type": "web_search"}]
+    assert body["tools"] == [{"type": "web_search", "limit": 5, "sources": ["search_engine"]}]
+    assert body["priority"] == 7
+    assert body["safety_identifier"] == "anonymous-user-123"
     assert body["camerafixed"] is True
     assert "camera_fixed" not in body
 
@@ -130,7 +134,9 @@ def test_seedance_20_does_not_receive_25_defaults(client):
         model="doubao-seedance-2-0-260128",
         content=[{"type": "text", "text": "A scene"}],
     )
-    assert "output_format" not in transport.request.call_args.kwargs["json"]
+    body = transport.request.call_args.kwargs["json"]
+    assert "output_format" not in body
+    assert body["priority"] == 0
 
 
 def test_seedream_omits_example_only_size(client):
