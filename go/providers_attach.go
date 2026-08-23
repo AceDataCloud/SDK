@@ -27,7 +27,6 @@ type providers struct {
 	flux         *Flux
 	hailuo       *Hailuo
 	happyhorse   *Happyhorse
-	kling        *Kling
 	localization *Localization
 	luma         *Luma
 	maestro      *Maestro
@@ -48,7 +47,6 @@ func newProviders(tr *transport) *providers {
 		flux:         &Flux{t: tr},
 		hailuo:       &Hailuo{t: tr},
 		happyhorse:   &Happyhorse{t: tr},
-		kling:        &Kling{t: tr},
 		localization: &Localization{t: tr},
 		luma:         &Luma{t: tr},
 		maestro:      &Maestro{t: tr},
@@ -79,9 +77,6 @@ func (c *Client) Hailuo() *Hailuo { return c.providers.hailuo }
 
 // Happyhorse returns the happyhorse provider client.
 func (c *Client) Happyhorse() *Happyhorse { return c.providers.happyhorse }
-
-// Kling returns the Kling provider client.
-func (c *Client) Kling() *Kling { return c.providers.kling }
 
 // Localization returns the localization provider client.
 func (c *Client) Localization() *Localization { return c.providers.localization }
