@@ -1,0 +1,460 @@
+{
+  "paths": {
+    "/qwen-image/tasks": {
+      "post": {
+        "summary": "$t(api_description_qwen_image_tasks)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/QwenImageTaskRecord"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "items",
+                        "count"
+                      ],
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/QwenImageTaskRecord"
+                          },
+                          "description": "Matching tasks."
+                        },
+                        "count": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Total matching task count."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "description": "Returned when the requested task does not exist."
+                    }
+                  ]
+                },
+                "example": {
+                  "items": [],
+                  "count": 0
+                }
+              }
+            },
+            "description": "$t(qwen_image_tasks_response_200)"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "$t(qwen_image_tasks_response_400_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "$t(qwen_image_tasks_response_400_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_tasks_response_400_trace_id)"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "$t(qwen_image_tasks_response_400_error_code_2)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "$t(qwen_image_tasks_response_400_error_message_2)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_tasks_response_400_trace_id_2)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_tasks_response_400)"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "$t(qwen_image_tasks_response_401_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "$t(qwen_image_tasks_response_401_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_tasks_response_401_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_tasks_response_401)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "$t(qwen_image_tasks_response_429_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "$t(qwen_image_tasks_response_429_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_tasks_response_429_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_tasks_response_429)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "$t(qwen_image_tasks_response_500_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "$t(qwen_image_tasks_response_500_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_tasks_response_500_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_tasks_response_500)"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "$t(qwen_image_tasks_param_accept)"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "$t(qwen_image_tasks_id)"
+                  },
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "$t(qwen_image_tasks_ids)"
+                  },
+                  "action": {
+                    "enum": [
+                      "retrieve",
+                      "retrieve_batch"
+                    ],
+                    "type": "string",
+                    "default": "retrieve",
+                    "description": "$t(qwen_image_tasks_action)"
+                  }
+                },
+                "example": {
+                  "action": "retrieve",
+                  "id": "task-id"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "operationId": "qwenImageTasksRetrieve"
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "$t(qwen_image_tasks_servers)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "QwenImageTaskRequestPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Request body recorded from the API operation that created this task. Fields depend on that operation and action."
+      },
+      "QwenImageTaskResultPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Final response recorded from the API operation that created this task. Fields follow that operation’s documented success or error contract."
+      },
+      "QwenImageTaskRecord": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "trace_id",
+          "request"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Task identifier."
+          },
+          "type": {
+            "type": "string",
+            "description": "Task type."
+          },
+          "trace_id": {
+            "type": "string",
+            "description": "Request trace identifier."
+          },
+          "request": {
+            "$ref": "#/components/schemas/QwenImageTaskRequestPayload"
+          },
+          "response": {
+            "$ref": "#/components/schemas/QwenImageTaskResultPayload"
+          },
+          "created_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Unix timestamp in seconds when the task was created."
+          },
+          "started_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Unix timestamp in seconds when processing started."
+          },
+          "finished_at": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Unix timestamp in seconds when processing finished."
+          },
+          "elapsed": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Processing duration in seconds."
+          },
+          "user_id": {
+            "type": "string",
+            "description": "Account that owns the task."
+          },
+          "actor_user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Account that executed an authorized request."
+          },
+          "api_id": {
+            "type": "string",
+            "description": "API identifier."
+          },
+          "application_id": {
+            "type": "string",
+            "description": "Application used for billing."
+          },
+          "credential_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Credential used to start the task."
+          },
+          "authorization_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Authorization used to start the task."
+          }
+        }
+      }
+    }
+  },
+  "translations": {
+    "qwen_image_tasks_response_200_id": "Qwen Image 任务的 ID。",
+    "qwen_image_tasks_response_200_request": "Qwen Image 任务的请求内容。",
+    "qwen_image_tasks_response_200_response": "Qwen Image 任务的响应内容。",
+    "qwen_image_tasks_response_200": "操作成功执行。",
+    "qwen_image_tasks_response_400_error_code": "响应的错误码。",
+    "qwen_image_tasks_response_400_error_message": "响应的错误信息。",
+    "qwen_image_tasks_response_400_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_tasks_response_400_error_code_2": "响应的错误码。",
+    "qwen_image_tasks_response_400_error_message_2": "响应的错误信息。",
+    "qwen_image_tasks_response_400_trace_id_2": "本次请求的追踪 ID。",
+    "qwen_image_tasks_response_400": "请求错误，可能是参数缺失或无效。",
+    "qwen_image_tasks_response_401_error_code": "响应的错误码。",
+    "qwen_image_tasks_response_401_error_message": "响应的错误信息。",
+    "qwen_image_tasks_response_401_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_tasks_response_401": "未授权，授权令牌无效或缺失。",
+    "qwen_image_tasks_response_429_error_code": "响应的错误码。",
+    "qwen_image_tasks_response_429_error_message": "响应的错误信息。",
+    "qwen_image_tasks_response_429_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_tasks_response_429": "请求过多，已超出速率限制。",
+    "qwen_image_tasks_response_500_error_code": "响应的错误码。",
+    "qwen_image_tasks_response_500_error_message": "响应的错误信息。",
+    "qwen_image_tasks_response_500_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_tasks_response_500": "服务器内部错误，服务端发生异常。",
+    "qwen_image_tasks_param_accept": "指定服务器返回的响应格式。",
+    "qwen_image_tasks_id": "Qwen Image 任务的 ID。",
+    "qwen_image_tasks_ids": "多个 Qwen Image 任务的 ID 列表。",
+    "qwen_image_tasks_action": "操作类型。使用 `retrieve` 获取单个任务，使用 `retrieve_batch` 批量获取多个任务。",
+    "qwen_image_tasks_servers": "Ace Data Cloud API 服务器",
+    "qwen_image_tasks_response_200_created_at": "任务创建时间，Unix 时间戳（秒，浮点）。",
+    "qwen_image_tasks_response_200_started_at": "任务开始执行时间，Unix 时间戳（秒，浮点）。",
+    "qwen_image_tasks_response_200_finished_at": "任务完成时间，Unix 时间戳（秒，浮点）。任务未完成时不返回该字段。",
+    "qwen_image_tasks_response_200_elapsed": "任务执行耗时，单位为秒（浮点，保留 3 位小数）。任务未完成时不返回该字段。",
+    "qwen_image_tasks_response_200_trace_id": "本次请求的追踪 ID，排查问题时提供给技术支持。",
+    "qwen_image_tasks_response_200_type": "任务类型。",
+    "qwen_image_tasks_response_200_user_id": "发起该任务的账号 ID。",
+    "qwen_image_tasks_response_200_actor_user_id": "实际执行者的账号 ID。通过授权代发时与 `user_id` 不同。",
+    "qwen_image_tasks_response_200_api_id": "该任务所属接口的 ID。",
+    "qwen_image_tasks_response_200_application_id": "该任务计费所用应用的 ID。",
+    "qwen_image_tasks_response_200_credential_id": "发起该任务所用凭证的 ID。",
+    "qwen_image_tasks_response_200_authorization_id": "该任务使用的授权 ID。未通过授权发起时为 null。",
+    "api_description_qwen_image_tasks": "查询 Qwen Image 异步任务。"
+  }
+}
