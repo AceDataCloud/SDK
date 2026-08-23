@@ -4,12 +4,13 @@ import "context"
 
 // MessagesRequest is the input to chat.messages.create (native Anthropic shape).
 type MessagesRequest struct {
-	Model     string           `json:"model"`
-	Messages  []map[string]any `json:"messages"`
-	MaxTokens int              `json:"max_tokens"`
-	Stream    bool             `json:"stream,omitempty"`
-	System    string           `json:"system,omitempty"`
-	Extra     map[string]any   `json:"-"`
+	Model        string           `json:"model"`
+	Messages     []map[string]any `json:"messages"`
+	MaxTokens    int              `json:"max_tokens"`
+	Stream       bool             `json:"stream,omitempty"`
+	System       string           `json:"system,omitempty"`
+	OutputConfig map[string]any   `json:"-"`
+	Extra        map[string]any   `json:"-"`
 }
 
 func (r MessagesRequest) toBody() map[string]any {
@@ -27,6 +28,9 @@ func (r MessagesRequest) toBody() map[string]any {
 	}
 	if r.System != "" {
 		body["system"] = r.System
+	}
+	if r.OutputConfig != nil {
+		body["output_config"] = r.OutputConfig
 	}
 	for k, v := range r.Extra {
 		if _, exists := body[k]; !exists {

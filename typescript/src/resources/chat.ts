@@ -2,6 +2,11 @@
 
 import { Transport } from '../runtime/transport';
 
+export interface ClaudeOutputConfig {
+  effort?: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+  [key: string]: unknown;
+}
+
 export class Messages {
   constructor(private transport: Transport) {}
 
@@ -9,6 +14,7 @@ export class Messages {
     model: string;
     messages: Array<Record<string, unknown>>;
     maxTokens?: number;
+    outputConfig?: ClaudeOutputConfig;
     stream?: false;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>>;
@@ -16,6 +22,7 @@ export class Messages {
     model: string;
     messages: Array<Record<string, unknown>>;
     maxTokens?: number;
+    outputConfig?: ClaudeOutputConfig;
     stream: true;
     [key: string]: unknown;
   }): Promise<AsyncGenerator<Record<string, unknown>>>;
@@ -23,12 +30,16 @@ export class Messages {
     model: string;
     messages: Array<Record<string, unknown>>;
     maxTokens?: number;
+    outputConfig?: ClaudeOutputConfig;
     stream?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
-    const { model, messages, maxTokens = 4096, stream, ...rest } = opts;
+    const { model, messages, maxTokens = 4096, outputConfig, stream, ...rest } = opts;
     const body: Record<string, unknown> = { model, messages, max_tokens: maxTokens, ...rest };
 
+    if (outputConfig !== undefined) {
+      body.output_config = outputConfig;
+    }
     if (stream) {
       body.stream = true;
       return this.stream(body);

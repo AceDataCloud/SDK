@@ -174,6 +174,23 @@ func TestChatCompletions_Create(t *testing.T) {
 	}
 }
 
+func TestChatMessagesOutputConfig(t *testing.T) {
+	body := (MessagesRequest{
+		Model:        "claude-opus-5",
+		Messages:     []map[string]any{{"role": "user", "content": "Hi"}},
+		MaxTokens:    1024,
+		OutputConfig: map[string]any{"effort": "max"},
+	}).toBody()
+
+	if body["output_config"] == nil {
+		t.Fatalf("output_config missing: %+v", body)
+	}
+	config, ok := body["output_config"].(map[string]any)
+	if !ok || config["effort"] != "max" {
+		t.Fatalf("unexpected output_config: %+v", body["output_config"])
+	}
+}
+
 func TestTransport_RetriesOn503(t *testing.T) {
 	attempts := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

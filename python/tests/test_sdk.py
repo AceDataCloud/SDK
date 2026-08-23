@@ -249,6 +249,27 @@ def test_chat_messages(client):
 
 
 @respx.mock
+def test_chat_messages_sends_output_config(client):
+    route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+        return_value=httpx.Response(200, json={"id": "msg-123"})
+    )
+
+    client.chat.messages.create(
+        model="claude-opus-5",
+        messages=[{"role": "user", "content": "Hello"}],
+        max_tokens=1024,
+        output_config={"effort": "max"},
+    )
+
+    assert json.loads(route.calls.last.request.content) == {
+        "model": "claude-opus-5",
+        "messages": [{"role": "user", "content": "Hello"}],
+        "max_tokens": 1024,
+        "output_config": {"effort": "max"},
+    }
+
+
+@respx.mock
 def test_chat_count_tokens(client):
     mock_response = {"input_tokens": 42}
     respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(

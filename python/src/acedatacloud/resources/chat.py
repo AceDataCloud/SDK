@@ -4,7 +4,13 @@ from __future__ import annotations
 
 import json as _json
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Literal, TypedDict
+
+
+class ClaudeOutputConfig(TypedDict, total=False):
+    """Controls Claude response generation."""
+
+    effort: Literal["low", "medium", "high", "xhigh", "max"]
 
 
 class _Messages:
@@ -20,6 +26,7 @@ class _Messages:
         messages: list[dict[str, Any]],
         max_tokens: int = 4096,
         stream: bool = False,
+        output_config: ClaudeOutputConfig | None = None,
         **kwargs: Any,
     ) -> dict[str, Any] | Iterator[dict[str, Any]]:
         body = {
@@ -28,6 +35,8 @@ class _Messages:
             "max_tokens": max_tokens,
             **kwargs,
         }
+        if output_config is not None:
+            body["output_config"] = output_config
         if stream:
             body["stream"] = True
             return self._stream(body)
@@ -59,6 +68,7 @@ class _AsyncMessages:
         messages: list[dict[str, Any]],
         max_tokens: int = 4096,
         stream: bool = False,
+        output_config: ClaudeOutputConfig | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body = {
@@ -67,6 +77,8 @@ class _AsyncMessages:
             "max_tokens": max_tokens,
             **kwargs,
         }
+        if output_config is not None:
+            body["output_config"] = output_config
         if stream:
             body["stream"] = True
             return self._stream(body)
