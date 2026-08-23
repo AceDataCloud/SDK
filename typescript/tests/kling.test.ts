@@ -172,6 +172,42 @@ describe('Kling resource', () => {
     });
   });
 
+  it('serializes the remaining documented Kling endpoints with defaults', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-kling' });
+    const kling = new Kling({ request } as any);
+
+    await kling.motion({
+      mode: 'pro',
+      imageUrl: 'https://example.com/subject.jpg',
+      videoUrl: 'https://example.com/motion.mp4',
+      characterOrientation: 'image',
+      modelName: 'kling-v3',
+      watermarkInfo: { enabled: true },
+    });
+    await kling.lipSync({ mode: 'text2video', text: 'Hello' });
+    await kling.talkingPhoto({
+      imageUrl: 'https://example.com/subject.jpg',
+      audioUrl: 'https://example.com/speech.mp3',
+    });
+
+    expect(request).toHaveBeenNthCalledWith(1, 'POST', '/kling/motion', {
+      json: expect.objectContaining({ model_name: 'kling-v3', watermark_info: { enabled: true } }),
+    });
+    expect(request).toHaveBeenNthCalledWith(2, 'POST', '/kling/lip-sync', {
+      json: { mode: 'text2video', text: 'Hello', audio_type: 'url', voice_language: 'zh', voice_speed: 1, async: false },
+    });
+    expect(request).toHaveBeenNthCalledWith(3, 'POST', '/kling/talking-photo', {
+      json: {
+        image_url: 'https://example.com/subject.jpg',
+        audio_url: 'https://example.com/speech.mp3',
+        model: 'kling-v2-1-master',
+        duration: 5,
+        mode: 'pro',
+        async: false,
+      },
+    });
+  });
+
   it('rejects malformed motion and callback URLs before transport', async () => {
     const request = jest.fn();
     const kling = new Kling({ request } as any);

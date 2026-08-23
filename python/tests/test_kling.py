@@ -138,6 +138,60 @@ def test_sync_motion_uses_closed_serialization() -> None:
     ]
 
 
+def test_sync_motion_serializes_docs_fields() -> None:
+    transport = SyncTransport()
+
+    Kling(transport).motion(
+        mode="pro",
+        image_url="https://example.com/subject.jpg",
+        video_url="https://example.com/motion.mp4",
+        character_orientation="image",
+        model_name="kling-v3",
+        watermark_info={"enabled": True},
+    )
+
+    assert transport.calls[0][2]["model_name"] == "kling-v3"
+    assert transport.calls[0][2]["watermark_info"] == {"enabled": True}
+
+
+def test_sync_lip_sync_and_talking_photo_use_documented_defaults() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.lip_sync(mode="text2video", text="Hello")
+    client.talking_photo(
+        image_url="https://example.com/subject.jpg",
+        audio_url="https://example.com/speech.mp3",
+    )
+
+    assert transport.calls == [
+        (
+            "POST",
+            "/kling/lip-sync",
+            {
+                "mode": "text2video",
+                "text": "Hello",
+                "audio_type": "url",
+                "voice_language": "zh",
+                "voice_speed": 1.0,
+                "async": False,
+            },
+        ),
+        (
+            "POST",
+            "/kling/talking-photo",
+            {
+                "image_url": "https://example.com/subject.jpg",
+                "audio_url": "https://example.com/speech.mp3",
+                "model": "kling-v2-1-master",
+                "duration": 5,
+                "mode": "pro",
+                "async": False,
+            },
+        ),
+    ]
+
+
 @pytest.mark.asyncio
 async def test_async_motion_uses_same_validation() -> None:
     transport = AsyncTransport()
