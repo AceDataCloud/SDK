@@ -29,6 +29,7 @@ export type {
 export type { AiChatModel } from './resources/aichat';
 export type { GlmModel } from './resources/glm';
 export type { ImageProvider } from './resources/images';
+export type { GoogleSearchOptions, SerpImageSize, SerpRange } from './resources/search';
 export type { VideoProvider } from './resources/video';
 export type { VeoModel } from './resources/veo';
 export type {

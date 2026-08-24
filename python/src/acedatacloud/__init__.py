@@ -34,6 +34,7 @@ from acedatacloud.resources.kling import (
     KlingReferenceImage,
     KlingReferenceVideo,
 )
+from acedatacloud.resources.search import SerpImageSize, SerpRange
 from acedatacloud.resources.veo import VeoModel
 from acedatacloud.resources.video import VideoProvider
 
@@ -48,6 +49,8 @@ __all__ = [
     "KlingModel",
     "KlingReferenceImage",
     "KlingReferenceVideo",
+    "SerpImageSize",
+    "SerpRange",
     "VideoProvider",
     "VeoModel",
     "AceDataCloudError",
