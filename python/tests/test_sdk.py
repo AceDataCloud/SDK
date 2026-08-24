@@ -226,6 +226,57 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_models_list(client):
+    respx.get("https://api.acedata.cloud/openai/models").mock(
+        return_value=httpx.Response(200, json={"object": "list", "data": []})
+    )
+
+    result = client.openai.models.list()
+
+    assert result["object"] == "list"
+
+
+@respx.mock
+def test_openai_audio_speech(client):
+    route = respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+        return_value=httpx.Response(200, content=b"audio-bytes", headers={"content-type": "audio/mpeg"})
+    )
+
+    result = client.openai.audio.speech.create(
+        input="hello",
+        model="tts-1",
+        voice="alloy",
+        response_format="mp3",
+    )
+
+    assert result == b"audio-bytes"
+    assert route.calls.last.request.content == (
+        b'{"input":"hello","model":"tts-1","voice":"alloy","response_format":"mp3"}'
+    )
+
+
+@respx.mock
+def test_openai_audio_transcriptions(client):
+    route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+        return_value=httpx.Response(200, json={"text": "hello"})
+    )
+
+    result = client.openai.audio.transcriptions.create(
+        file=b"audio",
+        filename="sample.wav",
+        model="whisper-1",
+        response_format="json",
+        timestamp_granularities=["word"],
+    )
+
+    request = route.calls.last.request
+    assert result["text"] == "hello"
+    assert request.headers["content-type"].startswith("multipart/form-data")
+    assert b'name="file"; filename="sample.wav"' in request.content
+    assert b'name="timestamp_granularities[]"' in request.content
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

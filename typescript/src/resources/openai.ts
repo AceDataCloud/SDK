@@ -1,6 +1,35 @@
 /** OpenAI-compatible facade resources. */
 
 import { Transport } from '../runtime/transport';
+import { mapError } from '../runtime/transport';
+
+type TransportInternals = {
+  baseURL: string;
+  headers: Record<string, string>;
+  timeout: number;
+};
+
+function transportInternals(transport: Transport): TransportInternals {
+  return transport as unknown as TransportInternals;
+}
+
+async function parseError(resp: Response): Promise<Record<string, unknown>> {
+  const text = await resp.text();
+  try {
+    return JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    return { error: { code: 'unknown', message: text } };
+  }
+}
+
+function appendFormValue(body: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return;
+  if (Array.isArray(value)) {
+    for (const item of value) body.append(key, String(item));
+    return;
+  }
+  body.append(key, String(value));
+}
 
 class Completions {
   constructor(private transport: Transport) {}
@@ -44,6 +73,14 @@ class ChatNamespace {
   readonly completions: Completions;
   constructor(transport: Transport) {
     this.completions = new Completions(transport);
+  }
+}
+
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
   }
 }
 
@@ -164,6 +201,139 @@ class Embeddings {
   }
 }
 
+class Speech {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    input: string;
+    model?: string;
+    voice?: string;
+    responseFormat?: string;
+    speed?: number;
+    [key: string]: unknown;
+  }): Promise<ArrayBuffer> {
+    const { input, responseFormat, ...rest } = opts;
+    const body: Record<string, unknown> = { input, ...rest };
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    const { baseURL, headers, timeout } = transportInternals(this.transport);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+      const resp = await fetch(`${baseURL}/v1/audio/speech`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      if (resp.status >= 400) throw mapError(resp.status, await parseError(resp));
+      return await resp.arrayBuffer();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+}
+
+class Transcriptions {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    file: Blob | Buffer | Uint8Array;
+    filename?: string;
+    model?: string;
+    language?: string;
+    prompt?: string;
+    responseFormat?: string;
+    temperature?: number;
+    timestampGranularities?: string[];
+    stream?: boolean;
+    languages?: string[];
+    keywords?: string[];
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown> | string | AsyncGenerator<string>> {
+    const {
+      file,
+      filename = 'audio',
+      responseFormat,
+      timestampGranularities,
+      languages,
+      keywords,
+      stream,
+      ...rest
+    } = opts;
+    const body = new FormData();
+    body.append('file', file instanceof Blob ? file : new Blob([file]), filename);
+    for (const [key, value] of Object.entries(rest)) appendFormValue(body, key, value);
+    appendFormValue(body, 'response_format', responseFormat);
+    appendFormValue(body, 'timestamp_granularities[]', timestampGranularities);
+    appendFormValue(body, 'languages[]', languages);
+    appendFormValue(body, 'keywords[]', keywords);
+    appendFormValue(body, 'stream', stream);
+    if (stream) return this.streamResponse(body);
+    const resp = await this.fetchMultipart(body);
+    const contentType = resp.headers.get('content-type') ?? '';
+    if (contentType.startsWith('text/plain')) return await resp.text();
+    return (await resp.json()) as Record<string, unknown>;
+  }
+
+  private async fetchMultipart(body: FormData): Promise<Response> {
+    const { baseURL, headers, timeout } = transportInternals(this.transport);
+    const { ['content-type']: _contentType, ...authHeaders } = headers;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+      const resp = await fetch(`${baseURL}/v1/audio/transcriptions`, {
+        method: 'POST',
+        headers: authHeaders,
+        body,
+        signal: controller.signal,
+      });
+      if (resp.status >= 400) throw mapError(resp.status, await parseError(resp));
+      return resp;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  private async *streamResponse(body: FormData): AsyncGenerator<string> {
+    const resp = await this.fetchMultipart(body);
+    const reader = resp.body?.getReader();
+    if (!reader) return;
+    const decoder = new TextDecoder();
+    let buffer = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') return;
+          yield data;
+        }
+      }
+    }
+  }
+}
+
+class AudioNamespace {
+  readonly speech: Speech;
+  readonly transcriptions: Transcriptions;
+  constructor(transport: Transport) {
+    this.speech = new Speech(transport);
+    this.transcriptions = new Transcriptions(transport);
+  }
+}
+
+class Realtime {
+  constructor(private transport: Transport) {}
+
+  async connect(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/v1/realtime');
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -208,16 +378,22 @@ class Tasks {
 
 export class OpenAI {
   readonly chat: ChatNamespace;
+  readonly models: Models;
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly audio: AudioNamespace;
+  readonly realtime: Realtime;
   readonly tasks: Tasks;
 
   constructor(transport: Transport) {
     this.chat = new ChatNamespace(transport);
+    this.models = new Models(transport);
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.audio = new AudioNamespace(transport);
+    this.realtime = new Realtime(transport);
     this.tasks = new Tasks(transport);
   }
 }
