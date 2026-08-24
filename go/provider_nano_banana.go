@@ -12,20 +12,20 @@ type NanoBanana struct {
 
 // NanoBananaGenerateRequest is the input to nano_banana.Generate.
 type NanoBananaGenerateRequest struct {
-	// Image operation type. If it is `generate`, then generate an image based on the prompt; if it is `edit`, then e
+	// Nano Banana Images Action
 	Action string
-	// Prompts for generating images.
+	// Nano Banana Images Prompt
 	Prompt string
-	// The number of images to be generated or edited supports 1 to 4, with a default of 1. If some images fail to ge
-	Count int
-	// Models used for generating images. If not specified, the default is `nano-banana`. `nano-banana-2-lite` is an
+	// Nano Banana Images Model
 	Model string
-	// Link to the image that needs to be edited. It can be an accessible http or https URL, or a Base64 encoded imag
+	// Nano Banana Images Image Urls
 	ImageURLs []string
-	// Resolution of generated images. Supported values are `1K`, `2K`, `4K`, with a default of `1K`. If this paramet
-	Resolution string
-	// Aspect ratio for generating images. Supported values are `1:1`, `3:2`, `2:3`, `16:9`, `9:16`, `4:3`, `3:4`. If
+	// Nano Banana Images Count
+	Count int
+	// Nano Banana Images Aspect Ratio
 	AspectRatio string
+	// Nano Banana Images Resolution
+	Resolution string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -38,22 +38,22 @@ func (r NanoBananaGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["action"] = r.Action
 	body["prompt"] = r.Prompt
-	if r.Count != 0 {
-		body["count"] = r.Count
-	} else {
-		body["count"] = 1
-	}
 	if r.Model != "" {
 		body["model"] = r.Model
 	}
 	if r.ImageURLs != nil {
 		body["image_urls"] = r.ImageURLs
 	}
-	if r.Resolution != "" {
-		body["resolution"] = r.Resolution
+	if r.Count != 0 {
+		body["count"] = r.Count
+	} else {
+		body["count"] = 1
 	}
 	if r.AspectRatio != "" {
 		body["aspect_ratio"] = r.AspectRatio
+	}
+	if r.Resolution != "" {
+		body["resolution"] = r.Resolution
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -70,7 +70,7 @@ func (r NanoBananaGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Google Nano Banana image generation and editing API. Supports nano-banana, nano-banana-2, and nano-banana-pro for text-to-image generation and referen
+// Generate Nano Banana Images
 func (c *NanoBanana) Generate(ctx context.Context, req NanoBananaGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

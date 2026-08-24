@@ -7,6 +7,7 @@ from typing import Any
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
 _SERVICE_TASK_ENDPOINTS = {
+    "drawai": "/headshots/tasks",
     "suno": "/suno/tasks",
     "producer": "/producer/tasks",
     "fish": "/fish/tasks",

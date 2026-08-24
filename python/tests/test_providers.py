@@ -13,7 +13,10 @@ from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
 # Every service the platform exposes as a non-private generation API.
 GENERATED = (
+    "drawai",
     "flux",
+    "gemini",
+    "grok",
     "seedream",
     "nano_banana",
     "seedance",
@@ -21,6 +24,9 @@ GENERATED = (
     "producer",
     "fish",
     "hailuo",
+    "midjourney",
+    "qrart",
+    "qwen_image",
     "wan",
     "luma",
     "happyhorse",

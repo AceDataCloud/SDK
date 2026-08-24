@@ -54,7 +54,7 @@ export interface MaestroGenerateOptions {
 export class Maestro {
   constructor(private transport: Transport) {}
 
-  /** Call /maestro/videos. */
+  /** Maestro Videos */
   async generate(options: MaestroGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["prompt"] = options.prompt;

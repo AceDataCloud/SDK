@@ -33,8 +33,8 @@ class Dreamina:
     def generate(
         self,
         *,
-        audio_url: str,
         image_url: str,
+        audio_url: str,
         model: Literal["omnihuman-1.5"] | None = None,
         prompt: str | None = None,
         mask_url: list[str] | None = None,
@@ -45,10 +45,10 @@ class Dreamina:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Audio-driven talking-photo digital human video generation (OmniHuman 1.5)"""
+        """Dreamina Videos"""
         body: dict[str, Any] = {}
-        body["audio_url"] = audio_url
         body["image_url"] = image_url
+        body["audio_url"] = audio_url
         body["model"] = model if model is not None else "omnihuman-1.5"
         if prompt is not None:
             body["prompt"] = prompt
@@ -74,8 +74,8 @@ class AsyncDreamina:
     async def generate(
         self,
         *,
-        audio_url: str,
         image_url: str,
+        audio_url: str,
         model: Literal["omnihuman-1.5"] | None = None,
         prompt: str | None = None,
         mask_url: list[str] | None = None,
@@ -86,10 +86,10 @@ class AsyncDreamina:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Audio-driven talking-photo digital human video generation (OmniHuman 1.5)"""
+        """Dreamina Videos"""
         body: dict[str, Any] = {}
-        body["audio_url"] = audio_url
         body["image_url"] = image_url
+        body["audio_url"] = audio_url
         body["model"] = model if model is not None else "omnihuman-1.5"
         if prompt is not None:
             body["prompt"] = prompt

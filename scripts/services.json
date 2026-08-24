@@ -6,11 +6,6 @@
     "id": "77adcb84-d59f-5ef9-b8a0-8b35eb42a71d",
     "path": "/fish/tts",
     "name": "Fish TTS API"
-   },
-   {
-    "id": "82dcabe9-b1a3-541f-80f1-decb183b920c",
-    "path": "/fish/model",
-    "name": "Fish Model Create API"
    }
   ],
   "tasks": "/fish/tasks"
@@ -376,5 +371,121 @@
    }
   ],
   "tasks": null
+ },
+ "drawai": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "eece7257-9848-58b4-a684-2bff33edda23",
+    "path": "/headshots/generate",
+    "name": "Generate"
+   }
+  ],
+  "tasks": "/headshots/tasks"
+ },
+ "gemini": {
+  "category": "AI Chat",
+  "endpoints": [
+   {
+    "id": "fffcd3a3-dd5d-5fb7-8afa-afc3ddf47579",
+    "path": "/gemini/chat/completions",
+    "name": "Gemini Chat Completions"
+   },
+   {
+    "id": "414f1134-d884-555c-b420-079da10dfd2d",
+    "path": "/v1beta/models/{model}:generateContent",
+    "name": "Gemini Generate Content"
+   },
+   {
+    "id": "1780518c-6434-5798-8cf5-ce39d1712cf1",
+    "path": "/v1beta/models/{model}:streamGenerateContent",
+    "name": "Gemini Stream Generate Content"
+   },
+   {
+    "id": "90d85d82-ccb9-536c-920e-333e9b2fac0a",
+    "path": "/gemini/videos",
+    "name": "Gemini Videos"
+   }
+  ],
+  "tasks": "/gemini/tasks"
+ },
+ "grok": {
+  "category": "AI Chat",
+  "endpoints": [
+   {
+    "id": "e8130f50-d5ee-5279-b4fa-91b049e4e85e",
+    "path": "/grok/chat/completions",
+    "name": "Grok Chat Completions"
+   },
+   {
+    "id": "f1f9e09b-0efb-5089-b697-a3262a0f4065",
+    "path": "/grok/videos",
+    "name": "Grok Videos"
+   }
+  ],
+  "tasks": "/grok/tasks"
+ },
+ "midjourney": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "f806e835-27a9-5ee8-b745-fdfce5d334e1",
+    "path": "/midjourney/imagine",
+    "name": "Midjourney Imagine"
+   },
+   {
+    "id": "8670f338-0253-5136-823d-44ca4f969a72",
+    "path": "/midjourney/seed",
+    "name": "Midjourney Seed"
+   },
+   {
+    "id": "489d8858-6923-544e-9a35-eb31a6c76ef1",
+    "path": "/midjourney/edits",
+    "name": "Midjourney Edits"
+   },
+   {
+    "id": "94ef9175-8ff8-59a1-b2be-ea2286ca97e6",
+    "path": "/midjourney/videos",
+    "name": "Midjourney Videos"
+   },
+   {
+    "id": "2cd9b1e7-4247-5696-a523-3e121222edbf",
+    "path": "/midjourney/describe",
+    "name": "Midjourney Describe"
+   },
+   {
+    "id": "f39a9b67-c4fa-5060-aded-37db042b691d",
+    "path": "/midjourney/shorten",
+    "name": "Midjourney Shorten"
+   },
+   {
+    "id": "1a7a0497-2313-5101-bb29-0a69c9805b98",
+    "path": "/midjourney/translate",
+    "name": "Midjourney Translate"
+   }
+  ],
+  "tasks": "/midjourney/tasks"
+ },
+ "qrart": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "5d374427-33c1-54c2-933e-871f8da40512",
+    "path": "/qrart/generate",
+    "name": "Generate an QR code"
+   }
+  ],
+  "tasks": "/qrart/tasks"
+ },
+ "qwen-image": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "c3d0361b-5786-50f2-8e23-2f34ccb4d2ce",
+    "path": "/qwen-image/images",
+    "name": "Qwen Image Images"
+   }
+  ],
+  "tasks": "/qwen-image/tasks"
  }
 }

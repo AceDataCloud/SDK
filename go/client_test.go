@@ -33,6 +33,16 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 }
 
+func TestNewClient_AttachesNewGeneratedProviders(t *testing.T) {
+	c, err := NewClient(WithAPIToken("test-token"))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	if c.Drawai() == nil || c.Gemini() == nil || c.Grok() == nil || c.Midjourney() == nil || c.Qrart() == nil || c.QwenImage() == nil {
+		t.Fatal("newly generated providers must be non-nil")
+	}
+}
+
 func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/seedream/images" {

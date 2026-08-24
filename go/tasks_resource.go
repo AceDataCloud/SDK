@@ -6,6 +6,7 @@ import (
 )
 
 var serviceTaskEndpoints = map[string]string{
+	"drawai":      "/headshots/tasks",
 	"suno":        "/suno/tasks",
 	"producer":    "/producer/tasks",
 	"fish":        "/fish/tasks",
