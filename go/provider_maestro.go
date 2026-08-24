@@ -102,7 +102,7 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Call /maestro/videos.
+// Generate Maestro Videos
 func (c *Maestro) Generate(ctx context.Context, req MaestroGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

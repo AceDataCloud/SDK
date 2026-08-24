@@ -90,6 +90,27 @@ def test_sync_generate_serializes_canonical_omni_request() -> None:
     ]
 
 
+def test_generate_uses_spec_defaults() -> None:
+    transport = SyncTransport()
+    client = Kling(transport)
+
+    client.generate(action="text2video", prompt="Use defaults")
+
+    assert transport.calls == [
+        (
+            "POST",
+            "/kling/videos",
+            {
+                "action": "text2video",
+                "model": "kling-v1",
+                "mode": "std",
+                "prompt": "Use defaults",
+                "duration": 5,
+            },
+        )
+    ]
+
+
 @pytest.mark.asyncio
 async def test_async_generate_serializes_without_callback() -> None:
     transport = AsyncTransport()

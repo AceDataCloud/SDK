@@ -44,6 +44,26 @@ describe('Kling resource', () => {
     });
   });
 
+  it('serializes spec defaults for video generation', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-kling' });
+    const kling = new Kling({ request } as any);
+
+    await kling.generate({
+      action: 'text2video',
+      prompt: 'Use defaults',
+    });
+
+    expect(request).toHaveBeenCalledWith('POST', '/kling/videos', {
+      json: {
+        action: 'text2video',
+        model: 'kling-v1',
+        mode: 'std',
+        prompt: 'Use defaults',
+        duration: 5,
+      },
+    });
+  });
+
   it('rejects references on non-Omni models before transport', async () => {
     const request = jest.fn();
     const kling = new Kling({ request } as any);

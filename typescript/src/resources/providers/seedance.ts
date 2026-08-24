@@ -17,36 +17,40 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface SeedanceGenerateOptions {
-  /** $t(seedance_videos_model) */
+  /** Seedance Videos Model */
   model: "doubao-seedance-1-0-pro-250528" | "doubao-seedance-1-0-pro-fast-251015" | "doubao-seedance-1-5-pro-251215" | "doubao-seedance-1-0-lite-t2v-250428" | "doubao-seedance-1-0-lite-i2v-250428" | "doubao-seedance-2-0-260128" | "doubao-seedance-2-0-fast-260128" | "doubao-seedance-2-0-mini-260615" | "doubao-seedance-2-5-260628";
-  /** $t(seedance_videos) */
+  /** Seedance Videos */
   content: Array<Record<string, unknown>>;
-  /** $t(seedance_videos_resolution) */
+  /** Seedance Videos Resolution */
   resolution?: "480p" | "720p" | "1080p" | "4k";
-  /** $t(seedance_videos_ratio) */
+  /** Seedance Videos Ratio */
   ratio?: "16:9" | "4:3" | "1:1" | "3:4" | "9:16" | "21:9" | "adaptive";
-  /** $t(seedance_videos_duration) */
+  /** Seedance Videos Duration */
   duration?: number;
-  /** $t(seedance_videos_frames) */
+  /** Seedance Videos Frames */
   frames?: number;
-  /** $t(seedance_videos_seed) */
+  /** Seedance Videos Seed */
   seed?: number;
-  /** $t(seedance_videos_camerafixed) */
+  /** Seedance Videos Camerafixed */
   camerafixed?: boolean;
-  /** $t(seedance_videos_watermark) */
+  /** Seedance Videos Watermark */
   watermark?: boolean;
-  /** $t(seedance_videos_generate_audio) */
+  /** Seedance Videos Generate Audio */
   generateAudio?: boolean;
-  /** $t(seedance_videos_return_last_frame) */
+  /** Seedance Videos Return Last Frame */
   returnLastFrame?: boolean;
-  /** $t(seedance_videos_execution_expires_after) */
+  /** Seedance Videos Execution Expires After */
   executionExpiresAfter?: number;
-  /** $t(seedance_videos_omni_reference_task_type) */
+  /** Seedance Videos Omni Reference Task Type */
   omniReferenceTaskType?: "auto" | "edit" | "extend";
-  /** $t(seedance_videos_output_format) */
+  /** Seedance Videos Output Format */
   outputFormat?: "mp4" | "mov";
-  /** $t(seedance_videos_tools) */
+  /** Seedance Videos Tools */
   tools?: Array<Record<string, unknown>>;
+  /** Seedance Videos Priority */
+  priority?: number;
+  /** Seedance Videos Safety Identifier */
+  safetyIdentifier?: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -62,7 +66,7 @@ export interface SeedanceGenerateOptions {
 export class Seedance {
   constructor(private transport: Transport) {}
 
-  /** Call /seedance/videos. */
+  /** Seedance Videos */
   async generate(options: SeedanceGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;
@@ -80,8 +84,10 @@ export class Seedance {
     if (options.omniReferenceTaskType !== undefined) body["omni_reference_task_type"] = options.omniReferenceTaskType;
     if (options.outputFormat !== undefined) body["output_format"] = options.outputFormat;
     if (options.tools !== undefined) body["tools"] = options.tools;
+    body["priority"] = options.priority ?? 0;
+    if (options.safetyIdentifier !== undefined) body["safety_identifier"] = options.safetyIdentifier;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "callbackUrl", "camerafixed", "content", "duration", "executionExpiresAfter", "frames", "generateAudio", "maxWait", "model", "omniReferenceTaskType", "outputFormat", "pollInterval", "ratio", "resolution", "returnLastFrame", "seed", "tools", "wait", "watermark"].includes(key) && value !== undefined) {
+      if (!["async", "callbackUrl", "camerafixed", "content", "duration", "executionExpiresAfter", "frames", "generateAudio", "maxWait", "model", "omniReferenceTaskType", "outputFormat", "pollInterval", "priority", "ratio", "resolution", "returnLastFrame", "safetyIdentifier", "seed", "tools", "wait", "watermark"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }

@@ -38,4 +38,16 @@ describe('Seedance provider', () => {
     });
     expect(request.mock.calls[0][2].json.output_format).toBeUndefined();
   });
+
+  it('sends the new priority contract fields', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'seedance-priority' });
+    const seedance = new Seedance({ request } as any);
+    await seedance.generate({
+      model: 'doubao-seedance-2-0-260128',
+      content: [{ type: 'text', text: 'A scene' }],
+      safetyIdentifier: 'user-123',
+    });
+    expect(request.mock.calls[0][2].json.priority).toBe(0);
+    expect(request.mock.calls[0][2].json.safety_identifier).toBe('user-123');
+  });
 });

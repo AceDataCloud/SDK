@@ -95,7 +95,7 @@ class Maestro:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Call /maestro/videos."""
+        """Maestro Videos"""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body["action"] = action if action is not None else "generate"
@@ -148,7 +148,7 @@ class AsyncMaestro:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Call /maestro/videos."""
+        """Maestro Videos"""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body["action"] = action if action is not None else "generate"

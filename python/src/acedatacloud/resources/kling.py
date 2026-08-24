@@ -67,9 +67,9 @@ def _build_generate_body(
     *,
     action: KlingAction,
     model: KlingModel,
-    mode: KlingMode | None,
+    mode: KlingMode,
     prompt: str | None,
-    duration: int | None,
+    duration: int,
     generate_audio: bool | None,
     video_id: str | None,
     cfg_scale: float | None,
@@ -117,13 +117,13 @@ def _build_generate_body(
         raise ValueError("cfg_scale must be between 0 and 1")
     if duration is not None and (isinstance(duration, bool) or not isinstance(duration, int)):
         raise ValueError("duration must be an integer")
-    if is_v3 and duration is not None and not 3 <= duration <= 15:
+    if is_v3 and not 3 <= duration <= 15:
         raise ValueError("Kling V3 duration must be between 3 and 15 seconds")
-    if not is_v3 and model != "kling-o1" and duration is not None and duration not in {5, 10}:
+    if not is_v3 and model != "kling-o1" and duration not in {5, 10}:
         raise ValueError("This Kling model supports only 5- or 10-second generation")
-    if model == "kling-o1" and duration is not None and duration != 5:
+    if model == "kling-o1" and duration != 5:
         raise ValueError("kling-o1 supports only 5-second generation")
-    if model == "kling-o1" and mode is not None and mode not in {"std", "pro"}:
+    if model == "kling-o1" and mode not in {"std", "pro"}:
         raise ValueError("kling-o1 supports only std and pro modes")
     if mode == "4k" and not is_v3:
         raise ValueError("4k mode requires kling-v3 or kling-v3-omni")
@@ -257,10 +257,10 @@ class Kling:
         self,
         *,
         action: KlingAction,
-        model: KlingModel,
-        mode: KlingMode | None = None,
+        model: KlingModel = "kling-v1",
+        mode: KlingMode = "std",
         prompt: str | None = None,
-        duration: int | None = None,
+        duration: int = 5,
         generate_audio: bool | None = None,
         video_id: str | None = None,
         cfg_scale: float | None = None,
@@ -332,10 +332,10 @@ class AsyncKling:
         self,
         *,
         action: KlingAction,
-        model: KlingModel,
-        mode: KlingMode | None = None,
+        model: KlingModel = "kling-v1",
+        mode: KlingMode = "std",
         prompt: str | None = None,
-        duration: int | None = None,
+        duration: int = 5,
         generate_audio: bool | None = None,
         video_id: str | None = None,
         cfg_scale: float | None = None,

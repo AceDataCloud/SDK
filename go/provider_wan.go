@@ -12,39 +12,39 @@ type Wan struct {
 
 // WanGenerateRequest is the input to wan.Generate.
 type WanGenerateRequest struct {
-	// $t(wan_videos_model)
+	// Wan Videos Model
 	Model string
-	// $t(wan_videos_audio)
+	// Wan Videos Audio
 	Audio bool
-	// $t(wan_videos_prompt_extend)
+	// Wan Videos Prompt Extend
 	PromptExtend bool
-	// $t(wan_videos_action)
+	// Wan Videos Action
 	Action string
-	// $t(wan_videos_resolution)
+	// Wan Videos Resolution
 	Resolution string
-	// $t(wan_videos_shot_type)
+	// Wan Videos Shot Type
 	ShotType string
-	// $t(wan_videos_duration)
+	// Wan Videos Duration
 	Duration float64
-	// $t(wan_videos_prompt)
+	// Wan Videos Prompt
 	Prompt string
-	// $t(wan_videos_negative_prompt)
+	// Wan Videos Negative Prompt
 	NegativePrompt string
-	// $t(wan_videos_size)
+	// Wan Videos Size
 	Size string
-	// $t(wan_videos_audio_url)
+	// Wan Videos Audio Url
 	AudioURL string
-	// $t(wan_videos_reference_video_urls)
+	// Wan Videos Reference Video Urls
 	ReferenceVideoURLs []string
-	// $t(wan_videos_image_url)
+	// Wan Videos Image Url
 	ImageURL string
-	// $t(wan_videos_media)
+	// Wan Videos Media
 	Media []map[string]any
-	// $t(wan_videos_ratio)
+	// Wan Videos Ratio
 	Ratio string
-	// $t(wan_videos_seed)
+	// Wan Videos Seed
 	Seed int
-	// $t(wan_videos_watermark)
+	// Wan Videos Watermark
 	Watermark bool
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool

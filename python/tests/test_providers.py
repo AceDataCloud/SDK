@@ -133,6 +133,22 @@ def test_seedance_20_does_not_receive_25_defaults(client):
     assert "output_format" not in transport.request.call_args.kwargs["json"]
 
 
+def test_seedance_sends_new_priority_contract_fields(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "seedance-priority"}
+    client.seedance._transport = transport
+
+    client.seedance.generate(
+        model="doubao-seedance-2-0-260128",
+        content=[{"type": "text", "text": "A scene"}],
+        safety_identifier="user-123",
+    )
+
+    body = transport.request.call_args.kwargs["json"]
+    assert body["priority"] == 0
+    assert body["safety_identifier"] == "user-123"
+
+
 def test_seedream_omits_example_only_size(client):
     transport = Mock()
     transport.request.return_value = {

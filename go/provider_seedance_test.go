@@ -30,3 +30,14 @@ func TestSeedance20OmitsSeedance25Defaults(t *testing.T) {
 		t.Fatalf("2.0 request unexpectedly contains output_format: %#v", body)
 	}
 }
+
+func TestSeedanceRequestIncludesPriorityContractFields(t *testing.T) {
+	body := (SeedanceGenerateRequest{
+		Model:            "doubao-seedance-2-0-260128",
+		Content:          []map[string]any{{"type": "text", "text": "A scene"}},
+		SafetyIdentifier: "user-123",
+	}).toBody()
+	if body["priority"] != 0 || body["safety_identifier"] != "user-123" {
+		t.Fatalf("missing priority contract fields: %#v", body)
+	}
+}
