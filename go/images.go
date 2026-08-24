@@ -6,7 +6,7 @@ import "context"
 type ImageGenerateRequest struct {
 	// Prompt is the required text prompt.
 	Prompt string
-	// Provider selects the backend. Common values: "nano-banana", "flux", "seedream".
+	// Provider selects the backend. Common values: "nano-banana", "flux", "qwen-image", "seedream".
 	Provider string
 	// Model is optional — provider-specific model identifier.
 	Model string

@@ -1,1 +1,1016 @@
-{"paths": {"/wan/videos": {"post": {"summary": "Generate videos based on prompt and image frames", "security": [{"bearerAuth": []}], "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "example": {"state": "completed", "prompt": "Astronauts shuttle from space to volcano", "success": true, "task_id": "5636d6ba-957f-475e-a98a-718a07ee89a6", "video_id": "b4ef4c5e-9680-41c8-a678-0ce2ce6194de", "video_url": "https://cdn.acedata.cloud/43a57990c0.mp4", "video_width": 1552, "video_height": 656, "thumbnail_url": "https://cdn.acedata.cloud/4hfydw.jpg", "thumbnail_width": 1552, "thumbnail_height": 656}, "properties": {"state": {"type": "string", "description": "The current status of video generation tasks."}, "prompt": {"type": "string", "description": "Prompts for generating videos."}, "success": {"type": "boolean", "description": "Indicate whether the task was successfully executed."}, "task_id": {"type": "string", "description": "The ID of the video generation task."}, "video_id": {"type": "string", "description": "The unique identifier for generating a video."}, "video_url": {"type": "string", "description": "Generate the access URL for the video."}, "video_width": {"type": "number", "description": "The width of the generated video (in pixels)."}, "video_height": {"type": "number", "description": "Height of the video (pixels)."}, "thumbnail_url": {"type": "string", "description": "Access URL for generating video thumbnails."}, "thumbnail_width": {"type": "number", "description": "The width of the generated video thumbnail (pixels)."}, "thumbnail_height": {"type": "number", "description": "Height of the generated video thumbnail (pixels)."}}}}}, "description": "Video generation successful or operation executed successfully."}, "400": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "bad_request", "message": "The json payload is not valid to request the API"}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "bad_request", "description": "Response error code."}, "message": {"type": "string", "example": "prompt is required", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "token_mismatched", "message": "The specified token is not matched with API."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "token_mismatched", "description": "Response error code."}, "message": {"type": "string", "example": "The specified token is not matched with API.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "api_not_implemented", "message": "The API is not implemented."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "api_not_implemented", "description": "Response error code."}, "message": {"type": "string", "example": "The API is not implemented.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Request error, possibly due to missing or invalid parameters."}, "401": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "invalid_token", "message": "The specified token is invalid or wrong."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "invalid_token", "description": "Response error code."}, "message": {"type": "string", "example": "The specified token is invalid or wrong.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Unauthorized, authorization token is invalid or missing."}, "403": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "forbidden", "message": "Sorry! Our Al moderators feel your prompt might be against our community standards."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "forbidden", "description": "Response error code."}, "message": {"type": "string", "example": "Sorry! Our Al moderators feel your prompt might be against our community standards.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Access denied, the request has been understood but is denied or lacks access permissions."}, "429": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "too_many_requests", "message": "You have exceeded the rate limit."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "too_many_requests", "description": "Response error code."}, "message": {"type": "string", "example": "You have exceeded the rate limit.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Too many requests, rate limit exceeded."}, "500": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "api_error", "message": "Internal server error."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "api_error", "description": "Response error code."}, "message": {"type": "string", "example": "Internal server error.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Internal server error, an exception occurred on the server."}, "504": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "timeout", "message": "Timeout to generate the image."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "timeout", "description": "Response error code."}, "message": {"type": "string", "example": "Timeout to generate the image.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Request timed out, server processing time is too long."}}, "parameters": [{"in": "header", "name": "accept", "schema": {"enum": ["application/json"], "type": "string"}, "required": false, "description": "Specify the response format returned by the server."}], "requestBody": {"content": {"application/json": {"schema": {"type": "object", "required": ["action", "model", "prompt"], "properties": {"size": {"rank": 15, "type": "string", "description": "Video size specifications."}, "async": {"rank": 51, "type": "boolean", "description": "Whether to process in asynchronous mode. When set to `true`, the interface immediately returns `task_id`, without the need to provide `callback_url`, and then the result can be obtained by polling the corresponding task query interface; if `callback_url` is also provided, the result will be pushed to that callback address."}, "audio": {"rank": 80, "type": "boolean", "default": false, "description": "Specify whether the generated video contains sound."}, "model": {"enum": ["wan2.6-i2v", "wan2.6-r2v", "wan2.6-i2v-flash", "wan2.6-t2v"], "rank": 10, "type": "string", "description": "Models for generating videos include optional values such as `wan2.6-t2v` (text-to-video), `wan2.6-i2v` (image-to-video), `wan2.6-i2v-flash` (fast version of image-to-video), and `wan2.6-r2v` (reference video generation)."}, "action": {"enum": ["text2video", "image2video"], "rank": 1, "type": "string", "default": "text2video", "description": "Operation types. `text2video` indicates text-to-video, and `image2video` indicates image-to-video."}, "prompt": {"rank": 10, "type": "string", "example": "Astronauts shuttle from space to volcano", "description": "Prompts for generating videos."}, "duration": {"enum": [5, 10, 15], "rank": 10, "type": "number", "description": "Specify the duration of the video to be generated (in seconds), with optional values of `5`, `10`, or `15`."}, "audio_url": {"rank": 25, "type": "string", "description": "The URL of the audio file, the model will generate the corresponding video based on that audio."}, "image_url": {"rank": 30, "type": "string", "example": "https://cdn.acedata.cloud/r9vsv9.png", "description": "The URL of the starting frame image, which will serve as the first frame of the generated video."}, "shot_type": {"enum": ["single", "multi"], "rank": 10, "type": "string", "description": "Specify the type of shots for the video, that is, whether the video consists of a single continuous shot (`single`) or multiple switching shots (`multi`)."}, "resolution": {"enum": ["480P", "720P", "1080P"], "rank": 10, "type": "string", "description": "Specify the resolution level for generating the video, used to adjust the video clarity (total pixel count). The model will automatically scale to a similar total pixel count based on the selected resolution level, and the aspect ratio of the generated video will strive to remain consistent with the aspect ratio of the input image `image_url`."}, "callback_url": {"rank": 50, "type": "string", "description": "Asynchronous notification Webhook callback URL."}, "prompt_extend": {"rank": 80, "type": "boolean", "default": false, "description": "Whether to enable intelligent rewriting of prompts. Once enabled, a large model will be used to intelligently expand the input prompts, which can significantly improve the generation effect of shorter prompts, but will increase processing time."}, "negative_prompt": {"rank": 20, "type": "string", "example": "Astronauts shuttle from space to volcano", "description": "Reverse prompt words, used to describe content that is not desired to appear in the video footage, can be used to limit the video visuals. Supports both Chinese and English, with a length not exceeding 500 characters; any excess will be automatically truncated."}, "reference_video_urls": {"rank": 25, "type": "array", "items": {"type": "string", "format": "uri"}, "minItems": 1, "description": "An array of URLs for reference video files, used to extract the character images (and vocal tones, if any) from the reference videos to generate videos that match the reference features."}}}, "example": {"model": "wan2.6-i2v", "action": "text2video", "prompt": "Astronauts shuttle from space to volcano", "image_url": "https://cdn.acedata.cloud/r9vsv9.png", "negative_prompt": "Astronauts shuttle from space to volcano"}}}, "required": true}}}}, "openapi": "3.0.0", "servers": [{"url": "https://api.acedata.cloud", "description": "Ace Data Cloud API Server"}], "components": {"securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer"}}}}
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Tongyi Wansiang Video Generation",
+    "version": "1.0.0",
+    "description": "API reference for Tongyi Wansiang Video Generation on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    },
+    "schemas": {
+      "WanTaskRequestPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Request body recorded from the API operation that created this task. Fields depend on that operation and action."
+      },
+      "WanTaskResultPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Final response recorded from the API operation that created this task. Fields follow that operation’s documented success or error contract."
+      },
+      "WanTaskRecord": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "trace_id",
+          "request"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Task identifier."
+          },
+          "type": {
+            "type": "string",
+            "description": "Task type."
+          },
+          "trace_id": {
+            "type": "string",
+            "description": "Request trace identifier."
+          },
+          "request": {
+            "$ref": "#/components/schemas/WanTaskRequestPayload"
+          },
+          "response": {
+            "$ref": "#/components/schemas/WanTaskResultPayload"
+          },
+          "created_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Unix timestamp in seconds when the task was created."
+          },
+          "started_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Unix timestamp in seconds when processing started."
+          },
+          "finished_at": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Unix timestamp in seconds when processing finished."
+          },
+          "elapsed": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Processing duration in seconds."
+          },
+          "user_id": {
+            "type": "string",
+            "description": "Account that owns the task."
+          },
+          "actor_user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Account that executed an authorized request."
+          },
+          "api_id": {
+            "type": "string",
+            "description": "API identifier."
+          },
+          "application_id": {
+            "type": "string",
+            "description": "Application used for billing."
+          },
+          "credential_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Credential used to start the task."
+          },
+          "authorization_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Authorization used to start the task."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/wan/tasks": {
+      "post": {
+        "summary": "Operate the tasks on the wan.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WanTaskRecord"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "items",
+                        "count"
+                      ],
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/WanTaskRecord"
+                          },
+                          "description": "Matching tasks."
+                        },
+                        "count": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "description": "Total matching task count."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "description": "Returned when the requested task does not exist."
+                    }
+                  ]
+                },
+                "example": {
+                  "items": [],
+                  "count": 0
+                }
+              }
+            },
+            "description": "Wan Tasks Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Wan Tasks Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Wan Tasks Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Tasks Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Wan Tasks Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Wan Tasks Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Tasks Response 400 Trace Id 2"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Tasks Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Wan Tasks Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Wan Tasks Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Tasks Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Tasks Response 401"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Wan Tasks Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Wan Tasks Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Tasks Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Tasks Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Wan Tasks Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Wan Tasks Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Tasks Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Tasks Response 500"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Wan Tasks Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Wan Tasks Id"
+                  },
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Wan Tasks Ids"
+                  },
+                  "action": {
+                    "enum": [
+                      "retrieve",
+                      "retrieve_batch"
+                    ],
+                    "type": "string",
+                    "default": "retrieve",
+                    "description": "Wan Tasks Action"
+                  }
+                },
+                "example": {
+                  "action": "retrieve",
+                  "id": "task-id"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "operationId": "queryWanTasks"
+      }
+    },
+    "/wan/videos": {
+      "post": {
+        "summary": "Generate videos based on prompt and image frames",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "state": "completed",
+                    "prompt": "Astronauts shuttle from space to volcano",
+                    "success": true,
+                    "task_id": "5636d6ba-957f-475e-a98a-718a07ee89a6",
+                    "video_id": "b4ef4c5e-9680-41c8-a678-0ce2ce6194de",
+                    "video_url": "https://cdn.acedata.cloud/43a57990c0.mp4",
+                    "video_width": 1552,
+                    "video_height": 656,
+                    "thumbnail_url": "https://cdn.acedata.cloud/4hfydw.jpg",
+                    "thumbnail_width": 1552,
+                    "thumbnail_height": 656
+                  },
+                  "properties": {
+                    "state": {
+                      "type": "string",
+                      "description": "Wan Videos Response 200 State"
+                    },
+                    "prompt": {
+                      "type": "string",
+                      "description": "Wan Videos Response 200 Prompt"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "description": "Wan Videos Response 200 Success"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "Wan Videos Response 200 Task Id"
+                    },
+                    "video_id": {
+                      "type": "string",
+                      "description": "Wan Videos Response 200 Video Id"
+                    },
+                    "video_url": {
+                      "type": "string",
+                      "description": "Wan Videos Response 200 Video Url"
+                    },
+                    "video_width": {
+                      "type": "number",
+                      "description": "Wan Videos Response 200 Video Width"
+                    },
+                    "video_height": {
+                      "type": "number",
+                      "description": "Wan Videos Response 200 Video Height"
+                    },
+                    "thumbnail_url": {
+                      "type": "string",
+                      "description": "Wan Videos Response 200 Thumbnail Url"
+                    },
+                    "thumbnail_width": {
+                      "type": "number",
+                      "description": "Wan Videos Response 200 Thumbnail Width"
+                    },
+                    "thumbnail_height": {
+                      "type": "number",
+                      "description": "Wan Videos Response 200 Thumbnail Height"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Wan Videos Response 200"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "The json payload is not valid to request the API"
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Wan Videos Response 400 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "prompt is required",
+                              "description": "Wan Videos Response 400 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 400 Trace Id"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Wan Videos Response 400 Error Code 2"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Wan Videos Response 400 Error Message 2"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 400 Trace Id 2"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Wan Videos Response 400 Error Code 3"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Wan Videos Response 400 Error Message 3"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 400 Trace Id 3"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Videos Response 400"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Wan Videos Response 401 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Wan Videos Response 401 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 401 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Videos Response 401"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "forbidden",
+                          "message": "Sorry! Our Al moderators feel your prompt might be against our community standards."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "forbidden",
+                              "description": "Wan Videos Response 403 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Sorry! Our Al moderators feel your prompt might be against our community standards.",
+                              "description": "Wan Videos Response 403 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 403 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Videos Response 403"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Wan Videos Response 429 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Wan Videos Response 429 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 429 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Videos Response 429"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Wan Videos Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Wan Videos Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Videos Response 500"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "timeout",
+                          "message": "Timeout to generate the image."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "timeout",
+                              "description": "Wan Videos Response 504 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Timeout to generate the image.",
+                              "description": "Wan Videos Response 504 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Wan Videos Response 504 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Wan Videos Response 504"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Wan Videos Param Accept"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "audio": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Wan Videos Audio"
+                  },
+                  "prompt_extend": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Wan Videos Prompt Extend"
+                  },
+                  "action": {
+                    "enum": [
+                      "text2video",
+                      "image2video"
+                    ],
+                    "type": "string",
+                    "default": "text2video",
+                    "description": "Wan Videos Action"
+                  },
+                  "resolution": {
+                    "enum": [
+                      "480P",
+                      "720P",
+                      "1080P"
+                    ],
+                    "type": "string",
+                    "description": "Wan Videos Resolution"
+                  },
+                  "shot_type": {
+                    "enum": [
+                      "single",
+                      "multi"
+                    ],
+                    "type": "string",
+                    "description": "Wan Videos Shot Type"
+                  },
+                  "duration": {
+                    "type": "number",
+                    "description": "Wan Videos Duration",
+                    "oneOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 2,
+                        "maximum": 30
+                      },
+                      {
+                        "type": "integer",
+                        "enum": [
+                          -1
+                        ]
+                      }
+                    ]
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "example": "Astronauts shuttle from space to volcano",
+                    "description": "Wan Videos Prompt"
+                  },
+                  "negative_prompt": {
+                    "type": "string",
+                    "example": "Astronauts shuttle from space to volcano",
+                    "description": "Wan Videos Negative Prompt"
+                  },
+                  "size": {
+                    "type": "string",
+                    "description": "Wan Videos Size"
+                  },
+                  "audio_url": {
+                    "type": "string",
+                    "description": "Wan Videos Audio Url"
+                  },
+                  "reference_video_urls": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "description": "Wan Videos Reference Video Urls"
+                  },
+                  "model": {
+                    "enum": [
+                      "wan2.6-i2v",
+                      "wan2.6-r2v",
+                      "wan2.6-i2v-flash",
+                      "wan2.6-t2v",
+                      "wan3.0-video"
+                    ],
+                    "type": "string",
+                    "description": "Wan Videos Model"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "description": "Wan Videos Callback Url"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "description": "Wan Videos Async"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "example": "https://cdn.acedata.cloud/r9vsv9.png",
+                    "description": "Wan Videos Image Url"
+                  },
+                  "media": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "url"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "first_frame",
+                            "last_frame",
+                            "reference_image",
+                            "reference_video",
+                            "reference_audio",
+                            "file",
+                            "link"
+                          ]
+                        },
+                        "url": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "description": "Wan Videos Media"
+                  },
+                  "ratio": {
+                    "type": "string",
+                    "enum": [
+                      "adaptive",
+                      "16:9",
+                      "4:3",
+                      "1:1",
+                      "3:4",
+                      "9:16"
+                    ],
+                    "description": "Wan Videos Ratio"
+                  },
+                  "seed": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647,
+                    "description": "Wan Videos Seed"
+                  },
+                  "watermark": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Wan Videos Watermark"
+                  }
+                }
+              },
+              "example": {
+                "action": "text2video",
+                "prompt": "Astronauts shuttle from space to volcano",
+                "negative_prompt": "Astronauts shuttle from space to volcano",
+                "model": "wan2.6-i2v",
+                "image_url": "https://cdn.acedata.cloud/r9vsv9.png"
+              }
+            }
+          },
+          "required": true
+        },
+        "operationId": "createWanVideos"
+      }
+    }
+  }
+}

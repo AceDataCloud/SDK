@@ -3,7 +3,7 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
-export type ImageProvider = 'nano-banana' | 'flux' | 'seedream' | (string & {});
+export type ImageProvider = 'nano-banana' | 'flux' | 'qwen-image' | 'seedream' | (string & {});
 
 export class Images {
   constructor(private transport: Transport) {}

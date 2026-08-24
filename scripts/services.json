@@ -376,5 +376,16 @@
    }
   ],
   "tasks": null
+ },
+ "qwen-image": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "qwen-image",
+    "path": "/qwen-image/images",
+    "name": "Qwen Image Images API"
+   }
+  ],
+  "tasks": "/qwen-image/tasks"
  }
 }

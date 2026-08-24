@@ -14,6 +14,7 @@ from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 # Every service the platform exposes as a non-private generation API.
 GENERATED = (
     "flux",
+    "qwen_image",
     "seedream",
     "nano_banana",
     "seedance",
@@ -131,6 +132,53 @@ def test_seedance_20_does_not_receive_25_defaults(client):
         content=[{"type": "text", "text": "A scene"}],
     )
     assert "output_format" not in transport.request.call_args.kwargs["json"]
+
+
+def test_qwen_image_serializes_spec_defaults(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "qwen-1"}
+    client.qwen_image._transport = transport
+
+    handle = client.qwen_image.generate(model="qwen-image-3.0-pro", prompt="a cat")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "qwen-1"
+    assert transport.request.call_args.args == ("POST", "/qwen-image/images")
+    assert transport.request.call_args.kwargs["json"] == {
+        "model": "qwen-image-3.0-pro",
+        "prompt": "a cat",
+        "n": 1,
+        "prompt_extend": True,
+        "prompt_extend_mode": "direct",
+        "enable_thinking": True,
+        "watermark": False,
+        "async": True,
+    }
+
+
+def test_wan_serializes_new_video_fields(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "wan-1"}
+    client.wan._transport = transport
+
+    client.wan.generate(
+        model="wan3.0-video",
+        media=[{"type": "image", "url": "https://cdn.example.com/frame.png"}],
+        ratio="16:9",
+        seed=42,
+        watermark=True,
+    )
+
+    body = transport.request.call_args.kwargs["json"]
+    assert transport.request.call_args.args == ("POST", "/wan/videos")
+    assert body["model"] == "wan3.0-video"
+    assert body["action"] == "text2video"
+    assert body["media"] == [{"type": "image", "url": "https://cdn.example.com/frame.png"}]
+    assert body["ratio"] == "16:9"
+    assert body["seed"] == 42
+    assert body["watermark"] is True
+    assert "prompt" not in body
+    assert body["async"] is True
 
 
 def test_seedream_omits_example_only_size(client):

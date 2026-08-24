@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-ImageProvider = Literal["nano-banana", "flux", "seedream"]
+ImageProvider = Literal["nano-banana", "flux", "qwen-image", "seedream"]
 
 
 class Images:

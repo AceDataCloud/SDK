@@ -8,6 +8,7 @@ const SERVICE_TASK_ENDPOINTS: Record<string, string> = {
   producer: '/producer/tasks',
   fish: '/fish/tasks',
   'nano-banana': '/nano-banana/tasks',
+  'qwen-image': '/qwen-image/tasks',
   seedream: '/seedream/tasks',
   seedance: '/seedance/tasks',
   sora: '/sora/tasks',

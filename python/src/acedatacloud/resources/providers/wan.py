@@ -16,6 +16,15 @@ WanModel = Literal[
     "wan2.6-r2v",
     "wan2.6-i2v-flash",
     "wan2.6-t2v",
+    "wan3.0-video",
+]
+WanRatio = Literal[
+    "adaptive",
+    "16:9",
+    "4:3",
+    "1:1",
+    "3:4",
+    "9:16",
 ]
 
 
@@ -41,18 +50,22 @@ class Wan:
         self,
         *,
         model: WanModel,
-        action: Literal["text2video", "image2video"],
-        prompt: str,
-        size: str | None = None,
         audio: bool | None = None,
-        duration: float | None = None,
-        audio_url: str | None = None,
-        image_url: str | None = None,
-        shot_type: Literal["single", "multi"] | None = None,
-        resolution: Literal["480P", "720P", "1080P"] | None = None,
         prompt_extend: bool | None = None,
+        action: Literal["text2video", "image2video"] | None = None,
+        resolution: Literal["480P", "720P", "1080P"] | None = None,
+        shot_type: Literal["single", "multi"] | None = None,
+        duration: float | None = None,
+        prompt: str | None = None,
         negative_prompt: str | None = None,
+        size: str | None = None,
+        audio_url: str | None = None,
         reference_video_urls: list[str] | None = None,
+        image_url: str | None = None,
+        media: list[dict[str, Any]] | None = None,
+        ratio: WanRatio | None = None,
+        seed: int | None = None,
+        watermark: bool | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -63,26 +76,34 @@ class Wan:
         """Generate videos based on prompt and image frames"""
         body: dict[str, Any] = {}
         body["model"] = model
-        body["action"] = action
-        body["prompt"] = prompt
-        if size is not None:
-            body["size"] = size
         body["audio"] = audio if audio is not None else False
-        if duration is not None:
-            body["duration"] = duration
-        if audio_url is not None:
-            body["audio_url"] = audio_url
-        if image_url is not None:
-            body["image_url"] = image_url
-        if shot_type is not None:
-            body["shot_type"] = shot_type
+        body["prompt_extend"] = prompt_extend if prompt_extend is not None else False
+        body["action"] = action if action is not None else "text2video"
         if resolution is not None:
             body["resolution"] = resolution
-        body["prompt_extend"] = prompt_extend if prompt_extend is not None else False
+        if shot_type is not None:
+            body["shot_type"] = shot_type
+        if duration is not None:
+            body["duration"] = duration
+        if prompt is not None:
+            body["prompt"] = prompt
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
+        if size is not None:
+            body["size"] = size
+        if audio_url is not None:
+            body["audio_url"] = audio_url
         if reference_video_urls is not None:
             body["reference_video_urls"] = reference_video_urls
+        if image_url is not None:
+            body["image_url"] = image_url
+        if media is not None:
+            body["media"] = media
+        if ratio is not None:
+            body["ratio"] = ratio
+        if seed is not None:
+            body["seed"] = seed
+        body["watermark"] = watermark if watermark is not None else False
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -104,18 +125,22 @@ class AsyncWan:
         self,
         *,
         model: WanModel,
-        action: Literal["text2video", "image2video"],
-        prompt: str,
-        size: str | None = None,
         audio: bool | None = None,
-        duration: float | None = None,
-        audio_url: str | None = None,
-        image_url: str | None = None,
-        shot_type: Literal["single", "multi"] | None = None,
-        resolution: Literal["480P", "720P", "1080P"] | None = None,
         prompt_extend: bool | None = None,
+        action: Literal["text2video", "image2video"] | None = None,
+        resolution: Literal["480P", "720P", "1080P"] | None = None,
+        shot_type: Literal["single", "multi"] | None = None,
+        duration: float | None = None,
+        prompt: str | None = None,
         negative_prompt: str | None = None,
+        size: str | None = None,
+        audio_url: str | None = None,
         reference_video_urls: list[str] | None = None,
+        image_url: str | None = None,
+        media: list[dict[str, Any]] | None = None,
+        ratio: WanRatio | None = None,
+        seed: int | None = None,
+        watermark: bool | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -126,26 +151,34 @@ class AsyncWan:
         """Generate videos based on prompt and image frames"""
         body: dict[str, Any] = {}
         body["model"] = model
-        body["action"] = action
-        body["prompt"] = prompt
-        if size is not None:
-            body["size"] = size
         body["audio"] = audio if audio is not None else False
-        if duration is not None:
-            body["duration"] = duration
-        if audio_url is not None:
-            body["audio_url"] = audio_url
-        if image_url is not None:
-            body["image_url"] = image_url
-        if shot_type is not None:
-            body["shot_type"] = shot_type
+        body["prompt_extend"] = prompt_extend if prompt_extend is not None else False
+        body["action"] = action if action is not None else "text2video"
         if resolution is not None:
             body["resolution"] = resolution
-        body["prompt_extend"] = prompt_extend if prompt_extend is not None else False
+        if shot_type is not None:
+            body["shot_type"] = shot_type
+        if duration is not None:
+            body["duration"] = duration
+        if prompt is not None:
+            body["prompt"] = prompt
         if negative_prompt is not None:
             body["negative_prompt"] = negative_prompt
+        if size is not None:
+            body["size"] = size
+        if audio_url is not None:
+            body["audio_url"] = audio_url
         if reference_video_urls is not None:
             body["reference_video_urls"] = reference_video_urls
+        if image_url is not None:
+            body["image_url"] = image_url
+        if media is not None:
+            body["media"] = media
+        if ratio is not None:
+            body["ratio"] = ratio
+        if seed is not None:
+            body["seed"] = seed
+        body["watermark"] = watermark if watermark is not None else False
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

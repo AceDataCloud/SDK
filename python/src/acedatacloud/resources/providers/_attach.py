@@ -21,6 +21,7 @@ from .maestro import AsyncMaestro, Maestro
 from .minimax import AsyncMinimax, Minimax
 from .nano_banana import AsyncNanoBanana, NanoBanana
 from .producer import AsyncProducer, Producer
+from .qwen_image import AsyncQwenImage, QwenImage
 from .seedance import AsyncSeedance, Seedance
 from .seedream import AsyncSeedream, Seedream
 from .suno import AsyncSuno, Suno
@@ -42,6 +43,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.minimax = AsyncMinimax(transport)
         client.nano_banana = AsyncNanoBanana(transport)
         client.producer = AsyncProducer(transport)
+        client.qwen_image = AsyncQwenImage(transport)
         client.seedance = AsyncSeedance(transport)
         client.seedream = AsyncSeedream(transport)
         client.suno = AsyncSuno(transport)
@@ -59,6 +61,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.minimax = Minimax(transport)
         client.nano_banana = NanoBanana(transport)
         client.producer = Producer(transport)
+        client.qwen_image = QwenImage(transport)
         client.seedance = Seedance(transport)
         client.seedream = Seedream(transport)
         client.suno = Suno(transport)

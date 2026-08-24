@@ -34,6 +34,12 @@ def _field_name(name: str) -> str:
     return out
 
 
+def _field_type(p) -> str:
+    if p.go_type() == "bool" and not p.required and p.default() is True:
+        return "*bool"
+    return p.go_type()
+
+
 def _request_struct(svc: Service, ep) -> str:
     name = f"{svc.class_name}{pascal(ep.method)}Request"
     lines = [f"// {name} is the input to {svc.attr}.{ep.method.title()}."]
@@ -41,7 +47,7 @@ def _request_struct(svc: Service, ep) -> str:
     for p in ep.callable_params:
         comment = p.description or ("required" if p.required else "optional")
         lines.append(f"\t// {comment[:110].rstrip()}")
-        lines.append(f"\t{_field_name(p.name)} {p.go_type()}")
+        lines.append(f"\t{_field_name(p.name)} {_field_type(p)}")
     if ep.pollable:
         lines.append("\t// Async submits without blocking; poll the returned handle. Defaults true.")
         lines.append("\tAsync *bool")
@@ -60,7 +66,7 @@ def _to_body(struct: str, svc: Service, ep) -> str:
         field = _field_name(p.name)
         key = json.dumps(p.name)
         default = p.default()
-        go_type = p.go_type()
+        go_type = _field_type(p)
         zero = {"string": '""', "int": "0", "float64": "0"}.get(go_type)
 
         if p.required:
@@ -70,6 +76,12 @@ def _to_body(struct: str, svc: Service, ep) -> str:
             if zero:
                 lines.append(f"\tif r.{field} != {zero} {{")
                 lines.append(f"\t\tbody[{key}] = r.{field}")
+                lines.append("\t} else {")
+                lines.append(f"\t\tbody[{key}] = {_go_literal(default)}")
+                lines.append("\t}")
+            elif go_type == "*bool":
+                lines.append(f"\tif r.{field} != nil {{")
+                lines.append(f"\t\tbody[{key}] = *r.{field}")
                 lines.append("\t} else {")
                 lines.append(f"\t\tbody[{key}] = {_go_literal(default)}")
                 lines.append("\t}")

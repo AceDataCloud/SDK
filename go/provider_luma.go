@@ -25,7 +25,7 @@ type LumaGenerateRequest struct {
 	// The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time,
 	VideoURL string
 	// Whether to enable automatic optimization enhancement for the input prompt text, suitable for use when unsure h
-	Enhancement bool
+	Enhancement *bool
 	// Generate the aspect ratio of the video, for example `16:9`.
 	AspectRatio string
 	// The URL of the ending frame image, which will be used as the last frame of the generated video.
@@ -62,7 +62,11 @@ func (r LumaGenerateRequest) toBody() map[string]any {
 	if r.VideoURL != "" {
 		body["video_url"] = r.VideoURL
 	}
-	body["enhancement"] = r.Enhancement
+	if r.Enhancement != nil {
+		body["enhancement"] = *r.Enhancement
+	} else {
+		body["enhancement"] = true
+	}
 	if r.AspectRatio != "" {
 		body["aspect_ratio"] = r.AspectRatio
 	}
