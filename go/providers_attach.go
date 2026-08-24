@@ -33,6 +33,7 @@ type providers struct {
 	minimax      *Minimax
 	nanobanana   *NanoBanana
 	producer     *Producer
+	qwenimage    *QwenImage
 	seedance     *Seedance
 	seedream     *Seedream
 	suno         *Suno
@@ -53,6 +54,7 @@ func newProviders(tr *transport) *providers {
 		minimax:      &Minimax{t: tr},
 		nanobanana:   &NanoBanana{t: tr},
 		producer:     &Producer{t: tr},
+		qwenimage:    &QwenImage{t: tr},
 		seedance:     &Seedance{t: tr},
 		seedream:     &Seedream{t: tr},
 		suno:         &Suno{t: tr},
@@ -95,6 +97,9 @@ func (c *Client) NanoBanana() *NanoBanana { return c.providers.nanobanana }
 
 // Producer returns the producer provider client.
 func (c *Client) Producer() *Producer { return c.providers.producer }
+
+// QwenImage returns the qwen-image provider client.
+func (c *Client) QwenImage() *QwenImage { return c.providers.qwenimage }
 
 // Seedance returns the seedance provider client.
 func (c *Client) Seedance() *Seedance { return c.providers.seedance }

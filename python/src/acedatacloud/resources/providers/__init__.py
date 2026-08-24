@@ -24,6 +24,8 @@ from .nano_banana import AsyncNanoBanana as AsyncNanoBanana
 from .nano_banana import NanoBanana as NanoBanana
 from .producer import AsyncProducer as AsyncProducer
 from .producer import Producer as Producer
+from .qwen_image import AsyncQwenImage as AsyncQwenImage
+from .qwen_image import QwenImage as QwenImage
 from .seedance import AsyncSeedance as AsyncSeedance
 from .seedance import Seedance as Seedance
 from .seedream import AsyncSeedream as AsyncSeedream
@@ -58,6 +60,8 @@ __all__ = [
     "AsyncNanoBanana",
     "Producer",
     "AsyncProducer",
+    "QwenImage",
+    "AsyncQwenImage",
     "Seedance",
     "AsyncSeedance",
     "Seedream",

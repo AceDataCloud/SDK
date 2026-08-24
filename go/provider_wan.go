@@ -12,32 +12,40 @@ type Wan struct {
 
 // WanGenerateRequest is the input to wan.Generate.
 type WanGenerateRequest struct {
-	// Models for generating videos include optional values such as `wan2.6-t2v` (text-to-video), `wan2.6-i2v` (image
+	// $t(wan_videos_model)
 	Model string
-	// Operation types. `text2video` indicates text-to-video, and `image2video` indicates image-to-video.
-	Action string
-	// Prompts for generating videos.
-	Prompt string
-	// Video size specifications.
-	Size string
-	// Specify whether the generated video contains sound.
+	// $t(wan_videos_audio)
 	Audio bool
-	// Specify the duration of the video to be generated (in seconds), with optional values of `5`, `10`, or `15`.
-	Duration float64
-	// The URL of the audio file, the model will generate the corresponding video based on that audio.
-	AudioURL string
-	// The URL of the starting frame image, which will serve as the first frame of the generated video.
-	ImageURL string
-	// Specify the type of shots for the video, that is, whether the video consists of a single continuous shot (`sin
-	ShotType string
-	// Specify the resolution level for generating the video, used to adjust the video clarity (total pixel count). T
-	Resolution string
-	// Whether to enable intelligent rewriting of prompts. Once enabled, a large model will be used to intelligently
+	// $t(wan_videos_prompt_extend)
 	PromptExtend bool
-	// Reverse prompt words, used to describe content that is not desired to appear in the video footage, can be used
+	// $t(wan_videos_action)
+	Action string
+	// $t(wan_videos_resolution)
+	Resolution string
+	// $t(wan_videos_shot_type)
+	ShotType string
+	// $t(wan_videos_duration)
+	Duration float64
+	// $t(wan_videos_prompt)
+	Prompt string
+	// $t(wan_videos_negative_prompt)
 	NegativePrompt string
-	// An array of URLs for reference video files, used to extract the character images (and vocal tones, if any) fro
+	// $t(wan_videos_size)
+	Size string
+	// $t(wan_videos_audio_url)
+	AudioURL string
+	// $t(wan_videos_reference_video_urls)
 	ReferenceVideoURLs []string
+	// $t(wan_videos_image_url)
+	ImageURL string
+	// $t(wan_videos_media)
+	Media []map[string]any
+	// $t(wan_videos_ratio)
+	Ratio string
+	// $t(wan_videos_seed)
+	Seed int
+	// $t(wan_videos_watermark)
+	Watermark bool
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -49,34 +57,50 @@ type WanGenerateRequest struct {
 func (r WanGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["model"] = r.Model
-	body["action"] = r.Action
-	body["prompt"] = r.Prompt
-	if r.Size != "" {
-		body["size"] = r.Size
-	}
 	body["audio"] = r.Audio
-	if r.Duration != 0 {
-		body["duration"] = r.Duration
-	}
-	if r.AudioURL != "" {
-		body["audio_url"] = r.AudioURL
-	}
-	if r.ImageURL != "" {
-		body["image_url"] = r.ImageURL
-	}
-	if r.ShotType != "" {
-		body["shot_type"] = r.ShotType
+	body["prompt_extend"] = r.PromptExtend
+	if r.Action != "" {
+		body["action"] = r.Action
+	} else {
+		body["action"] = "text2video"
 	}
 	if r.Resolution != "" {
 		body["resolution"] = r.Resolution
 	}
-	body["prompt_extend"] = r.PromptExtend
+	if r.ShotType != "" {
+		body["shot_type"] = r.ShotType
+	}
+	if r.Duration != 0 {
+		body["duration"] = r.Duration
+	}
+	if r.Prompt != "" {
+		body["prompt"] = r.Prompt
+	}
 	if r.NegativePrompt != "" {
 		body["negative_prompt"] = r.NegativePrompt
+	}
+	if r.Size != "" {
+		body["size"] = r.Size
+	}
+	if r.AudioURL != "" {
+		body["audio_url"] = r.AudioURL
 	}
 	if r.ReferenceVideoURLs != nil {
 		body["reference_video_urls"] = r.ReferenceVideoURLs
 	}
+	if r.ImageURL != "" {
+		body["image_url"] = r.ImageURL
+	}
+	if r.Media != nil {
+		body["media"] = r.Media
+	}
+	if r.Ratio != "" {
+		body["ratio"] = r.Ratio
+	}
+	if r.Seed != 0 {
+		body["seed"] = r.Seed
+	}
+	body["watermark"] = r.Watermark
 	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
