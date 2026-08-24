@@ -9,6 +9,7 @@ type Client struct {
 	transport *transport
 
 	openai   *OpenAIResource
+	aichat   *AIChatResource
 	chat     *ChatResource
 	captcha  *CaptchaResource
 	images   *ImagesResource
@@ -18,6 +19,7 @@ type Client struct {
 	search   *SearchResource
 	face     *FaceResource
 	shorturl *ShortURLResource
+	glm      *GLMResource
 
 	// providers holds the generated provider-axis clients, one per service.
 	providers *providers
@@ -36,6 +38,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	}
 	c := &Client{transport: tr}
 	c.openai = &OpenAIResource{t: tr}
+	c.aichat = &AIChatResource{t: tr}
 	c.chat = &ChatResource{t: tr}
 	c.captcha = &CaptchaResource{t: tr}
 	c.images = &ImagesResource{t: tr}
@@ -46,12 +49,17 @@ func NewClient(opts ...Option) (*Client, error) {
 	c.providers = newProviders(tr)
 	c.face = &FaceResource{t: tr}
 	c.shorturl = &ShortURLResource{t: tr}
+	c.glm = &GLMResource{t: tr}
 	return c, nil
 }
 
 // OpenAI returns the OpenAI-compatible resource (“/v1/chat/completions“,
 // “/openai/responses“).
 func (c *Client) OpenAI() *OpenAIResource { return c.openai }
+
+// AIChat returns the AI Dialogue resource (“/aichat/conversations“,
+// “/aichat2/conversations“).
+func (c *Client) AIChat() *AIChatResource { return c.aichat }
 
 // Chat returns the native chat resource (“/v1/messages“ — Anthropic
 // Messages API shape).
@@ -80,3 +88,6 @@ func (c *Client) Face() *FaceResource { return c.face }
 
 // ShortURL returns the short URL resource.
 func (c *Client) ShortURL() *ShortURLResource { return c.shorturl }
+
+// GLM returns the GLM chat-completions resource.
+func (c *Client) GLM() *GLMResource { return c.glm }

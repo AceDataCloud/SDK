@@ -24,9 +24,9 @@ from acedatacloud._runtime.payment import (
     PaymentRequirement,
     SyncPaymentHandler,
 )
-from acedatacloud.resources.aichat import AiChatModel
+from acedatacloud.resources.aichat import AiChat2Action, AiChat2Model, AiChat2ModelGroup, AiChatModel
 from acedatacloud.resources.audio import AudioProvider
-from acedatacloud.resources.glm import GlmModel
+from acedatacloud.resources.glm import GlmModel, GlmReasoningEffort, GlmServiceTier
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
     KlingCameraControl,
@@ -40,9 +40,14 @@ from acedatacloud.resources.video import VideoProvider
 __all__ = [
     "AceDataCloud",
     "AsyncAceDataCloud",
+    "AiChat2Action",
+    "AiChat2Model",
+    "AiChat2ModelGroup",
     "AiChatModel",
     "AudioProvider",
     "GlmModel",
+    "GlmReasoningEffort",
+    "GlmServiceTier",
     "ImageProvider",
     "KlingCameraControl",
     "KlingModel",

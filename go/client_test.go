@@ -28,8 +28,73 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.AIChat() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil || c.GLM() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestAIChatCreateV2(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat2/conversations" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "gpt-5.4-mini" || body["action"] != "retrieve_batch" || body["async"] != false {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		if body["offset"] != float64(0) || body["limit"] != float64(25) {
+			t.Errorf("expected explicit pagination values: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer srv.Close()
+
+	async := false
+	offset := 0
+	limit := 25
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.AIChat().CreateV2(context.Background(), AIChatV2CreateRequest{
+		Model:             "gpt-5.4-mini",
+		Action:            "retrieve_batch",
+		Async:             &async,
+		Offset:            &offset,
+		Limit:             &limit,
+		AllowedMCPServers: []string{"server-a"},
+		ToolResults:       []map[string]any{{"tool_use_id": "tool-1", "output": "ok", "is_error": false}},
+		ModelGroup:        "chatgpt",
+		Extra:             map[string]any{"ids": []string{"extra-id"}},
+	}); err != nil {
+		t.Fatalf("AIChat CreateV2: %v", err)
+	}
+}
+
+func TestGLMChatCompletionsCreate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/glm/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "glm-5.3" || body["temperature"] != float64(0) || body["parallel_tool_calls"] != false {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer srv.Close()
+
+	temperature := 0.0
+	parallelToolCalls := false
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.GLM().Chat().Completions().Create(context.Background(), GLMChatCompletionRequest{
+		Model:             "glm-5.3",
+		Messages:          []map[string]any{{"role": "user", "content": "hi"}},
+		Temperature:       &temperature,
+		ParallelToolCalls: &parallelToolCalls,
+		ReasoningEffort:   "low",
+		WebSearchOptions:  map[string]any{"search_context_size": "medium"},
+	}); err != nil {
+		t.Fatalf("GLM Create: %v", err)
 	}
 }
 
