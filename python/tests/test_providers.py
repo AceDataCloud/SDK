@@ -19,6 +19,7 @@ GENERATED = (
     "seedance",
     "suno",
     "producer",
+    "qwen_image",
     "fish",
     "hailuo",
     "wan",

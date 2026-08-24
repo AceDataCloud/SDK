@@ -13,6 +13,8 @@ describe('Seedance provider', () => {
       omniReferenceTaskType: 'extend',
       outputFormat: 'mov',
       tools: [{ type: 'web_search' }],
+      priority: 7,
+      safetyIdentifier: 'tenant-42',
     });
     expect(task).toBeInstanceOf(TaskHandle);
     expect(request).toHaveBeenCalledWith('POST', '/seedance/videos', {
@@ -23,6 +25,8 @@ describe('Seedance provider', () => {
         omni_reference_task_type: 'extend',
         output_format: 'mov',
         tools: [{ type: 'web_search' }],
+        priority: 7,
+        safety_identifier: 'tenant-42',
         async: true,
       }),
     });

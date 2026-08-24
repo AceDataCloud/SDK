@@ -46,4 +46,20 @@ describe('Seedream provider', () => {
     const adaptiveIsSupported: AdaptiveIsSupported = false;
     expect(adaptiveIsSupported).toBe(false);
   });
+
+  it('removes retired models and parameters from the public contract', () => {
+    type Model = SeedreamGenerateOptions['model'];
+    type RetiredModelIsSupported = 'doubao-seedream-3-0-t2i-250415' extends Model ? true : false;
+    type SeedIsSupported = 'seed' extends keyof SeedreamGenerateOptions ? true : false;
+    type GuidanceScaleIsSupported = 'guidanceScale' extends keyof SeedreamGenerateOptions ? true : false;
+
+    const retiredModelIsSupported: RetiredModelIsSupported = false;
+    const seedIsSupported: SeedIsSupported = false;
+    const guidanceScaleIsSupported: GuidanceScaleIsSupported = false;
+    expect({ retiredModelIsSupported, seedIsSupported, guidanceScaleIsSupported }).toEqual({
+      retiredModelIsSupported: false,
+      seedIsSupported: false,
+      guidanceScaleIsSupported: false,
+    });
+  });
 });

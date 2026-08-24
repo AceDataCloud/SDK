@@ -112,6 +112,17 @@
   ],
   "tasks": "/nano-banana/tasks"
  },
+ "qwen-image": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "qwen-image",
+    "path": "/qwen-image/images",
+    "name": "Qwen Image Generation API"
+   }
+  ],
+  "tasks": "/qwen-image/tasks"
+ },
  "veo": {
   "category": "AI Video",
   "endpoints": [

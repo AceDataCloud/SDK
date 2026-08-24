@@ -12,7 +12,7 @@ type Producer struct {
 
 // ProducerUploadRequest is the input to producer.Upload.
 type ProducerUploadRequest struct {
-	// The CDN address for the custom audio files to be uploaded.
+	// Producer Upload Audio Url
 	AudioURL string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -34,7 +34,7 @@ func (r ProducerUploadRequest) toBody() map[string]any {
 	return body
 }
 
-// Upload Producer reference audio upload API, upload audio to get an audio_id for generation.
+// Upload Producer Upload
 func (c *Producer) Upload(ctx context.Context, req ProducerUploadRequest) (map[string]any, error) {
 	return c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -45,7 +45,7 @@ func (c *Producer) Upload(ctx context.Context, req ProducerUploadRequest) (map[s
 
 // ProducerVideosRequest is the input to producer.Videos.
 type ProducerVideosRequest struct {
-	// Reference audio ID.
+	// Producer Videos Audio Id
 	AudioID string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -67,7 +67,7 @@ func (r ProducerVideosRequest) toBody() map[string]any {
 	return body
 }
 
-// Videos AceData Producer MP4 retrieval API. Pass an audio_id to receive an MP4 video download link with cover art.
+// Videos Producer Videos
 func (c *Producer) Videos(ctx context.Context, req ProducerVideosRequest) (map[string]any, error) {
 	return c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -78,7 +78,7 @@ func (c *Producer) Videos(ctx context.Context, req ProducerVideosRequest) (map[s
 
 // ProducerWavRequest is the input to producer.Wav.
 type ProducerWavRequest struct {
-	// Reference audio ID.
+	// Producer Wav Audio Id
 	AudioID string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -100,7 +100,7 @@ func (r ProducerWavRequest) toBody() map[string]any {
 	return body
 }
 
-// Wav AceData Producer WAV (lossless) retrieval API. Pass an audio_id to receive a WAV-format download link.
+// Wav Producer Wav
 func (c *Producer) Wav(ctx context.Context, req ProducerWavRequest) (map[string]any, error) {
 	return c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -111,35 +111,35 @@ func (c *Producer) Wav(ctx context.Context, req ProducerWavRequest) (map[string]
 
 // ProducerGenerateRequest is the input to producer.Generate.
 type ProducerGenerateRequest struct {
-	// Lyrics content for generating audio.
+	// Producer Audios Lyric
 	Lyric string
-	// Types of audio generation operations. Supported values include `generate` (generate based on prompts), `cover`
+	// Producer Audios Action
 	Action string
-	// Prompts for generating audio should not exceed 200 characters in length.
+	// Producer Audios Prompt
 	Prompt string
-	// Random seed used for audio generation.
-	Seed string
-	// The model used for generating music is `FUZZ-2.0` by default.
+	// Producer Audios Model
 	Model string
-	// Title used for generating songs.
+	// Producer Audios Title
 	Title string
-	// Is it a custom mode? If `true`, the audio will be generated based on the `lyric`; otherwise, it will be genera
+	// Producer Audios Custom
 	Custom bool
-	// The unique ID of the reference song.
+	// Producer Audios Audio Id
 	AudioID string
-	// The degree of uniqueness of style can be selected between 0 and 1, with a default value of 0.5.
-	Weirdness float64
-	// Specify the time point (in seconds) from which to continue writing the song.
+	// Producer Audios Continue At
 	ContinueAt float64
-	// If `true`, the generated audio will only contain the accompaniment, without vocal lyrics.
+	// Producer Audios Seed
+	Seed string
+	// Producer Audios Instrumental
 	Instrumental bool
-	// The impact intensity of the audio prompt words can be selected between 0.2 and 1, with a default value of 0.5.
+	// Producer Audios Sound Strength
 	SoundStrength float64
-	// The degree of influence of lyrics on audio generation can be selected between 0 and 1, with a default value of
+	// Producer Audios Lyrics Strength
 	LyricsStrength float64
-	// Replace the end time point of the segment (seconds).
+	// Producer Audios Weirdness
+	Weirdness float64
+	// Producer Audios Replace Section End
 	ReplaceSectionEnd float64
-	// Replace the starting time point of the segment (seconds).
+	// Producer Audios Replace Section Start
 	ReplaceSectionStart float64
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -154,9 +154,6 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 	body["lyric"] = r.Lyric
 	body["action"] = r.Action
 	body["prompt"] = r.Prompt
-	if r.Seed != "" {
-		body["seed"] = r.Seed
-	}
 	if r.Model != "" {
 		body["model"] = r.Model
 	}
@@ -167,15 +164,13 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 	if r.AudioID != "" {
 		body["audio_id"] = r.AudioID
 	}
-	if r.Weirdness != 0 {
-		body["weirdness"] = r.Weirdness
-	} else {
-		body["weirdness"] = false
-	}
 	if r.ContinueAt != 0 {
 		body["continue_at"] = r.ContinueAt
 	} else {
 		body["continue_at"] = false
+	}
+	if r.Seed != "" {
+		body["seed"] = r.Seed
 	}
 	body["instrumental"] = r.Instrumental
 	if r.SoundStrength != 0 {
@@ -187,6 +182,11 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 		body["lyrics_strength"] = r.LyricsStrength
 	} else {
 		body["lyrics_strength"] = false
+	}
+	if r.Weirdness != 0 {
+		body["weirdness"] = r.Weirdness
+	} else {
+		body["weirdness"] = false
 	}
 	if r.ReplaceSectionEnd != 0 {
 		body["replace_section_end"] = r.ReplaceSectionEnd
@@ -213,7 +213,7 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Producer AI music generation API, generates 1 song per request.
+// Generate Producer Audios
 func (c *Producer) Generate(ctx context.Context, req ProducerGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -228,8 +228,8 @@ func (c *Producer) Generate(ctx context.Context, req ProducerGenerateRequest) (*
 
 // ProducerLyricsRequest is the input to producer.Lyrics.
 type ProducerLyricsRequest struct {
-	// Prompts for generating lyrics.
-	Prompt map[string]any
+	// Producer Lyrics Prompt
+	Prompt string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.
@@ -250,7 +250,7 @@ func (r ProducerLyricsRequest) toBody() map[string]any {
 	return body
 }
 
-// Lyrics Producer AI lyrics generation API, input a prompt to generate lyrics.
+// Lyrics Producer Lyrics
 func (c *Producer) Lyrics(ctx context.Context, req ProducerLyricsRequest) (map[string]any, error) {
 	return c.t.do(ctx, requestOpts{
 		Method: "POST",

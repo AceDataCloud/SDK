@@ -11,6 +11,8 @@ func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 		OmniReferenceTaskType: "extend",
 		OutputFormat:          "mov",
 		Tools:                 []map[string]any{{"type": "web_search"}},
+		Priority:              7,
+		SafetyIdentifier:      "tenant-42",
 	}
 	body := req.toBody()
 	if body["model"] != req.Model || body["omni_reference_task_type"] != "extend" || body["output_format"] != "mov" {
@@ -18,6 +20,9 @@ func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 	}
 	if body["camerafixed"] != true || body["camera_fixed"] != nil {
 		t.Fatalf("camera field drift: %#v", body)
+	}
+	if body["priority"] != 7 || body["safety_identifier"] != "tenant-42" {
+		t.Fatalf("new Seedance fields drifted: %#v", body)
 	}
 }
 

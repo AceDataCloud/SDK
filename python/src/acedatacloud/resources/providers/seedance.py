@@ -11,6 +11,7 @@ from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
+
 SeedanceModel = Literal[
     "doubao-seedance-1-0-pro-250528",
     "doubao-seedance-1-0-pro-fast-251015",
@@ -69,6 +70,8 @@ class Seedance:
         omni_reference_task_type: Literal["auto", "edit", "extend"] | None = None,
         output_format: Literal["mp4", "mov"] | None = None,
         tools: list[dict[str, Any]] | None = None,
+        priority: int | None = None,
+        safety_identifier: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -76,7 +79,7 @@ class Seedance:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Call /seedance/videos."""
+        """Seedance Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
@@ -102,6 +105,9 @@ class Seedance:
             body["output_format"] = output_format
         if tools is not None:
             body["tools"] = tools
+        body["priority"] = priority if priority is not None else 0
+        if safety_identifier is not None:
+            body["safety_identifier"] = safety_identifier
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -137,6 +143,8 @@ class AsyncSeedance:
         omni_reference_task_type: Literal["auto", "edit", "extend"] | None = None,
         output_format: Literal["mp4", "mov"] | None = None,
         tools: list[dict[str, Any]] | None = None,
+        priority: int | None = None,
+        safety_identifier: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -144,7 +152,7 @@ class AsyncSeedance:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Call /seedance/videos."""
+        """Seedance Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
@@ -170,6 +178,9 @@ class AsyncSeedance:
             body["output_format"] = output_format
         if tools is not None:
             body["tools"] = tools
+        body["priority"] = priority if priority is not None else 0
+        if safety_identifier is not None:
+            body["safety_identifier"] = safety_identifier
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

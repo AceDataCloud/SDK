@@ -11,6 +11,7 @@ from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
+
 ProducerModel = Literal[
     "FUZZ-2.0 Pro",
     "FUZZ-2.0",
@@ -58,7 +59,7 @@ class Producer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Producer reference audio upload API, upload audio to get an audio_id for generation."""
+        """Producer Upload"""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
         body.update(extra)
@@ -73,7 +74,7 @@ class Producer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """AceData Producer MP4 retrieval API. Pass an audio_id to receive an MP4 video download link with cover art."""
+        """Producer Videos"""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -88,7 +89,7 @@ class Producer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """AceData Producer WAV (lossless) retrieval API. Pass an audio_id to receive a WAV-format download link."""
+        """Producer Wav"""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -102,16 +103,16 @@ class Producer:
         lyric: str,
         action: ProducerAction,
         prompt: str,
-        seed: str | None = None,
         model: ProducerModel | None = None,
         title: str | None = None,
         custom: bool | None = None,
         audio_id: str | None = None,
-        weirdness: float | None = None,
         continue_at: float | None = None,
+        seed: str | None = None,
         instrumental: bool | None = None,
         sound_strength: float | None = None,
         lyrics_strength: float | None = None,
+        weirdness: float | None = None,
         replace_section_end: float | None = None,
         replace_section_start: float | None = None,
         async_: bool | None = None,
@@ -121,13 +122,11 @@ class Producer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Producer AI music generation API, generates 1 song per request."""
+        """Producer Audios"""
         body: dict[str, Any] = {}
         body["lyric"] = lyric
         body["action"] = action
         body["prompt"] = prompt
-        if seed is not None:
-            body["seed"] = seed
         if model is not None:
             body["model"] = model
         if title is not None:
@@ -136,11 +135,13 @@ class Producer:
             body["custom"] = custom
         if audio_id is not None:
             body["audio_id"] = audio_id
-        body["weirdness"] = weirdness if weirdness is not None else False
         body["continue_at"] = continue_at if continue_at is not None else False
+        if seed is not None:
+            body["seed"] = seed
         body["instrumental"] = instrumental if instrumental is not None else False
         body["sound_strength"] = sound_strength if sound_strength is not None else False
         body["lyrics_strength"] = lyrics_strength if lyrics_strength is not None else False
+        body["weirdness"] = weirdness if weirdness is not None else False
         body["replace_section_end"] = replace_section_end if replace_section_end is not None else False
         body["replace_section_start"] = replace_section_start if replace_section_start is not None else False
         body.update(extra)
@@ -156,11 +157,11 @@ class Producer:
     def lyrics(
         self,
         *,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Producer AI lyrics generation API, input a prompt to generate lyrics."""
+        """Producer Lyrics"""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body.update(extra)
@@ -182,7 +183,7 @@ class AsyncProducer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Producer reference audio upload API, upload audio to get an audio_id for generation."""
+        """Producer Upload"""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
         body.update(extra)
@@ -197,7 +198,7 @@ class AsyncProducer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """AceData Producer MP4 retrieval API. Pass an audio_id to receive an MP4 video download link with cover art."""
+        """Producer Videos"""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -212,7 +213,7 @@ class AsyncProducer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """AceData Producer WAV (lossless) retrieval API. Pass an audio_id to receive a WAV-format download link."""
+        """Producer Wav"""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -226,16 +227,16 @@ class AsyncProducer:
         lyric: str,
         action: ProducerAction,
         prompt: str,
-        seed: str | None = None,
         model: ProducerModel | None = None,
         title: str | None = None,
         custom: bool | None = None,
         audio_id: str | None = None,
-        weirdness: float | None = None,
         continue_at: float | None = None,
+        seed: str | None = None,
         instrumental: bool | None = None,
         sound_strength: float | None = None,
         lyrics_strength: float | None = None,
+        weirdness: float | None = None,
         replace_section_end: float | None = None,
         replace_section_start: float | None = None,
         async_: bool | None = None,
@@ -245,13 +246,11 @@ class AsyncProducer:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Producer AI music generation API, generates 1 song per request."""
+        """Producer Audios"""
         body: dict[str, Any] = {}
         body["lyric"] = lyric
         body["action"] = action
         body["prompt"] = prompt
-        if seed is not None:
-            body["seed"] = seed
         if model is not None:
             body["model"] = model
         if title is not None:
@@ -260,11 +259,13 @@ class AsyncProducer:
             body["custom"] = custom
         if audio_id is not None:
             body["audio_id"] = audio_id
-        body["weirdness"] = weirdness if weirdness is not None else False
         body["continue_at"] = continue_at if continue_at is not None else False
+        if seed is not None:
+            body["seed"] = seed
         body["instrumental"] = instrumental if instrumental is not None else False
         body["sound_strength"] = sound_strength if sound_strength is not None else False
         body["lyrics_strength"] = lyrics_strength if lyrics_strength is not None else False
+        body["weirdness"] = weirdness if weirdness is not None else False
         body["replace_section_end"] = replace_section_end if replace_section_end is not None else False
         body["replace_section_start"] = replace_section_start if replace_section_start is not None else False
         body.update(extra)
@@ -280,11 +281,11 @@ class AsyncProducer:
     async def lyrics(
         self,
         *,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Producer AI lyrics generation API, input a prompt to generate lyrics."""
+        """Producer Lyrics"""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body.update(extra)
