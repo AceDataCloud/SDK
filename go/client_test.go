@@ -74,6 +74,33 @@ func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
 	}
 }
 
+func TestSunoGenerateUsesStringPrompts(t *testing.T) {
+	body := SunoGenerateRequest{
+		Prompt:      "A song for Christmas",
+		LyricPrompt: "winter chorus",
+	}.toBody()
+	if body["prompt"] != "A song for Christmas" {
+		t.Fatalf("string prompt missing: %+v", body)
+	}
+	if body["lyric_prompt"] != "winter chorus" {
+		t.Fatalf("string lyric_prompt missing: %+v", body)
+	}
+}
+
+func TestSunoVoxIncludesRequiredZeroStart(t *testing.T) {
+	body := SunoVoxRequest{
+		AudioID:     "audio-1",
+		VocalStart: 0,
+		VocalEnd:   60,
+	}.toBody()
+	if _, ok := body["vocal_start"]; !ok {
+		t.Fatalf("required vocal_start missing: %+v", body)
+	}
+	if body["vocal_end"] != float64(60) {
+		t.Fatalf("required vocal_end missing: %+v", body)
+	}
+}
+
 func TestMinimaxGenerate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/minimax/videos" {
