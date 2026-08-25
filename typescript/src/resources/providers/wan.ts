@@ -17,39 +17,39 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface WanGenerateOptions {
-  /** $t(wan_videos_model) */
+  /** Wan Videos Model */
   model: "wan2.6-i2v" | "wan2.6-r2v" | "wan2.6-i2v-flash" | "wan2.6-t2v" | "wan3.0-video";
-  /** $t(wan_videos_audio) */
+  /** Wan Videos Audio */
   audio?: boolean;
-  /** $t(wan_videos_prompt_extend) */
+  /** Wan Videos Prompt Extend */
   promptExtend?: boolean;
-  /** $t(wan_videos_action) */
+  /** Wan Videos Action */
   action?: "text2video" | "image2video";
-  /** $t(wan_videos_resolution) */
+  /** Wan Videos Resolution */
   resolution?: "480P" | "720P" | "1080P";
-  /** $t(wan_videos_shot_type) */
+  /** Wan Videos Shot Type */
   shotType?: "single" | "multi";
-  /** $t(wan_videos_duration) */
+  /** Wan Videos Duration */
   duration?: number;
-  /** $t(wan_videos_prompt) */
+  /** Wan Videos Prompt */
   prompt?: string;
-  /** $t(wan_videos_negative_prompt) */
+  /** Wan Videos Negative Prompt */
   negativePrompt?: string;
-  /** $t(wan_videos_size) */
+  /** Wan Videos Size */
   size?: string;
-  /** $t(wan_videos_audio_url) */
+  /** Wan Videos Audio Url */
   audioUrl?: string;
-  /** $t(wan_videos_reference_video_urls) */
+  /** Wan Videos Reference Video Urls */
   referenceVideoUrls?: string[];
-  /** $t(wan_videos_image_url) */
+  /** Wan Videos Image Url */
   imageUrl?: string;
-  /** $t(wan_videos_media) */
+  /** Wan Videos Media */
   media?: Array<Record<string, unknown>>;
-  /** $t(wan_videos_ratio) */
+  /** Wan Videos Ratio */
   ratio?: "adaptive" | "16:9" | "4:3" | "1:1" | "3:4" | "9:16";
-  /** $t(wan_videos_seed) */
+  /** Wan Videos Seed */
   seed?: number;
-  /** $t(wan_videos_watermark) */
+  /** Wan Videos Watermark */
   watermark?: boolean;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -66,7 +66,7 @@ export interface WanGenerateOptions {
 export class Wan {
   constructor(private transport: Transport) {}
 
-  /** Generate videos based on prompt and image frames */
+  /** Wan Videos */
   async generate(options: WanGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;

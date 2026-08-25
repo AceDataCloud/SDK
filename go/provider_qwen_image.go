@@ -12,27 +12,27 @@ type QwenImage struct {
 
 // QwenImageGenerateRequest is the input to qwen_image.Generate.
 type QwenImageGenerateRequest struct {
-	// $t(qwen_image_images_model)
+	// Qwen Image Images Model
 	Model string
-	// $t(qwen_image_images_prompt)
+	// Qwen Image Images Prompt
 	Prompt string
-	// $t(qwen_image_images_image_urls)
+	// Qwen Image Images Image Urls
 	ImageURLs []string
-	// $t(qwen_image_images_n)
+	// Qwen Image Images N
 	N int
-	// $t(qwen_image_images_size)
+	// Qwen Image Images Size
 	Size string
-	// $t(qwen_image_images_prompt_extend)
+	// Qwen Image Images Prompt Extend
 	PromptExtend bool
-	// $t(qwen_image_images_prompt_extend_mode)
+	// Qwen Image Images Prompt Extend Mode
 	PromptExtendMode string
-	// $t(qwen_image_images_enable_thinking)
+	// Qwen Image Images Enable Thinking
 	EnableThinking bool
-	// $t(qwen_image_images_negative_prompt)
+	// Qwen Image Images Negative Prompt
 	NegativePrompt string
-	// $t(qwen_image_images_seed)
+	// Qwen Image Images Seed
 	Seed int
-	// $t(qwen_image_images_watermark)
+	// Qwen Image Images Watermark
 	Watermark bool
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -86,7 +86,7 @@ func (r QwenImageGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Call /qwen-image/images.
+// Generate Qwen Image Images
 func (c *QwenImage) Generate(ctx context.Context, req QwenImageGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

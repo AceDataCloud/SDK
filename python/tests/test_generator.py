@@ -67,6 +67,53 @@ def test_endpoint_is_pollable_only_when_schema_or_manifest_declares_it():
     assert Endpoint("maestro", "/maestro/videos", sync_spec, pollable=True).pollable
 
 
+def test_endpoint_reads_schema_for_manifest_path():
+    spec = {
+        "paths": {
+            "/wan/tasks": {
+                "post": {
+                    "summary": "Wan Tasks",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {"id": {"type": "string"}},
+                                }
+                            }
+                        }
+                    },
+                }
+            },
+            "/wan/videos": {
+                "post": {
+                    "summary": "Wan Videos",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["model"],
+                                    "properties": {
+                                        "model": {"type": "string"},
+                                        "async": {"type": "boolean"},
+                                    },
+                                }
+                            }
+                        }
+                    },
+                }
+            },
+        }
+    }
+
+    endpoint = Endpoint("wan", "/wan/videos", spec)
+
+    assert [p.name for p in endpoint.params] == ["model", "async"]
+    assert endpoint.pollable
+    assert endpoint.summary == "Wan Videos"
+
+
 def test_array_of_object_union_stays_structured_in_all_languages():
     schema = {
         "type": "array",

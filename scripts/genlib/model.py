@@ -50,8 +50,10 @@ def py_param(name: str) -> str:
     return f"{name}_" if keyword.iskeyword(name) else name
 
 
-def request_schema(spec: dict) -> dict:
-    for _path, methods in (spec.get("paths") or {}).items():
+def request_schema(spec: dict, path: str | None = None) -> dict:
+    paths = spec.get("paths") or {}
+    items = [(path, paths.get(path) or {})] if path else list(paths.items())
+    for _path, methods in items:
         for method, op in (methods or {}).items():
             if method.lower() != "post":
                 continue
@@ -62,8 +64,10 @@ def request_schema(spec: dict) -> dict:
     return {}
 
 
-def summary(spec: dict) -> str:
-    for _path, methods in (spec.get("paths") or {}).items():
+def summary(spec: dict, path: str | None = None) -> str:
+    paths = spec.get("paths") or {}
+    items = [(path, paths.get(path) or {})] if path else list(paths.items())
+    for _path, methods in items:
         for _method, op in (methods or {}).items():
             text = op.get("summary") or op.get("description") or ""
             if text and not text.startswith("$t("):
@@ -166,10 +170,10 @@ class Endpoint:
         self.alias = alias
         self.path = path
         self.method = _method_name(path)
-        schema = request_schema(spec)
+        schema = request_schema(spec, path)
         required = set(schema.get("required") or [])
         props: dict[str, dict] = schema.get("properties") or {}
-        self.summary = summary(spec)
+        self.summary = summary(spec, path)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
         self.pollable = "async" in props or pollable
 
