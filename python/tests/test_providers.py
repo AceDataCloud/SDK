@@ -10,6 +10,8 @@ import pytest
 
 from acedatacloud import AceDataCloud, AsyncAceDataCloud
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
+from acedatacloud.resources.aichat import AiChat2Model, AiChatModel
+from acedatacloud.resources.glm import GlmModel
 
 # Every service the platform exposes as a non-private generation API.
 GENERATED = (
@@ -46,6 +48,78 @@ def test_provider_namespace_exists(client, name):
 @pytest.mark.parametrize("name", GENERATED + HAND_WRITTEN)
 def test_async_client_has_the_same_namespaces(name):
     assert hasattr(AsyncAceDataCloud(api_token="test-token"), name)
+
+
+def test_updated_chat_model_enums_include_docs_models():
+    assert "gpt-5.6-luna" in typing.get_args(AiChatModel)
+    assert "deepseek-v4-pro" in typing.get_args(AiChatModel)
+    assert "claude-opus-4-6" in typing.get_args(AiChat2Model)
+    assert "glm-5.3" in typing.get_args(GlmModel)
+
+
+def test_aichat_v2_serializes_latest_parameters(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "conversation-1"}
+    client.aichat._transport = transport
+
+    client.aichat.create_v2(
+        model="claude-opus-4-6",
+        action="chat",
+        message={"role": "user", "content": "hi"},
+        allowed_skills=["web_search"],
+        allowed_mcp_servers=["docs"],
+        model_group="claude",
+        async_=True,
+    )
+
+    assert transport.request.call_args.args == ("POST", "/aichat2/conversations")
+    assert transport.request.call_args.kwargs["json"] == {
+        "model": "claude-opus-4-6",
+        "action": "chat",
+        "message": {"role": "user", "content": "hi"},
+        "allowed_skills": ["web_search"],
+        "allowed_mcp_servers": ["docs"],
+        "model_group": "claude",
+        "async": True,
+    }
+
+
+def test_openai_responses_serializes_latest_parameters(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "resp-1"}
+    client.openai.responses._transport = transport
+
+    client.openai.responses.create(
+        model="gpt-5.6-luna",
+        input="hi",
+        parallel_tool_calls=False,
+        include=["file_search_call.results"],
+        reasoning={"effort": "medium"},
+        text={"format": {"type": "text"}},
+        max_output_tokens=128,
+        stream_options={"include_usage": True},
+    )
+
+    assert transport.request.call_args.args == ("POST", "/openai/responses")
+    assert transport.request.call_args.kwargs["json"] == {
+        "model": "gpt-5.6-luna",
+        "input": "hi",
+        "parallel_tool_calls": False,
+        "include": ["file_search_call.results"],
+        "reasoning": {"effort": "medium"},
+        "text": {"format": {"type": "text"}},
+        "max_output_tokens": 128,
+        "stream_options": {"include_usage": True},
+    }
+
+
+def test_openai_models_list_endpoint(client):
+    transport = Mock()
+    transport.request.return_value = {"object": "list", "data": []}
+    client.openai.models._transport = transport
+
+    assert client.openai.models.list() == {"object": "list", "data": []}
+    assert transport.request.call_args.args == ("GET", "/openai/models")
 
 
 @pytest.mark.parametrize("name", GENERATED)

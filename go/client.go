@@ -9,6 +9,8 @@ type Client struct {
 	transport *transport
 
 	openai   *OpenAIResource
+	aichat   *AIChatResource
+	glm      *GLMResource
 	chat     *ChatResource
 	captcha  *CaptchaResource
 	images   *ImagesResource
@@ -36,6 +38,8 @@ func NewClient(opts ...Option) (*Client, error) {
 	}
 	c := &Client{transport: tr}
 	c.openai = &OpenAIResource{t: tr}
+	c.aichat = &AIChatResource{t: tr}
+	c.glm = &GLMResource{t: tr}
 	c.chat = &ChatResource{t: tr}
 	c.captcha = &CaptchaResource{t: tr}
 	c.images = &ImagesResource{t: tr}
@@ -49,9 +53,15 @@ func NewClient(opts ...Option) (*Client, error) {
 	return c, nil
 }
 
-// OpenAI returns the OpenAI-compatible resource (“/v1/chat/completions“,
+// OpenAI returns the OpenAI-compatible resource (“/openai/chat/completions“,
 // “/openai/responses“).
 func (c *Client) OpenAI() *OpenAIResource { return c.openai }
+
+// AIChat returns the AI dialogue resource.
+func (c *Client) AIChat() *AIChatResource { return c.aichat }
+
+// GLM returns the GLM chat completions resource.
+func (c *Client) GLM() *GLMResource { return c.glm }
 
 // Chat returns the native chat resource (“/v1/messages“ — Anthropic
 // Messages API shape).

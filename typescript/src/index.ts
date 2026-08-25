@@ -26,7 +26,7 @@ export type {
   PaymentRequiredBody,
 } from './runtime/payment';
 
-export type { AiChatModel } from './resources/aichat';
+export type { AiChat2Action, AiChat2Model, AiChat2ModelGroup, AiChatModel } from './resources/aichat';
 export type { GlmModel } from './resources/glm';
 export type { ImageProvider } from './resources/images';
 export type { VideoProvider } from './resources/video';

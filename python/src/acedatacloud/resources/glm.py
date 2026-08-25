@@ -6,7 +6,16 @@ import json as _json
 from collections.abc import AsyncIterator, Iterator
 from typing import Any, Literal
 
-GlmModel = Literal["glm-5.1", "glm-4.7", "glm-4.6", "glm-3-turbo"]
+GlmModel = Literal[
+    "glm-5.3",
+    "glm-5.2",
+    "glm-5",
+    "glm-5-turbo",
+    "glm-5.1",
+    "glm-4.7",
+    "glm-4.6",
+    "glm-3-turbo",
+]
 
 
 class _Completions:
@@ -18,7 +27,7 @@ class _Completions:
     def create(
         self,
         *,
-        model: str,
+        model: GlmModel,
         messages: list[dict[str, Any]],
         stream: bool = False,
         **kwargs: Any,
@@ -41,7 +50,7 @@ class _AsyncCompletions:
     async def create(
         self,
         *,
-        model: str,
+        model: GlmModel,
         messages: list[dict[str, Any]],
         stream: bool = False,
         **kwargs: Any,

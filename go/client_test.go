@@ -28,7 +28,7 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.AIChat() == nil || c.GLM() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
 	}
 }
@@ -145,12 +145,13 @@ func TestCaptchaEndpoints(t *testing.T) {
 
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/chat/completions" {
+		if r.URL.Path != "/openai/chat/completions" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
 		if r.Header.Get("Authorization") != "Bearer token-abc" {
 			t.Errorf("missing auth header")
 		}
+
 		var body map[string]any
 		_ = json.NewDecoder(r.Body).Decode(&body)
 		if body["model"] != "gpt-4o-mini" {
@@ -170,6 +171,91 @@ func TestChatCompletions_Create(t *testing.T) {
 		t.Fatalf("Create: %v", err)
 	}
 	if res["id"] != "c1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestAIChatCreateV2(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat2/conversations" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "claude-opus-4-6" || body["action"] != "chat" || body["model_group"] != "claude" {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		if body["async"] != true {
+			t.Errorf("expected async flag: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"conversation-1"}`))
+	}))
+	defer srv.Close()
+
+	async := true
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.AIChat().CreateV2(context.Background(), AIChatV2Request{
+		Model:             "claude-opus-4-6",
+		Action:            "chat",
+		Message:           map[string]any{"role": "user", "content": "hi"},
+		AllowedSkills:     []string{"web_search"},
+		AllowedMCPServers: []string{"docs"},
+		ModelGroup:        "claude",
+		Async:             &async,
+	})
+	if err != nil {
+		t.Fatalf("CreateV2: %v", err)
+	}
+	if res["id"] != "conversation-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestGLMChatCompletionsCreate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/glm/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "glm-5.3" {
+			t.Errorf("bad model: %v", body["model"])
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"glm-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.GLM().Chat().Completions().Create(context.Background(), GLMChatCompletionRequest{
+		Model:    "glm-5.3",
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "glm-1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAIModelsList(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/openai/models" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"object":"list","data":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Models().List(context.Background())
+	if err != nil {
+		t.Fatalf("List: %v", err)
+	}
+	if res["object"] != "list" {
 		t.Fatalf("bad response: %+v", res)
 	}
 }
