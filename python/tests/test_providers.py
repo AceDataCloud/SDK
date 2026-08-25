@@ -237,6 +237,29 @@ def test_suno_keeps_its_secondary_endpoints(client):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
 
 
+def test_suno_text_prompts_match_spec(client):
+    hints = typing.get_type_hints(type(client.suno).generate)
+    assert hints["prompt"] == str | None
+    assert hints["lyric_prompt"] == str | None
+
+    lyrics_hints = typing.get_type_hints(type(client.suno).lyrics)
+    assert lyrics_hints["prompt"] is str
+
+
+def test_suno_vox_requires_vocal_range(client):
+    signature = inspect.signature(type(client.suno).vox)
+    assert signature.parameters["vocal_start"].default is inspect.Parameter.empty
+    assert signature.parameters["vocal_end"].default is inspect.Parameter.empty
+
+    transport = Mock()
+    transport.request.return_value = {"task_id": "vox-1"}
+    client.suno._transport = transport
+
+    client.suno.vox(audio_id="song-1", vocal_start=0, vocal_end=12.5)
+    assert transport.request.call_args.kwargs["json"]["vocal_start"] == 0
+    assert transport.request.call_args.kwargs["json"]["vocal_end"] == 12.5
+
+
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):
     """Some endpoints return the artifact inline. `.wait()` must not then poll
     for a task that already finished — which is what made the documented

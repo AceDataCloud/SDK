@@ -74,6 +74,27 @@ func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
 	}
 }
 
+func TestSunoGenerateUsesStringPrompts(t *testing.T) {
+	body := SunoGenerateRequest{
+		Prompt:      "A bright pop song",
+		LyricPrompt: "Write lyrics about summer",
+	}.toBody()
+	if body["prompt"] != "A bright pop song" || body["lyric_prompt"] != "Write lyrics about summer" {
+		t.Fatalf("string prompts missing: %+v", body)
+	}
+}
+
+func TestSunoVoxSendsRequiredVocalRange(t *testing.T) {
+	body := SunoVoxRequest{
+		AudioID:    "song-1",
+		VocalStart: 0,
+		VocalEnd:   12.5,
+	}.toBody()
+	if body["vocal_start"] != float64(0) || body["vocal_end"] != 12.5 {
+		t.Fatalf("required vocal range missing: %+v", body)
+	}
+}
+
 func TestMinimaxGenerate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/minimax/videos" {

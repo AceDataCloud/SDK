@@ -25,7 +25,7 @@ type SunoGenerateRequest struct {
 	// Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise,
 	Custom bool
 	// The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 50
-	Prompt map[string]any
+	Prompt string
 	// Audio ID used for generating additional audio based on existing audio. This field is required when `action` is
 	AudioID string
 	// Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is main
@@ -45,7 +45,7 @@ type SunoGenerateRequest struct {
 	// Pure accompaniment mode (no lyrics), default is `false`. When set to `true`, the lyrics filled in above will b
 	Instrumental bool
 	// Prompts for automatically generating lyrics, effective only when `custom` is `true` and `lyric` is empty.
-	LyricPrompt map[string]any
+	LyricPrompt string
 	// Voice gender preference, selectable values are `'m'` (male voice) or `'f'` (female voice). Models `chirp-v4-5`
 	VocalGender string
 	// Add a default start time for the uploaded audio sample, with a default value of 0.
@@ -96,7 +96,7 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 		body["action"] = r.Action
 	}
 	body["custom"] = r.Custom
-	if r.Prompt != nil {
+	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
 	}
 	if r.AudioID != "" {
@@ -124,7 +124,7 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 		body["audio_weight"] = r.AudioWeight
 	}
 	body["instrumental"] = r.Instrumental
-	if r.LyricPrompt != nil {
+	if r.LyricPrompt != "" {
 		body["lyric_prompt"] = r.LyricPrompt
 	}
 	if r.VocalGender != "" {
@@ -375,12 +375,8 @@ type SunoVoxRequest struct {
 func (r SunoVoxRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["audio_id"] = r.AudioID
-	if r.VocalEnd != 0 {
-		body["vocal_end"] = r.VocalEnd
-	}
-	if r.VocalStart != 0 {
-		body["vocal_start"] = r.VocalStart
-	}
+	body["vocal_end"] = r.VocalEnd
+	body["vocal_start"] = r.VocalStart
 	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
@@ -533,7 +529,7 @@ type SunoLyricsRequest struct {
 	// The model used for generating lyrics has a default value of `default`, with optional values including `default
 	Model string
 	// Prompts for generating lyrics, describing the desired theme or style of the lyrics.
-	Prompt map[string]any
+	Prompt string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.
