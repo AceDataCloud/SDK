@@ -30,11 +30,24 @@ def test_sync_captcha_serialization() -> None:
     captcha = Captcha(transport)
 
     captcha.recognition.hcaptcha(queries=["cat"], question="Pick cats", async_=True)
+    captcha.recognition.image2text(image="base64-image")
+    captcha.recognition.recaptcha2(image="base64-image", question="Pick cars", async_=False)
     captcha.token.hcaptcha(
         website_key="site-key",
         website_url="https://accounts.hcaptcha.com/demo",
         rqdata="rq",
         proxy="1.2.3.4:8080",
+        async_=True,
+    )
+    captcha.token.recaptcha2(
+        website_key="site-key",
+        website_url="https://www.google.com/recaptcha/api2/demo",
+        proxy="5.6.7.8:9090",
+    )
+    captcha.token.recaptcha3(
+        page_action="verify",
+        website_key="site-key",
+        website_url="https://www.google.com/recaptcha/api3/demo",
         async_=True,
     )
     captcha.tasks.retrieve(task_id="task-1")
@@ -45,6 +58,12 @@ def test_sync_captcha_serialization() -> None:
             "/captcha/recognition/hcaptcha",
             {"queries": ["cat"], "question": "Pick cats", "async": True},
         ),
+        ("POST", "/captcha/recognition/image2text", {"image": "base64-image"}),
+        (
+            "POST",
+            "/captcha/recognition/recaptcha2",
+            {"image": "base64-image", "question": "Pick cars", "async": False},
+        ),
         (
             "POST",
             "/captcha/token/hcaptcha",
@@ -53,6 +72,25 @@ def test_sync_captcha_serialization() -> None:
                 "website_url": "https://accounts.hcaptcha.com/demo",
                 "rqdata": "rq",
                 "proxy": "1.2.3.4:8080",
+                "async": True,
+            },
+        ),
+        (
+            "POST",
+            "/captcha/token/recaptcha2",
+            {
+                "website_key": "site-key",
+                "website_url": "https://www.google.com/recaptcha/api2/demo",
+                "proxy": "5.6.7.8:9090",
+            },
+        ),
+        (
+            "POST",
+            "/captcha/token/recaptcha3",
+            {
+                "page_action": "verify",
+                "website_key": "site-key",
+                "website_url": "https://www.google.com/recaptcha/api3/demo",
                 "async": True,
             },
         ),
@@ -66,17 +104,51 @@ async def test_async_captcha_serialization() -> None:
     captcha = AsyncCaptcha(transport)
 
     await captcha.recognition.hcaptcha(async_=False)
+    await captcha.recognition.image2text(image="base64-image", async_=True)
+    await captcha.recognition.recaptcha2(image="base64-image", question="Pick buses")
     await captcha.token.hcaptcha(website_key="site-key", website_url="https://accounts.hcaptcha.com/demo")
+    await captcha.token.recaptcha2(
+        website_key="site-key",
+        website_url="https://www.google.com/recaptcha/api2/demo",
+    )
+    await captcha.token.recaptcha3(
+        page_action="verify",
+        website_key="site-key",
+        website_url="https://www.google.com/recaptcha/api3/demo",
+    )
     await captcha.tasks.retrieve(task_id="task-1")
 
     assert transport.calls == [
         ("POST", "/captcha/recognition/hcaptcha", {"async": False}),
+        ("POST", "/captcha/recognition/image2text", {"image": "base64-image", "async": True}),
+        (
+            "POST",
+            "/captcha/recognition/recaptcha2",
+            {"image": "base64-image", "question": "Pick buses"},
+        ),
         (
             "POST",
             "/captcha/token/hcaptcha",
             {
                 "website_key": "site-key",
                 "website_url": "https://accounts.hcaptcha.com/demo",
+            },
+        ),
+        (
+            "POST",
+            "/captcha/token/recaptcha2",
+            {
+                "website_key": "site-key",
+                "website_url": "https://www.google.com/recaptcha/api2/demo",
+            },
+        ),
+        (
+            "POST",
+            "/captcha/token/recaptcha3",
+            {
+                "page_action": "verify",
+                "website_key": "site-key",
+                "website_url": "https://www.google.com/recaptcha/api3/demo",
             },
         ),
         ("POST", "/captcha/tasks", {"task_id": "task-1"}),
