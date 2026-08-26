@@ -120,6 +120,7 @@ func TestCaptchaEndpoints(t *testing.T) {
 		default:
 			t.Fatalf("unexpected path: %s", r.URL.Path)
 		}
+
 	}))
 	defer srv.Close()
 
@@ -140,6 +141,20 @@ func TestCaptchaEndpoints(t *testing.T) {
 	}
 	if _, err := c.Captcha().Tasks().Retrieve(context.Background(), "task-1", nil); err != nil {
 		t.Fatalf("Tasks Retrieve: %v", err)
+	}
+}
+
+func TestSunoVoxSerializesVocalRange(t *testing.T) {
+	body := (SunoVoxRequest{
+		AudioID:    "audio-1",
+		VocalStart: 1.5,
+		VocalEnd:   30,
+	}).toBody()
+	if body["audio_id"] != "audio-1" || body["vocal_start"] != 1.5 || body["vocal_end"] != 30.0 {
+		t.Fatalf("unexpected Suno Vox body: %#v", body)
+	}
+	if _, exists := body["async"]; exists {
+		t.Fatalf("async must be omitted without a schema default: %#v", body)
 	}
 }
 

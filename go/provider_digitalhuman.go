@@ -34,7 +34,7 @@ type DigitalhumanGenerateRequest struct {
 	ImageURL string
 	// optional
 	Resolution string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle. Defaults false.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -83,7 +83,7 @@ func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	} else {
 		body["resolution"] = "720p"
 	}
-	body["async"] = true
+	body["async"] = false
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}
@@ -119,7 +119,7 @@ type DigitalhumanVoicesRequest struct {
 	Lang string
 	// Optional label.
 	Name string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle. Defaults false.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -138,7 +138,7 @@ func (r DigitalhumanVoicesRequest) toBody() map[string]any {
 	if r.Name != "" {
 		body["name"] = r.Name
 	}
-	body["async"] = true
+	body["async"] = false
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

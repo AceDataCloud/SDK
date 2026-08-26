@@ -41,7 +41,7 @@ export interface HappyhorseGenerateOptions {
   resolution?: "720P" | "1080P";
   /** Audio strategy for video editing. `auto` is determined by the model, `origin` retains the original audio of the input video. */
   audioSetting?: "auto" | "origin";
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -77,7 +77,7 @@ export class Happyhorse {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/happyhorse/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/happyhorse/tasks", this.transport, result);
     if (options.wait) {

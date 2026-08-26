@@ -38,7 +38,7 @@ export interface DigitalhumanGenerateOptions {
   /** Public URL of a source face photo (photo-driven path). */
   imageUrl?: string;
   resolution?: "720p" | "540p";
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. Defaults to false. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -55,7 +55,7 @@ export interface DigitalhumanVoicesOptions {
   lang?: "zh" | "en";
   /** Optional label. */
   name?: string;
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. Defaults to false. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -90,7 +90,7 @@ export class Digitalhuman {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    body.async = options.async ?? false;
     const result = (await this.transport.request('POST', "/digital-human/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/digital-human/tasks", this.transport, result);
     if (options.wait) {
@@ -111,7 +111,7 @@ export class Digitalhuman {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    body.async = options.async ?? false;
     const result = (await this.transport.request('POST', "/digital-human/voices", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/digital-human/tasks", this.transport, result);
     if (options.wait) {

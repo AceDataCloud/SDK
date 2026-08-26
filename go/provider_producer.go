@@ -141,7 +141,7 @@ type ProducerGenerateRequest struct {
 	ReplaceSectionEnd float64
 	// Replace the starting time point of the segment (seconds).
 	ReplaceSectionStart float64
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -198,7 +198,6 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 	} else {
 		body["replace_section_start"] = false
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

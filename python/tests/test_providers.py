@@ -168,14 +168,13 @@ def test_seedream_size_type_excludes_adaptive(client):
     assert "adaptive" not in typing.get_args(literal)
 
 
-def test_async_is_requested_by_default(client):
-    """Otherwise a slow generation holds the HTTP connection open."""
+def test_async_is_omitted_without_a_schema_default(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}
     client.flux._transport = transport
 
     client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
-    assert transport.request.call_args.kwargs["json"]["async"] is True
+    assert "async" not in transport.request.call_args.kwargs["json"]
 
 
 def test_minimax_generate_builds_a_task_handle(client):
@@ -235,6 +234,20 @@ def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
     for method in ("generate", "lyrics", "wav", "mp4"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_suno_vox_requires_and_serializes_the_vocal_range(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "suno-vox"}
+    client.suno._transport = transport
+
+    client.suno.vox(audio_id="audio-1", vocal_start=1.5, vocal_end=30.0)
+
+    assert transport.request.call_args.kwargs["json"] == {
+        "audio_id": "audio-1",
+        "vocal_start": 1.5,
+        "vocal_end": 30.0,
+    }
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):

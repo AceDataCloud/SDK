@@ -39,7 +39,7 @@ export interface MaestroGenerateOptions {
   style?: "auto" | "cinematic" | "glass" | "luxury" | "swiss" | "modern" | "editorial" | "warm" | "vibrant" | "neon" | "mono" | "pastel" | "bold" | "industrial" | "futuristic" | "retro";
   /** Optional narration voice — the **timbre** of the voiceover, independent of language. `auto` (default) lets the director pick a fitting voice. Every preset is cross-lingual: the same voice speaks whatever language(s) you set in `langs`, so choose purely by character — `warm-female`, `bright-female`, `anchor-female`, `clean-female`, `calm-male`, `deep-male`, `documentary-male`, `energetic-male`, `storyteller-male`. Advanced: a raw 32-character Fish `reference_id` is also accepted. For `drama` / `avatar` this sets the primary / narrator timbre; distinct characters may still get their own. */
   voice?: "auto" | "warm-female" | "bright-female" | "anchor-female" | "clean-female" | "calm-male" | "deep-male" | "documentary-male" | "energetic-male" | "storyteller-male";
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -74,7 +74,7 @@ export class Maestro {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/maestro/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/maestro/tasks", this.transport, result);
     if (options.wait) {

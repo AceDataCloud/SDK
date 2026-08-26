@@ -47,7 +47,7 @@ export interface SeedanceGenerateOptions {
   outputFormat?: "mp4" | "mov";
   /** $t(seedance_videos_tools) */
   tools?: Array<Record<string, unknown>>;
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -86,7 +86,7 @@ export class Seedance {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/seedance/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/seedance/tasks", this.transport, result);
     if (options.wait) {

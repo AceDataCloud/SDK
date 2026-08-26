@@ -31,7 +31,7 @@ export interface NanoBananaGenerateOptions {
   resolution?: "1K" | "2K" | "4K";
   /** Aspect ratio for generating images. Supported values are `1:1`, `3:2`, `2:3`, `16:9`, `9:16`, `4:3`, `3:4`. If this parameter is specified, the specified aspect ratio will be used for generation regardless of whether `action` is `generate` or `edit`; if not specified, the default for `action` as `generate` is `1:1`, and for `action` as `edit`, it will automatically adopt the aspect ratio of the first image in `image_urls` to preserve the original composition. Note: In `edit` mode, specifying an aspect ratio that differs significantly from the original image will cause the model to redraw according to the new ratio, which may deviate from the reference image. */
   aspectRatio?: "1:1" | "3:2" | "2:3" | "16:9" | "9:16" | "4:3" | "3:4";
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -62,7 +62,7 @@ export class NanoBanana {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/nano-banana/images", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/nano-banana/tasks", this.transport, result);
     if (options.wait) {

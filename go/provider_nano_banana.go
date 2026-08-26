@@ -26,7 +26,7 @@ type NanoBananaGenerateRequest struct {
 	Resolution string
 	// Aspect ratio for generating images. Supported values are `1:1`, `3:2`, `2:3`, `16:9`, `9:16`, `4:3`, `3:4`. If
 	AspectRatio string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -55,7 +55,6 @@ func (r NanoBananaGenerateRequest) toBody() map[string]any {
 	if r.AspectRatio != "" {
 		body["aspect_ratio"] = r.AspectRatio
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

@@ -24,7 +24,7 @@ type FluxGenerateRequest struct {
 	Model string
 	// Link to the original image that needs editing.
 	ImageURL string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -46,7 +46,6 @@ func (r FluxGenerateRequest) toBody() map[string]any {
 	if r.ImageURL != "" {
 		body["image_url"] = r.ImageURL
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

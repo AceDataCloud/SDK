@@ -36,7 +36,7 @@ type HappyhorseGenerateRequest struct {
 	Resolution string
 	// Audio strategy for video editing. `auto` is determined by the model, `origin` retains the original audio of th
 	AudioSetting string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -92,7 +92,6 @@ func (r HappyhorseGenerateRequest) toBody() map[string]any {
 	} else {
 		body["audio_setting"] = "auto"
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

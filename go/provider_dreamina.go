@@ -22,7 +22,7 @@ type DreaminaGenerateRequest struct {
 	Prompt string
 	// Optional subject mask URL (from object detection) to specify and drive a particular person in a multi-person i
 	MaskURL []string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -45,7 +45,6 @@ func (r DreaminaGenerateRequest) toBody() map[string]any {
 	if r.MaskURL != nil {
 		body["mask_url"] = r.MaskURL
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

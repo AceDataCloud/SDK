@@ -20,7 +20,7 @@ type HailuoGenerateRequest struct {
 	Prompt string
 	// You can specify the URL of the first frame image to generate a video from the image.
 	FirstImageURL string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -40,7 +40,6 @@ func (r HailuoGenerateRequest) toBody() map[string]any {
 	if r.FirstImageURL != "" {
 		body["first_image_url"] = r.FirstImageURL
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

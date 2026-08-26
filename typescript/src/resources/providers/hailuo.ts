@@ -25,7 +25,7 @@ export interface HailuoGenerateOptions {
   prompt?: string;
   /** You can specify the URL of the first frame image to generate a video from the image. */
   firstImageUrl?: string;
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -53,7 +53,7 @@ export class Hailuo {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/hailuo/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/hailuo/tasks", this.transport, result);
     if (options.wait) {

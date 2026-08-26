@@ -32,7 +32,7 @@ type LumaGenerateRequest struct {
 	EndImageURL string
 	// The URL of the starting frame image, which will be used as the first frame of the generated video.
 	StartImageURL string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -72,7 +72,6 @@ func (r LumaGenerateRequest) toBody() map[string]any {
 	if r.StartImageURL != "" {
 		body["start_image_url"] = r.StartImageURL
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

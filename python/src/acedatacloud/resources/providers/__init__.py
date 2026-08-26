@@ -1,39 +1,22 @@
 """Provider-axis clients, generated from the platform OpenAPI specs."""
 
-from .digitalhuman import AsyncDigitalhuman as AsyncDigitalhuman
-from .digitalhuman import Digitalhuman as Digitalhuman
-from .dreamina import AsyncDreamina as AsyncDreamina
-from .dreamina import Dreamina as Dreamina
-from .fish import AsyncFish as AsyncFish
-from .fish import Fish as Fish
-from .flux import AsyncFlux as AsyncFlux
-from .flux import Flux as Flux
-from .hailuo import AsyncHailuo as AsyncHailuo
-from .hailuo import Hailuo as Hailuo
-from .happyhorse import AsyncHappyhorse as AsyncHappyhorse
-from .happyhorse import Happyhorse as Happyhorse
-from .localization import AsyncLocalization as AsyncLocalization
-from .localization import Localization as Localization
-from .luma import AsyncLuma as AsyncLuma
-from .luma import Luma as Luma
-from .maestro import AsyncMaestro as AsyncMaestro
-from .maestro import Maestro as Maestro
-from .minimax import AsyncMinimax as AsyncMinimax
-from .minimax import Minimax as Minimax
-from .nano_banana import AsyncNanoBanana as AsyncNanoBanana
-from .nano_banana import NanoBanana as NanoBanana
-from .producer import AsyncProducer as AsyncProducer
-from .producer import Producer as Producer
-from .qwen_image import AsyncQwenImage as AsyncQwenImage
-from .qwen_image import QwenImage as QwenImage
-from .seedance import AsyncSeedance as AsyncSeedance
-from .seedance import Seedance as Seedance
-from .seedream import AsyncSeedream as AsyncSeedream
-from .seedream import Seedream as Seedream
-from .suno import AsyncSuno as AsyncSuno
-from .suno import Suno as Suno
-from .wan import AsyncWan as AsyncWan
-from .wan import Wan as Wan
+from .digitalhuman import AsyncDigitalhuman, Digitalhuman
+from .dreamina import AsyncDreamina, Dreamina
+from .fish import AsyncFish, Fish
+from .flux import AsyncFlux, Flux
+from .hailuo import AsyncHailuo, Hailuo
+from .happyhorse import AsyncHappyhorse, Happyhorse
+from .localization import AsyncLocalization, Localization
+from .luma import AsyncLuma, Luma
+from .maestro import AsyncMaestro, Maestro
+from .minimax import AsyncMinimax, Minimax
+from .nano_banana import AsyncNanoBanana, NanoBanana
+from .producer import AsyncProducer, Producer
+from .qwen_image import AsyncQwenImage, QwenImage
+from .seedance import AsyncSeedance, Seedance
+from .seedream import AsyncSeedream, Seedream
+from .suno import AsyncSuno, Suno
+from .wan import AsyncWan, Wan
 
 __all__ = [
     "Digitalhuman",

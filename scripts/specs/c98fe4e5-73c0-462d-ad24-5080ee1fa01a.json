@@ -1,1 +1,603 @@
-{"paths": {"/suno/lyrics": {"post": {"summary": "Suno lyrics generation API. Generates structured song lyrics from a prompt; supports the default and remi-v1 models.", "security": [{"bearerAuth": []}], "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "example": {"data": [{"tags": ["dreamy, mellow, ballad"], "text": "[Verse]\nSnowflakes falling from the sky\nWinter's cold touch\nOh how it gets me high\nI bundle up in layers\nOh so cozy\nStepping out and feeling the frost on my nose\n\n[Chorus]\nOh\nWinter's cold touch\nIt's a season that I love so much\nSnowfall brings a feeling so divine\nWinter's cold touch\nIt's a magical time", "title": "Winter's Cold Touch", "status": "complete"}, {"tags": ["dream pop, mellow, shoegaze"], "text": "[Verse]\nThe world is covered in a blanket of white\nIcicles hanging\nShimmering so bright\nThe chilly air fills my lungs with every breath\nWalking in the snow\nLeaving footprints behind\n\n[Chorus]\nWinter wonderland\nEverything is so bright\nWinter wonderland\nHold me through the night", "title": "Winter Wonderland", "status": "complete"}], "elapsed": 7.433, "success": true, "task_id": "2e26f7ff-0b82-4a60-bb9b-78db89f98b51", "started_at": 1780684179.15, "finished_at": 1780684186.583}, "properties": {"data": {"type": "array", "items": {"type": "object", "properties": {"tags": {"type": "array", "items": {"type": "string"}, "description": "Recommended music genre tags for the generated lyrics."}, "text": {"type": "string", "description": "Generated lyrics text content."}, "title": {"type": "string", "description": "Suggested titles for the generated lyrics."}, "status": {"type": "string", "description": "The generation status of this lyric variant, such as `complete`."}}}, "description": "List of lyric variations generated based on the prompt words."}, "elapsed": {"type": "number", "description": "The number of seconds consumed by task execution."}, "success": {"type": "boolean", "description": "A boolean value indicating whether this request was successful."}, "task_id": {"type": "string", "description": "The unique ID for this lyric generation task."}, "started_at": {"type": "number", "description": "The time when the task starts execution."}, "finished_at": {"type": "number", "description": "The time when the task execution is completed."}}}}}, "description": "Request successful, returning lyrics generation result."}, "400": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "token_mismatched", "message": "The specified token is not matched with API."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "token_mismatched", "description": "Response error code."}, "message": {"type": "string", "example": "The specified token is not matched with API.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "api_not_implemented", "message": "The API is not implemented."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "api_not_implemented", "description": "Response error code."}, "message": {"type": "string", "example": "The API is not implemented.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "disabled", "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "disabled", "description": "Response error code."}, "message": {"type": "string", "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "bad_request", "message": "model is invalid."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "bad_request", "description": "Response error code."}, "message": {"type": "string", "example": "model is invalid.", "description": "Response error message."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "no_token", "message": "No token specified for the request."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "no_token", "description": "Response error code."}, "message": {"type": "string", "example": "No token specified for the request.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Request error, possibly due to missing or invalid parameters."}, "401": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "invalid_token", "message": "The specified token is invalid or wrong."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "invalid_token", "description": "Response error code."}, "message": {"type": "string", "example": "The specified token is invalid or wrong.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "token_expired", "message": "token expired."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "token_expired", "description": "Response error code."}, "message": {"type": "string", "example": "token expired.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "token_mismatched", "message": "token and api does not match."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "token_mismatched", "description": "Response error code."}, "message": {"type": "string", "example": "token and api does not match.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Unauthorized, authorization token is invalid or missing."}, "403": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "used_up", "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "used_up", "description": "Response error code."}, "message": {"type": "string", "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Unauthorized, authorization token is invalid or missing."}, "404": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "no_api", "message": "API does not exist, please make sure url is correct."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "no_api", "description": "Response error code."}, "message": {"type": "string", "example": "API does not exist, please make sure url is correct.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Unauthorized, authorization token is invalid or missing."}, "429": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "too_many_requests", "message": "You have exceeded the rate limit."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "too_many_requests", "description": "Response error code."}, "message": {"type": "string", "example": "You have exceeded the rate limit.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Too many requests, rate limit exceeded."}, "500": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "api_error", "message": "Internal server error."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "api_error", "description": "Response error code."}, "message": {"type": "string", "example": "Internal server error.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Internal server error, an exception occurred on the server side."}}, "parameters": [{"in": "header", "name": "accept", "schema": {"enum": ["application/json"], "type": "string"}, "required": false, "description": "Specify the response format returned by the server."}], "requestBody": {"content": {"application/json": {"schema": {"type": "object", "required": ["prompt", "model"], "properties": {"model": {"enum": ["default", "remi-v1"], "rank": 40, "type": "string", "description": "The model used for generating lyrics has a default value of `default`, with optional values including `default` and `remi-v1`."}, "prompt": {"rank": 20, "type": "object", "example": "A song about winter", "description": "Prompts for generating lyrics, describing the desired theme or style of the lyrics."}}}, "example": {"model": "default", "prompt": "A song about winter"}}}, "required": true}}}}, "openapi": "3.0.0", "servers": [{"url": "https://api.acedata.cloud", "description": "Ace Data Cloud API Server"}], "components": {"securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer"}}}}
+{
+  "paths": {
+    "/suno/lyrics": {
+      "post": {
+        "summary": "Suno lyrics generation API. Generates structured song lyrics from a prompt; supports the default and remi-v1 models.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "data": [
+                      {
+                        "tags": [
+                          "dreamy, mellow, ballad"
+                        ],
+                        "text": "[Verse]\nSnowflakes falling from the sky\nWinter's cold touch\nOh how it gets me high\nI bundle up in layers\nOh so cozy\nStepping out and feeling the frost on my nose\n\n[Chorus]\nOh\nWinter's cold touch\nIt's a season that I love so much\nSnowfall brings a feeling so divine\nWinter's cold touch\nIt's a magical time",
+                        "title": "Winter's Cold Touch",
+                        "status": "complete"
+                      },
+                      {
+                        "tags": [
+                          "dream pop, mellow, shoegaze"
+                        ],
+                        "text": "[Verse]\nThe world is covered in a blanket of white\nIcicles hanging\nShimmering so bright\nThe chilly air fills my lungs with every breath\nWalking in the snow\nLeaving footprints behind\n\n[Chorus]\nWinter wonderland\nEverything is so bright\nWinter wonderland\nHold me through the night",
+                        "title": "Winter Wonderland",
+                        "status": "complete"
+                      }
+                    ],
+                    "elapsed": 7.433,
+                    "success": true,
+                    "task_id": "2e26f7ff-0b82-4a60-bb9b-78db89f98b51",
+                    "started_at": 1780684179.15,
+                    "finished_at": 1780684186.583
+                  },
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Recommended music genre tags for the generated lyrics."
+                          },
+                          "text": {
+                            "type": "string",
+                            "description": "Generated lyrics text content."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Suggested titles for the generated lyrics."
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "The generation status of this lyric variant, such as `complete`."
+                          }
+                        }
+                      },
+                      "description": "List of lyric variations generated based on the prompt words."
+                    },
+                    "elapsed": {
+                      "type": "number",
+                      "description": "The number of seconds consumed by task execution."
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "description": "A boolean value indicating whether this request was successful."
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "The unique ID for this lyric generation task."
+                    },
+                    "started_at": {
+                      "type": "number",
+                      "description": "The time when the task starts execution."
+                    },
+                    "finished_at": {
+                      "type": "number",
+                      "description": "The time when the task execution is completed."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful, returning lyrics generation result."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "disabled",
+                          "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "disabled",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "model is invalid."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "model is invalid.",
+                              "description": "Response error message."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_token",
+                          "message": "No token specified for the request."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_token",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "No token specified for the request.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Request error, possibly due to missing or invalid parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_expired",
+                          "message": "token expired."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_expired",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token expired.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "token and api does not match."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token and api does not match.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized, authorization token is invalid or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "used_up",
+                          "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "used_up",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized, authorization token is invalid or missing."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_api",
+                          "message": "API does not exist, please make sure url is correct."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_api",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "API does not exist, please make sure url is correct.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized, authorization token is invalid or missing."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Too many requests, rate limit exceeded."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Internal server error, an exception occurred on the server side."
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Specify the response format returned by the server."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt",
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "enum": [
+                      "default",
+                      "remi-v1"
+                    ],
+                    "rank": 40,
+                    "type": "string",
+                    "description": "The model used for generating lyrics has a default value of `default`, with optional values including `default` and `remi-v1`."
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "example": "A song about winter",
+                    "description": "Suno Lyrics Prompt",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "example": {
+                "model": "default",
+                "prompt": "A song about winter"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

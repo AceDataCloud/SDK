@@ -44,7 +44,7 @@ type FishGenerateRequest struct {
 	MinChunkLength int
 	// The repetition penalty coefficient applied during the generation process.
 	RepetitionPenalty float64
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -98,7 +98,6 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	if r.RepetitionPenalty != 0 {
 		body["repetition_penalty"] = r.RepetitionPenalty
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

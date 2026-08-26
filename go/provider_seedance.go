@@ -42,7 +42,7 @@ type SeedanceGenerateRequest struct {
 	OutputFormat string
 	// $t(seedance_videos_tools)
 	Tools []map[string]any
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -89,7 +89,6 @@ func (r SeedanceGenerateRequest) toBody() map[string]any {
 	if r.Tools != nil {
 		body["tools"] = r.Tools
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

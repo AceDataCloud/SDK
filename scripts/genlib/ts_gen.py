@@ -30,7 +30,11 @@ def _options_interface(svc: Service, ep) -> tuple[str, str]:
         doc = f"  /** {p.description} */\n" if p.description else ""
         lines.append(f"{doc}  {camel(p.name)}{optional}: {p.ts_type()};")
     if ep.pollable:
-        lines.append("  /** Submit asynchronously and poll. Defaults to true. */")
+        async_default = next((p.default() for p in ep.params if p.name == "async"), None)
+        if async_default is None:
+            lines.append("  /** Submit asynchronously and poll. */")
+        else:
+            lines.append(f"  /** Submit asynchronously and poll. Defaults to {str(async_default).lower()}. */")
         lines.append("  async?: boolean;")
         lines.append("  /** Wait for completion before returning the handle. */")
         lines.append("  wait?: boolean;")
@@ -84,7 +88,11 @@ def _method(svc: Service, ep) -> str:
     lines.extend(_body(ep))
 
     if ep.pollable:
-        lines.append("    body.async = options.async ?? true;")
+        async_default = next((p.default() for p in ep.params if p.name == "async"), None)
+        if async_default is None:
+            lines.append("    if (options.async !== undefined) body.async = options.async;")
+        else:
+            lines.append(f"    body.async = options.async ?? {_ts_literal(async_default)};")
         lines.append(
             f"    const result = (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body }})) as Record<string, unknown>;"
         )

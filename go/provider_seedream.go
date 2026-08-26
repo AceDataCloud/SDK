@@ -40,7 +40,7 @@ type SeedreamGenerateRequest struct {
 	SequentialImageGeneration string
 	// Adjustable parameters for batch image generation. Effective only when `sequential_image_generation=auto`. Only
 	SequentialImageGenerationOptions map[string]any
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -82,7 +82,6 @@ func (r SeedreamGenerateRequest) toBody() map[string]any {
 	if r.SequentialImageGenerationOptions != nil {
 		body["sequential_image_generation_options"] = r.SequentialImageGenerationOptions
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

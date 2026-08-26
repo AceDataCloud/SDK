@@ -22,7 +22,6 @@ describe('Seedream provider', () => {
       json: {
         model: 'doubao-seedream-5-0-260128',
         prompt: 'a cat',
-        async: true,
       },
     });
   });

@@ -23,7 +23,6 @@ describe('Seedance provider', () => {
         omni_reference_task_type: 'extend',
         output_format: 'mov',
         tools: [{ type: 'web_search' }],
-        async: true,
       }),
     });
     expect((request.mock.calls[0][2].json as Record<string, unknown>).camera_fixed).toBeUndefined();

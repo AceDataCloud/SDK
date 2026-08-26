@@ -45,7 +45,7 @@ export interface SeedreamGenerateOptions {
   sequentialImageGeneration?: "auto" | "disabled";
   /** Adjustable parameters for batch image generation. Effective only when `sequential_image_generation=auto`. Only supports `doubao-seedream-5.0-lite`, `doubao-seedream-4.5`, and `doubao-seedream-4.0`. */
   sequentialImageGenerationOptions?: Record<string, unknown>;
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -83,7 +83,7 @@ export class Seedream {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/seedream/images", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/seedream/tasks", this.transport, result);
     if (options.wait) {

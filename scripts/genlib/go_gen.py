@@ -43,7 +43,13 @@ def _request_struct(svc: Service, ep) -> str:
         lines.append(f"\t// {comment[:110].rstrip()}")
         lines.append(f"\t{_field_name(p.name)} {p.go_type()}")
     if ep.pollable:
-        lines.append("\t// Async submits without blocking; poll the returned handle. Defaults true.")
+        async_default = next((p.default() for p in ep.params if p.name == "async"), None)
+        if async_default is None:
+            lines.append("\t// Async submits without blocking; poll the returned handle.")
+        else:
+            lines.append(
+                f"\t// Async submits without blocking; poll the returned handle. Defaults {_go_literal(async_default)}."
+            )
         lines.append("\tAsync *bool")
     lines.append("\t// CallbackURL optionally receives the completion webhook.")
     lines.append("\tCallbackURL string")
@@ -88,7 +94,9 @@ def _to_body(struct: str, svc: Service, ep) -> str:
             lines.append(f"\tbody[{key}] = r.{field}")
 
     if ep.pollable:
-        lines.append('\tbody["async"] = true')
+        async_default = next((p.default() for p in ep.params if p.name == "async"), None)
+        if async_default is not None:
+            lines.append(f'\tbody["async"] = {_go_literal(async_default)}')
         lines.append("\tif r.Async != nil {")
         lines.append('\t\tbody["async"] = *r.Async')
         lines.append("\t}")

@@ -34,7 +34,7 @@ type QwenImageGenerateRequest struct {
 	Seed int
 	// $t(qwen_image_images_watermark)
 	Watermark bool
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle. Defaults false.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -71,7 +71,7 @@ func (r QwenImageGenerateRequest) toBody() map[string]any {
 		body["seed"] = r.Seed
 	}
 	body["watermark"] = r.Watermark
-	body["async"] = true
+	body["async"] = false
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

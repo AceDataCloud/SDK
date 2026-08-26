@@ -27,7 +27,7 @@ export interface DreaminaGenerateOptions {
   prompt?: string;
   /** Optional subject mask URL (from object detection) to specify and drive a particular person in a multi-person image. */
   maskUrl?: string[];
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -56,7 +56,7 @@ export class Dreamina {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/dreamina/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/dreamina/tasks", this.transport, result);
     if (options.wait) {

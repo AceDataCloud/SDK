@@ -39,7 +39,7 @@ export interface QwenImageGenerateOptions {
   seed?: number;
   /** $t(qwen_image_images_watermark) */
   watermark?: boolean;
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. Defaults to false. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -74,7 +74,7 @@ export class QwenImage {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    body.async = options.async ?? false;
     const result = (await this.transport.request('POST', "/qwen-image/images", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/qwen-image/tasks", this.transport, result);
     if (options.wait) {

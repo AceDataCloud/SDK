@@ -46,7 +46,7 @@ type WanGenerateRequest struct {
 	Seed int
 	// $t(wan_videos_watermark)
 	Watermark bool
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -101,7 +101,6 @@ func (r WanGenerateRequest) toBody() map[string]any {
 		body["seed"] = r.Seed
 	}
 	body["watermark"] = r.Watermark
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

@@ -34,7 +34,7 @@ type MaestroGenerateRequest struct {
 	Style string
 	// Optional narration voice — the **timbre** of the voiceover, independent of language. `auto` (default) lets the
 	Voice string
-	// Async submits without blocking; poll the returned handle. Defaults true.
+	// Async submits without blocking; poll the returned handle.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
@@ -87,7 +87,6 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 	} else {
 		body["voice"] = "auto"
 	}
-	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
 	}

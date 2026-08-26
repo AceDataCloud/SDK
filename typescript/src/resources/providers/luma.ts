@@ -37,7 +37,7 @@ export interface LumaGenerateOptions {
   endImageUrl?: string;
   /** The URL of the starting frame image, which will be used as the first frame of the generated video. */
   startImageUrl?: string;
-  /** Submit asynchronously and poll. Defaults to true. */
+  /** Submit asynchronously and poll. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
   wait?: boolean;
@@ -71,7 +71,7 @@ export class Luma {
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    body.async = options.async ?? true;
+    if (options.async !== undefined) body.async = options.async;
     const result = (await this.transport.request('POST', "/luma/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/luma/tasks", this.transport, result);
     if (options.wait) {

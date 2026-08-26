@@ -68,7 +68,7 @@ class Suno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -78,7 +78,7 @@ class Suno:
         samples_end: float | None = None,
         audio_weight: float | None = None,
         instrumental: bool | None = None,
-        lyric_prompt: dict[str, Any] | None = None,
+        lyric_prompt: str | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
         negative_tags: str | None = None,
@@ -161,7 +161,8 @@ class Suno:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = self._transport.request("POST", "/suno/audios", json=body)
         handle = TaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -254,8 +255,8 @@ class Suno:
         self,
         *,
         audio_id: str,
-        vocal_end: float | None = None,
-        vocal_start: float | None = None,
+        vocal_end: float,
+        vocal_start: float,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -268,14 +269,13 @@ class Suno:
         """
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
-        if vocal_end is not None:
-            body["vocal_end"] = vocal_end
-        if vocal_start is not None:
-            body["vocal_start"] = vocal_start
+        body["vocal_end"] = vocal_end
+        body["vocal_start"] = vocal_start
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = self._transport.request("POST", "/suno/vox", json=body)
         handle = TaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -299,7 +299,8 @@ class Suno:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = self._transport.request("POST", "/suno/wav", json=body)
         handle = TaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -323,7 +324,8 @@ class Suno:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = self._transport.request("POST", "/suno/midi", json=body)
         handle = TaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -349,7 +351,7 @@ class Suno:
         self,
         *,
         model: SunoModel,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
@@ -412,7 +414,7 @@ class AsyncSuno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -422,7 +424,7 @@ class AsyncSuno:
         samples_end: float | None = None,
         audio_weight: float | None = None,
         instrumental: bool | None = None,
-        lyric_prompt: dict[str, Any] | None = None,
+        lyric_prompt: str | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
         negative_tags: str | None = None,
@@ -505,7 +507,8 @@ class AsyncSuno:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = await self._transport.request("POST", "/suno/audios", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -598,8 +601,8 @@ class AsyncSuno:
         self,
         *,
         audio_id: str,
-        vocal_end: float | None = None,
-        vocal_start: float | None = None,
+        vocal_end: float,
+        vocal_start: float,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -612,14 +615,13 @@ class AsyncSuno:
         """
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
-        if vocal_end is not None:
-            body["vocal_end"] = vocal_end
-        if vocal_start is not None:
-            body["vocal_start"] = vocal_start
+        body["vocal_end"] = vocal_end
+        body["vocal_start"] = vocal_start
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = await self._transport.request("POST", "/suno/vox", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -643,7 +645,8 @@ class AsyncSuno:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = await self._transport.request("POST", "/suno/wav", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -667,7 +670,8 @@ class AsyncSuno:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        if async_ is not None:
+            body["async"] = async_
         result = await self._transport.request("POST", "/suno/midi", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
@@ -693,7 +697,7 @@ class AsyncSuno:
         self,
         *,
         model: SunoModel,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:

@@ -71,7 +71,7 @@ class Digitalhuman:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        body["async"] = False if async_ is None else async_
         result = self._transport.request("POST", "/digital-human/videos", json=body)
         handle = TaskHandle(_task_id(result), "/digital-human/tasks", self._transport, submitted=result)
         if wait:
@@ -100,7 +100,7 @@ class Digitalhuman:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        body["async"] = False if async_ is None else async_
         result = self._transport.request("POST", "/digital-human/voices", json=body)
         handle = TaskHandle(_task_id(result), "/digital-human/tasks", self._transport, submitted=result)
         if wait:
@@ -155,7 +155,7 @@ class AsyncDigitalhuman:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        body["async"] = False if async_ is None else async_
         result = await self._transport.request("POST", "/digital-human/videos", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/digital-human/tasks", self._transport, submitted=result)
         if wait:
@@ -184,7 +184,7 @@ class AsyncDigitalhuman:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
-        body["async"] = True if async_ is None else async_
+        body["async"] = False if async_ is None else async_
         result = await self._transport.request("POST", "/digital-human/voices", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/digital-human/tasks", self._transport, submitted=result)
         if wait:

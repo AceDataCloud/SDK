@@ -23,8 +23,7 @@ from __future__ import annotations
 
 from typing import Any, Literal  # noqa: F401
 
-from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
-'''
+{task_import}'''
 
 
 def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
@@ -174,7 +173,12 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
     lines.append(_body(params, consts=consts, method=ep.method))
 
     if ep.pollable:
-        lines.append("        body[\"async\"] = True if async_ is None else async_")
+        async_default = next((p.default() for p in ep.params if p.name == "async"), None)
+        if async_default is None:
+            lines.append("        if async_ is not None:")
+            lines.append('            body["async"] = async_')
+        else:
+            lines.append(f'        body["async"] = {async_default!r} if async_ is None else async_')
         lines.append(
             f'        result = {await_}self._transport.request("POST", "{ep.path}", json=body)'
         )
@@ -198,7 +202,10 @@ def render(svc: Service) -> str:
     title = f"{svc.class_name} ({svc.alias})"
     aliases, alias_lines = _aliases(svc)
     consts, const_lines = _default_consts(svc)
-    out = [HEADER.format(title=title)]
+    task_import = "from ..._runtime.tasks import AsyncTaskHandle, TaskHandle\n" if any(
+        ep.pollable for ep in svc.endpoints
+    ) else ""
+    out = [HEADER.format(title=title, task_import=task_import).rstrip()]
     out.append("")
     if const_lines:
         out.append("")
@@ -246,10 +253,7 @@ def write_all(services: list[Service], root: Path) -> list[Path]:
 
     init = ['"""Provider-axis clients, generated from the platform OpenAPI specs."""', ""]
     for svc in services:
-        init.append(
-            f"from .{svc.py_module} import {svc.class_name} as {svc.class_name}, "
-            f"Async{svc.class_name} as Async{svc.class_name}"
-        )
+        init.append(f"from .{svc.py_module} import Async{svc.class_name}, {svc.class_name}")
     init.append("")
     init.append("__all__ = [")
     for svc in services:
@@ -277,7 +281,7 @@ from typing import Any
 
 
 def render_mixin(services: list[Service]) -> str:
-    out = [MIXIN_HEADER]
+    out = [MIXIN_HEADER.rstrip()]
     for svc in services:
         out.append(
             f"from .{svc.py_module} import Async{svc.class_name}, {svc.class_name}"
