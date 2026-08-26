@@ -79,7 +79,7 @@ func (o *OpenAIResource) Chat() *OpenAIChat { return &OpenAIChat{t: o.t} }
 // Responses returns the responses sub-namespace.
 func (o *OpenAIResource) Responses() *OpenAIResponses { return &OpenAIResponses{t: o.t} }
 
-// OpenAIChat exposes “/v1/chat/completions“.
+// OpenAIChat exposes “/openai/chat/completions“.
 type OpenAIChat struct{ t *transport }
 
 // Completions returns the completions sub-namespace.
@@ -92,7 +92,7 @@ type OpenAIChatCompletions struct{ t *transport }
 func (c *OpenAIChatCompletions) Create(ctx context.Context, req ChatCompletionRequest) (map[string]any, error) {
 	body := req.toBody()
 	delete(body, "stream")
-	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/v1/chat/completions", Body: body})
+	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/openai/chat/completions", Body: body})
 }
 
 // CreateStream performs a streaming chat completion and returns a
@@ -100,7 +100,7 @@ func (c *OpenAIChatCompletions) Create(ctx context.Context, req ChatCompletionRe
 // single SSE “data:“ line).
 func (c *OpenAIChatCompletions) CreateStream(ctx context.Context, req ChatCompletionRequest) (<-chan map[string]any, <-chan error) {
 	req.Stream = true
-	return streamDecode(c.t, "/v1/chat/completions", req.toBody())
+	return streamDecode(c.t, "/openai/chat/completions", req.toBody())
 }
 
 // OpenAIResponses exposes “/openai/responses“.
