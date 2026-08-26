@@ -113,8 +113,18 @@ func TestCaptchaEndpoints(t *testing.T) {
 		switch r.URL.Path {
 		case "/captcha/recognition/hcaptcha":
 			_, _ = w.Write([]byte(`{"task_id":"captcha-recognition-task"}`))
+		case "/captcha/recognition/image2text":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-image2text-task"}`))
+		case "/captcha/recognition/recaptcha2":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-recaptcha2-recognition-task"}`))
 		case "/captcha/token/hcaptcha":
 			_, _ = w.Write([]byte(`{"task_id":"captcha-token-task"}`))
+		case "/captcha/token/recaptcha2":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-token-recaptcha2-task"}`))
+		case "/captcha/token/recaptcha3":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-token-recaptcha3-task"}`))
+		case "/captcha/token/turnstile":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-token-turnstile-task"}`))
 		case "/captcha/tasks":
 			_, _ = w.Write([]byte(`{"status":"succeeded"}`))
 		default:
@@ -131,12 +141,46 @@ func TestCaptchaEndpoints(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("Recognition HCaptcha: %v", err)
 	}
+	if _, err := c.Captcha().Recognition().Image2Text(context.Background(), CaptchaRecognitionImage2TextRequest{
+		Image: "base64-image",
+		Async: true,
+	}); err != nil {
+		t.Fatalf("Recognition Image2Text: %v", err)
+	}
+	if _, err := c.Captcha().Recognition().Recaptcha2(context.Background(), CaptchaRecognitionRecaptcha2Request{
+		Image:    "base64-grid",
+		Question: "Pick buses",
+	}); err != nil {
+		t.Fatalf("Recognition Recaptcha2: %v", err)
+	}
 	if _, err := c.Captcha().Token().HCaptcha(context.Background(), CaptchaTokenHCaptchaRequest{
 		WebsiteKey: "site-key",
 		WebsiteURL: "https://accounts.hcaptcha.com/demo",
 		Async:      true,
 	}); err != nil {
 		t.Fatalf("Token HCaptcha: %v", err)
+	}
+	if _, err := c.Captcha().Token().Recaptcha2(context.Background(), CaptchaTokenRecaptcha2Request{
+		WebsiteKey: "site-key",
+		WebsiteURL: "https://www.google.com/recaptcha/api2/demo",
+		Proxy:      "1.2.3.4:8080",
+	}); err != nil {
+		t.Fatalf("Token Recaptcha2: %v", err)
+	}
+	if _, err := c.Captcha().Token().Recaptcha3(context.Background(), CaptchaTokenRecaptcha3Request{
+		PageAction: "submit",
+		WebsiteKey: "site-key",
+		WebsiteURL: "https://www.google.com/recaptcha/api3/demo",
+	}); err != nil {
+		t.Fatalf("Token Recaptcha3: %v", err)
+	}
+	if _, err := c.Captcha().Token().Turnstile(context.Background(), CaptchaTokenTurnstileRequest{
+		WebsiteKey: "ts-site-key",
+		WebsiteURL: "https://challenges.cloudflare.com/turnstile-demo",
+		Action:     "managed",
+		CData:      "abc123",
+	}); err != nil {
+		t.Fatalf("Token Turnstile: %v", err)
 	}
 	if _, err := c.Captcha().Tasks().Retrieve(context.Background(), "task-1", nil); err != nil {
 		t.Fatalf("Tasks Retrieve: %v", err)

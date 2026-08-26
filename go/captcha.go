@@ -53,6 +53,68 @@ func (r *CaptchaRecognition) HCaptcha(ctx context.Context, req CaptchaRecognitio
 	})
 }
 
+// CaptchaRecognitionImage2TextRequest is the input to recognition.image2text.
+type CaptchaRecognitionImage2TextRequest struct {
+	Image string
+	Async bool
+	Extra map[string]any
+}
+
+func (r *CaptchaRecognitionImage2TextRequest) toBody() map[string]any {
+	body := map[string]any{"image": r.Image}
+	if r.Async {
+		body["async"] = true
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Image2Text calls POST /captcha/recognition/image2text.
+func (r *CaptchaRecognition) Image2Text(ctx context.Context, req CaptchaRecognitionImage2TextRequest) (map[string]any, error) {
+	return r.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/captcha/recognition/image2text",
+		Body:   req.toBody(),
+	})
+}
+
+// CaptchaRecognitionRecaptcha2Request is the input to recognition.recaptcha2.
+type CaptchaRecognitionRecaptcha2Request struct {
+	Image    string
+	Question string
+	Async    bool
+	Extra    map[string]any
+}
+
+func (r *CaptchaRecognitionRecaptcha2Request) toBody() map[string]any {
+	body := map[string]any{
+		"image":    r.Image,
+		"question": r.Question,
+	}
+	if r.Async {
+		body["async"] = true
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Recaptcha2 calls POST /captcha/recognition/recaptcha2.
+func (r *CaptchaRecognition) Recaptcha2(ctx context.Context, req CaptchaRecognitionRecaptcha2Request) (map[string]any, error) {
+	return r.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/captcha/recognition/recaptcha2",
+		Body:   req.toBody(),
+	})
+}
+
 // CaptchaToken exposes captcha token endpoints.
 type CaptchaToken struct{ t *transport }
 
@@ -93,6 +155,119 @@ func (r *CaptchaToken) HCaptcha(ctx context.Context, req CaptchaTokenHCaptchaReq
 	return r.t.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   "/captcha/token/hcaptcha",
+		Body:   req.toBody(),
+	})
+}
+
+// CaptchaTokenRecaptcha2Request is the input to token.recaptcha2.
+type CaptchaTokenRecaptcha2Request struct {
+	WebsiteKey string
+	WebsiteURL string
+	Proxy      string
+	Async      bool
+	Extra      map[string]any
+}
+
+func (r *CaptchaTokenRecaptcha2Request) toBody() map[string]any {
+	body := map[string]any{
+		"website_key": r.WebsiteKey,
+		"website_url": r.WebsiteURL,
+	}
+	if r.Proxy != "" {
+		body["proxy"] = r.Proxy
+	}
+	if r.Async {
+		body["async"] = true
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Recaptcha2 calls POST /captcha/token/recaptcha2.
+func (r *CaptchaToken) Recaptcha2(ctx context.Context, req CaptchaTokenRecaptcha2Request) (map[string]any, error) {
+	return r.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/captcha/token/recaptcha2",
+		Body:   req.toBody(),
+	})
+}
+
+// CaptchaTokenRecaptcha3Request is the input to token.recaptcha3.
+type CaptchaTokenRecaptcha3Request struct {
+	PageAction string
+	WebsiteKey string
+	WebsiteURL string
+	Async      bool
+	Extra      map[string]any
+}
+
+func (r *CaptchaTokenRecaptcha3Request) toBody() map[string]any {
+	body := map[string]any{
+		"page_action": r.PageAction,
+		"website_key": r.WebsiteKey,
+		"website_url": r.WebsiteURL,
+	}
+	if r.Async {
+		body["async"] = true
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Recaptcha3 calls POST /captcha/token/recaptcha3.
+func (r *CaptchaToken) Recaptcha3(ctx context.Context, req CaptchaTokenRecaptcha3Request) (map[string]any, error) {
+	return r.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/captcha/token/recaptcha3",
+		Body:   req.toBody(),
+	})
+}
+
+// CaptchaTokenTurnstileRequest is the input to token.turnstile.
+type CaptchaTokenTurnstileRequest struct {
+	WebsiteKey string
+	WebsiteURL string
+	Action     string
+	CData      string
+	Async      bool
+	Extra      map[string]any
+}
+
+func (r *CaptchaTokenTurnstileRequest) toBody() map[string]any {
+	body := map[string]any{
+		"website_key": r.WebsiteKey,
+		"website_url": r.WebsiteURL,
+	}
+	if r.Action != "" {
+		body["action"] = r.Action
+	}
+	if r.CData != "" {
+		body["cdata"] = r.CData
+	}
+	if r.Async {
+		body["async"] = true
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Turnstile calls POST /captcha/token/turnstile.
+func (r *CaptchaToken) Turnstile(ctx context.Context, req CaptchaTokenTurnstileRequest) (map[string]any, error) {
+	return r.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/captcha/token/turnstile",
 		Body:   req.toBody(),
 	})
 }
