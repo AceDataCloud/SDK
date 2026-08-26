@@ -44,7 +44,6 @@ def test_generate_serializes_new_sku_contract() -> None:
                 "scenario": "drama",
                 "style": "auto",
                 "voice": "auto",
-                "async": True,
             },
         )
     ]
