@@ -49,16 +49,72 @@ func (r ChatCompletionRequest) toBody() map[string]any {
 
 // ResponsesRequest is the input to OpenAI responses.create.
 type ResponsesRequest struct {
-	Model  string         `json:"model"`
-	Input  any            `json:"input"`
-	Stream bool           `json:"stream,omitempty"`
-	Extra  map[string]any `json:"-"`
+	Model             string           `json:"model"`
+	Input             any              `json:"input"`
+	Stream            bool             `json:"stream,omitempty"`
+	N                 float64          `json:"n,omitempty"`
+	Background        *bool            `json:"background,omitempty"`
+	Tools             []map[string]any `json:"tools,omitempty"`
+	MaxTokens         float64          `json:"max_tokens,omitempty"`
+	MaxOutputTokens   int              `json:"max_output_tokens,omitempty"`
+	Temperature       *float64         `json:"temperature,omitempty"`
+	ResponseFormat    map[string]any   `json:"response_format,omitempty"`
+	Include           []string         `json:"include,omitempty"`
+	ParallelToolCalls *bool            `json:"parallel_tool_calls,omitempty"`
+	Reasoning         map[string]any   `json:"reasoning,omitempty"`
+	Store             *bool            `json:"store,omitempty"`
+	StreamOptions     map[string]any   `json:"stream_options,omitempty"`
+	Text              map[string]any   `json:"text,omitempty"`
+	ToolChoice        any              `json:"tool_choice,omitempty"`
+	Extra             map[string]any   `json:"-"`
 }
 
 func (r ResponsesRequest) toBody() map[string]any {
 	body := map[string]any{"model": r.Model, "input": r.Input}
 	if r.Stream {
 		body["stream"] = true
+	}
+	if r.N > 0 {
+		body["n"] = r.N
+	}
+	if r.Background != nil {
+		body["background"] = *r.Background
+	}
+	if r.Tools != nil {
+		body["tools"] = r.Tools
+	}
+	if r.MaxTokens > 0 {
+		body["max_tokens"] = r.MaxTokens
+	}
+	if r.MaxOutputTokens > 0 {
+		body["max_output_tokens"] = r.MaxOutputTokens
+	}
+	if r.Temperature != nil {
+		body["temperature"] = *r.Temperature
+	}
+	if r.ResponseFormat != nil {
+		body["response_format"] = r.ResponseFormat
+	}
+	if r.Include != nil {
+		body["include"] = r.Include
+	}
+	if r.ParallelToolCalls != nil {
+		body["parallel_tool_calls"] = *r.ParallelToolCalls
+	}
+	if r.Reasoning != nil {
+		body["reasoning"] = r.Reasoning
+	}
+	if r.Store != nil {
+		body["store"] = *r.Store
+	}
+	if r.StreamOptions != nil {
+		body["stream_options"] = r.StreamOptions
+	}
+	if r.Text != nil {
+		body["text"] = r.Text
+	}
+	if r.ToolChoice != nil {
+		body["tool_choice"] = r.ToolChoice
 	}
 	for k, v := range r.Extra {
 		if _, exists := body[k]; !exists {
@@ -79,7 +135,10 @@ func (o *OpenAIResource) Chat() *OpenAIChat { return &OpenAIChat{t: o.t} }
 // Responses returns the responses sub-namespace.
 func (o *OpenAIResource) Responses() *OpenAIResponses { return &OpenAIResponses{t: o.t} }
 
-// OpenAIChat exposes “/v1/chat/completions“.
+// Models returns the models sub-namespace.
+func (o *OpenAIResource) Models() *OpenAIModels { return &OpenAIModels{t: o.t} }
+
+// OpenAIChat exposes “/openai/chat/completions“.
 type OpenAIChat struct{ t *transport }
 
 // Completions returns the completions sub-namespace.
@@ -92,7 +151,7 @@ type OpenAIChatCompletions struct{ t *transport }
 func (c *OpenAIChatCompletions) Create(ctx context.Context, req ChatCompletionRequest) (map[string]any, error) {
 	body := req.toBody()
 	delete(body, "stream")
-	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/v1/chat/completions", Body: body})
+	return c.t.do(ctx, requestOpts{Method: "POST", Path: "/openai/chat/completions", Body: body})
 }
 
 // CreateStream performs a streaming chat completion and returns a
@@ -100,7 +159,7 @@ func (c *OpenAIChatCompletions) Create(ctx context.Context, req ChatCompletionRe
 // single SSE “data:“ line).
 func (c *OpenAIChatCompletions) CreateStream(ctx context.Context, req ChatCompletionRequest) (<-chan map[string]any, <-chan error) {
 	req.Stream = true
-	return streamDecode(c.t, "/v1/chat/completions", req.toBody())
+	return streamDecode(c.t, "/openai/chat/completions", req.toBody())
 }
 
 // OpenAIResponses exposes “/openai/responses“.
@@ -117,6 +176,14 @@ func (r *OpenAIResponses) Create(ctx context.Context, req ResponsesRequest) (map
 func (r *OpenAIResponses) CreateStream(ctx context.Context, req ResponsesRequest) (<-chan map[string]any, <-chan error) {
 	req.Stream = true
 	return streamDecode(r.t, "/openai/responses", req.toBody())
+}
+
+// OpenAIModels exposes “/openai/models“.
+type OpenAIModels struct{ t *transport }
+
+// List returns the OpenAI-compatible model list.
+func (m *OpenAIModels) List(ctx context.Context) (map[string]any, error) {
+	return m.t.do(ctx, requestOpts{Method: "GET", Path: "/openai/models"})
 }
 
 // streamDecode wraps transport.stream and parses each SSE data line as JSON.

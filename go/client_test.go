@@ -145,7 +145,7 @@ func TestCaptchaEndpoints(t *testing.T) {
 
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/chat/completions" {
+		if r.URL.Path != "/openai/chat/completions" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
 		if r.Header.Get("Authorization") != "Bearer token-abc" {
@@ -201,6 +201,66 @@ func TestTransport_RetriesOn503(t *testing.T) {
 	}
 	if attempts != 2 {
 		t.Fatalf("expected 2 attempts, got %d", attempts)
+	}
+}
+
+func TestOpenAIResponses_NewOptions(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/openai/responses" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["max_output_tokens"] != float64(128) {
+			t.Errorf("missing max_output_tokens: %+v", body)
+		}
+		if body["parallel_tool_calls"] != false {
+			t.Errorf("missing parallel_tool_calls: %+v", body)
+		}
+		if body["tool_choice"] != "auto" {
+			t.Errorf("missing tool_choice: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"resp-123"}`))
+	}))
+	defer srv.Close()
+
+	parallelToolCalls := false
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Responses().Create(context.Background(), ResponsesRequest{
+		Model:             "gpt-5.6-luna",
+		Input:             "Hello",
+		MaxOutputTokens:   128,
+		ParallelToolCalls: &parallelToolCalls,
+		ToolChoice:        "auto",
+	})
+	if err != nil {
+		t.Fatalf("Responses Create: %v", err)
+	}
+	if res["id"] != "resp-123" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAIModels_List(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/openai/models" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"data":[{"id":"gpt-5.6-luna"}]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Models().List(context.Background())
+	if err != nil {
+		t.Fatalf("Models List: %v", err)
+	}
+	data := res["data"].([]any)
+	model := data[0].(map[string]any)
+	if model["id"] != "gpt-5.6-luna" {
+		t.Fatalf("bad response: %+v", res)
 	}
 }
 

@@ -75,9 +75,40 @@ class _Responses:
         model: str,
         input: str | list[dict[str, Any]],
         stream: bool = False,
+        n: float | None = None,
+        background: bool | None = None,
+        tools: list[dict[str, Any]] | None = None,
+        max_tokens: float | None = None,
+        max_output_tokens: int | None = None,
+        temperature: float | None = None,
+        response_format: dict[str, Any] | None = None,
+        include: list[str] | None = None,
+        parallel_tool_calls: bool | None = None,
+        reasoning: dict[str, Any] | None = None,
+        store: bool | None = None,
+        stream_options: dict[str, Any] | None = None,
+        text: dict[str, Any] | None = None,
+        tool_choice: str | dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> dict[str, Any] | Iterator[dict[str, Any]]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        optional = {
+            "n": n,
+            "background": background,
+            "tools": tools,
+            "max_tokens": max_tokens,
+            "max_output_tokens": max_output_tokens,
+            "temperature": temperature,
+            "response_format": response_format,
+            "include": include,
+            "parallel_tool_calls": parallel_tool_calls,
+            "reasoning": reasoning,
+            "store": store,
+            "stream_options": stream_options,
+            "text": text,
+            "tool_choice": tool_choice,
+        }
+        body.update({key: value for key, value in optional.items() if value is not None})
         if stream:
             body["stream"] = True
             return self._stream(body)
@@ -98,9 +129,40 @@ class _AsyncResponses:
         model: str,
         input: str | list[dict[str, Any]],
         stream: bool = False,
+        n: float | None = None,
+        background: bool | None = None,
+        tools: list[dict[str, Any]] | None = None,
+        max_tokens: float | None = None,
+        max_output_tokens: int | None = None,
+        temperature: float | None = None,
+        response_format: dict[str, Any] | None = None,
+        include: list[str] | None = None,
+        parallel_tool_calls: bool | None = None,
+        reasoning: dict[str, Any] | None = None,
+        store: bool | None = None,
+        stream_options: dict[str, Any] | None = None,
+        text: dict[str, Any] | None = None,
+        tool_choice: str | dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        body = {"model": model, "input": input, **kwargs}
+        body: dict[str, Any] = {"model": model, "input": input, **kwargs}
+        optional = {
+            "n": n,
+            "background": background,
+            "tools": tools,
+            "max_tokens": max_tokens,
+            "max_output_tokens": max_output_tokens,
+            "temperature": temperature,
+            "response_format": response_format,
+            "include": include,
+            "parallel_tool_calls": parallel_tool_calls,
+            "reasoning": reasoning,
+            "store": store,
+            "stream_options": stream_options,
+            "text": text,
+            "tool_choice": tool_choice,
+        }
+        body.update({key: value for key, value in optional.items() if value is not None})
         if stream:
             body["stream"] = True
             return self._stream(body)
@@ -461,6 +523,22 @@ class _AsyncTasks:
         return await self._transport.request("POST", "/openai/tasks", json=body)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(self) -> dict[str, Any]:
+        return self._transport.request("GET", "/openai/models")
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(self) -> dict[str, Any]:
+        return await self._transport.request("GET", "/openai/models")
+
+
 class OpenAI:
     """Synchronous OpenAI-compatible facade."""
 
@@ -469,6 +547,7 @@ class OpenAI:
         self.responses = _Responses(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
+        self.models = _Models(transport)
         self.tasks = _Tasks(transport)
 
 
@@ -480,4 +559,5 @@ class AsyncOpenAI:
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
+        self.models = _AsyncModels(transport)
         self.tasks = _AsyncTasks(transport)

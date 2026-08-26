@@ -54,22 +54,81 @@ class Responses {
     model: string;
     input: string | Array<Record<string, unknown>>;
     stream?: false;
+    n?: number;
+    background?: boolean;
+    tools?: Array<Record<string, unknown>>;
+    maxTokens?: number;
+    maxOutputTokens?: number;
+    temperature?: number;
+    responseFormat?: Record<string, unknown>;
+    include?: string[];
+    parallelToolCalls?: boolean;
+    reasoning?: Record<string, unknown>;
+    store?: boolean;
+    streamOptions?: Record<string, unknown>;
+    text?: Record<string, unknown>;
+    toolChoice?: string | Record<string, unknown>;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
     stream: true;
+    n?: number;
+    background?: boolean;
+    tools?: Array<Record<string, unknown>>;
+    maxTokens?: number;
+    maxOutputTokens?: number;
+    temperature?: number;
+    responseFormat?: Record<string, unknown>;
+    include?: string[];
+    parallelToolCalls?: boolean;
+    reasoning?: Record<string, unknown>;
+    store?: boolean;
+    streamOptions?: Record<string, unknown>;
+    text?: Record<string, unknown>;
+    toolChoice?: string | Record<string, unknown>;
     [key: string]: unknown;
   }): Promise<AsyncGenerator<Record<string, unknown>>>;
   async create(opts: {
     model: string;
     input: string | Array<Record<string, unknown>>;
     stream?: boolean;
+    n?: number;
+    background?: boolean;
+    tools?: Array<Record<string, unknown>>;
+    maxTokens?: number;
+    maxOutputTokens?: number;
+    temperature?: number;
+    responseFormat?: Record<string, unknown>;
+    include?: string[];
+    parallelToolCalls?: boolean;
+    reasoning?: Record<string, unknown>;
+    store?: boolean;
+    streamOptions?: Record<string, unknown>;
+    text?: Record<string, unknown>;
+    toolChoice?: string | Record<string, unknown>;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
-    const { model, input, stream, ...rest } = opts;
+    const {
+      model,
+      input,
+      stream,
+      maxTokens,
+      maxOutputTokens,
+      responseFormat,
+      parallelToolCalls,
+      streamOptions,
+      toolChoice,
+      ...rest
+    } = opts;
     const body: Record<string, unknown> = { model, input, ...rest };
+    if (maxTokens !== undefined) body.max_tokens = maxTokens;
+    if (maxOutputTokens !== undefined) body.max_output_tokens = maxOutputTokens;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (parallelToolCalls !== undefined) body.parallel_tool_calls = parallelToolCalls;
+    if (streamOptions !== undefined) body.stream_options = streamOptions;
+    if (toolChoice !== undefined) body.tool_choice = toolChoice;
 
     if (stream) {
       body.stream = true;
@@ -164,6 +223,15 @@ class Embeddings {
   }
 }
 
+
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(): Promise<Record<string, unknown>> {
+    return this.transport.request('GET', '/openai/models');
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -211,6 +279,7 @@ export class OpenAI {
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly models: Models;
   readonly tasks: Tasks;
 
   constructor(transport: Transport) {
@@ -218,6 +287,7 @@ export class OpenAI {
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.models = new Models(transport);
     this.tasks = new Tasks(transport);
   }
 }
