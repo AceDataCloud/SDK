@@ -232,7 +232,9 @@ def test_openai_models(client):
         "object": "list",
         "data": [{"id": "gpt-4o-mini", "object": "model"}],
     }
-    route = respx.get("https://api.acedata.cloud/openai/models").mock(return_value=httpx.Response(200, json=mock_response))
+    route = respx.get("https://api.acedata.cloud/openai/models").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
 
     result = client.openai.models.list(accept="application/json")
     assert result["object"] == "list"
