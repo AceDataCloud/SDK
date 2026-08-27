@@ -353,6 +353,32 @@ class _AsyncEmbeddings:
         return await self._transport.request("POST", "/openai/embeddings", json=body)
 
 
+class _Models:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    def list(
+        self,
+        *,
+        accept: str | None = None,
+    ) -> dict[str, Any]:
+        extra_headers = {"accept": accept} if accept is not None else None
+        return self._transport.request("GET", "/openai/models", extra_headers=extra_headers)
+
+
+class _AsyncModels:
+    def __init__(self, transport: Any) -> None:
+        self._transport = transport
+
+    async def list(
+        self,
+        *,
+        accept: str | None = None,
+    ) -> dict[str, Any]:
+        extra_headers = {"accept": accept} if accept is not None else None
+        return await self._transport.request("GET", "/openai/models", extra_headers=extra_headers)
+
+
 class _Tasks:
     def __init__(self, transport: Any) -> None:
         self._transport = transport
@@ -469,6 +495,7 @@ class OpenAI:
         self.responses = _Responses(transport)
         self.images = _Images(transport)
         self.embeddings = _Embeddings(transport)
+        self.models = _Models(transport)
         self.tasks = _Tasks(transport)
 
 
@@ -480,4 +507,5 @@ class AsyncOpenAI:
         self.responses = _AsyncResponses(transport)
         self.images = _AsyncImages(transport)
         self.embeddings = _AsyncEmbeddings(transport)
+        self.models = _AsyncModels(transport)
         self.tasks = _AsyncTasks(transport)

@@ -164,6 +164,18 @@ class Embeddings {
   }
 }
 
+class Models {
+  constructor(private transport: Transport) {}
+
+  async list(opts: {
+    accept?: string;
+  } = {}): Promise<Record<string, unknown>> {
+    const headers: Record<string, string> = {};
+    if (opts.accept !== undefined) headers.accept = opts.accept;
+    return this.transport.request('GET', '/openai/models', { headers });
+  }
+}
+
 class Tasks {
   constructor(private transport: Transport) {}
 
@@ -211,6 +223,7 @@ export class OpenAI {
   readonly responses: Responses;
   readonly images: Images;
   readonly embeddings: Embeddings;
+  readonly models: Models;
   readonly tasks: Tasks;
 
   constructor(transport: Transport) {
@@ -218,6 +231,7 @@ export class OpenAI {
     this.responses = new Responses(transport);
     this.images = new Images(transport);
     this.embeddings = new Embeddings(transport);
+    this.models = new Models(transport);
     this.tasks = new Tasks(transport);
   }
 }
