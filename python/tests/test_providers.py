@@ -214,6 +214,36 @@ def test_model_enum_is_typed(client):
     assert "flux-dev" in typing.get_args(literal)
 
 
+def test_suno_lyrics_model_enum_is_typed(client):
+    hints = typing.get_type_hints(type(client.suno).lyrics)
+    assert typing.get_args(hints["model"]) == ("default", "remi-v1")
+
+
+@pytest.mark.asyncio
+async def test_async_suno_lyrics_model_enum_is_typed():
+    client = AsyncAceDataCloud(api_token="t")
+    hints = typing.get_type_hints(type(client.suno).lyrics)
+    assert typing.get_args(hints["model"]) == ("default", "remi-v1")
+
+
+def test_veo_generate_model_enum_is_typed(client):
+    hints = typing.get_type_hints(type(client.veo).generate)
+    model = hints["model"]
+    literal = next((arg for arg in typing.get_args(model) if typing.get_origin(arg) is typing.Literal), None)
+    assert literal is not None
+    assert "veo31-fast-ingredients" in typing.get_args(literal)
+
+
+@pytest.mark.asyncio
+async def test_async_veo_generate_model_enum_is_typed():
+    client = AsyncAceDataCloud(api_token="t")
+    hints = typing.get_type_hints(type(client.veo).generate)
+    model = hints["model"]
+    literal = next((arg for arg in typing.get_args(model) if typing.get_origin(arg) is typing.Literal), None)
+    assert literal is not None
+    assert "veo31-fast-ingredients" in typing.get_args(literal)
+
+
 def test_extra_parameters_pass_through(client):
     """A parameter added upstream must be reachable before the SDK is regenerated."""
     transport = Mock()
