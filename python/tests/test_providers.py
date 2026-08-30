@@ -178,6 +178,16 @@ def test_async_is_requested_by_default(client):
     assert transport.request.call_args.kwargs["json"]["async"] is True
 
 
+def test_qwen_image_async_defaults_to_false(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "qwen-1"}
+    client.qwen_image._transport = transport
+
+    client.qwen_image.generate(model="qwen-image-3.0", prompt="a cat")
+
+    assert transport.request.call_args.kwargs["json"]["async"] is False
+
+
 def test_minimax_generate_builds_a_task_handle(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "minimax-1"}
@@ -212,6 +222,13 @@ def test_model_enum_is_typed(client):
     literal = next((a for a in args if typing.get_origin(a) is typing.Literal), None)
     assert literal is not None, "model should be a Literal of the spec's enum"
     assert "flux-dev" in typing.get_args(literal)
+
+
+def test_suno_lyrics_model_enum_is_typed(client):
+    hints = typing.get_type_hints(type(client.suno).lyrics)
+    model = hints["model"]
+    assert typing.get_origin(model) is typing.Literal
+    assert typing.get_args(model) == ("default", "remi-v1")
 
 
 def test_extra_parameters_pass_through(client):

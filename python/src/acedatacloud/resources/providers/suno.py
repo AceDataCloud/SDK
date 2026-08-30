@@ -20,6 +20,10 @@ SunoModel = Literal[
     "chirp-v3-5",
     "chirp-v3-0",
 ]
+SunoLyricsModel = Literal[
+    "default",
+    "remi-v1",
+]
 SunoAction = Literal[
     "generate",
     "extend",
@@ -348,7 +352,7 @@ class Suno:
     def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: SunoLyricsModel,
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
@@ -692,7 +696,7 @@ class AsyncSuno:
     async def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: SunoLyricsModel,
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
