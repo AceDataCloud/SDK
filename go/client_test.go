@@ -28,8 +28,42 @@ func TestNewClient_WithToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
-	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+	if c.OpenAI() == nil || c.AIChat() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestAIChatV2SerializesCurrentGeminiModel(t *testing.T) {
+	var body map[string]any
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/aichat2/conversations" {
+			t.Fatalf("path = %q", r.URL.Path)
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatal(err)
+		}
+		_, _ = w.Write([]byte(`{"id":"conversation-1","answer":"Hello"}`))
+	}))
+	defer server.Close()
+
+	client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(server.URL))
+	if err != nil {
+		t.Fatal(err)
+	}
+	async := false
+	_, err = client.AIChat().CreateV2(context.Background(), AIChatV2Request{
+		Model:             AIChat2ModelGemini37Flash,
+		Action:            "chat",
+		Message:           map[string]any{"role": "user", "content": "Hello"},
+		AllowedMCPServers: []string{"server-1"},
+		Async:             &async,
+		Limit:             25,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if body["model"] != "gemini-3.7-flash" || body["async"] != false || body["limit"] != float64(25) {
+		t.Fatalf("body = %#v", body)
 	}
 }
 
