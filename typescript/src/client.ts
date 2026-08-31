@@ -4,6 +4,7 @@ import { Transport, TransportOptions } from './runtime/transport';
 import type { PaymentHandler } from './runtime/payment';
 import { AiChat } from './resources/aichat';
 import { Chat } from './resources/chat';
+import { Discord } from './resources/discord';
 import { Captcha } from './resources/captcha';
 import { Images } from './resources/images';
 import { Audio } from './resources/audio';
@@ -19,6 +20,7 @@ import { Kling } from './resources/kling';
 import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
 import { ShortUrl } from './resources/shorturl';
+import { Telegram } from './resources/telegram';
 import { attachProviders } from './resources/providers';
 
 export interface AceDataCloudOptions {
@@ -40,6 +42,7 @@ export class AceDataCloud {
   readonly aichat: AiChat;
   readonly chat: Chat;
   readonly captcha: Captcha;
+  readonly discord: Discord;
   readonly images: Images;
   readonly audio: Audio;
   readonly video: Video;
@@ -54,6 +57,7 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  readonly telegram: Telegram;
 
   private transport: Transport;
 
@@ -71,6 +75,7 @@ export class AceDataCloud {
     this.aichat = new AiChat(this.transport);
     this.chat = new Chat(this.transport);
     this.captcha = new Captcha(this.transport);
+    this.discord = new Discord(this.transport);
     this.images = new Images(this.transport);
     this.audio = new Audio(this.transport);
     this.video = new Video(this.transport);
@@ -85,6 +90,7 @@ export class AceDataCloud {
     this.webextrator = new WebExtrator(this.transport);
     this.face = new Face(this.transport);
     this.shorturl = new ShortUrl(this.transport);
+    this.telegram = new Telegram(this.transport);
     // Provider axis: one namespace per service, generated from the specs.
     attachProviders(this as unknown as Record<string, unknown>, this.transport);
   }
