@@ -84,17 +84,33 @@ type AIChatV2Request struct {
 }
 
 func (r AIChatV2Request) toBody() map[string]any {
-	body := map[string]any{"model": r.Model}
+	body := map[string]any{
+		"model":    r.Model,
+		"stateful": true,
+		"async":    false,
+		"offset":   0,
+		"limit":    100,
+	}
+	if r.Stateful != nil {
+		body["stateful"] = *r.Stateful
+	}
+	if r.Async != nil {
+		body["async"] = *r.Async
+	}
+	if r.Offset != 0 {
+		body["offset"] = r.Offset
+	}
+	if r.Limit != 0 {
+		body["limit"] = r.Limit
+	}
 	optional := map[string]any{
 		"action":              r.Action,
 		"id":                  r.ID,
 		"question":            r.Question,
 		"message":             r.Message,
-		"stateful":            r.Stateful,
 		"references":          r.References,
 		"preset":              r.Preset,
 		"max_turns":           r.MaxTurns,
-		"async":               r.Async,
 		"callback_url":        r.CallbackURL,
 		"allowed_skills":      r.AllowedSkills,
 		"allowed_mcp_servers": r.AllowedMCPServers,
@@ -105,8 +121,6 @@ func (r AIChatV2Request) toBody() map[string]any {
 		"user_id":             r.UserID,
 		"application_id":      r.ApplicationID,
 		"model_group":         r.ModelGroup,
-		"offset":              r.Offset,
-		"limit":               r.Limit,
 	}
 	for key, value := range optional {
 		switch typed := value.(type) {

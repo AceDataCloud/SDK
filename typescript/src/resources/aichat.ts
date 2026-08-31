@@ -216,6 +216,10 @@ export class AiChat {
   }): Promise<Record<string, unknown>> {
     const {
       model,
+      stateful,
+      async: async_,
+      offset,
+      limit,
       maxTurns,
       callbackUrl,
       allowedSkills,
@@ -227,7 +231,7 @@ export class AiChat {
       modelGroup,
       ...rest
     } = opts;
-    const body: Record<string, unknown> = { model, ...rest };
+    const body: Record<string, unknown> = { model, stateful: stateful ?? true, async: async_ ?? false, offset: offset ?? 0, limit: limit ?? 100, ...rest };
     if (maxTurns !== undefined) body.max_turns = maxTurns;
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     if (allowedSkills !== undefined) body.allowed_skills = allowedSkills;

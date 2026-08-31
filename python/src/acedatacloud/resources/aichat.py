@@ -171,7 +171,7 @@ AiChat2ModelGroup = Literal["chatgpt", "claude", "gemini", "grok", "kimi", "glm"
 
 
 def _build_v2_body(model: str, values: dict[str, Any]) -> dict[str, Any]:
-    body = {"model": model}
+    body = {"model": model, "stateful": True, "async": False, "offset": 0, "limit": 100}
     body.update({key: value for key, value in values.items() if value is not None})
     return body
 
@@ -234,6 +234,7 @@ class AiChat:
         body = _build_v2_body(
             model,
             {
+                **kwargs,
                 "action": action,
                 "id": id,
                 "question": question,
@@ -255,7 +256,6 @@ class AiChat:
                 "model_group": model_group,
                 "offset": offset,
                 "limit": limit,
-                **kwargs,
             },
         )
         return self._transport.request("POST", "/aichat2/conversations", json=body)
@@ -319,6 +319,7 @@ class AsyncAiChat:
         body = _build_v2_body(
             model,
             {
+                **kwargs,
                 "action": action,
                 "id": id,
                 "question": question,
@@ -340,7 +341,6 @@ class AsyncAiChat:
                 "model_group": model_group,
                 "offset": offset,
                 "limit": limit,
-                **kwargs,
             },
         )
         return await self._transport.request("POST", "/aichat2/conversations", json=body)

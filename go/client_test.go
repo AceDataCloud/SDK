@@ -62,7 +62,8 @@ func TestAIChatV2SerializesCurrentGeminiModel(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if body["model"] != "gemini-3.7-flash" || body["async"] != false || body["limit"] != float64(25) {
+	if body["model"] != "gemini-3.7-flash" || body["stateful"] != true || body["async"] != false ||
+		body["offset"] != float64(0) || body["limit"] != float64(25) {
 		t.Fatalf("body = %#v", body)
 	}
 }

@@ -24,9 +24,11 @@ def test_aichat_v2_serializes_current_gemini_model_and_fields():
     assert transport.request.call_args.args == ("POST", "/aichat2/conversations")
     assert transport.request.call_args.kwargs["json"] == {
         "model": "gemini-3.7-flash",
+        "stateful": True,
         "action": "chat",
         "message": {"role": "user", "content": "Hello"},
         "allowed_mcp_servers": ["server-1"],
         "async": False,
+        "offset": 0,
         "limit": 25,
     }

@@ -19,9 +19,11 @@ describe('AIChat v2', () => {
     expect(transport.request).toHaveBeenCalledWith('POST', '/aichat2/conversations', {
       json: {
         model: 'gemini-3.7-flash',
+        stateful: true,
         action: 'chat',
         message: { role: 'user', content: 'Hello' },
         async: false,
+        offset: 0,
         limit: 25,
         allowed_mcp_servers: ['server-1'],
       },
