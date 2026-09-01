@@ -27,6 +27,7 @@ from acedatacloud._runtime.payment import (
 from acedatacloud.resources.aichat import AiChatModel
 from acedatacloud.resources.audio import AudioProvider
 from acedatacloud.resources.glm import GlmModel
+from acedatacloud.resources.gemini import GeminiModel
 from acedatacloud.resources.images import ImageProvider
 from acedatacloud.resources.kling import (
     KlingCameraControl,
@@ -43,6 +44,7 @@ __all__ = [
     "AiChatModel",
     "AudioProvider",
     "GlmModel",
+    "GeminiModel",
     "ImageProvider",
     "KlingCameraControl",
     "KlingModel",

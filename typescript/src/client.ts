@@ -3,6 +3,7 @@
 import { Transport, TransportOptions } from './runtime/transport';
 import type { PaymentHandler } from './runtime/payment';
 import { AiChat } from './resources/aichat';
+import { Gemini } from './resources/gemini';
 import { Chat } from './resources/chat';
 import { Captcha } from './resources/captcha';
 import { Images } from './resources/images';
@@ -38,6 +39,7 @@ export interface AceDataCloudOptions {
 
 export class AceDataCloud {
   readonly aichat: AiChat;
+  readonly gemini: Gemini;
   readonly chat: Chat;
   readonly captcha: Captcha;
   readonly images: Images;
@@ -69,6 +71,7 @@ export class AceDataCloud {
     });
 
     this.aichat = new AiChat(this.transport);
+    this.gemini = new Gemini(this.transport);
     this.chat = new Chat(this.transport);
     this.captcha = new Captcha(this.transport);
     this.images = new Images(this.transport);
