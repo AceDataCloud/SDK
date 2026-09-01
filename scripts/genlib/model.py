@@ -85,12 +85,13 @@ def _array_items_are_objects(schema: dict[str, Any]) -> bool:
 
 
 class Param:
-    def __init__(self, name: str, schema: dict, required: bool) -> None:
+    def __init__(self, name: str, schema: dict, required: bool, location: str = "body") -> None:
         self.name = name
         self.schema = schema or {}
         self.required = required
+        self.location = location
         self.type = self.schema.get("type")
-        self.enum = [e for e in (self.schema.get("enum") or []) if isinstance(e, str)]
+        self.enum = [e for e in (self.schema.get("enum") or []) if isinstance(e, (str, int, float))]
         self.description = " ".join(str(self.schema.get("description") or "").split())
 
     @property
@@ -170,7 +171,13 @@ class Endpoint:
         required = set(schema.get("required") or [])
         props: dict[str, dict] = schema.get("properties") or {}
         self.summary = summary(spec)
-        self.params = [Param(n, s, n in required) for n, s in props.items()]
+        self.body_params = [Param(n, s, n in required) for n, s in props.items()]
+        self.header_params = [
+            Param(p["name"], p.get("schema") or {}, bool(p.get("required")), "header")
+            for p in op_parameters(spec, path)
+            if p.get("in") == "header" and p.get("name") not in {"accept", "Content-Type"}
+        ]
+        self.params = self.body_params + self.header_params
         self.pollable = "async" in props or pollable
 
     @property
@@ -178,6 +185,14 @@ class Endpoint:
         """Required first — a Python signature cannot put a defaulted arg before one."""
         usable = [p for p in self.params if not p.is_control]
         return sorted(usable, key=lambda p: not p.required)
+
+
+def op_parameters(spec: dict, path: str) -> list[dict]:
+    methods = (spec.get("paths") or {}).get(path) or {}
+    for method, op in methods.items():
+        if method.lower() == "post":
+            return op.get("parameters") or []
+    return []
 
 
 class Service:

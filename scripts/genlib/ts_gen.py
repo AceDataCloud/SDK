@@ -45,7 +45,7 @@ def _options_interface(svc: Service, ep) -> tuple[str, str]:
 
 def _body(ep, indent: str = "    ") -> list[str]:
     out = [f"{indent}const body: Record<string, unknown> = {{}};"]
-    for p in ep.callable_params:
+    for p in (p for p in ep.body_params if not p.is_control):
         prop = camel(p.name)
         if p.required:
             out.append(f"{indent}body[{json.dumps(p.name)}] = options.{prop};")
@@ -66,6 +66,13 @@ def _body(ep, indent: str = "    ") -> list[str]:
     out.append(f"{indent}  }}")
     out.append(f"{indent}}}")
     out.append(f"{indent}if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;")
+    if ep.header_params:
+        out.append(f"{indent}const headers: Record<string, string> = {{}};")
+        for p in ep.header_params:
+            out.append(
+                f"{indent}if (options.{camel(p.name)} !== undefined) "
+                f"headers[{json.dumps(p.name)}] = options.{camel(p.name)};"
+            )
     return out
 
 
@@ -86,7 +93,10 @@ def _method(svc: Service, ep) -> str:
     if ep.pollable:
         lines.append("    body.async = options.async ?? true;")
         lines.append(
-            f"    const result = (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body }})) as Record<string, unknown>;"
+            f"    const result = (await this.transport.request('POST', {json.dumps(ep.path)}, "
+            + "{ json: body"
+            + (", headers" if ep.header_params else "")
+            + " })) as Record<string, unknown>;"
         )
         lines.append(
             f"    const handle = new TaskHandle(taskId(result), {json.dumps(tasks)}, this.transport, result);"
@@ -99,7 +109,10 @@ def _method(svc: Service, ep) -> str:
         lines.append("    return handle;")
     else:
         lines.append(
-            f"    return (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body }})) as Record<string, unknown>;"
+            f"    return (await this.transport.request('POST', {json.dumps(ep.path)}, "
+            + "{ json: body"
+            + (", headers" if ep.header_params else "")
+            + " })) as Record<string, unknown>;"
         )
     lines.append("  }")
     return "\n".join(lines)

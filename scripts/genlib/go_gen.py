@@ -56,7 +56,7 @@ def _request_struct(svc: Service, ep) -> str:
 def _to_body(struct: str, svc: Service, ep) -> str:
     lines = [f"func (r {struct}) toBody() map[string]any {{"]
     lines.append("\tbody := map[string]any{}")
-    for p in ep.callable_params:
+    for p in (p for p in ep.body_params if not p.is_control):
         field = _field_name(p.name)
         key = json.dumps(p.name)
         default = p.default()
@@ -116,10 +116,19 @@ def _method(svc: Service, ep, struct: str) -> str:
         lines.append(
             f"func (c *{receiver}) {method}(ctx context.Context, req {struct}) (*TaskHandle, error) {{"
         )
+        if ep.header_params:
+            lines.append("\theaders := map[string]string{}")
+            for p in ep.header_params:
+                field = _field_name(p.name)
+                lines.append(f'\tif req.{field} != "" {{')
+                lines.append(f'\t\theaders["{p.name}"] = req.{field}')
+                lines.append("\t}")
         lines.append("\tresult, err := c.t.do(ctx, requestOpts{")
         lines.append('\t\tMethod: "POST",')
         lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
         lines.append("\t\tBody:   req.toBody(),")
+        if ep.header_params:
+            lines.append("\t\tExtraHeaders: headers,")
         lines.append("\t})")
         lines.append("\tif err != nil {")
         lines.append("\t\treturn nil, err")
@@ -131,10 +140,19 @@ def _method(svc: Service, ep, struct: str) -> str:
         lines.append(
             f"func (c *{receiver}) {method}(ctx context.Context, req {struct}) (map[string]any, error) {{"
         )
+        if ep.header_params:
+            lines.append("\theaders := map[string]string{}")
+            for p in ep.header_params:
+                field = _field_name(p.name)
+                lines.append(f'\tif req.{field} != "" {{')
+                lines.append(f'\t\theaders["{p.name}"] = req.{field}')
+                lines.append("\t}")
         lines.append("\treturn c.t.do(ctx, requestOpts{")
         lines.append('\t\tMethod: "POST",')
         lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
         lines.append("\t\tBody:   req.toBody(),")
+        if ep.header_params:
+            lines.append("\t\tExtraHeaders: headers,")
         lines.append("\t})")
     lines.append("}")
     return "\n".join(lines)

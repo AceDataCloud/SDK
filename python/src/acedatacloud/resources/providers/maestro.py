@@ -84,7 +84,6 @@ class Maestro:
         langs: list[str] | None = None,
         aspect: Literal["9:16", "16:9", "1:1"] | None = None,
         duration: int | None = None,
-        quality: Literal["lite", "standard", "pro"] | None = None,
         scenario: MaestroScenario | None = None,
         style: MaestroStyle | None = None,
         voice: MaestroVoice | None = None,
@@ -95,7 +94,7 @@ class Maestro:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Call /maestro/videos."""
+        """Maestro Videos"""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body["action"] = action if action is not None else "generate"
@@ -106,7 +105,6 @@ class Maestro:
         body["langs"] = langs if langs is not None else ["zh-cn"]
         body["aspect"] = aspect if aspect is not None else "9:16"
         body["duration"] = duration if duration is not None else 30
-        body["quality"] = quality if quality is not None else "standard"
         body["scenario"] = scenario if scenario is not None else "auto"
         body["style"] = style if style is not None else "auto"
         body["voice"] = voice if voice is not None else "auto"
@@ -137,7 +135,6 @@ class AsyncMaestro:
         langs: list[str] | None = None,
         aspect: Literal["9:16", "16:9", "1:1"] | None = None,
         duration: int | None = None,
-        quality: Literal["lite", "standard", "pro"] | None = None,
         scenario: MaestroScenario | None = None,
         style: MaestroStyle | None = None,
         voice: MaestroVoice | None = None,
@@ -148,7 +145,7 @@ class AsyncMaestro:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Call /maestro/videos."""
+        """Maestro Videos"""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body["action"] = action if action is not None else "generate"
@@ -159,7 +156,6 @@ class AsyncMaestro:
         body["langs"] = langs if langs is not None else ["zh-cn"]
         body["aspect"] = aspect if aspect is not None else "9:16"
         body["duration"] = duration if duration is not None else 30
-        body["quality"] = quality if quality is not None else "standard"
         body["scenario"] = scenario if scenario is not None else "auto"
         body["style"] = style if style is not None else "auto"
         body["voice"] = voice if voice is not None else "auto"
