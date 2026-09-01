@@ -15,6 +15,47 @@
   ],
   "tasks": "/fish/tasks"
  },
+ "midjourney": {
+  "category": "AI Image",
+  "endpoints": [
+   {
+    "id": "midjourney",
+    "path": "/midjourney/imagine",
+    "name": "Midjourney Imagine API"
+   },
+   {
+    "id": "midjourney",
+    "path": "/midjourney/seed",
+    "name": "Midjourney Seed API"
+   },
+   {
+    "id": "midjourney",
+    "path": "/midjourney/edits",
+    "name": "Midjourney Edits API"
+   },
+   {
+    "id": "midjourney",
+    "path": "/midjourney/videos",
+    "name": "Midjourney Videos API"
+   },
+   {
+    "id": "midjourney",
+    "path": "/midjourney/describe",
+    "name": "Midjourney Describe API"
+   },
+   {
+    "id": "midjourney",
+    "path": "/midjourney/shorten",
+    "name": "Midjourney Shorten API"
+   },
+   {
+    "id": "midjourney",
+    "path": "/midjourney/translate",
+    "name": "Midjourney Translate API"
+   }
+  ],
+  "tasks": "/midjourney/tasks"
+ },
  "maestro": {
   "category": "AI Video",
   "endpoints": [

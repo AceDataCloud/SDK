@@ -18,6 +18,8 @@ from .luma import AsyncLuma as AsyncLuma
 from .luma import Luma as Luma
 from .maestro import AsyncMaestro as AsyncMaestro
 from .maestro import Maestro as Maestro
+from .midjourney import AsyncMidjourney as AsyncMidjourney
+from .midjourney import Midjourney as Midjourney
 from .minimax import AsyncMinimax as AsyncMinimax
 from .minimax import Minimax as Minimax
 from .nano_banana import AsyncNanoBanana as AsyncNanoBanana
@@ -54,6 +56,8 @@ __all__ = [
     "AsyncLuma",
     "Maestro",
     "AsyncMaestro",
+    "Midjourney",
+    "AsyncMidjourney",
     "Minimax",
     "AsyncMinimax",
     "NanoBanana",

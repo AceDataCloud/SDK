@@ -20,6 +20,7 @@ GENERATED = (
     "suno",
     "producer",
     "fish",
+    "midjourney",
     "hailuo",
     "wan",
     "luma",
@@ -66,6 +67,31 @@ def test_generation_returns_a_task_handle(client):
     result = client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     assert isinstance(result, TaskHandle)
     assert result.id == "t-1"
+
+
+def test_midjourney_video_serializes_the_documented_contract(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "midjourney-1"}
+    client.midjourney._transport = transport
+
+    handle = client.midjourney.generate(
+        action="generate",
+        mode="fast",
+        resolution="720p",
+        prompt="a cat",
+        image_url="https://example.com/cat.png",
+    )
+
+    assert isinstance(handle, TaskHandle)
+    assert transport.request.call_args.args == ("POST", "/midjourney/videos")
+    assert transport.request.call_args.kwargs["json"] == {
+        "action": "generate",
+        "mode": "fast",
+        "resolution": "720p",
+        "prompt": "a cat",
+        "image_url": "https://example.com/cat.png",
+        "async": True,
+    }
 
 
 @pytest.mark.asyncio

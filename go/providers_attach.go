@@ -30,6 +30,7 @@ type providers struct {
 	localization *Localization
 	luma         *Luma
 	maestro      *Maestro
+	midjourney   *Midjourney
 	minimax      *Minimax
 	nanobanana   *NanoBanana
 	producer     *Producer
@@ -51,6 +52,7 @@ func newProviders(tr *transport) *providers {
 		localization: &Localization{t: tr},
 		luma:         &Luma{t: tr},
 		maestro:      &Maestro{t: tr},
+		midjourney:   &Midjourney{t: tr},
 		minimax:      &Minimax{t: tr},
 		nanobanana:   &NanoBanana{t: tr},
 		producer:     &Producer{t: tr},
@@ -88,6 +90,9 @@ func (c *Client) Luma() *Luma { return c.providers.luma }
 
 // Maestro returns the maestro provider client.
 func (c *Client) Maestro() *Maestro { return c.providers.maestro }
+
+// Midjourney returns the midjourney provider client.
+func (c *Client) Midjourney() *Midjourney { return c.providers.midjourney }
 
 // Minimax returns the minimax provider client.
 func (c *Client) Minimax() *Minimax { return c.providers.minimax }
