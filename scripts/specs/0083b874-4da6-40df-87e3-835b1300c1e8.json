@@ -862,6 +862,7 @@
                     "type": "string",
                     "enum": [
                       "auto",
+                      "reference",
                       "edit",
                       "extend"
                     ],
@@ -882,6 +883,18 @@
                       "additionalProperties": true
                     },
                     "description": "$t(seedance_videos_tools)"
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9,
+                    "default": 0,
+                    "description": "Seedance Videos Priority"
+                  },
+                  "safety_identifier": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "description": "Seedance Videos Safety Identifier"
                   }
                 }
               },

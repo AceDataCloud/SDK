@@ -8,13 +8,18 @@ func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 		Content:               []map[string]any{{"type": "text", "text": "Extend the scene"}},
 		Duration:              30,
 		Camerafixed:           true,
-		OmniReferenceTaskType: "extend",
+		OmniReferenceTaskType: "reference",
 		OutputFormat:          "mov",
 		Tools:                 []map[string]any{{"type": "web_search"}},
+		Priority:              5,
+		SafetyIdentifier:      "customer-123",
 	}
 	body := req.toBody()
-	if body["model"] != req.Model || body["omni_reference_task_type"] != "extend" || body["output_format"] != "mov" {
+	if body["model"] != req.Model || body["omni_reference_task_type"] != "reference" || body["output_format"] != "mov" {
 		t.Fatalf("unexpected Seedance 2.5 body: %#v", body)
+	}
+	if body["priority"] != 5 || body["safety_identifier"] != "customer-123" {
+		t.Fatalf("priority fields missing from request: %#v", body)
 	}
 	if body["camerafixed"] != true || body["camera_fixed"] != nil {
 		t.Fatalf("camera field drift: %#v", body)

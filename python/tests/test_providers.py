@@ -108,16 +108,20 @@ def test_seedance_25_serializes_public_contract(client):
         content=[{"type": "text", "text": "Extend the scene"}],
         duration=30,
         camerafixed=True,
-        omni_reference_task_type="extend",
+        omni_reference_task_type="reference",
         output_format="mov",
         tools=[{"type": "web_search"}],
+        priority=5,
+        safety_identifier="customer-123",
     )
 
     body = transport.request.call_args.kwargs["json"]
     assert body["model"] == "doubao-seedance-2-5-260628"
-    assert body["omni_reference_task_type"] == "extend"
+    assert body["omni_reference_task_type"] == "reference"
     assert body["output_format"] == "mov"
     assert body["tools"] == [{"type": "web_search"}]
+    assert body["priority"] == 5
+    assert body["safety_identifier"] == "customer-123"
     assert body["camerafixed"] is True
     assert "camera_fixed" not in body
 

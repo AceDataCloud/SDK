@@ -10,9 +10,11 @@ describe('Seedance provider', () => {
       content: [{ type: 'text', text: 'Extend the scene' }],
       duration: 30,
       camerafixed: true,
-      omniReferenceTaskType: 'extend',
+      omniReferenceTaskType: 'reference',
       outputFormat: 'mov',
       tools: [{ type: 'web_search' }],
+      priority: 5,
+      safetyIdentifier: 'customer-123',
     });
     expect(task).toBeInstanceOf(TaskHandle);
     expect(request).toHaveBeenCalledWith('POST', '/seedance/videos', {
@@ -20,9 +22,11 @@ describe('Seedance provider', () => {
         model: 'doubao-seedance-2-5-260628',
         duration: 30,
         camerafixed: true,
-        omni_reference_task_type: 'extend',
+        omni_reference_task_type: 'reference',
         output_format: 'mov',
         tools: [{ type: 'web_search' }],
+        priority: 5,
+        safety_identifier: 'customer-123',
         async: true,
       }),
     });

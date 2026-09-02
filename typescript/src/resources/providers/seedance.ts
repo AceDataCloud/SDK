@@ -42,11 +42,15 @@ export interface SeedanceGenerateOptions {
   /** $t(seedance_videos_execution_expires_after) */
   executionExpiresAfter?: number;
   /** $t(seedance_videos_omni_reference_task_type) */
-  omniReferenceTaskType?: "auto" | "edit" | "extend";
+  omniReferenceTaskType?: "auto" | "reference" | "edit" | "extend";
   /** $t(seedance_videos_output_format) */
   outputFormat?: "mp4" | "mov";
   /** $t(seedance_videos_tools) */
   tools?: Array<Record<string, unknown>>;
+  /** Seedance Videos Priority */
+  priority?: number;
+  /** Seedance Videos Safety Identifier */
+  safetyIdentifier?: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -80,8 +84,10 @@ export class Seedance {
     if (options.omniReferenceTaskType !== undefined) body["omni_reference_task_type"] = options.omniReferenceTaskType;
     if (options.outputFormat !== undefined) body["output_format"] = options.outputFormat;
     if (options.tools !== undefined) body["tools"] = options.tools;
+    body["priority"] = options.priority ?? 0;
+    if (options.safetyIdentifier !== undefined) body["safety_identifier"] = options.safetyIdentifier;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "callbackUrl", "camerafixed", "content", "duration", "executionExpiresAfter", "frames", "generateAudio", "maxWait", "model", "omniReferenceTaskType", "outputFormat", "pollInterval", "ratio", "resolution", "returnLastFrame", "seed", "tools", "wait", "watermark"].includes(key) && value !== undefined) {
+      if (!["async", "callbackUrl", "camerafixed", "content", "duration", "executionExpiresAfter", "frames", "generateAudio", "maxWait", "model", "omniReferenceTaskType", "outputFormat", "pollInterval", "priority", "ratio", "resolution", "returnLastFrame", "safetyIdentifier", "seed", "tools", "wait", "watermark"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
