@@ -85,16 +85,6 @@
                     "maximum": 300,
                     "description": "Target video length in seconds. Lite: 5–30; Standard: 5–120; Pro: 5–300. Successful jobs are billed by actual delivered duration, never above the requested duration."
                   },
-                  "quality": {
-                    "type": "string",
-                    "enum": [
-                      "lite",
-                      "standard",
-                      "pro"
-                    ],
-                    "default": "standard",
-                    "description": "Production SKU. `lite` = fast 720p short video at 0.20 credits/s (up to 30s); `standard` = balanced 1080p at 0.60 credits/s (up to 120s); `pro` = advanced production at 1.20 credits/s (up to 300s). Default: standard."
-                  },
                   "scenario": {
                     "type": "string",
                     "enum": [

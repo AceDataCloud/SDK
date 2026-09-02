@@ -31,8 +31,6 @@ export interface MaestroGenerateOptions {
   aspect?: "9:16" | "16:9" | "1:1";
   /** Target video length in seconds. Lite: 5–30; Standard: 5–120; Pro: 5–300. Successful jobs are billed by actual delivered duration, never above the requested duration. */
   duration?: number;
-  /** Production SKU. `lite` = fast 720p short video at 0.20 credits/s (up to 30s); `standard` = balanced 1080p at 0.60 credits/s (up to 120s); `pro` = advanced production at 1.20 credits/s (up to 300s). Default: standard. */
-  quality?: "lite" | "standard" | "pro";
   /** Production route. Lite supports auto/narrated/captions; Standard adds avatar; Pro adds drama. `captions` requires source video in `file_urls`; `avatar` requires a portrait. avatar bills at 1.15× and drama at 1.35×. */
   scenario?: "auto" | "narrated" | "captions" | "avatar" | "drama";
   /** Optional visual-style preset — expressed through typography, palette, motion, image treatment and pacing. Orthogonal to `scenario` (it does NOT change routing). `auto` (default) lets the director pick; every other value adopts a real named look: `cinematic` = dark film-noir (black + blood-red, Oswald); `glass` = Apple / iOS-26 frosted liquid glass; `luxury` = timeless near-black + indigo, huge whitespace; `swiss` = precise grid + electric blue + oversized numerals; `modern` = clean light SaaS; `editorial` = cream magazine + serif; `warm` = intimate cream + amber; `vibrant` = festive folk colour; `neon` = electric neon glow; `mono` = grayscale, type-led; `pastel` = soft candy pastels; `bold` = huge poster type; `industrial` = raw glitch + rust; `futuristic` = particle glow. A freeform string is also accepted as a soft hint. */
@@ -64,12 +62,11 @@ export class Maestro {
     body["langs"] = options.langs ?? ["zh-cn"];
     body["aspect"] = options.aspect ?? "9:16";
     body["duration"] = options.duration ?? 30;
-    body["quality"] = options.quality ?? "standard";
     body["scenario"] = options.scenario ?? "auto";
     body["style"] = options.style ?? "auto";
     body["voice"] = options.voice ?? "auto";
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "aspect", "async", "callbackUrl", "duration", "fileUrls", "langs", "maxWait", "pollInterval", "prompt", "quality", "refTaskId", "scenario", "style", "voice", "wait"].includes(key) && value !== undefined) {
+      if (!["action", "aspect", "async", "callbackUrl", "duration", "fileUrls", "langs", "maxWait", "pollInterval", "prompt", "refTaskId", "scenario", "style", "voice", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }

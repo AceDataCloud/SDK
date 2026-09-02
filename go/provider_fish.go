@@ -34,8 +34,6 @@ type FishGenerateRequest struct {
 	Temperature float64
 	// The chunk length passed to the upstream synthesizer.
 	ChunkLength int
-	// Opus bitrate when `format=opus`.
-	OpusBitrate int
 	// Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios.
 	ReferenceID string
 	// Maximum number of new tokens generated.
@@ -83,9 +81,6 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	if r.ChunkLength != 0 {
 		body["chunk_length"] = r.ChunkLength
 	}
-	if r.OpusBitrate != 0 {
-		body["opus_bitrate"] = r.OpusBitrate
-	}
 	if r.ReferenceID != "" {
 		body["reference_id"] = r.ReferenceID
 	}
@@ -124,71 +119,4 @@ func (c *Fish) Generate(ctx context.Context, req FishGenerateRequest) (*TaskHand
 		return nil, err
 	}
 	return newTaskHandle(taskIDFrom(result), "/fish/tasks", c.t, result), nil
-}
-
-// FishModelRequest is the input to fish.Model.
-type FishModelRequest struct {
-	// Name of the voice model.
-	Title string
-	// The HTTP(S) URL of the audio file for cloning must be a single URL string. This interface does not support mul
-	Voices string
-	// Tags used for retrieval in public repositories (optional).
-	Tags []string
-	// Reference text corresponding to the audio sample (optional).
-	Texts []string
-	// The visibility of the model is set to `private` by default.
-	Visibility string
-	// HTTP(S) URL of the voice model cover image (optional).
-	CoverImage string
-	// Description of the voice model (optional).
-	Description string
-	// If it is `true`, the upstream service will generate a sample voice after the training is completed.
-	GenerateSample bool
-	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before
-	EnhanceAudioQuality bool
-	// CallbackURL optionally receives the completion webhook.
-	CallbackURL string
-	// Extra fields merged into the request body.
-	Extra map[string]any
-}
-
-func (r FishModelRequest) toBody() map[string]any {
-	body := map[string]any{}
-	body["title"] = r.Title
-	body["voices"] = r.Voices
-	if r.Tags != nil {
-		body["tags"] = r.Tags
-	}
-	if r.Texts != nil {
-		body["texts"] = r.Texts
-	}
-	if r.Visibility != "" {
-		body["visibility"] = r.Visibility
-	}
-	if r.CoverImage != "" {
-		body["cover_image"] = r.CoverImage
-	}
-	if r.Description != "" {
-		body["description"] = r.Description
-	}
-	body["generate_sample"] = r.GenerateSample
-	body["enhance_audio_quality"] = r.EnhanceAudioQuality
-	if r.CallbackURL != "" {
-		body["callback_url"] = r.CallbackURL
-	}
-	for k, v := range r.Extra {
-		if _, exists := body[k]; !exists {
-			body[k] = v
-		}
-	}
-	return body
-}
-
-// Model Fish Audio model creation API — upload reference audio to create a custom voice-clone model.
-func (c *Fish) Model(ctx context.Context, req FishModelRequest) (map[string]any, error) {
-	return c.t.do(ctx, requestOpts{
-		Method: "POST",
-		Path:   "/fish/model",
-		Body:   req.toBody(),
-	})
 }

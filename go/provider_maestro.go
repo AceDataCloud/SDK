@@ -26,8 +26,6 @@ type MaestroGenerateRequest struct {
 	Aspect string
 	// Target video length in seconds. Lite: 5–30; Standard: 5–120; Pro: 5–300. Successful jobs are billed by actual
 	Duration int
-	// Production SKU. `lite` = fast 720p short video at 0.20 credits/s (up to 30s); `standard` = balanced 1080p at 0
-	Quality string
 	// Production route. Lite supports auto/narrated/captions; Standard adds avatar; Pro adds drama. `captions` requi
 	Scenario string
 	// Optional visual-style preset — expressed through typography, palette, motion, image treatment and pacing. Orth
@@ -66,11 +64,6 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 		body["duration"] = r.Duration
 	} else {
 		body["duration"] = 30
-	}
-	if r.Quality != "" {
-		body["quality"] = r.Quality
-	} else {
-		body["quality"] = "standard"
 	}
 	if r.Scenario != "" {
 		body["scenario"] = r.Scenario

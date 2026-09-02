@@ -14,13 +14,12 @@ class Transport:
         return {"success": True, "task_id": "task-maestro", "trace_id": "trace-maestro"}
 
 
-def test_generate_serializes_new_sku_contract() -> None:
+def test_generate_serializes_current_contract() -> None:
     transport = Transport()
     client = Maestro(transport)
 
     result = client.generate(
         prompt="Launch video",
-        quality="pro",
         duration=300,
         scenario="drama",
         action="extend",
@@ -40,7 +39,6 @@ def test_generate_serializes_new_sku_contract() -> None:
                 "langs": ["en", "de"],
                 "aspect": "9:16",
                 "duration": 300,
-                "quality": "pro",
                 "scenario": "drama",
                 "style": "auto",
                 "voice": "auto",

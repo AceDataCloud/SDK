@@ -6,11 +6,6 @@
     "id": "77adcb84-d59f-5ef9-b8a0-8b35eb42a71d",
     "path": "/fish/tts",
     "name": "Fish TTS API"
-   },
-   {
-    "id": "82dcabe9-b1a3-541f-80f1-decb183b920c",
-    "path": "/fish/model",
-    "name": "Fish Model Create API"
    }
   ],
   "tasks": "/fish/tasks"

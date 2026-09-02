@@ -35,7 +35,7 @@ class Fish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
@@ -44,7 +44,6 @@ class Fish:
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -79,8 +78,6 @@ class Fish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         if reference_id is not None:
             body["reference_id"] = reference_id
         if max_new_tokens is not None:
@@ -99,44 +96,6 @@ class Fish:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
-    def model(
-        self,
-        *,
-        title: str,
-        voices: str,
-        tags: list[str] | None = None,
-        texts: list[str] | None = None,
-        visibility: Literal["public", "private"] | None = None,
-        cover_image: str | None = None,
-        description: str | None = None,
-        generate_sample: bool | None = None,
-        enhance_audio_quality: bool | None = None,
-        callback_url: str | None = None,
-        **extra: Any,
-    ) -> dict[str, Any]:
-        """Fish Audio model creation API — upload reference audio to create a custom voice-clone model."""
-        body: dict[str, Any] = {}
-        body["title"] = title
-        body["voices"] = voices
-        if tags is not None:
-            body["tags"] = tags
-        if texts is not None:
-            body["texts"] = texts
-        if visibility is not None:
-            body["visibility"] = visibility
-        if cover_image is not None:
-            body["cover_image"] = cover_image
-        if description is not None:
-            body["description"] = description
-        if generate_sample is not None:
-            body["generate_sample"] = generate_sample
-        if enhance_audio_quality is not None:
-            body["enhance_audio_quality"] = enhance_audio_quality
-        body.update(extra)
-        if callback_url is not None:
-            body["callback_url"] = callback_url
-        return self._transport.request("POST", "/fish/model", json=body)
-
 
 class AsyncFish:
     """Asynchronous fish client."""
@@ -149,7 +108,7 @@ class AsyncFish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
@@ -158,7 +117,6 @@ class AsyncFish:
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -193,8 +151,6 @@ class AsyncFish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         if reference_id is not None:
             body["reference_id"] = reference_id
         if max_new_tokens is not None:
@@ -212,41 +168,3 @@ class AsyncFish:
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
-
-    async def model(
-        self,
-        *,
-        title: str,
-        voices: str,
-        tags: list[str] | None = None,
-        texts: list[str] | None = None,
-        visibility: Literal["public", "private"] | None = None,
-        cover_image: str | None = None,
-        description: str | None = None,
-        generate_sample: bool | None = None,
-        enhance_audio_quality: bool | None = None,
-        callback_url: str | None = None,
-        **extra: Any,
-    ) -> dict[str, Any]:
-        """Fish Audio model creation API — upload reference audio to create a custom voice-clone model."""
-        body: dict[str, Any] = {}
-        body["title"] = title
-        body["voices"] = voices
-        if tags is not None:
-            body["tags"] = tags
-        if texts is not None:
-            body["texts"] = texts
-        if visibility is not None:
-            body["visibility"] = visibility
-        if cover_image is not None:
-            body["cover_image"] = cover_image
-        if description is not None:
-            body["description"] = description
-        if generate_sample is not None:
-            body["generate_sample"] = generate_sample
-        if enhance_audio_quality is not None:
-            body["enhance_audio_quality"] = enhance_audio_quality
-        body.update(extra)
-        if callback_url is not None:
-            body["callback_url"] = callback_url
-        return await self._transport.request("POST", "/fish/model", json=body)
