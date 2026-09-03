@@ -2,10 +2,12 @@
 
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 
 from genlib.model import Endpoint, Param
+from genlib.python_gen import _aliases
 
 
 def test_default_only_reads_schema_default():
@@ -82,3 +84,21 @@ def test_array_of_object_union_stays_structured_in_all_languages():
     assert param.py_type() == "list[dict[str, Any]]"
     assert param.ts_type() == "Array<Record<string, unknown>>"
     assert param.go_type() == "[]map[string]any"
+
+
+def test_python_enum_aliases_are_scoped_by_method():
+    long_model = Param("model", {"type": "string", "enum": [f"model-{i}" for i in range(8)]}, required=False)
+    short_model = Param("model", {"type": "string", "enum": ["default", "remi-v1"]}, required=True)
+    service = SimpleNamespace(
+        class_name="Suno",
+        endpoints=[
+            SimpleNamespace(method="generate", params=[long_model]),
+            SimpleNamespace(method="lyrics", params=[short_model]),
+        ],
+    )
+
+    aliases, lines = _aliases(service)
+
+    assert aliases == {"generate:model": "SunoModel"}
+    assert "lyrics:model" not in aliases
+    assert len(lines) == 1

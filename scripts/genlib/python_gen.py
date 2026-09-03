@@ -27,11 +27,11 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 '''
 
 
-def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
+def _signature(params: list[Param], aliases: dict[str, str], *, method: str, pollable: bool) -> str:
     lines = ["self", "*"]
     for p in params:
         name = py_param(p.name)
-        annotation = aliases.get(p.name) or p.py_type()
+        annotation = aliases.get(f"{method}:{p.name}") or p.py_type()
         if p.required:
             lines.append(f"{name}: {annotation}")
         else:
@@ -121,17 +121,30 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
     """
     mapping: dict[str, str] = {}
     lines: list[str] = []
+    seen: dict[tuple[str, tuple[str, ...]], str] = {}
+    used_aliases: set[str] = set()
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or not p.enum or p.name in mapping:
+            if p.is_control or not p.enum:
                 continue
             inline = p.py_type()
             if len(inline) <= 40:
                 continue
-            alias = f"{svc.class_name}{pascal(p.name)}"
-            mapping[p.name] = alias
-            values = ",\n    ".join(json.dumps(e) for e in p.enum)
-            lines.append(f"{alias} = Literal[\n    {values},\n]")
+            enum_key = tuple(p.enum)
+            seen_key = (p.name, enum_key)
+            if seen_key in seen:
+                alias = seen[seen_key]
+            else:
+                alias = f"{svc.class_name}{pascal(p.name)}"
+                if alias in used_aliases:
+                    alias = f"{svc.class_name}{pascal(ep.method)}{pascal(p.name)}"
+                while alias in used_aliases:
+                    alias = f"{alias}_"
+                seen[seen_key] = alias
+                used_aliases.add(alias)
+                values = ",\n    ".join(json.dumps(e) for e in p.enum)
+                lines.append(f"{alias} = Literal[\n    {values},\n]")
+            mapping[f"{ep.method}:{p.name}"] = alias
     return mapping, lines
 
 
@@ -164,7 +177,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
 
     lines = [
         f"    {prefix}def {ep.method}(",
-        f"        {_signature(params, aliases, pollable=ep.pollable)},",
+        f"        {_signature(params, aliases, method=ep.method, pollable=ep.pollable)},",
     ]
     if ep.pollable:
         lines.append(f"    ) -> {handle}:")
