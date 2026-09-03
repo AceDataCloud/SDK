@@ -16,6 +16,7 @@ GENERATED = (
     "flux",
     "seedream",
     "nano_banana",
+    "gemini",
     "seedance",
     "suno",
     "producer",
@@ -200,6 +201,25 @@ def test_minimax_generate_builds_a_task_handle(client):
         "resolution": "2K",
         "duration": 5,
         "ratio": "16:9",
+        "async": True,
+    }
+
+
+def test_gemini_generate_builds_a_task_handle(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "gemini-1"}
+    client.gemini._transport = transport
+
+    handle = client.gemini.generate(prompt="A cat running on the beach")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "gemini-1"
+    assert transport.request.call_args.args == ("POST", "/gemini/videos")
+    assert transport.request.call_args.kwargs["json"] == {
+        "prompt": "A cat running on the beach",
+        "model": "omni-flash",
+        "aspect_ratio": "16:9",
+        "resolution": "720p",
         "async": True,
     }
 
