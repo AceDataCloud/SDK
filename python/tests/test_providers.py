@@ -361,3 +361,31 @@ def test_seedream_pro_decomposition_omits_prompt_and_sends_layer_fields(client):
     assert body["size"] == "1.5K"
     assert body["layer_decomposition"] is True
     assert "prompt" not in body
+
+
+def test_fish_one_shot_reference_and_model_header(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "fish-1"}
+    client.fish._transport = transport
+
+    client.fish.generate(
+        text="New speech",
+        model="s2.1-pro",
+        references=[
+            {
+                "audio": "https://cdn.acedata.cloud/reference.mp3",
+                "text": "Reference transcript",
+            }
+        ],
+    )
+
+    kwargs = transport.request.call_args.kwargs
+    assert kwargs["extra_headers"] == {"model": "s2.1-pro"}
+    assert kwargs["json"]["references"] == [
+        {
+            "audio": "https://cdn.acedata.cloud/reference.mp3",
+            "text": "Reference transcript",
+        }
+    ]
+    assert "model" not in kwargs["json"]
+    assert "reference_id" not in kwargs["json"]

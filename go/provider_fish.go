@@ -24,7 +24,7 @@ type FishGenerateRequest struct {
 	Prosody map[string]any
 	// Is the input text subjected to text normalization processing by the upstream?
 	Normalize bool
-	// Inline reference audio samples will be forwarded upstream as is, for zero-shot voice cloning.
+	// One-shot voice clone reference; cannot be combined with reference_id.
 	References []map[string]any
 	// MP3 bitrate when `format=mp3`.
 	Mp3Bitrate int
@@ -36,14 +36,16 @@ type FishGenerateRequest struct {
 	ChunkLength int
 	// Opus bitrate when `format=opus`.
 	OpusBitrate int
-	// Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios.
-	ReferenceID string
+	// Saved/public voice ID; cannot be combined with references.
+	ReferenceID any
 	// Maximum number of new tokens generated.
 	MaxNewTokens int
 	// Minimum block length.
 	MinChunkLength int
 	// The repetition penalty coefficient applied during the generation process.
 	RepetitionPenalty float64
+	// optional
+	Model string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -86,7 +88,7 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	if r.OpusBitrate != 0 {
 		body["opus_bitrate"] = r.OpusBitrate
 	}
-	if r.ReferenceID != "" {
+	if r.ReferenceID != nil {
 		body["reference_id"] = r.ReferenceID
 	}
 	if r.MaxNewTokens != 0 {
@@ -119,6 +121,13 @@ func (c *Fish) Generate(ctx context.Context, req FishGenerateRequest) (*TaskHand
 		Method: "POST",
 		Path:   "/fish/tts",
 		Body:   req.toBody(),
+		ExtraHeaders: func() map[string]string {
+			headers := map[string]string{}
+			if req.Model != "" {
+				headers["model"] = req.Model
+			}
+			return headers
+		}(),
 	})
 	if err != nil {
 		return nil, err

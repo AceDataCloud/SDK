@@ -59,16 +59,17 @@ def py_param(name: str) -> str:
     return f"{name}_" if keyword.iskeyword(name) else name
 
 
-def request_schema(spec: dict) -> dict:
+def operation(spec: dict) -> dict:
     for _path, methods in (spec.get("paths") or {}).items():
         for method, op in (methods or {}).items():
-            if method.lower() != "post":
-                continue
-            content = (op.get("requestBody") or {}).get("content") or {}
-            schema = (content.get("application/json") or {}).get("schema") or {}
-            if schema:
-                return schema
+            if method.lower() == "post":
+                return op or {}
     return {}
+
+
+def request_schema(spec: dict) -> dict:
+    content = (operation(spec).get("requestBody") or {}).get("content") or {}
+    return (content.get("application/json") or {}).get("schema") or {}
 
 
 def summary(spec: dict) -> str:
@@ -119,6 +120,9 @@ class Param:
         return None
 
     def py_type(self) -> str:
+        variants = self.schema.get("oneOf") or []
+        if {variant.get("type") for variant in variants} == {"string", "array"}:
+            return "str | list[str]"
         if self.enum:
             return "Literal[" + ", ".join(json.dumps(e) for e in self.enum) + "]"
         pattern = self.schema.get("pattern")
@@ -151,6 +155,12 @@ class Param:
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
             if _array_items_are_objects(self.schema):
+                items = self.schema.get("items") or {}
+                properties = items.get("properties") or {} if items.get("additionalProperties") is False else {}
+                if properties:
+                    value_types = {PY_TYPES.get(prop.get("type"), "Any") for prop in properties.values()}
+                    value_type = next(iter(value_types)) if len(value_types) == 1 else "Any"
+                    return f"list[dict[str, {value_type}]]"
                 return "list[dict[str, Any]]"
             return f"list[{PY_TYPES.get(item, 'Any')}]"
         if self.type == "object":
@@ -158,6 +168,9 @@ class Param:
         return PY_TYPES.get(self.type, "Any")
 
     def ts_type(self) -> str:
+        variants = self.schema.get("oneOf") or []
+        if {variant.get("type") for variant in variants} == {"string", "array"}:
+            return "string | string[]"
         if self.enum:
             return " | ".join(json.dumps(e) for e in self.enum)
         variants = self.schema.get("oneOf") or self.schema.get("anyOf")
@@ -188,7 +201,14 @@ class Param:
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
             if _array_items_are_objects(self.schema):
-                return "Array<Record<string, unknown>>"
+                items = self.schema.get("items") or {}
+                properties = items.get("properties") or {} if items.get("additionalProperties") is False else {}
+                required = set(items.get("required") or [])
+                fields = "; ".join(
+                    f"{camel(name)}{'' if name in required else '?'}: {TS_TYPES.get(prop.get('type'), 'unknown')}"
+                    for name, prop in properties.items()
+                )
+                return f"Array<{{ {fields} }}>" if fields else "Array<Record<string, unknown>>"
             return f"{TS_TYPES.get(item, 'unknown')}[]"
         if self.type == "object":
             return "Record<string, unknown>"
@@ -242,13 +262,24 @@ class Endpoint:
         props: dict[str, dict] = schema.get("properties") or {}
         self.summary = summary(spec)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
+        header_parameters = [
+            p for p in (operation(spec).get("parameters") or [])
+            if p.get("in") == "header" and p.get("name") != "accept"
+        ]
+        self.header_params = [
+            Param(p["name"], p.get("schema") or {}, bool(p.get("required")))
+            for p in header_parameters
+        ]
         self.pollable = "async" in props or pollable
+
+    @property
+    def body_params(self) -> list[Param]:
+        return [p for p in self.params if not p.is_control]
 
     @property
     def callable_params(self) -> list[Param]:
         """Required first — a Python signature cannot put a defaulted arg before one."""
-        usable = [p for p in self.params if not p.is_control]
-        return sorted(usable, key=lambda p: not p.required)
+        return sorted(self.body_params + self.header_params, key=lambda p: not p.required)
 
 
 class Service:

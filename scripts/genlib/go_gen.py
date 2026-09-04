@@ -56,7 +56,7 @@ def _request_struct(svc: Service, ep) -> str:
 def _to_body(struct: str, svc: Service, ep) -> str:
     lines = [f"func (r {struct}) toBody() map[string]any {{"]
     lines.append("\tbody := map[string]any{}")
-    for p in ep.callable_params:
+    for p in sorted(ep.body_params, key=lambda p: not p.required):
         field = _field_name(p.name)
         key = json.dumps(p.name)
         default = p.default()
@@ -121,6 +121,14 @@ def _method(svc: Service, ep, struct: str) -> str:
         lines.append('\t\tMethod: "POST",')
         lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
         lines.append("\t\tBody:   req.toBody(),")
+        if ep.header_params:
+            lines.append("\t\tExtraHeaders: func() map[string]string {")
+            lines.append("\t\t	headers := map[string]string{}")
+            for p in ep.header_params:
+                field = _field_name(p.name)
+                lines.append(f"\t\t	if req.{field} != \"\" {{ headers[{json.dumps(p.name)}] = req.{field} }}")
+            lines.append("\t\t	return headers")
+            lines.append("\t\t}(),")
         lines.append("\t})")
         lines.append("\tif err != nil {")
         lines.append("\t\treturn nil, err")
@@ -136,6 +144,14 @@ def _method(svc: Service, ep, struct: str) -> str:
         lines.append('\t\tMethod: "POST",')
         lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
         lines.append("\t\tBody:   req.toBody(),")
+        if ep.header_params:
+            lines.append("\t\tExtraHeaders: func() map[string]string {")
+            lines.append("\t\t	headers := map[string]string{}")
+            for p in ep.header_params:
+                field = _field_name(p.name)
+                lines.append(f"\t\t	if req.{field} != \"\" {{ headers[{json.dumps(p.name)}] = req.{field} }}")
+            lines.append("\t\t	return headers")
+            lines.append("\t\t}(),")
         lines.append("\t})")
     lines.append("}")
     return "\n".join(lines)
