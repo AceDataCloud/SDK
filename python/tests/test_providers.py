@@ -214,6 +214,13 @@ def test_model_enum_is_typed(client):
     assert "flux-dev" in typing.get_args(literal)
 
 
+def test_aichat_model_enum_tracks_docs():
+    from acedatacloud.resources.aichat import AiChatModel
+
+    assert "gpt-5.6-sol" in typing.get_args(AiChatModel)
+    assert "grok-4.5" in typing.get_args(AiChatModel)
+
+
 def test_extra_parameters_pass_through(client):
     """A parameter added upstream must be reachable before the SDK is regenerated."""
     transport = Mock()
@@ -233,8 +240,24 @@ def test_every_provider_has_a_callable_method(client, name):
 
 def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
-    for method in ("generate", "lyrics", "wav", "mp4"):
+    for method in ("generate", "lyrics", "wav", "mp4", "mp3"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_suno_vox_requires_vocal_window(client):
+    sig = inspect.signature(type(client.suno).vox)
+    assert sig.parameters["vocal_start"].default is inspect._empty
+    assert sig.parameters["vocal_end"].default is inspect._empty
+
+
+def test_suno_upload_defaults_mode_to_standard(client):
+    transport = Mock()
+    transport.request.return_value = {"ok": True}
+    client.suno._transport = transport
+
+    client.suno.upload(audio_url="https://cdn.example.com/sample.mp3")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["mode"] == "standard"
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):

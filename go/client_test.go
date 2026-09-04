@@ -107,6 +107,44 @@ func TestMinimaxGenerate(t *testing.T) {
 	}
 }
 
+func TestSunoMp3_DefaultsAsyncAndUsesEndpoint(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/suno/mp3" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["audio_id"] != "audio-1" || body["async"] != true {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"task_id":"suno-mp3-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Suno().Mp3(context.Background(), SunoMp3Request{AudioID: "audio-1"})
+	if err != nil {
+		t.Fatalf("Suno Mp3: %v", err)
+	}
+	if task.ID != "suno-mp3-1" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+}
+
+func TestSunoVox_SendsRequiredWindow(t *testing.T) {
+	body := SunoVoxRequest{AudioID: "audio-2", VocalStart: 1.25, VocalEnd: 9.5}.toBody()
+	if body["vocal_start"] != 1.25 || body["vocal_end"] != 9.5 {
+		t.Fatalf("unexpected body: %+v", body)
+	}
+}
+
+func TestSunoUpload_DefaultMode(t *testing.T) {
+	body := SunoUploadRequest{AudioURL: "https://cdn.example.com/ref.mp3"}.toBody()
+	if body["mode"] != "standard" {
+		t.Fatalf("expected default mode=standard, got %+v", body)
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
