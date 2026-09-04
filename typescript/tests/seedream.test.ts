@@ -47,3 +47,46 @@ describe('Seedream provider', () => {
     expect(adaptiveIsSupported).toBe(false);
   });
 });
+
+describe('Seedream 5.0 official parity', () => {
+  it('sends Pro layer decomposition without a prompt', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'layer-task' });
+    const seedream = new Seedream({ request } as any);
+
+    await seedream.generate({
+      model: 'doubao-seedream-5-0-pro-260628',
+      image: 'https://cdn.example.com/poster.png',
+      size: '1.5K',
+      layerDecomposition: true,
+    });
+
+    expect(request.mock.calls[0][2].json).toMatchObject({
+      model: 'doubao-seedream-5-0-pro-260628',
+      image: 'https://cdn.example.com/poster.png',
+      size: '1.5K',
+      layer_decomposition: true,
+      async: true,
+    });
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('prompt');
+  });
+
+  it('sends transparent-background editing and allows synchronous streaming', async () => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'edit-task' });
+    const seedream = new Seedream({ request } as any);
+
+    await seedream.generate({
+      model: 'doubao-seedream-5-0-pro-260628',
+      prompt: 'Replace the object',
+      image: ['data:image/png;base64,AA=='],
+      outputFormat: 'png',
+      background: 'transparent',
+      async: false,
+    });
+
+    expect(request.mock.calls[0][2].json).toMatchObject({
+      output_format: 'png',
+      background: 'transparent',
+      async: false,
+    });
+  });
+});

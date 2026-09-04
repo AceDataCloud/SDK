@@ -17,7 +17,6 @@ on-disk copies still carry raw `$t(...)` tokens).
 
 from __future__ import annotations
 
-import argparse
 import json
 import keyword
 import re
@@ -28,8 +27,18 @@ from typing import Any
 CONTROL = {"async", "callback_url", "webhook_url"}
 
 PY_TYPES = {"string": "str", "integer": "int", "number": "float", "boolean": "bool"}
-TS_TYPES = {"string": "string", "integer": "number", "number": "number", "boolean": "boolean"}
-GO_TYPES = {"string": "string", "integer": "int", "number": "float64", "boolean": "bool"}
+TS_TYPES = {
+    "string": "string",
+    "integer": "number",
+    "number": "number",
+    "boolean": "boolean",
+}
+GO_TYPES = {
+    "string": "string",
+    "integer": "int",
+    "number": "float64",
+    "boolean": "bool",
+}
 
 
 def snake(name: str) -> str:
@@ -77,8 +86,13 @@ def _array_items_are_objects(schema: dict[str, Any]) -> bool:
         return True
     for union in ("oneOf", "anyOf"):
         variants = items.get(union)
-        if isinstance(variants, list) and variants and all(
-            isinstance(variant, dict) and variant.get("type") == "object" for variant in variants
+        if (
+            isinstance(variants, list)
+            and variants
+            and all(
+                isinstance(variant, dict) and variant.get("type") == "object"
+                for variant in variants
+            )
         ):
             return True
     return False
@@ -107,6 +121,33 @@ class Param:
     def py_type(self) -> str:
         if self.enum:
             return "Literal[" + ", ".join(json.dumps(e) for e in self.enum) + "]"
+        pattern = self.schema.get("pattern")
+        if (
+            self.type == "string"
+            and isinstance(pattern, str)
+            and pattern.startswith("^(")
+            and pattern.endswith(")$")
+        ):
+            values = [
+                part.replace("\\.", ".")
+                for part in pattern[2:-2].split("|")
+                if re.fullmatch(r"[A-Za-z0-9.\\-]+", part)
+            ]
+            if values:
+                return (
+                    "Literal["
+                    + ", ".join(json.dumps(value) for value in values)
+                    + "] | str"
+                )
+        variants = self.schema.get("oneOf") or self.schema.get("anyOf")
+        if isinstance(variants, list):
+            types = [
+                Param(self.name, variant, self.required).py_type()
+                for variant in variants
+                if isinstance(variant, dict)
+            ]
+            if types:
+                return " | ".join(dict.fromkeys(types))
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
             if _array_items_are_objects(self.schema):
@@ -119,6 +160,31 @@ class Param:
     def ts_type(self) -> str:
         if self.enum:
             return " | ".join(json.dumps(e) for e in self.enum)
+        variants = self.schema.get("oneOf") or self.schema.get("anyOf")
+        if isinstance(variants, list):
+            types = [
+                Param(self.name, variant, self.required).ts_type()
+                for variant in variants
+                if isinstance(variant, dict)
+            ]
+            if types:
+                return " | ".join(dict.fromkeys(types))
+        pattern = self.schema.get("pattern")
+        if (
+            self.type == "string"
+            and isinstance(pattern, str)
+            and pattern.startswith("^(")
+            and pattern.endswith(")$")
+        ):
+            parts = pattern[2:-2].split("|")
+            rendered = []
+            for part in parts:
+                if part == "[0-9]+x[0-9]+":
+                    rendered.append("`${number}x${number}`")
+                elif re.fullmatch(r"[A-Za-z0-9.\\-]+", part):
+                    rendered.append(json.dumps(part.replace(r"\.", ".")))
+            if rendered:
+                return " | ".join(rendered)
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
             if _array_items_are_objects(self.schema):
@@ -136,7 +202,10 @@ class Param:
             return f"[]{GO_TYPES.get(item, 'any')}"
         if self.type == "object":
             return "map[string]any"
-        return GO_TYPES.get(self.type, "any")
+        scalar = GO_TYPES.get(self.type, "any")
+        if self.schema.get("x-go-optional-pointer") is True:
+            return f"*{scalar}"
+        return scalar
 
 
 # The last path segment names the artifact ("/flux/images"), but a method reads
@@ -162,7 +231,9 @@ def _method_name(path: str) -> str:
 
 
 class Endpoint:
-    def __init__(self, alias: str, path: str, spec: dict, *, pollable: bool = False) -> None:
+    def __init__(
+        self, alias: str, path: str, spec: dict, *, pollable: bool = False
+    ) -> None:
         self.alias = alias
         self.path = path
         self.method = _method_name(path)
@@ -206,7 +277,8 @@ class Service:
         primary = None
         if want:
             primary = next(
-                (e for e in self.endpoints if snake(e.path.rsplit("/", 1)[-1]) == want), None
+                (e for e in self.endpoints if snake(e.path.rsplit("/", 1)[-1]) == want),
+                None,
             )
         if primary is None:
             primary = next((e for e in self.endpoints if e.method == "generate"), None)
@@ -216,7 +288,9 @@ class Service:
                 ep.method = "generate"
             elif ep.method == "generate":
                 # Lost the claim; fall back to its own noun.
-                ep.method = snake(ep.path.rsplit("/", 1)[-1]) or snake(ep.path.replace("/", "_"))
+                ep.method = snake(ep.path.rsplit("/", 1)[-1]) or snake(
+                    ep.path.replace("/", "_")
+                )
 
         seen: set[str] = set()
         for ep in self.endpoints:

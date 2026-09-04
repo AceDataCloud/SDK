@@ -12,34 +12,34 @@ type Seedream struct {
 
 // SeedreamGenerateRequest is the input to seedream.Generate.
 type SeedreamGenerateRequest struct {
-	// Models used for generating images. If not specified, the default is `doubao-seedream-5.0-lite`. `doubao-seedre
+	// Full model ID. Seedream 5.0 Pro supports single-image generation, precise editing, transparent backgrounds, an
 	Model string
-	// Prompts for generating images.
+	// Generation or editing prompt. Optional only for Seedream 5.0 Pro layer decomposition, where omission automatic
 	Prompt string
-	// Generate a random seed for image generation. The supported range is [-1, 2147483647], with a default value of
-	Seed int
-	// Generate image dimensions or aspect ratios. Supports preset options (`1K`/`2K`/`3K`/`4K`), or explicit `<width
+	// One reference image URL/base64 string or an array. Pro accepts up to 10 images in regular mode and exactly one
+	Image any
+	// Output size. Pro supports 1K/1.5K/2K or valid dimensions; decomposition also supports auto. Lite supports 2K/3
 	Size string
-	// Reference image links for image editing are required, supporting accessible http/https URLs, or base64 encoded
-	Image []string
-	// List of tools that can be called by the model. Currently, only `web_search` is supported. Applicable only to `
-	Tools []map[string]any
-	// Whether to return all images in a streaming manner, default is `false`. Only supports `doubao-seedream-5.0-lit
-	Stream bool
-	// Whether to add AI-generated watermark, default is `true`.
-	Watermark bool
-	// The output image file format is `jpeg` by default. Only `doubao-seedream-5.0-pro` and `doubao-seedream-5.0-lit
-	OutputFormat string
-	// Prompt word weight, the larger the value, the more relevant the generated result is to the prompt word. Only s
-	GuidanceScale any
-	// The response format defaults to `url`, and also supports `b64_json`.
-	ResponseFormat string
-	// Optional prompt word optimization configuration. Only supports `doubao-seedream-5.0-lite`, `doubao-seedream-4.
-	OptimizePromptOptions map[string]any
-	// The default value is `disabled`. Setting it to `auto` allows the model to generate a set of stylistically cohe
+	// Sequential image mode. auto lets supported Lite/4.x models generate a related set; disabled returns one image.
 	SequentialImageGeneration string
-	// Adjustable parameters for batch image generation. Effective only when `sequential_image_generation=auto`. Only
+	// Sequential image options. max_images is 1-15 and input images plus outputs must not exceed 15.
 	SequentialImageGenerationOptions map[string]any
+	// Stream normalized image events. Supported by Lite/4.x only and cannot be combined with async or callback_url.
+	Stream *bool
+	// Image response format: url or b64_json.
+	ResponseFormat string
+	// Whether to add the AI-generated watermark.
+	Watermark bool
+	// Output image format, jpeg or png. Supported by Seedream 5.0 Pro and Lite.
+	OutputFormat string
+	// Model tools. Seedream 5.0 Lite supports web_search.
+	Tools []map[string]any
+	// Prompt optimization. Pro supports standard/fast; Lite and 4.5 support standard; 4.0 supports standard/fast.
+	OptimizePromptOptions map[string]any
+	// Seedream 5.0 Pro layer decomposition. Requires exactly one PNG/JPEG and returns one base image plus up to 16 t
+	LayerDecomposition *bool
+	// Seedream 5.0 Pro background mode. transparent requires one transparent PNG input and PNG output; opaque produc
+	Background string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -51,36 +51,42 @@ type SeedreamGenerateRequest struct {
 func (r SeedreamGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["model"] = r.Model
-	body["prompt"] = r.Prompt
-	if r.Seed != 0 {
-		body["seed"] = r.Seed
-	}
-	if r.Size != "" {
-		body["size"] = r.Size
+	if r.Prompt != "" {
+		body["prompt"] = r.Prompt
 	}
 	if r.Image != nil {
 		body["image"] = r.Image
 	}
-	if r.Tools != nil {
-		body["tools"] = r.Tools
-	}
-	body["stream"] = r.Stream
-	body["watermark"] = r.Watermark
-	if r.OutputFormat != "" {
-		body["output_format"] = r.OutputFormat
-	}
-	body["guidance_scale"] = r.GuidanceScale
-	if r.ResponseFormat != "" {
-		body["response_format"] = r.ResponseFormat
-	}
-	if r.OptimizePromptOptions != nil {
-		body["optimize_prompt_options"] = r.OptimizePromptOptions
+	if r.Size != "" {
+		body["size"] = r.Size
 	}
 	if r.SequentialImageGeneration != "" {
 		body["sequential_image_generation"] = r.SequentialImageGeneration
 	}
 	if r.SequentialImageGenerationOptions != nil {
 		body["sequential_image_generation_options"] = r.SequentialImageGenerationOptions
+	}
+	if r.Stream != nil {
+		body["stream"] = *r.Stream
+	}
+	if r.ResponseFormat != "" {
+		body["response_format"] = r.ResponseFormat
+	}
+	body["watermark"] = r.Watermark
+	if r.OutputFormat != "" {
+		body["output_format"] = r.OutputFormat
+	}
+	if r.Tools != nil {
+		body["tools"] = r.Tools
+	}
+	if r.OptimizePromptOptions != nil {
+		body["optimize_prompt_options"] = r.OptimizePromptOptions
+	}
+	if r.LayerDecomposition != nil {
+		body["layer_decomposition"] = *r.LayerDecomposition
+	}
+	if r.Background != "" {
+		body["background"] = r.Background
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -97,7 +103,7 @@ func (r SeedreamGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate ByteDance Seedream high-quality image generation and editing API. Supports text-to-image models doubao-seedream-3-0-t2i-250415, doubao-seedream-4-0-25
+// Generate Call /seedream/images.
 func (c *Seedream) Generate(ctx context.Context, req SeedreamGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

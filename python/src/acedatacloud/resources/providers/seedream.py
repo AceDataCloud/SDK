@@ -14,10 +14,9 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 SeedreamModel = Literal[
     "doubao-seedream-5-0-pro-260628",
     "doubao-seedream-5-0-260128",
+    "doubao-seedream-5-0-lite-260128",
     "doubao-seedream-4-0-250828",
     "doubao-seedream-4-5-251128",
-    "doubao-seedream-3-0-t2i-250415",
-    "doubao-seededit-3-0-i2i-250628",
 ]
 
 
@@ -43,19 +42,19 @@ class Seedream:
         self,
         *,
         model: SeedreamModel,
-        prompt: str,
-        seed: int | None = None,
-        size: Literal["1K", "2K", "3K", "4K"] | None = None,
-        image: list[str] | None = None,
-        tools: list[dict[str, Any]] | None = None,
-        stream: bool | None = None,
-        watermark: bool | None = None,
-        output_format: Literal["jpeg", "png"] | None = None,
-        guidance_scale: Any | None = None,
-        response_format: str | None = None,
-        optimize_prompt_options: dict[str, Any] | None = None,
+        prompt: str | None = None,
+        image: str | list[str] | None = None,
+        size: Literal["1K", "1.5K", "2K", "3K", "4K", "auto"] | str | None = None,
         sequential_image_generation: Literal["auto", "disabled"] | None = None,
         sequential_image_generation_options: dict[str, Any] | None = None,
+        stream: bool | None = None,
+        response_format: Literal["url", "b64_json"] | None = None,
+        watermark: bool | None = None,
+        output_format: Literal["jpeg", "png"] | None = None,
+        tools: list[dict[str, Any]] | None = None,
+        optimize_prompt_options: dict[str, Any] | None = None,
+        layer_decomposition: bool | None = None,
+        background: Literal["transparent", "opaque"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -63,36 +62,35 @@ class Seedream:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """ByteDance Seedream high-quality image generation and editing API. Supports text-to-image models
-        doubao-seedream-3-0-t2i-250415, doubao-seedream-4-0-250828, doubao-seedream-4-5-251128, doubao-seedream-
-        """
+        """Call /seedream/images."""
         body: dict[str, Any] = {}
         body["model"] = model
-        body["prompt"] = prompt
-        if seed is not None:
-            body["seed"] = seed
-        if size is not None:
-            body["size"] = size
+        if prompt is not None:
+            body["prompt"] = prompt
         if image is not None:
             body["image"] = image
-        if tools is not None:
-            body["tools"] = tools
-        if stream is not None:
-            body["stream"] = stream
-        if watermark is not None:
-            body["watermark"] = watermark
-        if output_format is not None:
-            body["output_format"] = output_format
-        if guidance_scale is not None:
-            body["guidance_scale"] = guidance_scale
-        if response_format is not None:
-            body["response_format"] = response_format
-        if optimize_prompt_options is not None:
-            body["optimize_prompt_options"] = optimize_prompt_options
+        if size is not None:
+            body["size"] = size
         if sequential_image_generation is not None:
             body["sequential_image_generation"] = sequential_image_generation
         if sequential_image_generation_options is not None:
             body["sequential_image_generation_options"] = sequential_image_generation_options
+        if stream is not None:
+            body["stream"] = stream
+        if response_format is not None:
+            body["response_format"] = response_format
+        if watermark is not None:
+            body["watermark"] = watermark
+        if output_format is not None:
+            body["output_format"] = output_format
+        if tools is not None:
+            body["tools"] = tools
+        if optimize_prompt_options is not None:
+            body["optimize_prompt_options"] = optimize_prompt_options
+        if layer_decomposition is not None:
+            body["layer_decomposition"] = layer_decomposition
+        if background is not None:
+            body["background"] = background
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -114,19 +112,19 @@ class AsyncSeedream:
         self,
         *,
         model: SeedreamModel,
-        prompt: str,
-        seed: int | None = None,
-        size: Literal["1K", "2K", "3K", "4K"] | None = None,
-        image: list[str] | None = None,
-        tools: list[dict[str, Any]] | None = None,
-        stream: bool | None = None,
-        watermark: bool | None = None,
-        output_format: Literal["jpeg", "png"] | None = None,
-        guidance_scale: Any | None = None,
-        response_format: str | None = None,
-        optimize_prompt_options: dict[str, Any] | None = None,
+        prompt: str | None = None,
+        image: str | list[str] | None = None,
+        size: Literal["1K", "1.5K", "2K", "3K", "4K", "auto"] | str | None = None,
         sequential_image_generation: Literal["auto", "disabled"] | None = None,
         sequential_image_generation_options: dict[str, Any] | None = None,
+        stream: bool | None = None,
+        response_format: Literal["url", "b64_json"] | None = None,
+        watermark: bool | None = None,
+        output_format: Literal["jpeg", "png"] | None = None,
+        tools: list[dict[str, Any]] | None = None,
+        optimize_prompt_options: dict[str, Any] | None = None,
+        layer_decomposition: bool | None = None,
+        background: Literal["transparent", "opaque"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -134,36 +132,35 @@ class AsyncSeedream:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """ByteDance Seedream high-quality image generation and editing API. Supports text-to-image models
-        doubao-seedream-3-0-t2i-250415, doubao-seedream-4-0-250828, doubao-seedream-4-5-251128, doubao-seedream-
-        """
+        """Call /seedream/images."""
         body: dict[str, Any] = {}
         body["model"] = model
-        body["prompt"] = prompt
-        if seed is not None:
-            body["seed"] = seed
-        if size is not None:
-            body["size"] = size
+        if prompt is not None:
+            body["prompt"] = prompt
         if image is not None:
             body["image"] = image
-        if tools is not None:
-            body["tools"] = tools
-        if stream is not None:
-            body["stream"] = stream
-        if watermark is not None:
-            body["watermark"] = watermark
-        if output_format is not None:
-            body["output_format"] = output_format
-        if guidance_scale is not None:
-            body["guidance_scale"] = guidance_scale
-        if response_format is not None:
-            body["response_format"] = response_format
-        if optimize_prompt_options is not None:
-            body["optimize_prompt_options"] = optimize_prompt_options
+        if size is not None:
+            body["size"] = size
         if sequential_image_generation is not None:
             body["sequential_image_generation"] = sequential_image_generation
         if sequential_image_generation_options is not None:
             body["sequential_image_generation_options"] = sequential_image_generation_options
+        if stream is not None:
+            body["stream"] = stream
+        if response_format is not None:
+            body["response_format"] = response_format
+        if watermark is not None:
+            body["watermark"] = watermark
+        if output_format is not None:
+            body["output_format"] = output_format
+        if tools is not None:
+            body["tools"] = tools
+        if optimize_prompt_options is not None:
+            body["optimize_prompt_options"] = optimize_prompt_options
+        if layer_decomposition is not None:
+            body["layer_decomposition"] = layer_decomposition
+        if background is not None:
+            body["background"] = background
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

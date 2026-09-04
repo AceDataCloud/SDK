@@ -342,3 +342,22 @@ def test_a_transient_string_error_still_keeps_waiting():
 
     assert task_status({"response": {"success": False, "error": "temporary"}}) == ""
     assert task_status({"response": {"success": False, "error": None}}) == ""
+
+
+def test_seedream_pro_decomposition_omits_prompt_and_sends_layer_fields(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "layer-task"}
+    client.seedream._transport = transport
+
+    client.seedream.generate(
+        model="doubao-seedream-5-0-pro-260628",
+        image="https://cdn.example.com/poster.png",
+        size="1.5K",
+        layer_decomposition=True,
+    )
+
+    body = transport.request.call_args.kwargs["json"]
+    assert body["image"] == "https://cdn.example.com/poster.png"
+    assert body["size"] == "1.5K"
+    assert body["layer_decomposition"] is True
+    assert "prompt" not in body

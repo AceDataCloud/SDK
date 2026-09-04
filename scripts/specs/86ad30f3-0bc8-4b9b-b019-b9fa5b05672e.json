@@ -1,1 +1,1047 @@
-{"paths":{"/seedream/images":{"post":{"summary":"ByteDance Seedream high-quality image generation and editing API. Supports text-to-image models doubao-seedream-3-0-t2i-250415, doubao-seedream-4-0-250828, doubao-seedream-4-5-251128, doubao-seedream-5-0-260128, and the doubao-seededit-3-0-i2i-250628 image-edit model. High-resolution outputs with multiple aspect ratios.","security":[{"bearerAuth":[]}],"responses":{"200":{"content":{"application/json":{"schema":{"type":"object","example":{"data":[{"prompt":"a cute cat running","image_url":"https://cdn.acedata.cloud/8c5b69a6e0.png"}],"success":true,"task_id":"93f11baf-347b-4bb4-9520-8653cb46d6a3","trace_id":"a9063166-26ed-4451-85b5-54e896817c69"},"properties":{"data":{"type":"array","items":{"type":"object","properties":{"prompt":{"type":"string","description":"Prompt words used for generation"},"image_url":{"type":"string","description":"URL of the cover or preview image"}}},"description":"List of output images generated or edited based on the prompt words."},"success":{"type":"boolean","description":"A boolean flag indicating whether this request was successful."},"task_id":{"type":"string","description":"The task ID for this request."},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}}},"description":"Request successful (OK)."},"400":{"content":{"application/json":{"schema":{"oneOf":[{"type":"object","example":{"error":{"code":"token_mismatched","message":"The specified token is not matched with API."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"token_mismatched","description":"Response error code."},"message":{"type":"string","example":"The specified token is not matched with API.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}},{"type":"object","example":{"error":{"code":"api_not_implemented","message":"The API is not implemented."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"api_not_implemented","description":"Response error code."},"message":{"type":"string","example":"The API is not implemented.","description":"Response error message."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}},{"type":"object","example":{"error":{"code":"disabled","message":"Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"disabled","description":"Response error code."},"message":{"type":"string","example":"Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}},{"type":"object","example":{"error":{"code":"bad_request","message":"model is invalid."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"bad_request","description":"Response error code."},"message":{"type":"string","example":"model is invalid.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}},{"type":"object","example":{"error":{"code":"no_token","message":"No token specified for the request."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"no_token","description":"Response error code."},"message":{"type":"string","example":"No token specified for the request.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}]}}},"description":"Request error, possibly due to missing or invalid parameters."},"401":{"content":{"application/json":{"schema":{"oneOf":[{"type":"object","example":{"error":{"code":"invalid_token","message":"The specified token is invalid or wrong."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"invalid_token","description":"Response error code."},"message":{"type":"string","example":"The specified token is invalid or wrong.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}},{"type":"object","example":{"error":{"code":"token_expired","message":"token expired."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"token_expired","description":"Response error code."},"message":{"type":"string","example":"token expired.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}},{"type":"object","example":{"error":{"code":"token_mismatched","message":"token and api does not match."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"token_mismatched","description":"Response error code."},"message":{"type":"string","example":"token and api does not match.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}]}}},"description":"Unauthorized, the authorization token is invalid or missing."},"403":{"content":{"application/json":{"schema":{"oneOf":[{"type":"object","example":{"error":{"code":"used_up","message":"Your balance is not sufficient for current request, please buy more in Ace Data Cloud."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"used_up","description":"Response error code."},"message":{"type":"string","example":"Your balance is not sufficient for current request, please buy more in Ace Data Cloud.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}]}}},"description":"Unauthorized, authorization token is invalid or missing."},"404":{"content":{"application/json":{"schema":{"oneOf":[{"type":"object","example":{"error":{"code":"no_api","message":"API does not exist, please make sure url is correct."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"no_api","description":"Response error code."},"message":{"type":"string","example":"API does not exist, please make sure url is correct.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}]}}},"description":"Unauthorized, authorization token is invalid or missing."},"413":{"content":{"application/json":{"schema":{"oneOf":[{"type":"object","example":{"error":{"code":"request_too_large","message":"Request body is too large."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"request_too_large","description":"Response error code."},"message":{"type":"string","example":"Request body is too large.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}]}}},"description":"Unauthorized, authorization token is invalid or missing."},"429":{"content":{"application/json":{"schema":{"oneOf":[{"type":"object","example":{"error":{"code":"too_many_requests","message":"You have exceeded the rate limit."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"too_many_requests","description":"Response error code."},"message":{"type":"string","example":"You have exceeded the rate limit.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}]}}},"description":"Too many requests, rate limit exceeded."},"500":{"content":{"application/json":{"schema":{"oneOf":[{"type":"object","example":{"error":{"code":"api_error","message":"Internal server error."},"trace_id":"2efa9340-b21b-4e26-9e14-4aac95f343ab"},"properties":{"error":{"type":"object","properties":{"code":{"type":"string","example":"api_error","description":"Response error code."},"message":{"type":"string","example":"Internal server error.","description":"Error message of the response."}}},"trace_id":{"type":"string","description":"The tracking ID for this request."}}}]}}},"description":"Internal server error, an exception occurred on the server."}},"parameters":[{"in":"header","name":"accept","schema":{"enum":["application/json"],"type":"string"},"required":false,"description":"Specify the format of the response returned by the server. If not specified, the default format is `application/json`."}],"requestBody":{"content":{"application/json":{"schema":{"type":"object","required":["prompt","model"],"properties":{"seed":{"rank":50,"type":"integer","description":"Generate a random seed for image generation. The supported range is [-1, 2147483647], with a default value of `-1`. **Only `doubao-seedream-3.0-t2i` supports this parameter** (according to the official Volcengine documentation), other models do not accept this parameter."},"size":{"enum":["1K","2K","3K","4K"],"rank":40,"type":"string","example":"2K","description":"Generate image dimensions or aspect ratios. Supports preset options (`1K`/`2K`/`3K`/`4K`), or explicit `<width>x<height>` format (e.g., `1024x1024`). **Different models support different preset options**: `doubao-seedream-5.0-pro` supports `1K`/`2K`; `doubao-seedream-5.0-lite` supports `2K`/`3K`/`4K`; `doubao-seedream-4.5` only supports `2K`/`4K`; `doubao-seedream-4.0` supports `1K`/`2K`/`4K`; `doubao-seedream-3.0-t2i` and `doubao-seedream-3.0-i2i` **do not support** any preset options and must receive explicit `<width>x<height>` values."},"async":{"rank":101,"type":"boolean","description":"Is it processed in asynchronous mode? When set to `true`, the interface immediately returns `task_id`, without the need to provide `callback_url`, and then the result can be obtained by polling `/seedream/tasks`; if `callback_url` is also provided, the result will be pushed to that callback address."},"image":{"rank":30,"type":"array","items":{"type":"string"},"description":"Reference image links for image editing are required, supporting accessible http/https URLs, or base64 encoded image strings in the format `data:image/png;base64,iVBORw0KG...`. Each image must not exceed 10MB in size. This parameter is mandatory when using image-to-image models (such as `doubao-seededit-3.0-i2i`)."},"model":{"enum":["doubao-seedream-5-0-pro-260628","doubao-seedream-5-0-260128","doubao-seedream-4-0-250828","doubao-seedream-4-5-251128","doubao-seedream-3-0-t2i-250415","doubao-seededit-3-0-i2i-250628"],"rank":10,"type":"string","description":"Models used for generating images. If not specified, the default is `doubao-seedream-5.0-lite`. `doubao-seedream-5.0-pro` is the latest flagship single image model (only generates single images, does not support group images, streaming, or online search)."},"tools":{"rank":93,"type":"array","items":{"type":"object","properties":{"type":{"enum":["web_search"],"type":"string"}}},"description":"List of tools that can be called by the model. Currently, only `web_search` is supported. Applicable only to `doubao-seedream-5.0-lite`."},"prompt":{"rank":20,"type":"string","example":"a white siamese cat","description":"Prompts for generating images."},"stream":{"rank":70,"type":"boolean","description":"Whether to return all images in a streaming manner, default is `false`. Only supports `doubao-seedream-5.0-lite`, `doubao-seedream-4.5`, and `doubao-seedream-4.0`."},"watermark":{"rank":91,"type":"boolean","description":"Whether to add AI-generated watermark, default is `true`."},"callback_url":{"rank":100,"type":"string","description":"The callback URL after image generation is completed, which must be accessible from the public network. Once specified, the interface will return immediately, and the generation result will be asynchronously pushed to this callback address when ready."},"output_format":{"enum":["jpeg","png"],"rank":92,"type":"string","description":"The output image file format is `jpeg` by default. Only `doubao-seedream-5.0-pro` and `doubao-seedream-5.0-lite` are supported."},"guidance_scale":{"rank":80,"type":"float","description":"Prompt word weight, the larger the value, the more relevant the generated result is to the prompt word. Only supports `doubao-seedream-3.0-t2i` (default value 2.5) and `doubao-seededit-3.0-i2i` (default value 5.5), both ranges are [1, 10]."},"response_format":{"rank":90,"type":"string","description":"The response format defaults to `url`, and also supports `b64_json`."},"optimize_prompt_options":{"rank":94,"type":"object","properties":{"mode":{"enum":["standard","fast"],"type":"string","description":"Prompt optimization mode. `standard` has higher quality but is slower; `fast` is faster but has relatively lower quality."}},"description":"Optional prompt word optimization configuration. Only supports `doubao-seedream-5.0-lite`, `doubao-seedream-4.5` (only in `standard` mode), and `doubao-seedream-4.0`."},"sequential_image_generation":{"enum":["auto","disabled"],"rank":60,"type":"string","description":"The default value is `disabled`. Setting it to `auto` allows the model to generate a set of stylistically coherent related images (multi-image consistency, sharing characters, styles, and details across frames). Only `doubao-seedream-5.0-lite`, `doubao-seedream-4.5`, and `doubao-seedream-4.0` are supported."},"sequential_image_generation_options":{"rank":61,"type":"object","properties":{"max_images":{"type":"integer","maximum":15,"minimum":1,"description":"The maximum number of images that can be generated in this request is in the range of [1, 15]. Note: `（the number of reference images in 'image'） + （the number of images generated this time）` must not exceed 15."}},"description":"Adjustable parameters for batch image generation. Effective only when `sequential_image_generation=auto`. Only supports `doubao-seedream-5.0-lite`, `doubao-seedream-4.5`, and `doubao-seedream-4.0`."}}},"example":{"size":"2K","model":"doubao-seedream-5-0-260128","prompt":"a white siamese cat"}}},"required":true}}}},"openapi":"3.0.0","servers":[{"url":"https://api.acedata.cloud","description":"Ace Data Cloud API Server"}],"components":{"securitySchemes":{"bearerAuth":{"type":"http","scheme":"bearer"}}}}
+{
+  "paths": {
+    "/seedream/images": {
+      "post": {
+        "summary": "$t(api_description_seedream_images)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "success": true,
+                    "task_id": "93f11baf-347b-4bb4-9520-8653cb46d6a3",
+                    "trace_id": "a9063166-26ed-4451-85b5-54e896817c69",
+                    "data": [
+                      {
+                        "prompt": "a cute cat running",
+                        "image_url": "https://cdn.acedata.cloud/8c5b69a6e0.png"
+                      }
+                    ]
+                  },
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "标识本次请求是否成功的布尔标志。"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "本次请求的任务 ID。"
+                    },
+                    "trace_id": {
+                      "type": "string",
+                      "description": "本次请求的追踪 ID。"
+                    },
+                    "data": {
+                      "type": "array",
+                      "description": "根据提示词生成或编辑的输出图像列表。",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "prompt": {
+                            "type": "string",
+                            "description": "生成时所使用的提示词"
+                          },
+                          "image_url": {
+                            "type": "string",
+                            "description": "封面或预览图片的 URL"
+                          },
+                          "b64_json": {
+                            "type": "string",
+                            "description": "response_format=b64_json 时返回的 Base64 图片。"
+                          },
+                          "size": {
+                            "type": "string",
+                            "description": "该输出图片的实际宽高，格式为 <宽>x<高>。"
+                          },
+                          "output_format": {
+                            "type": "string",
+                            "enum": [
+                              "jpeg",
+                              "png"
+                            ],
+                            "description": "该输出图片的格式。拆分图层始终为 PNG。"
+                          },
+                          "error": {
+                            "type": "object",
+                            "description": "Lite 组图中单个输出失败时的错误；其他成功输出仍会保留。",
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "message": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "z_index": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "description": "图层叠放顺序；底图为 0，值越大越靠上。"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "模型识别出的图层名称。"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "模型生成的图层内容描述。"
+                          },
+                          "bounding_box": {
+                            "type": "object",
+                            "description": "图层在底图中的 absolute 像素坐标与 normalized 归一化坐标。",
+                            "properties": {
+                              "absolute": {
+                                "type": "array",
+                                "minItems": 4,
+                                "maxItems": 4,
+                                "items": {
+                                  "type": "integer"
+                                }
+                              },
+                              "normalized": {
+                                "type": "array",
+                                "minItems": 4,
+                                "maxItems": 4,
+                                "items": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 1000
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "description": "本次请求的最终可信用量，仅成功生成的图片计入 generated_images。",
+                      "properties": {
+                        "generated_images": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "input_images": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "output_tokens": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "total_tokens": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "tool_usage": {
+                          "type": "object",
+                          "properties": {
+                            "web_search": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "tools": {
+                      "type": "array",
+                      "description": "本次请求实际调用的工具列表。",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "web_search"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "{\"type\":\"image_generation.partial_succeeded\",\"data\":[{\"image_url\":\"https://...\",\"size\":\"2048x2048\"}]}\\n"
+              }
+            },
+            "description": "请求成功（OK）。"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "disabled",
+                          "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "disabled",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "model is invalid."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "model is invalid.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_token",
+                          "message": "No token specified for the request."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_token",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "No token specified for the request.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "请求错误，可能是参数缺失或无效。"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_expired",
+                          "message": "token expired."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_expired",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token expired.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "token and api does not match."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token and api does not match.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "未授权，授权令牌无效或缺失。"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "used_up",
+                          "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "used_up",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "未授权，授权令牌无效或缺失。"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_api",
+                          "message": "API does not exist, please make sure url is correct."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_api",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "API does not exist, please make sure url is correct.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "未授权，授权令牌无效或缺失。"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "request_too_large",
+                          "message": "Request body is too large."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "request_too_large",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Request body is too large.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "未授权，授权令牌无效或缺失。"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "请求过多，已超出速率限制。"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "响应的错误码。"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "响应的错误信息。"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "本次请求的追踪 ID。"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "服务器内部错误，服务端发生异常。"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json",
+                "application/x-ndjson"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "指定服务器返回响应的格式。如未指定，默认格式为 `application/json`。"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "rank": 10,
+                    "type": "string",
+                    "enum": [
+                      "doubao-seedream-5-0-pro-260628",
+                      "doubao-seedream-5-0-260128",
+                      "doubao-seedream-5-0-lite-260128",
+                      "doubao-seedream-4-0-250828",
+                      "doubao-seedream-4-5-251128"
+                    ],
+                    "description": "Full model ID. Seedream 5.0 Pro supports single-image generation, precise editing, transparent backgrounds, and layer decomposition; Seedream 5.0 Lite supports single or sequential images, streaming, and web search."
+                  },
+                  "prompt": {
+                    "rank": 20,
+                    "type": "string",
+                    "example": "a white siamese cat",
+                    "description": "Generation or editing prompt. Optional only for Seedream 5.0 Pro layer decomposition, where omission automatically decomposes the main elements."
+                  },
+                  "image": {
+                    "rank": 30,
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "maxItems": 14
+                      }
+                    ],
+                    "description": "One reference image URL/base64 string or an array. Pro accepts up to 10 images in regular mode and exactly one for decomposition; Lite/4.x accept up to 14. Each image must be at most 30 MB."
+                  },
+                  "size": {
+                    "rank": 40,
+                    "type": "string",
+                    "example": "2K",
+                    "description": "Output size. Pro supports 1K/1.5K/2K or valid dimensions; decomposition also supports auto. Lite supports 2K/3K/4K or valid dimensions.",
+                    "pattern": "^(1K|1\\.5K|2K|3K|4K|auto|[0-9]+x[0-9]+)$"
+                  },
+                  "sequential_image_generation": {
+                    "rank": 60,
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "disabled"
+                    ],
+                    "description": "Sequential image mode. auto lets supported Lite/4.x models generate a related set; disabled returns one image. Not supported by Pro."
+                  },
+                  "sequential_image_generation_options": {
+                    "rank": 61,
+                    "type": "object",
+                    "properties": {
+                      "max_images": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 15,
+                        "description": "本次请求最多生成的图像数量，范围 [1, 15]。注意：`（`image` 中的参考图数量）+（本次生成的图像数量）不得超过 15`。"
+                      }
+                    },
+                    "description": "Sequential image options. max_images is 1-15 and input images plus outputs must not exceed 15."
+                  },
+                  "stream": {
+                    "rank": 70,
+                    "type": "boolean",
+                    "description": "Stream normalized image events. Supported by Lite/4.x only and cannot be combined with async or callback_url.",
+                    "x-go-optional-pointer": true
+                  },
+                  "response_format": {
+                    "rank": 90,
+                    "type": "string",
+                    "description": "Image response format: url or b64_json.",
+                    "enum": [
+                      "url",
+                      "b64_json"
+                    ]
+                  },
+                  "watermark": {
+                    "rank": 91,
+                    "type": "boolean",
+                    "description": "Whether to add the AI-generated watermark."
+                  },
+                  "output_format": {
+                    "rank": 92,
+                    "type": "string",
+                    "enum": [
+                      "jpeg",
+                      "png"
+                    ],
+                    "description": "Output image format, jpeg or png. Supported by Seedream 5.0 Pro and Lite."
+                  },
+                  "tools": {
+                    "rank": 93,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "web_search"
+                          ]
+                        }
+                      }
+                    },
+                    "description": "Model tools. Seedream 5.0 Lite supports web_search."
+                  },
+                  "optimize_prompt_options": {
+                    "rank": 94,
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "enum": [
+                          "standard",
+                          "fast"
+                        ],
+                        "description": "提示词优化模式。`standard` 质量更高但速度较慢；`fast` 速度更快但质量相对较低。"
+                      }
+                    },
+                    "description": "Prompt optimization. Pro supports standard/fast; Lite and 4.5 support standard; 4.0 supports standard/fast."
+                  },
+                  "callback_url": {
+                    "rank": 100,
+                    "type": "string",
+                    "description": "图像生成完成后的回调 URL，该 URL 须可从公网访问。指定后接口将立即返回，生成结果就绪时会异步推送至此回调地址。"
+                  },
+                  "async": {
+                    "rank": 101,
+                    "type": "boolean",
+                    "description": "是否以异步模式处理。设为 `true` 时接口立即返回 `task_id`，无需提供 `callback_url`，随后通过 `/seedream/tasks` 轮询获取结果；若同时提供了 `callback_url`，结果会推送至该回调地址。"
+                  },
+                  "layer_decomposition": {
+                    "rank": 41,
+                    "type": "boolean",
+                    "description": "Seedream 5.0 Pro layer decomposition. Requires exactly one PNG/JPEG and returns one base image plus up to 16 transparent PNG layers.",
+                    "x-go-optional-pointer": true
+                  },
+                  "background": {
+                    "rank": 42,
+                    "type": "string",
+                    "enum": [
+                      "transparent",
+                      "opaque"
+                    ],
+                    "description": "Seedream 5.0 Pro background mode. transparent requires one transparent PNG input and PNG output; opaque produces a regular background."
+                  }
+                },
+                "allOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "title": "Seedream 5.0 Pro layer decomposition",
+                        "required": [
+                          "image",
+                          "layer_decomposition"
+                        ],
+                        "properties": {
+                          "model": {
+                            "enum": [
+                              "doubao-seedream-5-0-pro-260628"
+                            ]
+                          },
+                          "layer_decomposition": {
+                            "enum": [
+                              true
+                            ]
+                          },
+                          "size": {
+                            "type": "string",
+                            "pattern": "^(auto|1K|1\\.5K|2K)$"
+                          }
+                        },
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "sequential_image_generation"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "stream"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "tools"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "background"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "title": "Seedream 5.0 Pro image generation and editing",
+                        "required": [
+                          "prompt"
+                        ],
+                        "properties": {
+                          "model": {
+                            "enum": [
+                              "doubao-seedream-5-0-pro-260628"
+                            ]
+                          },
+                          "size": {
+                            "type": "string",
+                            "pattern": "^(1K|1\\.5K|2K|[0-9]+x[0-9]+)$"
+                          },
+                          "image": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "maxItems": 10
+                              }
+                            ]
+                          }
+                        },
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "sequential_image_generation"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "stream"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "tools"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "title": "Seedream 5.0 Lite",
+                        "required": [
+                          "prompt"
+                        ],
+                        "properties": {
+                          "model": {
+                            "enum": [
+                              "doubao-seedream-5-0-260128",
+                              "doubao-seedream-5-0-lite-260128"
+                            ]
+                          },
+                          "size": {
+                            "type": "string",
+                            "pattern": "^(2K|3K|4K|[0-9]+x[0-9]+)$"
+                          },
+                          "optimize_prompt_options": {
+                            "type": "object",
+                            "properties": {
+                              "mode": {
+                                "enum": [
+                                  "standard"
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "layer_decomposition"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "background"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "title": "Seedream 4.x",
+                        "required": [
+                          "prompt"
+                        ],
+                        "properties": {
+                          "model": {
+                            "enum": [
+                              "doubao-seedream-4-0-250828",
+                              "doubao-seedream-4-5-251128"
+                            ]
+                          }
+                        },
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "layer_decomposition"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "background"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "output_format"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "tools"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "example": {
+                "model": "doubao-seedream-5-0-260128",
+                "prompt": "a white siamese cat",
+                "size": "2K"
+              }
+            }
+          },
+          "required": true
+        },
+        "operationId": "createSeedreamImages"
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API 服务器"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
