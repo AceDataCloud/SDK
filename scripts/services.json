@@ -387,5 +387,31 @@
    }
   ],
   "tasks": "/qwen-image/tasks"
+ },
+ "gemini": {
+  "category": "AI Video",
+  "endpoints": [
+   {
+    "id": "gemini",
+    "path": "/gemini/chat/completions",
+    "name": "Gemini Chat Completions"
+   },
+   {
+    "id": "gemini",
+    "path": "/v1beta/models/{model}:generateContent",
+    "name": "Gemini Generate Content"
+   },
+   {
+    "id": "gemini",
+    "path": "/v1beta/models/{model}:streamGenerateContent",
+    "name": "Gemini Stream Generate Content"
+   },
+   {
+    "id": "gemini",
+    "path": "/gemini/videos",
+    "name": "Gemini Videos"
+   }
+  ],
+  "tasks": "/gemini/tasks"
  }
 }

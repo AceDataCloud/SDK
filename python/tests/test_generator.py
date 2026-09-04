@@ -82,3 +82,83 @@ def test_array_of_object_union_stays_structured_in_all_languages():
     assert param.py_type() == "list[dict[str, Any]]"
     assert param.ts_type() == "Array<Record<string, unknown>>"
     assert param.go_type() == "[]map[string]any"
+
+
+def test_endpoint_uses_the_post_operation_for_its_manifest_path():
+    spec = {
+        "paths": {
+            "/gemini/chat/completions": {
+                "post": {
+                    "summary": "Gemini Chat Completions",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["model", "messages"],
+                                    "properties": {
+                                        "model": {"type": "string"},
+                                        "messages": {"type": "array", "items": {"type": "object"}},
+                                    },
+                                }
+                            }
+                        }
+                    },
+                }
+            },
+            "/gemini/videos": {
+                "post": {
+                    "summary": "Gemini Videos",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["prompt"],
+                                    "properties": {"prompt": {"type": "string"}},
+                                }
+                            }
+                        }
+                    },
+                }
+            },
+        }
+    }
+
+    endpoint = Endpoint("gemini", "/gemini/videos", spec)
+
+    assert endpoint.summary == "Gemini Videos"
+    assert [p.name for p in endpoint.callable_params] == ["prompt"]
+
+
+def test_path_and_query_params_are_not_body_params():
+    spec = {
+        "paths": {
+            "/v1beta/models/{model}:streamGenerateContent": {
+                "post": {
+                    "parameters": [
+                        {"name": "model", "in": "path", "required": True, "schema": {"type": "string"}},
+                        {"name": "alt", "in": "query", "required": False, "schema": {"type": "string"}},
+                    ],
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["contents"],
+                                    "properties": {"contents": {"type": "array", "items": {"type": "object"}}},
+                                }
+                            }
+                        }
+                    },
+                }
+            }
+        }
+    }
+
+    endpoint = Endpoint("gemini", "/v1beta/models/{model}:streamGenerateContent", spec)
+
+    assert [p.name for p in endpoint.callable_params] == ["contents", "model", "alt"]
+    assert [p.name for p in endpoint.body_params] == ["contents"]
+    assert [p.name for p in endpoint.path_params] == ["model"]
+    assert [p.name for p in endpoint.query_params] == ["alt"]

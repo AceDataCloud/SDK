@@ -50,24 +50,29 @@ def py_param(name: str) -> str:
     return f"{name}_" if keyword.iskeyword(name) else name
 
 
-def request_schema(spec: dict) -> dict:
-    for _path, methods in (spec.get("paths") or {}).items():
-        for method, op in (methods or {}).items():
-            if method.lower() != "post":
-                continue
-            content = (op.get("requestBody") or {}).get("content") or {}
-            schema = (content.get("application/json") or {}).get("schema") or {}
-            if schema:
-                return schema
+def post_operation(spec: dict, path: str) -> dict:
+    """Return the POST operation for ``path`` from a per-endpoint or service spec."""
+    paths = spec.get("paths") or {}
+    methods = paths.get(path) or {}
+    op = methods.get("post") or methods.get("POST")
+    if isinstance(op, dict):
+        return op
+    for _path, fallback_methods in paths.items():
+        for method, fallback in (fallback_methods or {}).items():
+            if method.lower() == "post" and isinstance(fallback, dict):
+                return fallback
     return {}
 
 
-def summary(spec: dict) -> str:
-    for _path, methods in (spec.get("paths") or {}).items():
-        for _method, op in (methods or {}).items():
-            text = op.get("summary") or op.get("description") or ""
-            if text and not text.startswith("$t("):
-                return " ".join(text.split())[:200]
+def request_schema(op: dict) -> dict:
+    content = (op.get("requestBody") or {}).get("content") or {}
+    return (content.get("application/json") or {}).get("schema") or {}
+
+
+def summary(op: dict) -> str:
+    text = op.get("summary") or op.get("description") or ""
+    if text and not text.startswith("$t("):
+        return " ".join(text.split())[:200]
     return ""
 
 
@@ -85,10 +90,11 @@ def _array_items_are_objects(schema: dict[str, Any]) -> bool:
 
 
 class Param:
-    def __init__(self, name: str, schema: dict, required: bool) -> None:
+    def __init__(self, name: str, schema: dict, required: bool, *, location: str = "body") -> None:
         self.name = name
         self.schema = schema or {}
         self.required = required
+        self.location = location
         self.type = self.schema.get("type")
         self.enum = [e for e in (self.schema.get("enum") or []) if isinstance(e, str)]
         self.description = " ".join(str(self.schema.get("description") or "").split())
@@ -166,11 +172,21 @@ class Endpoint:
         self.alias = alias
         self.path = path
         self.method = _method_name(path)
-        schema = request_schema(spec)
+        op = post_operation(spec, path)
+        schema = request_schema(op)
         required = set(schema.get("required") or [])
         props: dict[str, dict] = schema.get("properties") or {}
-        self.summary = summary(spec)
-        self.params = [Param(n, s, n in required) for n, s in props.items()]
+        self.summary = summary(op)
+        params = [Param(n, s, n in required) for n, s in props.items()]
+        for raw in op.get("parameters") or []:
+            location = raw.get("in")
+            if location not in {"path", "query"}:
+                continue
+            name = raw.get("name")
+            if not isinstance(name, str) or not name:
+                continue
+            params.append(Param(name, raw.get("schema") or {}, bool(raw.get("required")), location=location))
+        self.params = params
         self.pollable = "async" in props or pollable
 
     @property
@@ -178,6 +194,18 @@ class Endpoint:
         """Required first — a Python signature cannot put a defaulted arg before one."""
         usable = [p for p in self.params if not p.is_control]
         return sorted(usable, key=lambda p: not p.required)
+
+    @property
+    def body_params(self) -> list[Param]:
+        return [p for p in self.callable_params if p.location == "body"]
+
+    @property
+    def path_params(self) -> list[Param]:
+        return [p for p in self.params if p.location == "path"]
+
+    @property
+    def query_params(self) -> list[Param]:
+        return [p for p in self.params if p.location == "query"]
 
 
 class Service:

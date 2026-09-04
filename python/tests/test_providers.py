@@ -20,6 +20,7 @@ GENERATED = (
     "suno",
     "producer",
     "fish",
+    "gemini",
     "hailuo",
     "wan",
     "luma",
@@ -202,6 +203,67 @@ def test_minimax_generate_builds_a_task_handle(client):
         "ratio": "16:9",
         "async": True,
     }
+
+
+def test_gemini_video_generation_builds_a_task_handle(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "gemini-video-1"}
+    client.gemini._transport = transport
+
+    handle = client.gemini.generate(prompt="A cinematic ocean sunrise")
+
+    assert isinstance(handle, TaskHandle)
+    assert handle.id == "gemini-video-1"
+    assert transport.request.call_args.args == ("POST", "/gemini/videos")
+    assert transport.request.call_args.kwargs["json"] == {
+        "prompt": "A cinematic ocean sunrise",
+        "model": "omni-flash",
+        "aspect_ratio": "16:9",
+        "resolution": "720p",
+        "async": True,
+    }
+
+
+def test_gemini_generate_content_serializes_path_parameter(client):
+    transport = Mock()
+    transport.request.return_value = {"ok": True}
+    client.gemini._transport = transport
+
+    client.gemini.model_generatecontent(
+        model="gemini-2.5-flash",
+        contents=[{"parts": [{"text": "hi"}]}],
+    )
+
+    assert transport.request.call_args.args == ("POST", "/v1beta/models/gemini-2.5-flash:generateContent")
+    assert transport.request.call_args.kwargs["json"] == {
+        "contents": [{"parts": [{"text": "hi"}]}],
+    }
+
+
+def test_gemini_stream_generate_content_serializes_query_parameter(client):
+    transport = Mock()
+    transport.request.return_value = {"ok": True}
+    client.gemini._transport = transport
+
+    client.gemini.model_streamgeneratecontent(
+        model="gemini-2.5-flash",
+        contents=[{"parts": [{"text": "hi"}]}],
+        alt="sse",
+    )
+
+    assert transport.request.call_args.args == ("POST", "/v1beta/models/gemini-2.5-flash:streamGenerateContent")
+    assert transport.request.call_args.kwargs["params"] == {"alt": "sse"}
+    assert transport.request.call_args.kwargs["json"] == {
+        "contents": [{"parts": [{"text": "hi"}]}],
+    }
+
+
+def test_gemini_chat_uses_its_own_model_enum(client):
+    hints = typing.get_type_hints(type(client.gemini).completions)
+    model = hints["model"]
+    assert typing.get_origin(model) is typing.Literal
+    assert "gemini-2.5-flash" in typing.get_args(model)
+    assert "omni-flash" not in typing.get_args(model)
 
 
 def test_model_enum_is_typed(client):

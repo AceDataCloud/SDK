@@ -11,8 +11,6 @@ HEADER = """// Code generated from the platform OpenAPI spec. DO NOT EDIT.
 // Regenerate with: python scripts/generate_providers.py
 
 package acedatacloud
-
-import "context"
 """
 
 
@@ -56,7 +54,7 @@ def _request_struct(svc: Service, ep) -> str:
 def _to_body(struct: str, svc: Service, ep) -> str:
     lines = [f"func (r {struct}) toBody() map[string]any {{"]
     lines.append("\tbody := map[string]any{}")
-    for p in ep.callable_params:
+    for p in ep.body_params:
         field = _field_name(p.name)
         key = json.dumps(p.name)
         default = p.default()
@@ -105,6 +103,65 @@ def _to_body(struct: str, svc: Service, ep) -> str:
     return "\n".join(lines)
 
 
+def _imports(svc: Service) -> str:
+    imports = ["context"]
+    if any(ep.path_params or ep.query_params for ep in svc.endpoints):
+        imports.extend(["fmt", "net/url"])
+    if any(ep.path_params for ep in svc.endpoints):
+        imports.append("strings")
+    if len(imports) == 1:
+        return '\nimport "context"\n'
+    lines = ["", "import ("]
+    for name in imports:
+        lines.append(f"\t{json.dumps(name)}")
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def _query_method(struct: str, ep) -> str:
+    if not ep.query_params:
+        return ""
+    lines = [f"func (r {struct}) toQuery() url.Values {{"]
+    lines.append("\tquery := url.Values{}")
+    for p in ep.query_params:
+        field = _field_name(p.name)
+        key = json.dumps(p.name)
+        default = p.default()
+        zero = {"string": '""', "int": "0", "float64": "0"}.get(p.go_type())
+        if p.required:
+            lines.append(f"\tquery.Set({key}, fmt.Sprint(r.{field}))")
+        elif default is not None:
+            if zero:
+                lines.append(f"\tif r.{field} != {zero} {{")
+                lines.append(f"\t\tquery.Set({key}, fmt.Sprint(r.{field}))")
+                lines.append("\t} else {")
+                lines.append(f"\t\tquery.Set({key}, fmt.Sprint({_go_literal(default)}))")
+                lines.append("\t}")
+            else:
+                lines.append(f"\tquery.Set({key}, fmt.Sprint(r.{field}))")
+        elif zero:
+            lines.append(f"\tif r.{field} != {zero} {{")
+            lines.append(f"\t\tquery.Set({key}, fmt.Sprint(r.{field}))")
+            lines.append("\t}")
+        else:
+            lines.append(f"\tquery.Set({key}, fmt.Sprint(r.{field}))")
+    lines.append("\treturn query")
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def _path_lines(ep, struct: str) -> list[str]:
+    if not ep.path_params:
+        return []
+    lines = [f"\tpath := {json.dumps(ep.path)}"]
+    for p in ep.path_params:
+        lines.append(
+            f"\tpath = strings.ReplaceAll(path, {json.dumps('{'+p.name+'}')}, "
+            f"url.PathEscape(fmt.Sprint(req.{_field_name(p.name)})))"
+        )
+    return lines
+
+
 def _method(svc: Service, ep, struct: str) -> str:
     receiver = svc.class_name
     method = pascal(ep.method)
@@ -112,14 +169,18 @@ def _method(svc: Service, ep, struct: str) -> str:
     doc = (ep.summary or f"Call {ep.path}.").replace("\n", " ")
 
     lines = [f"// {method} {doc[:150]}"]
+    request_path = "path" if ep.path_params else json.dumps(ep.path)
     if ep.pollable:
         lines.append(
             f"func (c *{receiver}) {method}(ctx context.Context, req {struct}) (*TaskHandle, error) {{"
         )
+        lines.extend(_path_lines(ep, struct))
         lines.append("\tresult, err := c.t.do(ctx, requestOpts{")
         lines.append('\t\tMethod: "POST",')
-        lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
+        lines.append(f"\t\tPath:   {request_path},")
         lines.append("\t\tBody:   req.toBody(),")
+        if ep.query_params:
+            lines.append("\t\tQuery:  req.toQuery(),")
         lines.append("\t})")
         lines.append("\tif err != nil {")
         lines.append("\t\treturn nil, err")
@@ -131,17 +192,20 @@ def _method(svc: Service, ep, struct: str) -> str:
         lines.append(
             f"func (c *{receiver}) {method}(ctx context.Context, req {struct}) (map[string]any, error) {{"
         )
+        lines.extend(_path_lines(ep, struct))
         lines.append("\treturn c.t.do(ctx, requestOpts{")
         lines.append('\t\tMethod: "POST",')
-        lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
+        lines.append(f"\t\tPath:   {request_path},")
         lines.append("\t\tBody:   req.toBody(),")
+        if ep.query_params:
+            lines.append("\t\tQuery:  req.toQuery(),")
         lines.append("\t})")
     lines.append("}")
     return "\n".join(lines)
 
 
 def render(svc: Service) -> str:
-    out = [HEADER, ""]
+    out = [HEADER + _imports(svc), ""]
     out.append(f"// {svc.class_name} is the {svc.alias} provider client.")
     out.append(f"type {svc.class_name} struct {{")
     out.append("\tt *transport")
@@ -154,6 +218,10 @@ def render(svc: Service) -> str:
         out.append("")
         out.append(_to_body(struct, svc, ep))
         out.append("")
+        query = _query_method(struct, ep)
+        if query:
+            out.append(query)
+            out.append("")
         out.append(_method(svc, ep, struct))
         out.append("")
     return "\n".join(out).rstrip() + "\n"
@@ -170,7 +238,7 @@ def write_all(services: list[Service], root: Path) -> list[Path]:
 
     # One place that binds every provider onto the client.
     # This file has no request methods, so it must not import context.
-    lines = [HEADER.replace('\nimport "context"\n', ""), ""]
+    lines = [HEADER, ""]
     lines.append("// taskIDFrom pulls a task id out of a submission response.")
     lines.append("func taskIDFrom(result map[string]any) string {")
     lines.append('\tif s, ok := result["task_id"].(string); ok && s != "" {')

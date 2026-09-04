@@ -21,17 +21,17 @@ model upstream reaches the SDK without anyone retyping it.
 
 from __future__ import annotations
 
-from typing import Any, Literal  # noqa: F401
+{quote_import}from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 '''
 
 
-def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
+def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool, method: str) -> str:
     lines = ["self", "*"]
     for p in params:
         name = py_param(p.name)
-        annotation = aliases.get(p.name) or p.py_type()
+        annotation = aliases.get(f"{method}:{p.name}") or aliases.get(p.name) or p.py_type()
         if p.required:
             lines.append(f"{name}: {annotation}")
         else:
@@ -121,15 +121,39 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
     """
     mapping: dict[str, str] = {}
     lines: list[str] = []
+    enums_by_name: dict[str, set[tuple[str, ...]]] = {}
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or not p.enum or p.name in mapping:
+            if p.is_control or not p.enum:
+                continue
+            enums_by_name.setdefault(p.name, set()).add(tuple(p.enum))
+    generic_enums: dict[str, tuple[str, ...]] = {}
+    for ep in svc.endpoints:
+        for p in ep.params:
+            if p.is_control or not p.enum:
                 continue
             inline = p.py_type()
+            enum = tuple(p.enum)
+            has_conflict = svc.alias == "gemini" and len(enums_by_name.get(p.name, set())) > 1
+            if has_conflict and p.name in generic_enums and generic_enums[p.name] != enum:
+                method_key = f"{ep.method}:{p.name}"
+                if method_key in mapping:
+                    continue
+                if len(inline) <= 40:
+                    mapping[method_key] = inline
+                    continue
+                alias = f"{svc.class_name}{pascal(ep.method)}{pascal(p.name)}"
+                mapping[method_key] = alias
+                values = ",\n    ".join(json.dumps(e) for e in p.enum)
+                lines.append(f"{alias} = Literal[\n    {values},\n]")
+                continue
             if len(inline) <= 40:
+                continue
+            if p.name in mapping:
                 continue
             alias = f"{svc.class_name}{pascal(p.name)}"
             mapping[p.name] = alias
+            generic_enums[p.name] = enum
             values = ",\n    ".join(json.dumps(e) for e in p.enum)
             lines.append(f"{alias} = Literal[\n    {values},\n]")
     return mapping, lines
@@ -155,6 +179,31 @@ def _docstring(text: str, indent: str = "        ") -> list[str]:
     return out
 
 
+def _query_params(params: list[Param], indent: str = "        ") -> list[str]:
+    out: list[str] = [f"{indent}params: dict[str, Any] = {{}}"]
+    for p in params:
+        name = py_param(p.name)
+        default = p.default()
+        if p.required:
+            out.append(f'{indent}params["{p.name}"] = {name}')
+        elif default is None:
+            out.append(f"{indent}if {name} is not None:")
+            out.append(f'{indent}    params["{p.name}"] = {name}')
+        else:
+            out.append(f'{indent}params["{p.name}"] = {name} if {name} is not None else {_py_literal(default)}')
+    return out
+
+
+def _path_expr(ep) -> list[str]:
+    if not ep.path_params:
+        return []
+    lines = [f'        path = "{ep.path}"']
+    for p in ep.path_params:
+        name = py_param(p.name)
+        lines.append(f'        path = path.replace("{{{p.name}}}", quote(str({name}), safe=""))')
+    return lines
+
+
 def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *, is_async: bool) -> str:
     handle = "AsyncTaskHandle" if is_async else "TaskHandle"
     prefix = "async " if is_async else ""
@@ -164,19 +213,27 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
 
     lines = [
         f"    {prefix}def {ep.method}(",
-        f"        {_signature(params, aliases, pollable=ep.pollable)},",
+        f"        {_signature(params, aliases, pollable=ep.pollable, method=ep.method)},",
     ]
     if ep.pollable:
         lines.append(f"    ) -> {handle}:")
     else:
         lines.append("    ) -> dict[str, Any]:")
     lines.extend(_docstring(doc))
-    lines.append(_body(params, consts=consts, method=ep.method))
+    lines.extend(_path_expr(ep))
+    lines.append(_body(ep.body_params, consts=consts, method=ep.method))
+    if ep.query_params:
+        lines.extend(_query_params(ep.query_params))
+
+    request_path = "path" if ep.path_params else json.dumps(ep.path)
+    request_kwargs = "json=body"
+    if ep.query_params:
+        request_kwargs += ", params=params"
 
     if ep.pollable:
         lines.append("        body[\"async\"] = True if async_ is None else async_")
         lines.append(
-            f'        result = {await_}self._transport.request("POST", "{ep.path}", json=body)'
+            f'        result = {await_}self._transport.request("POST", {request_path}, {request_kwargs})'
         )
         tasks = svc.tasks_path or f"/{svc.alias}/tasks"
         lines.append(
@@ -189,7 +246,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
         lines.append("        return handle")
     else:
         lines.append(
-            f'        return {await_}self._transport.request("POST", "{ep.path}", json=body)'
+            f'        return {await_}self._transport.request("POST", {request_path}, {request_kwargs})'
         )
     return "\n".join(lines)
 
@@ -198,7 +255,8 @@ def render(svc: Service) -> str:
     title = f"{svc.class_name} ({svc.alias})"
     aliases, alias_lines = _aliases(svc)
     consts, const_lines = _default_consts(svc)
-    out = [HEADER.format(title=title)]
+    quote_import = "from urllib.parse import quote\n\n" if any(ep.path_params for ep in svc.endpoints) else ""
+    out = [HEADER.format(title=title, quote_import=quote_import)]
     out.append("")
     if const_lines:
         out.append("")

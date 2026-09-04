@@ -25,6 +25,7 @@ type providers struct {
 	dreamina     *Dreamina
 	fish         *Fish
 	flux         *Flux
+	gemini       *Gemini
 	hailuo       *Hailuo
 	happyhorse   *Happyhorse
 	localization *Localization
@@ -46,6 +47,7 @@ func newProviders(tr *transport) *providers {
 		dreamina:     &Dreamina{t: tr},
 		fish:         &Fish{t: tr},
 		flux:         &Flux{t: tr},
+		gemini:       &Gemini{t: tr},
 		hailuo:       &Hailuo{t: tr},
 		happyhorse:   &Happyhorse{t: tr},
 		localization: &Localization{t: tr},
@@ -73,6 +75,9 @@ func (c *Client) Fish() *Fish { return c.providers.fish }
 
 // Flux returns the flux provider client.
 func (c *Client) Flux() *Flux { return c.providers.flux }
+
+// Gemini returns the gemini provider client.
+func (c *Client) Gemini() *Gemini { return c.providers.gemini }
 
 // Hailuo returns the hailuo provider client.
 func (c *Client) Hailuo() *Hailuo { return c.providers.hailuo }
