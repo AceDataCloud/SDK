@@ -89,6 +89,7 @@ class Suno:
         overpainting_start: float | None = None,
         variation_category: str | None = None,
         replace_section_end: float | None = None,
+        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
         underpainting_start: float | None = None,
         replace_section_start: float | None = None,
         async_: bool | None = None,
@@ -154,6 +155,9 @@ class Suno:
             body["variation_category"] = variation_category
         if replace_section_end is not None:
             body["replace_section_end"] = replace_section_end
+        body["replace_section_result_mode"] = (
+            replace_section_result_mode if replace_section_result_mode is not None else "full_song"
+        )
         if underpainting_start is not None:
             body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
@@ -330,6 +334,30 @@ class Suno:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
+    def mp3(
+        self,
+        *,
+        audio_id: str,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> TaskHandle:
+        """Suno Mp3"""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = self._transport.request("POST", "/suno/mp3", json=body)
+        handle = TaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
+        if wait:
+            handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
     def style(
         self,
         *,
@@ -433,6 +461,7 @@ class AsyncSuno:
         overpainting_start: float | None = None,
         variation_category: str | None = None,
         replace_section_end: float | None = None,
+        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
         underpainting_start: float | None = None,
         replace_section_start: float | None = None,
         async_: bool | None = None,
@@ -498,6 +527,9 @@ class AsyncSuno:
             body["variation_category"] = variation_category
         if replace_section_end is not None:
             body["replace_section_end"] = replace_section_end
+        body["replace_section_result_mode"] = (
+            replace_section_result_mode if replace_section_result_mode is not None else "full_song"
+        )
         if underpainting_start is not None:
             body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
@@ -669,6 +701,30 @@ class AsyncSuno:
             body["callback_url"] = callback_url
         body["async"] = True if async_ is None else async_
         result = await self._transport.request("POST", "/suno/midi", json=body)
+        handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
+        if wait:
+            await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
+    async def mp3(
+        self,
+        *,
+        audio_id: str,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> AsyncTaskHandle:
+        """Suno Mp3"""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = await self._transport.request("POST", "/suno/mp3", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)

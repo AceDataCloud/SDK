@@ -15,6 +15,32 @@
   ],
   "tasks": "/fish/tasks"
  },
+ "gemini": {
+ "category": "AI Video",
+ "endpoints": [
+  {
+  "id": "gemini-chat",
+  "path": "/gemini/chat/completions",
+  "name": "Gemini Chat Completions API"
+  },
+  {
+  "id": "gemini-generate-content",
+  "path": "/v1beta/models/{model}:generateContent",
+  "name": "Gemini Generate Content API"
+  },
+  {
+  "id": "gemini-stream-generate-content",
+  "path": "/v1beta/models/{model}:streamGenerateContent",
+  "name": "Gemini Stream Generate Content API"
+  },
+  {
+  "id": "gemini-videos",
+  "path": "/gemini/videos",
+  "name": "Gemini Videos API"
+  }
+ ],
+ "tasks": "/gemini/tasks"
+ },
  "maestro": {
   "category": "AI Video",
   "endpoints": [
@@ -165,6 +191,11 @@
     "id": "be1de4f0-b5f5-43dc-bc7a-d2f90b2efe9c",
     "path": "/suno/midi",
     "name": "Suno MIDI Generation API"
+   },
+   {
+    "id": "suno-mp3",
+    "path": "/suno/mp3",
+    "name": "Suno MP3 API"
    },
    {
     "id": "e5ff24c0-ae4e-46bb-93db-2d678610a8d3",

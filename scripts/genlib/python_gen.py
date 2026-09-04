@@ -160,6 +160,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
     prefix = "async " if is_async else ""
     await_ = "await " if is_async else ""
     params = ep.callable_params
+    body_params = ep.body_params
     doc = ep.summary or f"Call {ep.path}."
 
     lines = [
@@ -171,12 +172,18 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
     else:
         lines.append("    ) -> dict[str, Any]:")
     lines.extend(_docstring(doc))
-    lines.append(_body(params, consts=consts, method=ep.method))
+    lines.append(_body(body_params, consts=consts, method=ep.method))
+    path = f'"{ep.path}"'
+    if ep.path_params:
+        path = ep.path
+        for p in ep.path_params:
+            path = path.replace("{" + p.name + "}", "{" + py_param(p.name) + "}")
+        path = f'f"{path}"'
 
     if ep.pollable:
         lines.append("        body[\"async\"] = True if async_ is None else async_")
         lines.append(
-            f'        result = {await_}self._transport.request("POST", "{ep.path}", json=body)'
+            f'        result = {await_}self._transport.request("POST", {path}, json=body)'
         )
         tasks = svc.tasks_path or f"/{svc.alias}/tasks"
         lines.append(
@@ -189,7 +196,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
         lines.append("        return handle")
     else:
         lines.append(
-            f'        return {await_}self._transport.request("POST", "{ep.path}", json=body)'
+            f'        return {await_}self._transport.request("POST", {path}, json=body)'
         )
     return "\n".join(lines)
 

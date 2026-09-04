@@ -20,6 +20,7 @@ GENERATED = (
     "suno",
     "producer",
     "fish",
+    "gemini",
     "hailuo",
     "wan",
     "luma",
@@ -87,6 +88,22 @@ def test_required_flux_size_is_sent(client):
     client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     body = transport.request.call_args.kwargs["json"]
     assert body["size"] == "1024x1024"
+
+
+def test_gemini_provider_serializes_path_and_async_video_request(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "gemini-1"}
+    client.gemini._transport = transport
+
+    task = client.gemini.model_generatecontent(
+        model="gemini-3.1-flash-lite", contents=[{"role": "user", "parts": [{"text": "Hello"}]}]
+    )
+    assert task == {"task_id": "gemini-1"}
+    transport.request.assert_called_once_with(
+        "POST",
+        "/v1beta/models/gemini-3.1-flash-lite:generateContent",
+        json={"contents": [{"role": "user", "parts": [{"text": "Hello"}]}]},
+    )
 
 
 def test_caller_value_beats_the_spec_default(client):

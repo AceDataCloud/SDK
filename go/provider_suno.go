@@ -66,6 +66,8 @@ type SunoGenerateRequest struct {
 	VariationCategory string
 	// When `action` is `replace_section`, specify the end time (in seconds) of the segment to be replaced.
 	ReplaceSectionEnd float64
+	// Suno Audios Replace Section Result Mode
+	ReplaceSectionResultMode string
 	// Set the default start time for the AI accompaniment added to the uploaded audio, with a default value of 0.
 	UnderpaintingStart float64
 	// When `action` is `replace_section`, specify the start time (in seconds) of the segment to be replaced.
@@ -156,6 +158,11 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	}
 	if r.ReplaceSectionEnd != 0 {
 		body["replace_section_end"] = r.ReplaceSectionEnd
+	}
+	if r.ReplaceSectionResultMode != "" {
+		body["replace_section_result_mode"] = r.ReplaceSectionResultMode
+	} else {
+		body["replace_section_result_mode"] = "full_song"
 	}
 	if r.UnderpaintingStart != 0 {
 		body["underpainting_start"] = r.UnderpaintingStart
@@ -487,6 +494,49 @@ func (c *Suno) Midi(ctx context.Context, req SunoMidiRequest) (*TaskHandle, erro
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   "/suno/midi",
+		Body:   req.toBody(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return newTaskHandle(taskIDFrom(result), "/suno/tasks", c.t, result), nil
+}
+
+// SunoMp3Request is the input to suno.Mp3.
+type SunoMp3Request struct {
+	// Suno Mp3 Audio Id
+	AudioID string
+	// Async submits without blocking; poll the returned handle. Defaults true.
+	Async *bool
+	// CallbackURL optionally receives the completion webhook.
+	CallbackURL string
+	// Extra fields merged into the request body.
+	Extra map[string]any
+}
+
+func (r SunoMp3Request) toBody() map[string]any {
+	body := map[string]any{}
+	body["audio_id"] = r.AudioID
+	body["async"] = true
+	if r.Async != nil {
+		body["async"] = *r.Async
+	}
+	if r.CallbackURL != "" {
+		body["callback_url"] = r.CallbackURL
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Mp3 Suno Mp3
+func (c *Suno) Mp3(ctx context.Context, req SunoMp3Request) (*TaskHandle, error) {
+	result, err := c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/suno/mp3",
 		Body:   req.toBody(),
 	})
 	if err != nil {

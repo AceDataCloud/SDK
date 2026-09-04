@@ -1,0 +1,522 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Gemini AI",
+    "version": "1.0.0",
+    "description": "API reference for Gemini AI on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    },
+    "schemas": {
+      "GeminiTaskRequestPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Geminitaskrequestpayload.758312281977"
+      },
+      "GeminiTaskResultPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Geminitaskresultpayload.30Ba8De514Ce"
+      },
+      "GeminiTaskRecord": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "trace_id",
+          "request"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Id.8C135Ef760Af"
+          },
+          "type": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Type.B198791A39Ec"
+          },
+          "trace_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Trace Id.5845C92B8695"
+          },
+          "request": {
+            "$ref": "#/components/schemas/GeminiTaskRequestPayload"
+          },
+          "response": {
+            "$ref": "#/components/schemas/GeminiTaskResultPayload"
+          },
+          "created_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Created At.0F20089Aa772"
+          },
+          "started_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Started At.570F25Cb4875"
+          },
+          "finished_at": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Finished At.Faf0F3Fc1E03"
+          },
+          "elapsed": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Elapsed.4A45C9D818B2"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.User Id.673F8F08B955"
+          },
+          "actor_user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Actor User Id.27De1E075502"
+          },
+          "api_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Api Id.62E563De2A8F"
+          },
+          "application_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Application Id.40F1A9Aa0B04"
+          },
+          "credential_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Credential Id.530422302F67"
+          },
+          "authorization_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Authorization Id.Ed49279Eb0D1"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1beta/models/{model}:streamGenerateContent": {
+      "post": {
+        "summary": "Gemini Stream Generate Content",
+        "description": "V1Beta Models Model Generatecontent",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "gemini-3.7-flash",
+                "gemini-3.6-flash",
+                "gemini-3.5-flash",
+                "gemini-3.5-flash-lite",
+                "gemini-3.1-flash-lite",
+                "gemini-3.1-pro-preview",
+                "gemini-3-flash-preview",
+                "gemini-2.5-pro",
+                "gemini-2.5-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-3.1-flash-image",
+                "gemini-2.5-flash-image",
+                "gemini-3-pro-image"
+              ],
+              "example": "gemini-2.5-flash"
+            },
+            "description": "V1Beta Models Model Generatecontent Param Model 2"
+          },
+          {
+            "name": "alt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sse"
+              ]
+            },
+            "description": "V1Beta Models Model Generatecontent Param Alt"
+          },
+          {
+            "name": "accept",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "text/event-stream"
+              ]
+            },
+            "description": "V1Beta Models Model Streamgeneratecontent Param Accept"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contents"
+                ],
+                "properties": {
+                  "contents": {
+                    "type": "array",
+                    "description": "V1Beta Models Model Generatecontent Contents",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "parts"
+                      ],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "model"
+                          ],
+                          "description": "V1Beta Models Model Generatecontent Contents Role"
+                        },
+                        "parts": {
+                          "type": "array",
+                          "description": "V1Beta Models Model Generatecontent Contents Parts",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "text": {
+                                "type": "string",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Text"
+                              },
+                              "inlineData": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Inlinedata",
+                                "properties": {
+                                  "mimeType": {
+                                    "type": "string",
+                                    "description": "V1Beta Models Model Generatecontent Contents Parts Inlinedata Mimetype"
+                                  },
+                                  "data": {
+                                    "type": "string",
+                                    "description": "V1Beta Models Model Generatecontent Contents Parts Inlinedata Data"
+                                  }
+                                }
+                              },
+                              "fileData": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Filedata",
+                                "properties": {
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "fileUri": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "functionCall": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Functioncall",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "args": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                  }
+                                }
+                              },
+                              "functionResponse": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Functionresponse",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "response": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "systemInstruction": {
+                    "type": "object",
+                    "description": "V1Beta Models Model Generatecontent Systeminstruction",
+                    "properties": {
+                      "parts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "generationConfig": {
+                    "type": "object",
+                    "description": "V1Beta Models Model Generatecontent Generationconfig",
+                    "properties": {
+                      "stopSequences": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Stopsequences"
+                      },
+                      "responseMimeType": {
+                        "type": "string",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Responsemimetype",
+                        "enum": [
+                          "text/plain",
+                          "application/json",
+                          "text/x.enum"
+                        ]
+                      },
+                      "responseSchema": {
+                        "type": "object",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Responseschema",
+                        "additionalProperties": true
+                      },
+                      "responseModalities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "TEXT",
+                            "IMAGE"
+                          ]
+                        },
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Responsemodalities"
+                      },
+                      "candidateCount": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Candidatecount"
+                      },
+                      "maxOutputTokens": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Maxoutputtokens"
+                      },
+                      "temperature": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Temperature",
+                        "minimum": 0,
+                        "maximum": 2
+                      },
+                      "topP": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Topp"
+                      },
+                      "topK": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Topk"
+                      },
+                      "seed": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Seed"
+                      },
+                      "presencePenalty": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Presencepenalty"
+                      },
+                      "frequencyPenalty": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Frequencypenalty"
+                      },
+                      "thinkingConfig": {
+                        "type": "object",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Thinkingconfig",
+                        "properties": {
+                          "includeThoughts": {
+                            "type": "boolean",
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Thinkingconfig Includethoughts"
+                          },
+                          "thinkingBudget": {
+                            "type": "integer",
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Thinkingconfig Thinkingbudget"
+                          }
+                        }
+                      },
+                      "imageConfig": {
+                        "type": "object",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Imageconfig",
+                        "properties": {
+                          "aspectRatio": {
+                            "type": "string",
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Imageconfig Aspectratio"
+                          },
+                          "imageSize": {
+                            "type": "string",
+                            "enum": [
+                              "512",
+                              "1K",
+                              "2K",
+                              "4K"
+                            ],
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Imageconfig Imagesize"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "tools": {
+                    "type": "array",
+                    "description": "V1Beta Models Model Generatecontent Tools",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "functionDeclarations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "parameters": {
+                                "type": "object",
+                                "additionalProperties": true
+                              }
+                            },
+                            "required": [
+                              "name"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "toolConfig": {
+                    "type": "object",
+                    "description": "V1Beta Models Model Generatecontent Toolconfig",
+                    "properties": {
+                      "functionCallingConfig": {
+                        "type": "object",
+                        "properties": {
+                          "mode": {
+                            "type": "string",
+                            "enum": [
+                              "MODE_UNSPECIFIED",
+                              "AUTO",
+                              "ANY",
+                              "NONE"
+                            ]
+                          },
+                          "allowedFunctionNames": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "safetySettings": {
+                    "type": "array",
+                    "description": "V1Beta Models Model Generatecontent Safetysettings",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "HARM_CATEGORY_HARASSMENT",
+                            "HARM_CATEGORY_HATE_SPEECH",
+                            "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                            "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            "HARM_CATEGORY_CIVIC_INTEGRITY"
+                          ]
+                        },
+                        "threshold": {
+                          "type": "string",
+                          "enum": [
+                            "BLOCK_NONE",
+                            "BLOCK_ONLY_HIGH",
+                            "BLOCK_MEDIUM_AND_ABOVE",
+                            "BLOCK_LOW_AND_ABOVE",
+                            "OFF"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "contents": [
+                  {
+                    "role": "user",
+                    "parts": [
+                      {
+                        "text": "Reply with exactly: Hello!"
+                      }
+                    ]
+                  }
+                ],
+                "generationConfig": {
+                  "maxOutputTokens": 128
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "V1Beta Models Model Streamgeneratecontent Response Sse",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "V1Beta Models Model Streamgeneratecontent Response Sse Schema"
+                },
+                "example": "data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"Hello!\"}],\"role\":\"model\"},\"index\":0}],\"modelVersion\":\"gemini-3.1-flash-lite\",\"model\":\"gemini-3.1-flash-lite\"}\n\ndata: {\"candidates\":[{\"content\":{\"parts\":[],\"role\":\"model\"},\"finishReason\":\"STOP\",\"index\":0}],\"usageMetadata\":{\"promptTokenCount\":7,\"candidatesTokenCount\":89,\"totalTokenCount\":96},\"usage\":{\"prompt_tokens\":7,\"completion_tokens\":89,\"total_tokens\":96,\"cost\":{\"amount\":0.00026161075472,\"currency\":\"credit\",\"list_amount\":0.000284359516}},\"modelVersion\":\"gemini-3.1-flash-lite\",\"model\":\"gemini-3.1-flash-lite\"}\n\n"
+              }
+            }
+          }
+        },
+        "operationId": "GeminiGenerateContentAPIcreateV1betaModelsByModelstreamGenerateContent"
+      }
+    }
+  }
+}

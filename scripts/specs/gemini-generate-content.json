@@ -1,0 +1,894 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Gemini AI",
+    "version": "1.0.0",
+    "description": "API reference for Gemini AI on Ace Data Cloud."
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API token from https://platform.acedata.cloud"
+      }
+    },
+    "schemas": {
+      "GeminiTaskRequestPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Geminitaskrequestpayload.758312281977"
+      },
+      "GeminiTaskResultPayload": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Geminitaskresultpayload.30Ba8De514Ce"
+      },
+      "GeminiTaskRecord": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "created_at",
+          "trace_id",
+          "request"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Id.8C135Ef760Af"
+          },
+          "type": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Type.B198791A39Ec"
+          },
+          "trace_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Trace Id.5845C92B8695"
+          },
+          "request": {
+            "$ref": "#/components/schemas/GeminiTaskRequestPayload"
+          },
+          "response": {
+            "$ref": "#/components/schemas/GeminiTaskResultPayload"
+          },
+          "created_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Created At.0F20089Aa772"
+          },
+          "started_at": {
+            "type": "number",
+            "format": "double",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Started At.570F25Cb4875"
+          },
+          "finished_at": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Finished At.Faf0F3Fc1E03"
+          },
+          "elapsed": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Elapsed.4A45C9D818B2"
+          },
+          "user_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.User Id.673F8F08B955"
+          },
+          "actor_user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Actor User Id.27De1E075502"
+          },
+          "api_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Api Id.62E563De2A8F"
+          },
+          "application_id": {
+            "type": "string",
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Application Id.40F1A9Aa0B04"
+          },
+          "credential_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Credential Id.530422302F67"
+          },
+          "authorization_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Openapi.E6Bd925D0C4947Bea5C5D087604A8E75.Authorization Id.Ed49279Eb0D1"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v1beta/models/{model}:generateContent": {
+      "post": {
+        "summary": "Gemini Generate Content",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "gemini-3.7-flash",
+                "gemini-3.6-flash",
+                "gemini-3.5-flash",
+                "gemini-3.5-flash-lite",
+                "gemini-3.1-flash-lite",
+                "gemini-3.1-pro-preview",
+                "gemini-3-flash-preview",
+                "gemini-2.5-pro",
+                "gemini-2.5-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-3.1-flash-image",
+                "gemini-2.5-flash-image",
+                "gemini-3-pro-image"
+              ],
+              "example": "gemini-2.5-flash"
+            },
+            "description": "V1Beta Models Model Generatecontent Param Model"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contents"
+                ],
+                "properties": {
+                  "contents": {
+                    "type": "array",
+                    "description": "V1Beta Models Model Generatecontent Contents",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "parts"
+                      ],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "model"
+                          ],
+                          "description": "V1Beta Models Model Generatecontent Contents Role"
+                        },
+                        "parts": {
+                          "type": "array",
+                          "description": "V1Beta Models Model Generatecontent Contents Parts",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "text": {
+                                "type": "string",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Text"
+                              },
+                              "inlineData": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Inlinedata",
+                                "properties": {
+                                  "mimeType": {
+                                    "type": "string",
+                                    "description": "V1Beta Models Model Generatecontent Contents Parts Inlinedata Mimetype"
+                                  },
+                                  "data": {
+                                    "type": "string",
+                                    "description": "V1Beta Models Model Generatecontent Contents Parts Inlinedata Data"
+                                  }
+                                }
+                              },
+                              "fileData": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Filedata",
+                                "properties": {
+                                  "mimeType": {
+                                    "type": "string"
+                                  },
+                                  "fileUri": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "functionCall": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Functioncall",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "args": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                  }
+                                }
+                              },
+                              "functionResponse": {
+                                "type": "object",
+                                "description": "V1Beta Models Model Generatecontent Contents Parts Functionresponse",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "response": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "systemInstruction": {
+                    "type": "object",
+                    "description": "V1Beta Models Model Generatecontent Systeminstruction",
+                    "properties": {
+                      "parts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "text": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "generationConfig": {
+                    "type": "object",
+                    "description": "V1Beta Models Model Generatecontent Generationconfig",
+                    "properties": {
+                      "stopSequences": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Stopsequences"
+                      },
+                      "responseMimeType": {
+                        "type": "string",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Responsemimetype",
+                        "enum": [
+                          "text/plain",
+                          "application/json",
+                          "text/x.enum"
+                        ]
+                      },
+                      "responseSchema": {
+                        "type": "object",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Responseschema",
+                        "additionalProperties": true
+                      },
+                      "responseModalities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "TEXT",
+                            "IMAGE"
+                          ]
+                        },
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Responsemodalities"
+                      },
+                      "candidateCount": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Candidatecount"
+                      },
+                      "maxOutputTokens": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Maxoutputtokens"
+                      },
+                      "temperature": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Temperature",
+                        "minimum": 0,
+                        "maximum": 2
+                      },
+                      "topP": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Topp"
+                      },
+                      "topK": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Topk"
+                      },
+                      "seed": {
+                        "type": "integer",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Seed"
+                      },
+                      "presencePenalty": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Presencepenalty"
+                      },
+                      "frequencyPenalty": {
+                        "type": "number",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Frequencypenalty"
+                      },
+                      "thinkingConfig": {
+                        "type": "object",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Thinkingconfig",
+                        "properties": {
+                          "includeThoughts": {
+                            "type": "boolean",
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Thinkingconfig Includethoughts"
+                          },
+                          "thinkingBudget": {
+                            "type": "integer",
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Thinkingconfig Thinkingbudget"
+                          }
+                        }
+                      },
+                      "imageConfig": {
+                        "type": "object",
+                        "description": "V1Beta Models Model Generatecontent Generationconfig Imageconfig",
+                        "properties": {
+                          "aspectRatio": {
+                            "type": "string",
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Imageconfig Aspectratio"
+                          },
+                          "imageSize": {
+                            "type": "string",
+                            "enum": [
+                              "512",
+                              "1K",
+                              "2K",
+                              "4K"
+                            ],
+                            "description": "V1Beta Models Model Generatecontent Generationconfig Imageconfig Imagesize"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "tools": {
+                    "type": "array",
+                    "description": "V1Beta Models Model Generatecontent Tools",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "functionDeclarations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "parameters": {
+                                "type": "object",
+                                "additionalProperties": true
+                              }
+                            },
+                            "required": [
+                              "name"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "toolConfig": {
+                    "type": "object",
+                    "description": "V1Beta Models Model Generatecontent Toolconfig",
+                    "properties": {
+                      "functionCallingConfig": {
+                        "type": "object",
+                        "properties": {
+                          "mode": {
+                            "type": "string",
+                            "enum": [
+                              "MODE_UNSPECIFIED",
+                              "AUTO",
+                              "ANY",
+                              "NONE"
+                            ]
+                          },
+                          "allowedFunctionNames": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "safetySettings": {
+                    "type": "array",
+                    "description": "V1Beta Models Model Generatecontent Safetysettings",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "HARM_CATEGORY_HARASSMENT",
+                            "HARM_CATEGORY_HATE_SPEECH",
+                            "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                            "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            "HARM_CATEGORY_CIVIC_INTEGRITY"
+                          ]
+                        },
+                        "threshold": {
+                          "type": "string",
+                          "enum": [
+                            "BLOCK_NONE",
+                            "BLOCK_ONLY_HIGH",
+                            "BLOCK_MEDIUM_AND_ABOVE",
+                            "BLOCK_LOW_AND_ABOVE",
+                            "OFF"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "contents": [
+                  {
+                    "role": "user",
+                    "parts": [
+                      {
+                        "text": "Reply with exactly: Hello!"
+                      }
+                    ]
+                  }
+                ],
+                "generationConfig": {
+                  "maxOutputTokens": 128
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "V1Beta Models Model Generatecontent Response 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "candidates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "content": {
+                            "type": "object",
+                            "properties": {
+                              "parts": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "text": {
+                                      "type": "string"
+                                    },
+                                    "thought": {
+                                      "type": "boolean",
+                                      "description": "V1Beta Models Model Generatecontent Response 200 Candidates Parts Thought"
+                                    }
+                                  }
+                                }
+                              },
+                              "role": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "finishReason": {
+                            "type": "string",
+                            "enum": [
+                              "STOP",
+                              "MAX_TOKENS",
+                              "SAFETY",
+                              "RECITATION",
+                              "LANGUAGE",
+                              "OTHER",
+                              "BLOCKLIST",
+                              "PROHIBITED_CONTENT",
+                              "SPII",
+                              "MALFORMED_FUNCTION_CALL"
+                            ]
+                          },
+                          "index": {
+                            "type": "integer"
+                          },
+                          "safetyRatings": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "category": {
+                                  "type": "string"
+                                },
+                                "probability": {
+                                  "type": "string"
+                                },
+                                "blocked": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "usageMetadata": {
+                      "type": "object",
+                      "properties": {
+                        "promptTokenCount": {
+                          "type": "integer"
+                        },
+                        "cachedContentTokenCount": {
+                          "type": "integer"
+                        },
+                        "candidatesTokenCount": {
+                          "type": "integer"
+                        },
+                        "totalTokenCount": {
+                          "type": "integer"
+                        },
+                        "thoughtsTokenCount": {
+                          "type": "integer"
+                        },
+                        "toolUsePromptTokenCount": {
+                          "type": "integer"
+                        },
+                        "promptTokensDetails": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "modality": {
+                                "type": "string"
+                              },
+                              "tokenCount": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "candidatesTokensDetails": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "modality": {
+                                "type": "string"
+                              },
+                              "tokenCount": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "cacheTokensDetails": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "modality": {
+                                "type": "string"
+                              },
+                              "tokenCount": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "toolUsePromptTokensDetails": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "modality": {
+                                "type": "string"
+                              },
+                              "tokenCount": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "description": "V1Beta Models Model Generatecontent Response 200 Usage",
+                      "required": [
+                        "prompt_tokens",
+                        "completion_tokens"
+                      ],
+                      "properties": {
+                        "prompt_tokens": {
+                          "type": "integer",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Prompt Tokens"
+                        },
+                        "completion_tokens": {
+                          "type": "integer",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Completion Tokens"
+                        },
+                        "total_tokens": {
+                          "type": "integer",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Total Tokens"
+                        },
+                        "prompt_tokens_details": {
+                          "type": "object",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Prompt Tokens Details",
+                          "properties": {
+                            "cached_tokens": {
+                              "type": "integer"
+                            },
+                            "modalities": {
+                              "type": "array",
+                              "description": "V1Beta Models Model Generatecontent Response 200 Usage Prompt Modalities",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "modality",
+                                  "tokenCount"
+                                ],
+                                "properties": {
+                                  "modality": {
+                                    "type": "string"
+                                  },
+                                  "tokenCount": {
+                                    "type": "integer"
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            },
+                            "cached_modalities": {
+                              "type": "array",
+                              "description": "V1Beta Models Model Generatecontent Response 200 Usage Cached Modalities",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "modality",
+                                  "tokenCount"
+                                ],
+                                "properties": {
+                                  "modality": {
+                                    "type": "string"
+                                  },
+                                  "tokenCount": {
+                                    "type": "integer"
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "completion_tokens_details": {
+                          "type": "object",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Completion Tokens Details",
+                          "properties": {
+                            "modalities": {
+                              "type": "array",
+                              "description": "V1Beta Models Model Generatecontent Response 200 Usage Completion Modalities",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "modality",
+                                  "tokenCount"
+                                ],
+                                "properties": {
+                                  "modality": {
+                                    "type": "string"
+                                  },
+                                  "tokenCount": {
+                                    "type": "integer"
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "thoughts_tokens": {
+                          "type": "integer",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Thoughts Tokens"
+                        },
+                        "tool_use_prompt_tokens": {
+                          "type": "integer",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Tool Use Prompt Tokens"
+                        },
+                        "tool_use_prompt_tokens_details": {
+                          "type": "object",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Tool Use Prompt Tokens Details",
+                          "properties": {
+                            "modalities": {
+                              "type": "array",
+                              "description": "V1Beta Models Model Generatecontent Response 200 Usage Tool Use Prompt Modalities",
+                              "items": {
+                                "type": "object",
+                                "required": [
+                                  "modality",
+                                  "tokenCount"
+                                ],
+                                "properties": {
+                                  "modality": {
+                                    "type": "string"
+                                  },
+                                  "tokenCount": {
+                                    "type": "integer"
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "cost": {
+                          "type": "object",
+                          "description": "V1Beta Models Model Generatecontent Response 200 Usage Cost",
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "properties": {
+                            "amount": {
+                              "type": "number",
+                              "description": "V1Beta Models Model Generatecontent Response 200 Usage Cost Amount"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "description": "V1Beta Models Model Generatecontent Response 200 Usage Cost Currency"
+                            },
+                            "list_amount": {
+                              "type": "number",
+                              "description": "V1Beta Models Model Generatecontent Response 200 Usage Cost List Amount"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "modelVersion": {
+                      "type": "string"
+                    },
+                    "responseId": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "candidates": [
+                    {
+                      "content": {
+                        "role": "model",
+                        "parts": [
+                          {
+                            "text": "Hello!"
+                          }
+                        ]
+                      },
+                      "finishReason": "STOP"
+                    }
+                  ],
+                  "usageMetadata": {
+                    "candidatesTokenCount": 2,
+                    "candidatesTokensDetails": [
+                      {
+                        "modality": "TEXT",
+                        "tokenCount": 2
+                      }
+                    ],
+                    "promptTokenCount": 260,
+                    "promptTokensDetails": [
+                      {
+                        "modality": "TEXT",
+                        "tokenCount": 260
+                      }
+                    ],
+                    "thoughtsTokenCount": 22,
+                    "totalTokenCount": 284
+                  },
+                  "usage": {
+                    "prompt_tokens": 260,
+                    "completion_tokens": 2,
+                    "total_tokens": 284,
+                    "completion_tokens_details": {
+                      "modalities": [
+                        {
+                          "modality": "TEXT",
+                          "tokenCount": 2
+                        }
+                      ]
+                    },
+                    "prompt_tokens_details": {
+                      "modalities": [
+                        {
+                          "modality": "TEXT",
+                          "tokenCount": 260
+                        }
+                      ]
+                    },
+                    "thoughts_tokens": 22,
+                    "cost": {
+                      "amount": 0.0001953617424,
+                      "currency": "credit",
+                      "list_amount": 0.00021234972
+                    }
+                  },
+                  "modelVersion": "gemini-3.1-flash-lite",
+                  "model": "gemini-3.1-flash-lite"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "V1Beta Models Model Generatecontent Response 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "GeminiGenerateContentAPIcreateV1betaModelsByModelgenerateContent"
+      }
+    }
+  }
+}

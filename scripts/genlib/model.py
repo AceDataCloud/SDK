@@ -169,6 +169,12 @@ class Endpoint:
         schema = request_schema(spec)
         required = set(schema.get("required") or [])
         props: dict[str, dict] = schema.get("properties") or {}
+        operation = (spec.get("paths") or {}).get(path, {}).get("post") or {}
+        self.path_params = [
+            Param(p["name"], p.get("schema") or {}, bool(p.get("required")))
+            for p in operation.get("parameters") or []
+            if p.get("in") == "path"
+        ]
         self.summary = summary(spec)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
         self.pollable = "async" in props or pollable
@@ -176,8 +182,12 @@ class Endpoint:
     @property
     def callable_params(self) -> list[Param]:
         """Required first — a Python signature cannot put a defaulted arg before one."""
-        usable = [p for p in self.params if not p.is_control]
+        usable = self.path_params + [p for p in self.params if not p.is_control]
         return sorted(usable, key=lambda p: not p.required)
+
+    @property
+    def body_params(self) -> list[Param]:
+        return [p for p in self.callable_params if p not in self.path_params]
 
 
 class Service:

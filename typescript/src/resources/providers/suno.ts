@@ -71,6 +71,8 @@ export interface SunoGenerateOptions {
   variationCategory?: string;
   /** When `action` is `replace_section`, specify the end time (in seconds) of the segment to be replaced. */
   replaceSectionEnd?: number;
+  /** Suno Audios Replace Section Result Mode */
+  replaceSectionResultMode?: "candidates" | "full_song";
   /** Set the default start time for the AI accompaniment added to the uploaded audio, with a default value of 0. */
   underpaintingStart?: number;
   /** When `action` is `replace_section`, specify the start time (in seconds) of the segment to be replaced. */
@@ -178,6 +180,20 @@ export interface SunoMidiOptions {
   [key: string]: unknown;
 }
 
+export interface SunoMp3Options {
+  /** Suno Mp3 Audio Id */
+  audioId: string;
+  /** Submit asynchronously and poll. Defaults to true. */
+  async?: boolean;
+  /** Wait for completion before returning the handle. */
+  wait?: boolean;
+  pollInterval?: number;
+  maxWait?: number;
+  callbackUrl?: string;
+  /** Any parameter added upstream before the SDK is regenerated. */
+  [key: string]: unknown;
+}
+
 export interface SunoStyleOptions {
   /** Style prompts that need optimization. */
   prompt: string;
@@ -248,10 +264,11 @@ export class Suno {
     if (options.overpaintingStart !== undefined) body["overpainting_start"] = options.overpaintingStart;
     if (options.variationCategory !== undefined) body["variation_category"] = options.variationCategory;
     if (options.replaceSectionEnd !== undefined) body["replace_section_end"] = options.replaceSectionEnd;
+    body["replace_section_result_mode"] = options.replaceSectionResultMode ?? "full_song";
     if (options.underpaintingStart !== undefined) body["underpainting_start"] = options.underpaintingStart;
     if (options.replaceSectionStart !== undefined) body["replace_section_start"] = options.replaceSectionStart;
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "negativeTags", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
+      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "negativeTags", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionResultMode", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
@@ -376,6 +393,25 @@ export class Suno {
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
     body.async = options.async ?? true;
     const result = (await this.transport.request('POST', "/suno/midi", { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), "/suno/tasks", this.transport, result);
+    if (options.wait) {
+      await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });
+    }
+    return handle;
+  }
+
+  /** Suno Mp3 */
+  async mp3(options: SunoMp3Options): Promise<TaskHandle> {
+    const body: Record<string, unknown> = {};
+    body["audio_id"] = options.audioId;
+    for (const [key, value] of Object.entries(options)) {
+      if (!["async", "audioId", "callbackUrl", "maxWait", "pollInterval", "wait"].includes(key) && value !== undefined) {
+        body[key] = value;
+      }
+    }
+    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
+    body.async = options.async ?? true;
+    const result = (await this.transport.request('POST', "/suno/mp3", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/suno/tasks", this.transport, result);
     if (options.wait) {
       await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });

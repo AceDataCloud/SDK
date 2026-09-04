@@ -56,7 +56,7 @@ def _request_struct(svc: Service, ep) -> str:
 def _to_body(struct: str, svc: Service, ep) -> str:
     lines = [f"func (r {struct}) toBody() map[string]any {{"]
     lines.append("\tbody := map[string]any{}")
-    for p in ep.callable_params:
+    for p in ep.body_params:
         field = _field_name(p.name)
         key = json.dumps(p.name)
         default = p.default()
@@ -110,6 +110,12 @@ def _method(svc: Service, ep, struct: str) -> str:
     method = pascal(ep.method)
     tasks = svc.tasks_path or f"/{svc.alias}/tasks"
     doc = (ep.summary or f"Call {ep.path}.").replace("\n", " ")
+    path = json.dumps(ep.path)
+    if ep.path_params:
+        replacements = ", ".join(
+            f'"{{{p.name}}}", req.{_field_name(p.name)}' for p in ep.path_params
+        )
+        path = f"strings.NewReplacer({replacements}).Replace({path})"
 
     lines = [f"// {method} {doc[:150]}"]
     if ep.pollable:
@@ -118,7 +124,7 @@ def _method(svc: Service, ep, struct: str) -> str:
         )
         lines.append("\tresult, err := c.t.do(ctx, requestOpts{")
         lines.append('\t\tMethod: "POST",')
-        lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
+        lines.append(f"\t\tPath:   {path},")
         lines.append("\t\tBody:   req.toBody(),")
         lines.append("\t})")
         lines.append("\tif err != nil {")
@@ -133,7 +139,7 @@ def _method(svc: Service, ep, struct: str) -> str:
         )
         lines.append("\treturn c.t.do(ctx, requestOpts{")
         lines.append('\t\tMethod: "POST",')
-        lines.append(f"\t\tPath:   {json.dumps(ep.path)},")
+        lines.append(f"\t\tPath:   {path},")
         lines.append("\t\tBody:   req.toBody(),")
         lines.append("\t})")
     lines.append("}")
@@ -141,7 +147,10 @@ def _method(svc: Service, ep, struct: str) -> str:
 
 
 def render(svc: Service) -> str:
-    out = [HEADER, ""]
+    imports = HEADER
+    if any(ep.path_params for ep in svc.endpoints):
+        imports = imports.replace('import "context"', 'import (\n\t"context"\n\t"strings"\n)')
+    out = [imports, ""]
     out.append(f"// {svc.class_name} is the {svc.alias} provider client.")
     out.append(f"type {svc.class_name} struct {{")
     out.append("\tt *transport")
