@@ -142,6 +142,11 @@
     "name": "Suno MP4 API"
    },
    {
+    "id": "f1143f0b-8146-4fc0-b02c-ac8db969392d",
+    "path": "/suno/mp3",
+    "name": "Suno MP3 API"
+   },
+   {
     "id": "1aece23f-07b3-4c21-8b2b-d93ce9bf0e84",
     "path": "/suno/voices",
     "name": "Suno Voices API"

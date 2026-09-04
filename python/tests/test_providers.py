@@ -233,8 +233,18 @@ def test_every_provider_has_a_callable_method(client, name):
 
 def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
-    for method in ("generate", "lyrics", "wav", "mp4"):
+    for method in ("generate", "lyrics", "wav", "mp4", "mp3"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_suno_upload_uses_docs_default_mode(client):
+    transport = Mock()
+    transport.request.return_value = {"success": True}
+    client.suno._transport = transport
+
+    client.suno.upload(audio_url="https://cdn.example.com/audio.mp3")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["mode"] == "standard"
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):
