@@ -1,6 +1,11 @@
 import { Gemini } from '../src/resources/providers/gemini';
+import { AceDataCloud } from '../src/client';
 
 describe('Gemini provider', () => {
+  it('is available from the top-level client', () => {
+    expect(new AceDataCloud({ apiToken: 'test' }).gemini).toBeInstanceOf(Gemini);
+  });
+
   it('interpolates the model path parameter without putting it in the body', async () => {
     const request = jest.fn().mockResolvedValue({ success: true });
     const gemini = new Gemini({ request } as any);

@@ -39,6 +39,29 @@ import { Seedream } from './seedream';
 import { Suno } from './suno';
 import { Wan } from './wan';
 
+declare module "../../client" {
+  interface AceDataCloud {
+    readonly digitalhuman: Digitalhuman;
+    readonly dreamina: Dreamina;
+    readonly fish: Fish;
+    readonly flux: Flux;
+    readonly gemini: Gemini;
+    readonly hailuo: Hailuo;
+    readonly happyhorse: Happyhorse;
+    readonly localization: Localization;
+    readonly luma: Luma;
+    readonly maestro: Maestro;
+    readonly minimax: Minimax;
+    readonly nanobanana: NanoBanana;
+    readonly producer: Producer;
+    readonly qwenimage: QwenImage;
+    readonly seedance: Seedance;
+    readonly seedream: Seedream;
+    readonly suno: Suno;
+    readonly wan: Wan;
+  }
+}
+
 /** Bind every generated provider client onto `client`. */
 export function attachProviders(client: Record<string, unknown>, transport: Transport): void {
   client.digitalhuman = new Digitalhuman(transport);

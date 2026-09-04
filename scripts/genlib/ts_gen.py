@@ -160,6 +160,13 @@ def write_all(services: list[Service], root: Path) -> list[Path]:
         module = svc.py_module.replace("_", "-")
         index.append(f"import {{ {svc.class_name} }} from './{module}';")
     index.append("")
+    index.append('declare module "../../client" {')
+    index.append("  interface AceDataCloud {")
+    for svc in services:
+        index.append(f"    readonly {svc.attr.replace('_', '')}: {svc.class_name};")
+    index.append("  }")
+    index.append("}")
+    index.append("")
     index.append("/** Bind every generated provider client onto `client`. */")
     index.append("export function attachProviders(client: Record<string, unknown>, transport: Transport): void {")
     for svc in services:
