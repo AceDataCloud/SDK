@@ -29,7 +29,7 @@ type SeedreamGenerateRequest struct {
 	// Image response format: url or b64_json.
 	ResponseFormat string
 	// Whether to add the AI-generated watermark.
-	Watermark bool
+	Watermark *bool
 	// Output image format, jpeg or png. Supported by Seedream 5.0 Pro and Lite.
 	OutputFormat string
 	// Model tools. Seedream 5.0 Lite supports web_search.
@@ -72,7 +72,9 @@ func (r SeedreamGenerateRequest) toBody() map[string]any {
 	if r.ResponseFormat != "" {
 		body["response_format"] = r.ResponseFormat
 	}
-	body["watermark"] = r.Watermark
+	if r.Watermark != nil {
+		body["watermark"] = *r.Watermark
+	}
 	if r.OutputFormat != "" {
 		body["output_format"] = r.OutputFormat
 	}

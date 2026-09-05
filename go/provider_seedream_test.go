@@ -27,4 +27,17 @@ func TestSeedreamLiteOmitsProOnlyOptionalBooleans(t *testing.T) {
 	if _, ok := body["stream"]; ok {
 		t.Fatalf("zero-value request leaked stream=false: %#v", body)
 	}
+	if _, ok := body["watermark"]; ok {
+		t.Fatalf("zero-value request leaked watermark=false: %#v", body)
+	}
+}
+
+func TestSeedreamSerializesExplicitWatermark(t *testing.T) {
+	body := SeedreamGenerateRequest{
+		Model:     "doubao-seedream-5-0-260128",
+		Watermark: boolPtr(false),
+	}.toBody()
+	if body["watermark"] != false {
+		t.Fatalf("expected explicit watermark=false, got %#v", body)
+	}
 }

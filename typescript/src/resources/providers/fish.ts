@@ -39,8 +39,6 @@ export interface FishGenerateOptions {
   temperature?: number;
   /** The chunk length passed to the upstream synthesizer. */
   chunkLength?: number;
-  /** Opus bitrate when `format=opus`. */
-  opusBitrate?: number;
   /** Saved/public voice ID; cannot be combined with references. */
   referenceId?: string | string[];
   /** Maximum number of new tokens generated. */
@@ -103,13 +101,12 @@ export class Fish {
     if (options.sampleRate !== undefined) body["sample_rate"] = options.sampleRate;
     if (options.temperature !== undefined) body["temperature"] = options.temperature;
     if (options.chunkLength !== undefined) body["chunk_length"] = options.chunkLength;
-    if (options.opusBitrate !== undefined) body["opus_bitrate"] = options.opusBitrate;
     if (options.referenceId !== undefined) body["reference_id"] = options.referenceId;
     if (options.maxNewTokens !== undefined) body["max_new_tokens"] = options.maxNewTokens;
     if (options.minChunkLength !== undefined) body["min_chunk_length"] = options.minChunkLength;
     if (options.repetitionPenalty !== undefined) body["repetition_penalty"] = options.repetitionPenalty;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "callbackUrl", "chunkLength", "format", "latency", "maxNewTokens", "maxWait", "minChunkLength", "model", "mp3Bitrate", "normalize", "opusBitrate", "pollInterval", "prosody", "referenceId", "references", "repetitionPenalty", "sampleRate", "temperature", "text", "topP", "wait"].includes(key) && value !== undefined) {
+      if (!["async", "callbackUrl", "chunkLength", "format", "latency", "maxNewTokens", "maxWait", "minChunkLength", "model", "mp3Bitrate", "normalize", "pollInterval", "prosody", "referenceId", "references", "repetitionPenalty", "sampleRate", "temperature", "text", "topP", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }

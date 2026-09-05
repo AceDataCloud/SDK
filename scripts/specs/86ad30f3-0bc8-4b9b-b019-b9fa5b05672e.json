@@ -764,6 +764,7 @@
                   "watermark": {
                     "rank": 91,
                     "type": "boolean",
+                    "x-go-optional-pointer": true,
                     "description": "Whether to add the AI-generated watermark."
                   },
                   "output_format": {

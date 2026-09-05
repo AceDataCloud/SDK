@@ -23,7 +23,7 @@ type FishGenerateRequest struct {
 	// Rhythm coverage parameters, forwarded as is to upstream (such as speech rate, volume, etc.).
 	Prosody map[string]any
 	// Is the input text subjected to text normalization processing by the upstream?
-	Normalize bool
+	Normalize *bool
 	// One-shot voice clone reference; cannot be combined with reference_id.
 	References []map[string]any
 	// MP3 bitrate when `format=mp3`.
@@ -34,8 +34,6 @@ type FishGenerateRequest struct {
 	Temperature float64
 	// The chunk length passed to the upstream synthesizer.
 	ChunkLength int
-	// Opus bitrate when `format=opus`.
-	OpusBitrate int
 	// Saved/public voice ID; cannot be combined with references.
 	ReferenceID any
 	// Maximum number of new tokens generated.
@@ -69,7 +67,9 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	if r.Prosody != nil {
 		body["prosody"] = r.Prosody
 	}
-	body["normalize"] = r.Normalize
+	if r.Normalize != nil {
+		body["normalize"] = *r.Normalize
+	}
 	if r.References != nil {
 		body["references"] = r.References
 	}
@@ -84,9 +84,6 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	}
 	if r.ChunkLength != 0 {
 		body["chunk_length"] = r.ChunkLength
-	}
-	if r.OpusBitrate != 0 {
-		body["opus_bitrate"] = r.OpusBitrate
 	}
 	if r.ReferenceID != nil {
 		body["reference_id"] = r.ReferenceID

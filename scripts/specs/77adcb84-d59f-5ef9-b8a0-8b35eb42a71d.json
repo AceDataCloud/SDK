@@ -547,6 +547,7 @@
                   "normalize": {
                     "rank": 70,
                     "type": "boolean",
+                    "x-go-optional-pointer": true,
                     "description": "Is the input text subjected to text normalization processing by the upstream?"
                   },
                   "references": {
@@ -609,11 +610,6 @@
                     "rank": 50,
                     "type": "integer",
                     "description": "The chunk length passed to the upstream synthesizer."
-                  },
-                  "opus_bitrate": {
-                    "rank": 32,
-                    "type": "integer",
-                    "description": "Opus bitrate when `format=opus`."
                   },
                   "reference_id": {
                     "rank": 10,

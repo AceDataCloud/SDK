@@ -44,7 +44,6 @@ class Fish:
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | list[str] | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -80,8 +79,6 @@ class Fish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         if reference_id is not None:
             body["reference_id"] = reference_id
         if max_new_tokens is not None:
@@ -160,7 +157,6 @@ class AsyncFish:
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
-        opus_bitrate: int | None = None,
         reference_id: str | list[str] | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
@@ -196,8 +192,6 @@ class AsyncFish:
             body["temperature"] = temperature
         if chunk_length is not None:
             body["chunk_length"] = chunk_length
-        if opus_bitrate is not None:
-            body["opus_bitrate"] = opus_bitrate
         if reference_id is not None:
             body["reference_id"] = reference_id
         if max_new_tokens is not None:

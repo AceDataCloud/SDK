@@ -389,3 +389,7 @@ def test_fish_one_shot_reference_and_model_header(client):
     ]
     assert "model" not in kwargs["json"]
     assert "reference_id" not in kwargs["json"]
+
+
+def test_fish_does_not_expose_unsupported_opus_bitrate(client):
+    assert "opus_bitrate" not in inspect.signature(type(client.fish).generate).parameters
