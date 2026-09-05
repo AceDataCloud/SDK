@@ -30,7 +30,7 @@ GENERATED = (
     "dreamina",
     "localization",
 )
-HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
+HAND_WRITTEN = ("glm", "kling", "veo", "openai", "webextrator", "shorturl")
 
 
 @pytest.fixture
@@ -66,6 +66,17 @@ def test_generation_returns_a_task_handle(client):
     result = client.flux.generate(action="generate", prompt="a cat", size="1024x1024")
     assert isinstance(result, TaskHandle)
     assert result.id == "t-1"
+
+
+def test_glm_accepts_current_docs_models(client):
+    transport = Mock()
+    transport.request.return_value = {"choices": []}
+    client.glm.chat.completions._transport = transport
+
+    client.glm.chat.completions.create(model="glm-5.3", messages=[{"role": "user", "content": "Hi"}])
+
+    assert transport.request.call_args.args == ("POST", "/glm/chat/completions")
+    assert transport.request.call_args.kwargs["json"]["model"] == "glm-5.3"
 
 
 @pytest.mark.asyncio
