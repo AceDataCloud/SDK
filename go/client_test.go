@@ -67,10 +67,20 @@ func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
 	}
 }
 
-func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
-	body := SeedreamGenerateRequest{Size: "4K"}.toBody()
-	if body["size"] != "4K" {
-		t.Fatalf("explicit size missing: %+v", body)
+func TestSeedreamGenerateSerializesNewContract(t *testing.T) {
+	body := SeedreamGenerateRequest{
+		Image:              "https://example.com/source.png",
+		Size:               "1.5K",
+		LayerDecomposition: true,
+		ResponseFormat:     "b64_json",
+		Background:         "transparent",
+	}.toBody()
+	if body["image"] != "https://example.com/source.png" ||
+		body["size"] != "1.5K" ||
+		body["layer_decomposition"] != true ||
+		body["response_format"] != "b64_json" ||
+		body["background"] != "transparent" {
+		t.Fatalf("new Seedream fields missing: %+v", body)
 	}
 }
 

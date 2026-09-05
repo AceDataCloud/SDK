@@ -27,23 +27,31 @@ describe('Seedream provider', () => {
     });
   });
 
-  it('sends an explicit supported size', async () => {
+  it('serializes the new request contract', async () => {
     const request = jest.fn().mockResolvedValue({ task_id: 'seedream-1' });
     const seedream = new Seedream({ request } as any);
 
     await seedream.generate({
-      model: 'doubao-seedream-5-0-260128',
-      prompt: 'a cat',
-      size: '4K',
+      model: 'doubao-seedream-5-0-pro-260628',
+      image: 'https://example.com/source.png',
+      size: '1.5K',
+      layerDecomposition: true,
+      responseFormat: 'b64_json',
+      background: 'transparent',
     });
 
-    expect(request.mock.calls[0][2].json.size).toBe('4K');
+    expect(request.mock.calls[0][2].json).toMatchObject({
+      image: 'https://example.com/source.png',
+      size: '1.5K',
+      layer_decomposition: true,
+      response_format: 'b64_json',
+      background: 'transparent',
+    });
   });
 
-  it('does not expose adaptive in the public size type', () => {
-    type Size = SeedreamGenerateOptions['size'];
-    type AdaptiveIsSupported = 'adaptive' extends Size ? true : false;
-    const adaptiveIsSupported: AdaptiveIsSupported = false;
-    expect(adaptiveIsSupported).toBe(false);
+  it('accepts either a string or array image', () => {
+    const stringImage: SeedreamGenerateOptions['image'] = 'https://example.com/source.png';
+    const arrayImage: SeedreamGenerateOptions['image'] = ['https://example.com/source.png'];
+    expect([stringImage, arrayImage]).toHaveLength(2);
   });
 });

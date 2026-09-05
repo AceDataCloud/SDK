@@ -13,14 +13,10 @@ type MessagesRequest struct {
 }
 
 func (r MessagesRequest) toBody() map[string]any {
-	maxTok := r.MaxTokens
-	if maxTok == 0 {
-		maxTok = 4096
-	}
 	body := map[string]any{
 		"model":      r.Model,
 		"messages":   r.Messages,
-		"max_tokens": maxTok,
+		"max_tokens": r.MaxTokens,
 	}
 	if r.Stream {
 		body["stream"] = true

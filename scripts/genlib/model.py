@@ -84,6 +84,33 @@ def _array_items_are_objects(schema: dict[str, Any]) -> bool:
     return False
 
 
+def _schema_type(schema: dict[str, Any], language: str) -> str:
+    type_name = schema.get("type")
+    types = {"python": PY_TYPES, "typescript": TS_TYPES, "go": GO_TYPES}[language]
+    fallback = {"python": "Any", "typescript": "unknown", "go": "any"}[language]
+    if type_name == "array":
+        item = (schema.get("items") or {}).get("type")
+        if _array_items_are_objects(schema):
+            return {
+                "python": "list[dict[str, Any]]",
+                "typescript": "Array<Record<string, unknown>>",
+                "go": "[]map[string]any",
+            }[language]
+        item_type = types.get(item, fallback)
+        return {
+            "python": f"list[{item_type}]",
+            "typescript": f"{item_type}[]",
+            "go": f"[]{item_type}",
+        }[language]
+    if type_name == "object":
+        return {
+            "python": "dict[str, Any]",
+            "typescript": "Record<string, unknown>",
+            "go": "map[string]any",
+        }[language]
+    return types.get(type_name, fallback)
+
+
 class Param:
     def __init__(self, name: str, schema: dict, required: bool) -> None:
         self.name = name
@@ -107,36 +134,25 @@ class Param:
     def py_type(self) -> str:
         if self.enum:
             return "Literal[" + ", ".join(json.dumps(e) for e in self.enum) + "]"
-        if self.type == "array":
-            item = (self.schema.get("items") or {}).get("type")
-            if _array_items_are_objects(self.schema):
-                return "list[dict[str, Any]]"
-            return f"list[{PY_TYPES.get(item, 'Any')}]"
-        if self.type == "object":
-            return "dict[str, Any]"
-        return PY_TYPES.get(self.type, "Any")
+        variants = self.schema.get("oneOf") or self.schema.get("anyOf")
+        if variants and not self.type:
+            return " | ".join(dict.fromkeys(_schema_type(v, "python") for v in variants))
+        return _schema_type(self.schema, "python")
 
     def ts_type(self) -> str:
         if self.enum:
             return " | ".join(json.dumps(e) for e in self.enum)
-        if self.type == "array":
-            item = (self.schema.get("items") or {}).get("type")
-            if _array_items_are_objects(self.schema):
-                return "Array<Record<string, unknown>>"
-            return f"{TS_TYPES.get(item, 'unknown')}[]"
-        if self.type == "object":
-            return "Record<string, unknown>"
-        return TS_TYPES.get(self.type, "unknown")
+        variants = self.schema.get("oneOf") or self.schema.get("anyOf")
+        if variants and not self.type:
+            return " | ".join(dict.fromkeys(_schema_type(v, "typescript") for v in variants))
+        return _schema_type(self.schema, "typescript")
 
     def go_type(self) -> str:
-        if self.type == "array":
-            item = (self.schema.get("items") or {}).get("type")
-            if _array_items_are_objects(self.schema):
-                return "[]map[string]any"
-            return f"[]{GO_TYPES.get(item, 'any')}"
-        if self.type == "object":
-            return "map[string]any"
-        return GO_TYPES.get(self.type, "any")
+        variants = self.schema.get("oneOf") or self.schema.get("anyOf")
+        if variants and not self.type:
+            types = list(dict.fromkeys(_schema_type(v, "go") for v in variants))
+            return types[0] if len(types) == 1 else "any"
+        return _schema_type(self.schema, "go")
 
 
 # The last path segment names the artifact ("/flux/images"), but a method reads

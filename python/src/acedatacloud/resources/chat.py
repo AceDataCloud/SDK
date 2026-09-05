@@ -18,7 +18,7 @@ class _Messages:
         *,
         model: str,
         messages: list[dict[str, Any]],
-        max_tokens: int = 4096,
+        max_tokens: int,
         stream: bool = False,
         **kwargs: Any,
     ) -> dict[str, Any] | Iterator[dict[str, Any]]:
@@ -57,7 +57,7 @@ class _AsyncMessages:
         *,
         model: str,
         messages: list[dict[str, Any]],
-        max_tokens: int = 4096,
+        max_tokens: int,
         stream: bool = False,
         **kwargs: Any,
     ) -> dict[str, Any]:

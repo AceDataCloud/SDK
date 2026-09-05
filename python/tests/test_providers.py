@@ -150,22 +150,33 @@ def test_seedream_omits_example_only_size(client):
     assert handle.urls() == ["https://cdn.example.com/seedream.png"]
 
 
-def test_seedream_sends_explicit_size(client):
+def test_seedream_serializes_new_contract(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "seedream-1"}
     client.seedream._transport = transport
 
-    client.seedream.generate(model="doubao-seedream-5-0-260128", prompt="a cat", size="4K")
+    client.seedream.generate(
+        model="doubao-seedream-5-0-pro-260628",
+        image="https://example.com/source.png",
+        size="1.5K",
+        layer_decomposition=True,
+        response_format="b64_json",
+        background="transparent",
+    )
 
-    assert transport.request.call_args.kwargs["json"]["size"] == "4K"
+    body = transport.request.call_args.kwargs["json"]
+    assert body["image"] == "https://example.com/source.png"
+    assert body["size"] == "1.5K"
+    assert body["layer_decomposition"] is True
+    assert body["response_format"] == "b64_json"
+    assert body["background"] == "transparent"
 
 
-def test_seedream_size_type_excludes_adaptive(client):
+def test_seedream_image_accepts_string_or_array(client):
     hints = typing.get_type_hints(type(client.seedream).generate)
-    size = hints["size"]
-    literal = next((arg for arg in typing.get_args(size) if typing.get_origin(arg) is typing.Literal), None)
-    assert literal is not None
-    assert "adaptive" not in typing.get_args(literal)
+    image_types = typing.get_args(hints["image"])
+    assert str in image_types
+    assert list[str] in image_types
 
 
 def test_async_is_requested_by_default(client):

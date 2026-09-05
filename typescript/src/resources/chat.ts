@@ -8,25 +8,25 @@ export class Messages {
   async create(opts: {
     model: string;
     messages: Array<Record<string, unknown>>;
-    maxTokens?: number;
+    maxTokens: number;
     stream?: false;
     [key: string]: unknown;
   }): Promise<Record<string, unknown>>;
   async create(opts: {
     model: string;
     messages: Array<Record<string, unknown>>;
-    maxTokens?: number;
+    maxTokens: number;
     stream: true;
     [key: string]: unknown;
   }): Promise<AsyncGenerator<Record<string, unknown>>>;
   async create(opts: {
     model: string;
     messages: Array<Record<string, unknown>>;
-    maxTokens?: number;
+    maxTokens: number;
     stream?: boolean;
     [key: string]: unknown;
   }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
-    const { model, messages, maxTokens = 4096, stream, ...rest } = opts;
+    const { model, messages, maxTokens, stream, ...rest } = opts;
     const body: Record<string, unknown> = { model, messages, max_tokens: maxTokens, ...rest };
 
     if (stream) {
