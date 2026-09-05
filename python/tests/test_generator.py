@@ -82,3 +82,38 @@ def test_array_of_object_union_stays_structured_in_all_languages():
     assert param.py_type() == "list[dict[str, Any]]"
     assert param.ts_type() == "Array<Record<string, unknown>>"
     assert param.go_type() == "[]map[string]any"
+
+
+def test_schema_can_request_optional_pointer_in_go():
+    param = Param("layer_decomposition", {"type": "boolean", "x-go-optional-pointer": True}, required=False)
+    assert param.go_type() == "*bool"
+
+
+def test_plain_optional_boolean_preserves_go_value_type():
+    param = Param("watermark", {"type": "boolean"}, required=False)
+    assert param.go_type() == "bool"
+
+
+def test_pattern_string_becomes_precise_typescript_literals():
+    param = Param("size", {"type": "string", "pattern": r"^(1K|1\.5K|auto|[0-9]+x[0-9]+)$"}, required=False)
+    assert param.py_type() == 'Literal["1K", "1.5K", "auto"] | str'
+    assert param.ts_type() == '"1K" | "1.5K" | "auto" | `${number}x${number}`'
+
+
+def test_string_or_array_union_stays_typed():
+    param = Param(
+        "image",
+        {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+        required=False,
+    )
+    assert param.py_type() == "str | list[str]"
+    assert param.ts_type() == "string | string[]"
+
+
+def test_optional_union_uses_nil_aware_go_any_type():
+    param = Param(
+        "image",
+        {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+        required=False,
+    )
+    assert param.go_type() == "any"

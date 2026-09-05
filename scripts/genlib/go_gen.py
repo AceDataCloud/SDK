@@ -80,9 +80,10 @@ def _to_body(struct: str, svc: Service, ep) -> str:
             lines.append(f"\tif r.{field} != {zero} {{")
             lines.append(f"\t\tbody[{key}] = r.{field}")
             lines.append("\t}")
-        elif go_type.startswith("[]") or go_type.startswith("map["):
+        elif go_type == "any" or go_type.startswith("[]") or go_type.startswith("map[") or go_type.startswith("*"):
             lines.append(f"\tif r.{field} != nil {{")
-            lines.append(f"\t\tbody[{key}] = r.{field}")
+            value = f"*r.{field}" if go_type.startswith("*") else f"r.{field}"
+            lines.append(f"\t\tbody[{key}] = {value}")
             lines.append("\t}")
         else:
             lines.append(f"\tbody[{key}] = r.{field}")
