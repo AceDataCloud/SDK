@@ -10,6 +10,10 @@ from .model import Param, Service, pascal, py_param, snake
 
 def _py_literal(value: object) -> str:
     """A Python literal, not a JSON one — json.dumps(True) emits `true`."""
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, list):
+        return "[" + ", ".join(_py_literal(item) for item in value) + "]"
     return repr(value)
 
 HEADER = '''"""{title} — generated from the platform OpenAPI spec.
@@ -22,12 +26,11 @@ model upstream reaches the SDK without anyone retyping it.
 from __future__ import annotations
 
 from typing import Any, Literal  # noqa: F401
-
-from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
+{extra_imports}{task_import}
 '''
 
 
-def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
+def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool, callback: bool) -> str:
     lines = ["self", "*"]
     for p in params:
         name = py_param(p.name)
@@ -43,7 +46,8 @@ def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) 
             "poll_interval: float = 3.0",
             "max_wait: float = 600.0",
         ]
-    lines.append("callback_url: str | None = None")
+    if callback:
+        lines.append("callback_url: str | None = None")
     lines.append("**extra: Any")
     return ",\n        ".join(lines)
 
@@ -58,7 +62,7 @@ def _default_consts(svc: Service) -> tuple[dict[str, str], list[str]]:
     lines: list[str] = []
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or p.required or p.name in mapping:
+            if p.is_control or p.is_header or p.required or p.name in mapping:
                 continue
             default = p.default()
             if not isinstance(default, str) or len(default) <= 60:
@@ -81,7 +85,7 @@ def _default_consts(svc: Service) -> tuple[dict[str, str], list[str]]:
 
 
 def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] | None = None,
-          method: str = "") -> str:
+          method: str = "", callback: bool = True) -> str:
     """Build the request body, applying only explicit schema defaults."""
     out: list[str] = [f"{indent}body: dict[str, Any] = {{}}"]
     for p in params:
@@ -108,9 +112,36 @@ def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] 
                 out.append(f"{indent}    {name} if {name} is not None else {_py_literal(default)}")
                 out.append(f"{indent})")
     out.append(f"{indent}body.update(extra)")
-    out.append(f"{indent}if callback_url is not None:")
-    out.append(f'{indent}    body["callback_url"] = callback_url')
+    if callback:
+        out.append(f"{indent}if callback_url is not None:")
+        out.append(f'{indent}    body["callback_url"] = callback_url')
     return "\n".join(out)
+
+
+def _params(params: list[Param], indent: str = "        ") -> str:
+    out: list[str] = [f"{indent}params: dict[str, Any] = {{}}"]
+    for p in params:
+        name = py_param(p.name)
+        default = p.default()
+        if p.required:
+            out.append(f'{indent}params["{p.name}"] = {name}')
+        elif default is None:
+            out.append(f"{indent}if {name} is not None:")
+            out.append(f'{indent}    params["{p.name}"] = {name}')
+        else:
+            out.append(f'{indent}params["{p.name}"] = {name} if {name} is not None else {_py_literal(default)}')
+    out.append(f"{indent}params.update(extra)")
+    return "\n".join(out)
+
+
+def _path_expr(path: str, params: list[Param]) -> str:
+    if not params:
+        return json.dumps(path)
+    expr = path
+    for p in params:
+        name = py_param(p.name)
+        expr = expr.replace("{" + p.name + "}", "{quote(str(" + name + "), safe='')}")
+    return "f" + json.dumps(expr)
 
 
 def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
@@ -123,7 +154,7 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
     lines: list[str] = []
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or not p.enum or p.name in mapping:
+            if p.is_control or p.is_header or not p.enum or p.name in mapping:
                 continue
             inline = p.py_type()
             if len(inline) <= 40:
@@ -164,14 +195,17 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
 
     lines = [
         f"    {prefix}def {ep.method}(",
-        f"        {_signature(params, aliases, pollable=ep.pollable)},",
+        f"        {_signature(params, aliases, pollable=ep.pollable, callback=bool(ep.body_params))},",
     ]
     if ep.pollable:
         lines.append(f"    ) -> {handle}:")
     else:
         lines.append("    ) -> dict[str, Any]:")
     lines.extend(_docstring(doc))
-    lines.append(_body(params, consts=consts, method=ep.method))
+    if ep.body_params:
+        lines.append(_body(ep.body_params, consts=consts, method=ep.method, callback=True))
+    elif ep.query_params or (not ep.body_params and not ep.pollable):
+        lines.append(_params(ep.query_params))
 
     if ep.pollable:
         lines.append("        body[\"async\"] = True if async_ is None else async_")
@@ -188,9 +222,16 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
         )
         lines.append("        return handle")
     else:
-        lines.append(
-            f'        return {await_}self._transport.request("POST", "{ep.path}", json=body)'
-        )
+        args = [f'"{ep.http_method.upper()}"', _path_expr(ep.path, ep.path_params)]
+        kwargs = []
+        if ep.body_params:
+            kwargs.append("json=body")
+        if ep.query_params or (not ep.body_params and not ep.pollable):
+            kwargs.append("params=params")
+        if kwargs:
+            lines.append(f"        return {await_}self._transport.request({', '.join(args)}, {', '.join(kwargs)})")
+        else:
+            lines.append(f"        return {await_}self._transport.request({', '.join(args)})")
     return "\n".join(lines)
 
 
@@ -198,8 +239,9 @@ def render(svc: Service) -> str:
     title = f"{svc.class_name} ({svc.alias})"
     aliases, alias_lines = _aliases(svc)
     consts, const_lines = _default_consts(svc)
-    out = [HEADER.format(title=title)]
-    out.append("")
+    extra_imports = "from urllib.parse import quote\n\n" if any(ep.path_params for ep in svc.endpoints) else "\n"
+    task_import = "from ..._runtime.tasks import AsyncTaskHandle, TaskHandle" if any(ep.pollable for ep in svc.endpoints) else ""
+    out = [HEADER.format(title=title, extra_imports=extra_imports, task_import=task_import).rstrip()]
     if const_lines:
         out.append("")
         out.extend(const_lines)
@@ -215,8 +257,8 @@ def render(svc: Service) -> str:
     out.append('    if result.get("task_id"):')
     out.append('        return str(result["task_id"])')
     out.append('    data = result.get("data")')
-    out.append("    if isinstance(data, dict) and data.get('task_id'):")
-    out.append("        return str(data['task_id'])")
+    out.append('    if isinstance(data, dict) and data.get("task_id"):')
+    out.append('        return str(data["task_id"])')
     out.append('    return str(result.get("id") or "")')
     out.append("")
     out.append("")
@@ -246,10 +288,8 @@ def write_all(services: list[Service], root: Path) -> list[Path]:
 
     init = ['"""Provider-axis clients, generated from the platform OpenAPI specs."""', ""]
     for svc in services:
-        init.append(
-            f"from .{svc.py_module} import {svc.class_name} as {svc.class_name}, "
-            f"Async{svc.class_name} as Async{svc.class_name}"
-        )
+        init.append(f"from .{svc.py_module} import Async{svc.class_name} as Async{svc.class_name}")
+        init.append(f"from .{svc.py_module} import {svc.class_name} as {svc.class_name}")
     init.append("")
     init.append("__all__ = [")
     for svc in services:
@@ -277,7 +317,7 @@ from typing import Any
 
 
 def render_mixin(services: list[Service]) -> str:
-    out = [MIXIN_HEADER]
+    out = [MIXIN_HEADER.rstrip() + "\n"]
     for svc in services:
         out.append(
             f"from .{svc.py_module} import Async{svc.class_name}, {svc.class_name}"

@@ -11,6 +11,11 @@
     "id": "82dcabe9-b1a3-541f-80f1-decb183b920c",
     "path": "/fish/model",
     "name": "Fish Model Create API"
+   },
+   {
+    "id": "82dcabe9-b1a3-541f-80f1-decb183b920c",
+    "path": "/fish/model/{id}",
+    "name": "Fish Model Get API"
    }
   ],
   "tasks": "/fish/tasks"

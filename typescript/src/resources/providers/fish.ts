@@ -17,38 +17,36 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface FishGenerateOptions {
-  /** Text content to be synthesized. Required, must be a non-empty string. */
+  /** Fish Tts Text */
   text: string;
-  /** Top-p nucleus sampling parameter, controls output diversity. */
-  topP?: number;
-  /** Output audio format, default is `mp3`. */
-  format?: "mp3" | "wav" | "pcm" | "opus";
-  /** Delay mode. The upstream rejects null values, and defaults to `normal` when omitted. */
-  latency?: "normal" | "balanced";
-  /** Rhythm coverage parameters, forwarded as is to upstream (such as speech rate, volume, etc.). */
-  prosody?: Record<string, unknown>;
-  /** Is the input text subjected to text normalization processing by the upstream? */
-  normalize?: boolean;
-  /** Inline reference audio samples will be forwarded upstream as is, for zero-shot voice cloning. */
-  references?: Array<Record<string, unknown>>;
-  /** MP3 bitrate when `format=mp3`. */
-  mp3Bitrate?: number;
-  /** Output the audio sampling rate (e.g., 16000, 22050, 44100). */
+  /** Fish Tts Reference Id */
+  referenceId?: string | string[];
+  /** Fish Tts Format */
+  format?: "mp3" | "wav" | "pcm";
+  /** Fish Tts Sample Rate */
   sampleRate?: number;
-  /** Sampling temperature (0.0–1.0). The higher the value, the more diverse the output; the lower the value, the more stable and consistent it is. */
-  temperature?: number;
-  /** The chunk length passed to the upstream synthesizer. */
+  /** Fish Tts Mp3 Bitrate */
+  mp3Bitrate?: number;
+  /** Fish Tts Latency */
+  latency?: "normal" | "balanced";
+  /** Fish Tts Chunk Length */
   chunkLength?: number;
-  /** Opus bitrate when `format=opus`. */
-  opusBitrate?: number;
-  /** Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios. */
-  referenceId?: string;
-  /** Maximum number of new tokens generated. */
-  maxNewTokens?: number;
-  /** Minimum block length. */
+  /** Fish Tts Min Chunk Length */
   minChunkLength?: number;
-  /** The repetition penalty coefficient applied during the generation process. */
+  /** Fish Tts Temperature */
+  temperature?: number;
+  /** Fish Tts Top P */
+  topP?: number;
+  /** Fish Tts Repetition Penalty */
   repetitionPenalty?: number;
+  /** Fish Tts Max New Tokens */
+  maxNewTokens?: number;
+  /** Fish Tts Normalize */
+  normalize?: boolean;
+  /** Fish Tts Prosody */
+  prosody?: Record<string, unknown>;
+  /** Fish Tts References */
+  references?: Array<Record<string, unknown>>;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -61,25 +59,21 @@ export interface FishGenerateOptions {
 }
 
 export interface FishModelOptions {
-  /** Name of the voice model. */
-  title: string;
-  /** The HTTP(S) URL of the audio file for cloning must be a single URL string. This interface does not support multipart/binary file uploads. */
-  voices: string;
-  /** Tags used for retrieval in public repositories (optional). */
-  tags?: string[];
-  /** Reference text corresponding to the audio sample (optional). */
-  texts?: string[];
-  /** The visibility of the model is set to `private` by default. */
-  visibility?: "public" | "private";
-  /** HTTP(S) URL of the voice model cover image (optional). */
-  coverImage?: string;
-  /** Description of the voice model (optional). */
-  description?: string;
-  /** If it is `true`, the upstream service will generate a sample voice after the training is completed. */
-  generateSample?: boolean;
-  /** If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before training. */
-  enhanceAudioQuality?: boolean;
-  callbackUrl?: string;
+  pageSize?: number;
+  pageNumber?: number;
+  title?: string;
+  tag?: string;
+  self?: boolean;
+  authorId?: string;
+  language?: string;
+  titleLanguage?: string;
+  sortBy?: string;
+  /** Any parameter added upstream before the SDK is regenerated. */
+  [key: string]: unknown;
+}
+
+export interface FishModelByIdOptions {
+  id: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;
 }
@@ -88,27 +82,26 @@ export interface FishModelOptions {
 export class Fish {
   constructor(private transport: Transport) {}
 
-  /** Fish Audio text-to-speech API — convert text into natural speech using a chosen voice model. */
+  /** Fish Tts */
   async generate(options: FishGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["text"] = options.text;
-    if (options.topP !== undefined) body["top_p"] = options.topP;
-    if (options.format !== undefined) body["format"] = options.format;
-    if (options.latency !== undefined) body["latency"] = options.latency;
-    if (options.prosody !== undefined) body["prosody"] = options.prosody;
-    if (options.normalize !== undefined) body["normalize"] = options.normalize;
-    if (options.references !== undefined) body["references"] = options.references;
-    if (options.mp3Bitrate !== undefined) body["mp3_bitrate"] = options.mp3Bitrate;
-    if (options.sampleRate !== undefined) body["sample_rate"] = options.sampleRate;
-    if (options.temperature !== undefined) body["temperature"] = options.temperature;
-    if (options.chunkLength !== undefined) body["chunk_length"] = options.chunkLength;
-    if (options.opusBitrate !== undefined) body["opus_bitrate"] = options.opusBitrate;
     if (options.referenceId !== undefined) body["reference_id"] = options.referenceId;
-    if (options.maxNewTokens !== undefined) body["max_new_tokens"] = options.maxNewTokens;
+    if (options.format !== undefined) body["format"] = options.format;
+    if (options.sampleRate !== undefined) body["sample_rate"] = options.sampleRate;
+    if (options.mp3Bitrate !== undefined) body["mp3_bitrate"] = options.mp3Bitrate;
+    if (options.latency !== undefined) body["latency"] = options.latency;
+    if (options.chunkLength !== undefined) body["chunk_length"] = options.chunkLength;
     if (options.minChunkLength !== undefined) body["min_chunk_length"] = options.minChunkLength;
+    if (options.temperature !== undefined) body["temperature"] = options.temperature;
+    if (options.topP !== undefined) body["top_p"] = options.topP;
     if (options.repetitionPenalty !== undefined) body["repetition_penalty"] = options.repetitionPenalty;
+    if (options.maxNewTokens !== undefined) body["max_new_tokens"] = options.maxNewTokens;
+    if (options.normalize !== undefined) body["normalize"] = options.normalize;
+    if (options.prosody !== undefined) body["prosody"] = options.prosody;
+    if (options.references !== undefined) body["references"] = options.references;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "callbackUrl", "chunkLength", "format", "latency", "maxNewTokens", "maxWait", "minChunkLength", "mp3Bitrate", "normalize", "opusBitrate", "pollInterval", "prosody", "referenceId", "references", "repetitionPenalty", "sampleRate", "temperature", "text", "topP", "wait"].includes(key) && value !== undefined) {
+      if (!["async", "callbackUrl", "chunkLength", "format", "latency", "maxNewTokens", "maxWait", "minChunkLength", "mp3Bitrate", "normalize", "pollInterval", "prosody", "referenceId", "references", "repetitionPenalty", "sampleRate", "temperature", "text", "topP", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
@@ -122,25 +115,35 @@ export class Fish {
     return handle;
   }
 
-  /** Fish Audio model creation API — upload reference audio to create a custom voice-clone model. */
-  async model(options: FishModelOptions): Promise<Record<string, unknown>> {
-    const body: Record<string, unknown> = {};
-    body["title"] = options.title;
-    body["voices"] = options.voices;
-    if (options.tags !== undefined) body["tags"] = options.tags;
-    if (options.texts !== undefined) body["texts"] = options.texts;
-    if (options.visibility !== undefined) body["visibility"] = options.visibility;
-    if (options.coverImage !== undefined) body["cover_image"] = options.coverImage;
-    if (options.description !== undefined) body["description"] = options.description;
-    if (options.generateSample !== undefined) body["generate_sample"] = options.generateSample;
-    if (options.enhanceAudioQuality !== undefined) body["enhance_audio_quality"] = options.enhanceAudioQuality;
+  /** Fish Model Query */
+  async model(options: FishModelOptions = {}): Promise<Record<string, unknown>> {
+    const params: Record<string, string> = {};
+    params["page_size"] = String(options.pageSize ?? 10);
+    params["page_number"] = String(options.pageNumber ?? 1);
+    if (options.title !== undefined) params["title"] = String(options.title);
+    if (options.tag !== undefined) params["tag"] = String(options.tag);
+    if (options.self !== undefined) params["self"] = String(options.self);
+    if (options.authorId !== undefined) params["author_id"] = String(options.authorId);
+    if (options.language !== undefined) params["language"] = String(options.language);
+    if (options.titleLanguage !== undefined) params["title_language"] = String(options.titleLanguage);
+    if (options.sortBy !== undefined) params["sort_by"] = String(options.sortBy);
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "callbackUrl", "coverImage", "description", "enhanceAudioQuality", "generateSample", "maxWait", "pollInterval", "tags", "texts", "title", "visibility", "voices", "wait"].includes(key) && value !== undefined) {
-        body[key] = value;
+      if (!["authorId", "language", "pageNumber", "pageSize", "self", "sortBy", "tag", "title", "titleLanguage"].includes(key) && value !== undefined) {
+        params[key] = String(value);
       }
     }
-    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
-    return (await this.transport.request('POST', "/fish/model", { json: body })) as Record<string, unknown>;
+    return (await this.transport.request('GET', "/fish/model", { params })) as Record<string, unknown>;
+  }
+
+  /** Fish Model Get */
+  async model_by_id(options: FishModelByIdOptions): Promise<Record<string, unknown>> {
+    const params: Record<string, string> = {};
+    for (const [key, value] of Object.entries(options)) {
+      if (!["id"].includes(key) && value !== undefined) {
+        params[key] = String(value);
+      }
+    }
+    return (await this.transport.request('GET', `/fish/model/${encodeURIComponent(String(options.id))}`, { params })) as Record<string, unknown>;
   }
 
 }

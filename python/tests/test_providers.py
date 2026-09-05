@@ -89,6 +89,30 @@ def test_required_flux_size_is_sent(client):
     assert body["size"] == "1024x1024"
 
 
+def test_fish_model_lists_with_get_query_params(client):
+    transport = Mock()
+    transport.request.return_value = {"data": []}
+    client.fish._transport = transport
+
+    client.fish.model(page_size=20, self_=False, tag="demo")
+
+    transport.request.assert_called_once_with(
+        "GET",
+        "/fish/model",
+        params={"page_size": 20, "page_number": 1, "self": False, "tag": "demo"},
+    )
+
+
+def test_fish_model_by_id_uses_get_path(client):
+    transport = Mock()
+    transport.request.return_value = {"_id": "voice/one"}
+    client.fish._transport = transport
+
+    client.fish.model_by_id(id="voice/one")
+
+    transport.request.assert_called_once_with("GET", "/fish/model/voice%2Fone", params={})
+
+
 def test_caller_value_beats_the_spec_default(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}

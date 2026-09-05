@@ -25,6 +25,10 @@ from typing import Any
 
 # Parameters the SDK owns rather than the caller.
 CONTROL = {"async", "callback_url", "webhook_url"}
+HEADER = "header"
+QUERY = "query"
+PATH = "path"
+BODY = "body"
 
 PY_TYPES = {"string": "str", "integer": "int", "number": "float", "boolean": "bool"}
 TS_TYPES = {
@@ -56,27 +60,30 @@ def pascal(name: str) -> str:
 
 def py_param(name: str) -> str:
     """`async` and friends are reserved; the SDK's convention is a trailing _."""
-    return f"{name}_" if keyword.iskeyword(name) else name
+    return f"{name}_" if keyword.iskeyword(name) or name == "self" else name
 
 
-def request_schema(spec: dict) -> dict:
-    for _path, methods in (spec.get("paths") or {}).items():
-        for method, op in (methods or {}).items():
-            if method.lower() != "post":
-                continue
-            content = (op.get("requestBody") or {}).get("content") or {}
-            schema = (content.get("application/json") or {}).get("schema") or {}
-            if schema:
-                return schema
+def operation(spec: dict, path: str) -> tuple[str, dict]:
+    methods = (spec.get("paths") or {}).get(path) or {}
+    if "post" in methods:
+        return "post", methods["post"]
+    for method, op in methods.items():
+        return method.lower(), op
+    return "post", {}
+
+
+def request_schema(op: dict) -> dict:
+    content = (op.get("requestBody") or {}).get("content") or {}
+    schema = (content.get("application/json") or {}).get("schema") or {}
+    if schema:
+        return schema
     return {}
 
 
-def summary(spec: dict) -> str:
-    for _path, methods in (spec.get("paths") or {}).items():
-        for _method, op in (methods or {}).items():
-            text = op.get("summary") or op.get("description") or ""
-            if text and not text.startswith("$t("):
-                return " ".join(text.split())[:200]
+def summary(op: dict) -> str:
+    text = op.get("summary") or op.get("description") or ""
+    if text and not text.startswith("$t("):
+        return " ".join(text.split())[:200]
     return ""
 
 
@@ -99,10 +106,11 @@ def _array_items_are_objects(schema: dict[str, Any]) -> bool:
 
 
 class Param:
-    def __init__(self, name: str, schema: dict, required: bool) -> None:
+    def __init__(self, name: str, schema: dict, required: bool, location: str = BODY) -> None:
         self.name = name
         self.schema = schema or {}
         self.required = required
+        self.location = location
         self.type = self.schema.get("type")
         self.enum = [e for e in (self.schema.get("enum") or []) if isinstance(e, str)]
         self.description = " ".join(str(self.schema.get("description") or "").split())
@@ -110,6 +118,10 @@ class Param:
     @property
     def is_control(self) -> bool:
         return self.name in CONTROL
+
+    @property
+    def is_header(self) -> bool:
+        return self.location == HEADER
 
     def default(self) -> Any:
         """Return a valid schema default, never an illustrative example."""
@@ -142,7 +154,7 @@ class Param:
         variants = self.schema.get("oneOf") or self.schema.get("anyOf")
         if isinstance(variants, list):
             types = [
-                Param(self.name, variant, self.required).py_type()
+                Param(self.name, variant, self.required, self.location).py_type()
                 for variant in variants
                 if isinstance(variant, dict)
             ]
@@ -163,7 +175,7 @@ class Param:
         variants = self.schema.get("oneOf") or self.schema.get("anyOf")
         if isinstance(variants, list):
             types = [
-                Param(self.name, variant, self.required).ts_type()
+                Param(self.name, variant, self.required, self.location).ts_type()
                 for variant in variants
                 if isinstance(variant, dict)
             ]
@@ -195,6 +207,8 @@ class Param:
         return TS_TYPES.get(self.type, "unknown")
 
     def go_type(self) -> str:
+        if self.location == QUERY and self.type == "boolean" and not self.required:
+            return "*bool"
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
             if _array_items_are_objects(self.schema):
@@ -226,7 +240,12 @@ _MODALITY_PRIMARY = {
 
 
 def _method_name(path: str) -> str:
-    tail = snake(path.rsplit("/", 1)[-1])
+    segments = [part for part in path.split("/") if part]
+    raw_tail = segments[-1] if segments else ""
+    if raw_tail.startswith("{") and raw_tail.endswith("}") and len(segments) >= 2:
+        tail = f"{snake(segments[-2])}_by_{snake(raw_tail[1:-1])}"
+    else:
+        tail = snake(raw_tail)
     return "generate" if tail in _PRIMARY else (tail or "generate")
 
 
@@ -236,19 +255,45 @@ class Endpoint:
     ) -> None:
         self.alias = alias
         self.path = path
+        self.http_method, op = operation(spec, path)
         self.method = _method_name(path)
-        schema = request_schema(spec)
+        schema = request_schema(op)
         required = set(schema.get("required") or [])
         props: dict[str, dict] = schema.get("properties") or {}
-        self.summary = summary(spec)
-        self.params = [Param(n, s, n in required) for n, s in props.items()]
+        self.summary = summary(op)
+        params = [Param(n, s, n in required, BODY) for n, s in props.items()]
+        for p in op.get("parameters") or []:
+            location = p.get("in")
+            if location not in {QUERY, PATH, HEADER}:
+                continue
+            params.append(
+                Param(
+                    p["name"],
+                    p.get("schema") or {},
+                    bool(p.get("required")) or location == PATH,
+                    location,
+                )
+            )
+        self.params = params
         self.pollable = "async" in props or pollable
 
     @property
     def callable_params(self) -> list[Param]:
         """Required first — a Python signature cannot put a defaulted arg before one."""
-        usable = [p for p in self.params if not p.is_control]
+        usable = [p for p in self.params if not p.is_control and not p.is_header]
         return sorted(usable, key=lambda p: not p.required)
+
+    @property
+    def body_params(self) -> list[Param]:
+        return [p for p in self.callable_params if p.location == BODY]
+
+    @property
+    def query_params(self) -> list[Param]:
+        return [p for p in self.callable_params if p.location == QUERY]
+
+    @property
+    def path_params(self) -> list[Param]:
+        return [p for p in self.callable_params if p.location == PATH]
 
 
 class Service:

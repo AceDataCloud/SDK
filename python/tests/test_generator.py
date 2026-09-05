@@ -67,6 +67,32 @@ def test_endpoint_is_pollable_only_when_schema_or_manifest_declares_it():
     assert Endpoint("maestro", "/maestro/videos", sync_spec, pollable=True).pollable
 
 
+def test_endpoint_models_get_query_and_path_parameters():
+    spec = {
+        "paths": {
+            "/fish/model": {
+                "get": {
+                    "parameters": [
+                        {"in": "query", "name": "page_size", "schema": {"type": "integer", "default": 10}},
+                        {"in": "query", "name": "self", "schema": {"type": "boolean"}},
+                        {"in": "header", "name": "accept", "schema": {"type": "string"}},
+                    ]
+                }
+            },
+            "/fish/model/{id}": {"get": {"parameters": [{"in": "path", "name": "id", "schema": {"type": "string"}}]}},
+        }
+    }
+
+    listing = Endpoint("fish", "/fish/model", spec)
+    detail = Endpoint("fish", "/fish/model/{id}", spec)
+
+    assert listing.http_method == "get"
+    assert [p.name for p in listing.query_params] == ["page_size", "self"]
+    assert [p.name for p in listing.callable_params] == ["page_size", "self"]
+    assert detail.method == "model_by_id"
+    assert [p.name for p in detail.path_params] == ["id"]
+
+
 def test_array_of_object_union_stays_structured_in_all_languages():
     schema = {
         "type": "array",

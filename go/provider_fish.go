@@ -3,7 +3,11 @@
 
 package acedatacloud
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"net/url"
+)
 
 // Fish is the fish provider client.
 type Fish struct {
@@ -12,38 +16,36 @@ type Fish struct {
 
 // FishGenerateRequest is the input to fish.Generate.
 type FishGenerateRequest struct {
-	// Text content to be synthesized. Required, must be a non-empty string.
+	// Fish Tts Text
 	Text string
-	// Top-p nucleus sampling parameter, controls output diversity.
-	TopP float64
-	// Output audio format, default is `mp3`.
+	// Fish Tts Reference Id
+	ReferenceID any
+	// Fish Tts Format
 	Format string
-	// Delay mode. The upstream rejects null values, and defaults to `normal` when omitted.
-	Latency string
-	// Rhythm coverage parameters, forwarded as is to upstream (such as speech rate, volume, etc.).
-	Prosody map[string]any
-	// Is the input text subjected to text normalization processing by the upstream?
-	Normalize bool
-	// Inline reference audio samples will be forwarded upstream as is, for zero-shot voice cloning.
-	References []map[string]any
-	// MP3 bitrate when `format=mp3`.
-	Mp3Bitrate int
-	// Output the audio sampling rate (e.g., 16000, 22050, 44100).
+	// Fish Tts Sample Rate
 	SampleRate int
-	// Sampling temperature (0.0–1.0). The higher the value, the more diverse the output; the lower the value, the mo
-	Temperature float64
-	// The chunk length passed to the upstream synthesizer.
+	// Fish Tts Mp3 Bitrate
+	Mp3Bitrate int
+	// Fish Tts Latency
+	Latency string
+	// Fish Tts Chunk Length
 	ChunkLength int
-	// Opus bitrate when `format=opus`.
-	OpusBitrate int
-	// Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios.
-	ReferenceID string
-	// Maximum number of new tokens generated.
-	MaxNewTokens int
-	// Minimum block length.
+	// Fish Tts Min Chunk Length
 	MinChunkLength int
-	// The repetition penalty coefficient applied during the generation process.
+	// Fish Tts Temperature
+	Temperature float64
+	// Fish Tts Top P
+	TopP float64
+	// Fish Tts Repetition Penalty
 	RepetitionPenalty float64
+	// Fish Tts Max New Tokens
+	MaxNewTokens int
+	// Fish Tts Normalize
+	Normalize bool
+	// Fish Tts Prosody
+	Prosody map[string]any
+	// Fish Tts References
+	References []map[string]any
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -55,48 +57,45 @@ type FishGenerateRequest struct {
 func (r FishGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["text"] = r.Text
-	if r.TopP != 0 {
-		body["top_p"] = r.TopP
+	if r.ReferenceID != nil {
+		body["reference_id"] = r.ReferenceID
 	}
 	if r.Format != "" {
 		body["format"] = r.Format
 	}
-	if r.Latency != "" {
-		body["latency"] = r.Latency
-	}
-	if r.Prosody != nil {
-		body["prosody"] = r.Prosody
-	}
-	body["normalize"] = r.Normalize
-	if r.References != nil {
-		body["references"] = r.References
+	if r.SampleRate != 0 {
+		body["sample_rate"] = r.SampleRate
 	}
 	if r.Mp3Bitrate != 0 {
 		body["mp3_bitrate"] = r.Mp3Bitrate
 	}
-	if r.SampleRate != 0 {
-		body["sample_rate"] = r.SampleRate
-	}
-	if r.Temperature != 0 {
-		body["temperature"] = r.Temperature
+	if r.Latency != "" {
+		body["latency"] = r.Latency
 	}
 	if r.ChunkLength != 0 {
 		body["chunk_length"] = r.ChunkLength
 	}
-	if r.OpusBitrate != 0 {
-		body["opus_bitrate"] = r.OpusBitrate
+	if r.MinChunkLength != 0 {
+		body["min_chunk_length"] = r.MinChunkLength
 	}
-	if r.ReferenceID != "" {
-		body["reference_id"] = r.ReferenceID
+	if r.Temperature != 0 {
+		body["temperature"] = r.Temperature
+	}
+	if r.TopP != 0 {
+		body["top_p"] = r.TopP
+	}
+	if r.RepetitionPenalty != 0 {
+		body["repetition_penalty"] = r.RepetitionPenalty
 	}
 	if r.MaxNewTokens != 0 {
 		body["max_new_tokens"] = r.MaxNewTokens
 	}
-	if r.MinChunkLength != 0 {
-		body["min_chunk_length"] = r.MinChunkLength
+	body["normalize"] = r.Normalize
+	if r.Prosody != nil {
+		body["prosody"] = r.Prosody
 	}
-	if r.RepetitionPenalty != 0 {
-		body["repetition_penalty"] = r.RepetitionPenalty
+	if r.References != nil {
+		body["references"] = r.References
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -113,7 +112,7 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Fish Audio text-to-speech API — convert text into natural speech using a chosen voice model.
+// Generate Fish Tts
 func (c *Fish) Generate(ctx context.Context, req FishGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -128,67 +127,101 @@ func (c *Fish) Generate(ctx context.Context, req FishGenerateRequest) (*TaskHand
 
 // FishModelRequest is the input to fish.Model.
 type FishModelRequest struct {
-	// Name of the voice model.
+	// optional
+	PageSize int
+	// optional
+	PageNumber int
+	// optional
 	Title string
-	// The HTTP(S) URL of the audio file for cloning must be a single URL string. This interface does not support mul
-	Voices string
-	// Tags used for retrieval in public repositories (optional).
-	Tags []string
-	// Reference text corresponding to the audio sample (optional).
-	Texts []string
-	// The visibility of the model is set to `private` by default.
-	Visibility string
-	// HTTP(S) URL of the voice model cover image (optional).
-	CoverImage string
-	// Description of the voice model (optional).
-	Description string
-	// If it is `true`, the upstream service will generate a sample voice after the training is completed.
-	GenerateSample bool
-	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before
-	EnhanceAudioQuality bool
-	// CallbackURL optionally receives the completion webhook.
-	CallbackURL string
+	// optional
+	Tag string
+	// optional
+	Self *bool
+	// optional
+	AuthorID string
+	// optional
+	Language string
+	// optional
+	TitleLanguage string
+	// optional
+	SortBy string
 	// Extra fields merged into the request body.
 	Extra map[string]any
 }
 
-func (r FishModelRequest) toBody() map[string]any {
-	body := map[string]any{}
-	body["title"] = r.Title
-	body["voices"] = r.Voices
-	if r.Tags != nil {
-		body["tags"] = r.Tags
+func (r FishModelRequest) toQuery() url.Values {
+	query := url.Values{}
+	if r.PageSize != 0 {
+		query.Set("page_size", fmt.Sprint(r.PageSize))
+	} else {
+		query.Set("page_size", fmt.Sprint(10))
 	}
-	if r.Texts != nil {
-		body["texts"] = r.Texts
+	if r.PageNumber != 0 {
+		query.Set("page_number", fmt.Sprint(r.PageNumber))
+	} else {
+		query.Set("page_number", fmt.Sprint(1))
 	}
-	if r.Visibility != "" {
-		body["visibility"] = r.Visibility
+	if r.Title != "" {
+		query.Set("title", fmt.Sprint(r.Title))
 	}
-	if r.CoverImage != "" {
-		body["cover_image"] = r.CoverImage
+	if r.Tag != "" {
+		query.Set("tag", fmt.Sprint(r.Tag))
 	}
-	if r.Description != "" {
-		body["description"] = r.Description
+	if r.Self != nil {
+		query.Set("self", fmt.Sprint(*r.Self))
 	}
-	body["generate_sample"] = r.GenerateSample
-	body["enhance_audio_quality"] = r.EnhanceAudioQuality
-	if r.CallbackURL != "" {
-		body["callback_url"] = r.CallbackURL
+	if r.AuthorID != "" {
+		query.Set("author_id", fmt.Sprint(r.AuthorID))
+	}
+	if r.Language != "" {
+		query.Set("language", fmt.Sprint(r.Language))
+	}
+	if r.TitleLanguage != "" {
+		query.Set("title_language", fmt.Sprint(r.TitleLanguage))
+	}
+	if r.SortBy != "" {
+		query.Set("sort_by", fmt.Sprint(r.SortBy))
 	}
 	for k, v := range r.Extra {
-		if _, exists := body[k]; !exists {
-			body[k] = v
+		if _, exists := query[k]; !exists {
+			query.Set(k, fmt.Sprint(v))
 		}
 	}
-	return body
+	return query
 }
 
-// Model Fish Audio model creation API — upload reference audio to create a custom voice-clone model.
+// Model Fish Model Query
 func (c *Fish) Model(ctx context.Context, req FishModelRequest) (map[string]any, error) {
 	return c.t.do(ctx, requestOpts{
-		Method: "POST",
+		Method: "GET",
 		Path:   "/fish/model",
-		Body:   req.toBody(),
+		Query:  req.toQuery(),
+	})
+}
+
+// FishModelByIdRequest is the input to fish.Model_By_Id.
+type FishModelByIdRequest struct {
+	// required
+	ID string
+	// Extra fields merged into the request body.
+	Extra map[string]any
+}
+
+func (r FishModelByIdRequest) toQuery() url.Values {
+	query := url.Values{}
+	for k, v := range r.Extra {
+		if _, exists := query[k]; !exists {
+			query.Set(k, fmt.Sprint(v))
+		}
+	}
+	return query
+}
+
+// ModelById Fish Model Get
+func (c *Fish) ModelById(ctx context.Context, req FishModelByIdRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "GET",
+		Path:   "/fish/model/" + url.PathEscape(req.ID) + "",
+		Query:  req.toQuery(),
 	})
 }

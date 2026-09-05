@@ -36,7 +36,8 @@ def _options_interface(svc: Service, ep) -> tuple[str, str]:
         lines.append("  wait?: boolean;")
         lines.append("  pollInterval?: number;")
         lines.append("  maxWait?: number;")
-    lines.append("  callbackUrl?: string;")
+    if ep.body_params:
+        lines.append("  callbackUrl?: string;")
     lines.append("  /** Any parameter added upstream before the SDK is regenerated. */")
     lines.append("  [key: string]: unknown;")
     lines.append("}")
@@ -45,7 +46,7 @@ def _options_interface(svc: Service, ep) -> tuple[str, str]:
 
 def _body(ep, indent: str = "    ") -> list[str]:
     out = [f"{indent}const body: Record<string, unknown> = {{}};"]
-    for p in ep.callable_params:
+    for p in ep.body_params:
         prop = camel(p.name)
         if p.required:
             out.append(f"{indent}body[{json.dumps(p.name)}] = options.{prop};")
@@ -69,6 +70,33 @@ def _body(ep, indent: str = "    ") -> list[str]:
     return out
 
 
+def _params(ep, indent: str = "    ") -> list[str]:
+    out = [f"{indent}const params: Record<string, string> = {{}};"]
+    for p in ep.query_params:
+        prop = camel(p.name)
+        default = p.default()
+        if p.required:
+            out.append(f"{indent}params[{json.dumps(p.name)}] = String(options.{prop});")
+        elif default is None:
+            out.append(f"{indent}if (options.{prop} !== undefined) params[{json.dumps(p.name)}] = String(options.{prop});")
+        else:
+            out.append(f"{indent}params[{json.dumps(p.name)}] = String(options.{prop} ?? {_ts_literal(default)});")
+    known = {camel(p.name) for p in ep.callable_params}
+    out.append(f"{indent}for (const [key, value] of Object.entries(options)) {{")
+    out.append(f"{indent}  if (!{json.dumps(sorted(known))}.includes(key) && value !== undefined) {{")
+    out.append(f"{indent}    params[key] = String(value);")
+    out.append(f"{indent}  }}")
+    out.append(f"{indent}}}")
+    return out
+
+
+def _path_expr(ep) -> str:
+    path = json.dumps(ep.path)
+    for p in ep.path_params:
+        path = path.replace("{" + p.name + "}", "${encodeURIComponent(String(options." + camel(p.name) + "))}")
+    return "`" + path[1:-1] + "`" if ep.path_params else path
+
+
 def _method(svc: Service, ep) -> str:
     options_name, _ = _options_interface(svc, ep)
     tasks = svc.tasks_path or f"/{svc.alias}/tasks"
@@ -81,7 +109,10 @@ def _method(svc: Service, ep) -> str:
         lines.append(f"  async {ep.method}({arg}): Promise<TaskHandle> {{")
     else:
         lines.append(f"  async {ep.method}({arg}): Promise<Record<string, unknown>> {{")
-    lines.extend(_body(ep))
+    if ep.body_params:
+        lines.extend(_body(ep))
+    elif ep.query_params or (not ep.body_params and not ep.pollable):
+        lines.extend(_params(ep))
 
     if ep.pollable:
         lines.append("    body.async = options.async ?? true;")
@@ -98,8 +129,14 @@ def _method(svc: Service, ep) -> str:
         lines.append("    }")
         lines.append("    return handle;")
     else:
+        opts = []
+        if ep.body_params:
+            opts.append("json: body")
+        if ep.query_params or (not ep.body_params and not ep.pollable):
+            opts.append("params")
+        options = f", {{ {', '.join(opts)} }}" if opts else ""
         lines.append(
-            f"    return (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body }})) as Record<string, unknown>;"
+            f"    return (await this.transport.request('{ep.http_method.upper()}', {_path_expr(ep)}{options})) as Record<string, unknown>;"
         )
     lines.append("  }")
     return "\n".join(lines)
