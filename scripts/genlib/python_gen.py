@@ -171,12 +171,18 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
     else:
         lines.append("    ) -> dict[str, Any]:")
     lines.extend(_docstring(doc))
-    lines.append(_body(params, consts=consts, method=ep.method))
+    lines.append(_body(sorted(ep.body_params, key=lambda p: not p.required), consts=consts, method=ep.method))
 
+    header_entries = ", ".join(
+        f'"{p.name}": {py_param(p.name)}' for p in ep.header_params
+    )
+    headers = ", extra_headers=extra_headers" if header_entries else ""
+    if header_entries:
+        lines.append(f"        extra_headers = {{k: v for k, v in {{{header_entries}}}.items() if v is not None}}")
     if ep.pollable:
         lines.append("        body[\"async\"] = True if async_ is None else async_")
         lines.append(
-            f'        result = {await_}self._transport.request("POST", "{ep.path}", json=body)'
+            f'        result = {await_}self._transport.request("POST", "{ep.path}", json=body{headers})'
         )
         tasks = svc.tasks_path or f"/{svc.alias}/tasks"
         lines.append(
@@ -189,7 +195,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
         lines.append("        return handle")
     else:
         lines.append(
-            f'        return {await_}self._transport.request("POST", "{ep.path}", json=body)'
+            f'        return {await_}self._transport.request("POST", "{ep.path}", json=body{headers})'
         )
     return "\n".join(lines)
 

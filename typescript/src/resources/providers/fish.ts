@@ -22,15 +22,15 @@ export interface FishGenerateOptions {
   /** Top-p nucleus sampling parameter, controls output diversity. */
   topP?: number;
   /** Output audio format, default is `mp3`. */
-  format?: "mp3" | "wav" | "pcm" | "opus";
+  format?: "mp3" | "wav" | "pcm";
   /** Delay mode. The upstream rejects null values, and defaults to `normal` when omitted. */
   latency?: "normal" | "balanced";
   /** Rhythm coverage parameters, forwarded as is to upstream (such as speech rate, volume, etc.). */
   prosody?: Record<string, unknown>;
   /** Is the input text subjected to text normalization processing by the upstream? */
   normalize?: boolean;
-  /** Inline reference audio samples will be forwarded upstream as is, for zero-shot voice cloning. */
-  references?: Array<Record<string, unknown>>;
+  /** One-shot voice clone reference; cannot be combined with reference_id. */
+  references?: Array<{ audio: string; text: string }>;
   /** MP3 bitrate when `format=mp3`. */
   mp3Bitrate?: number;
   /** Output the audio sampling rate (e.g., 16000, 22050, 44100). */
@@ -41,14 +41,15 @@ export interface FishGenerateOptions {
   chunkLength?: number;
   /** Opus bitrate when `format=opus`. */
   opusBitrate?: number;
-  /** Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios. */
-  referenceId?: string;
+  /** Saved/public voice ID; cannot be combined with references. */
+  referenceId?: string | string[];
   /** Maximum number of new tokens generated. */
   maxNewTokens?: number;
   /** Minimum block length. */
   minChunkLength?: number;
   /** The repetition penalty coefficient applied during the generation process. */
   repetitionPenalty?: number;
+  model?: "s1" | "s2-pro" | "s2.1-pro";
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -108,13 +109,13 @@ export class Fish {
     if (options.minChunkLength !== undefined) body["min_chunk_length"] = options.minChunkLength;
     if (options.repetitionPenalty !== undefined) body["repetition_penalty"] = options.repetitionPenalty;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "callbackUrl", "chunkLength", "format", "latency", "maxNewTokens", "maxWait", "minChunkLength", "mp3Bitrate", "normalize", "opusBitrate", "pollInterval", "prosody", "referenceId", "references", "repetitionPenalty", "sampleRate", "temperature", "text", "topP", "wait"].includes(key) && value !== undefined) {
+      if (!["async", "callbackUrl", "chunkLength", "format", "latency", "maxNewTokens", "maxWait", "minChunkLength", "model", "mp3Bitrate", "normalize", "opusBitrate", "pollInterval", "prosody", "referenceId", "references", "repetitionPenalty", "sampleRate", "temperature", "text", "topP", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
     body.async = options.async ?? true;
-    const result = (await this.transport.request('POST', "/fish/tts", { json: body })) as Record<string, unknown>;
+    const result = (await this.transport.request('POST', "/fish/tts", { json: body, headers: options.model !== undefined ? {"model": options.model} : {} })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/fish/tasks", this.transport, result);
     if (options.wait) {
       await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });

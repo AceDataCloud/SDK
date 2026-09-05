@@ -1,1 +1,674 @@
-{"paths": {"/fish/tts": {"post": {"summary": "Fish Audio text-to-speech API \u2014 convert text into natural speech using a chosen voice model.", "security": [{"bearerAuth": []}], "responses": {"200": {"content": {"application/json": {"schema": {"type": "object", "example": {"audio_url": "https://platform.r2.fish.audio/task/8a72ff9840234006a9f74cb2fa04f978.mp3"}, "properties": {"audio_url": {"type": "string", "description": "The URL of the generated audio file."}}}}}, "description": "Request successful (OK)."}, "400": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "token_mismatched", "message": "The specified token is not matched with API."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "token_mismatched", "description": "Response error code."}, "message": {"type": "string", "example": "The specified token is not matched with API.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "api_not_implemented", "message": "The API is not implemented."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "api_not_implemented", "description": "Response error code."}, "message": {"type": "string", "example": "The API is not implemented.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "disabled", "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "disabled", "description": "Response error code."}, "message": {"type": "string", "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "bad_request", "message": "model is invalid."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "bad_request", "description": "Response error code."}, "message": {"type": "string", "example": "model is invalid.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "no_token", "message": "No token specified for the request."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "no_token", "description": "Response error code."}, "message": {"type": "string", "example": "No token specified for the request.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Request error, possibly due to missing or invalid parameters."}, "401": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "invalid_token", "message": "The specified token is invalid or wrong."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "invalid_token", "description": "Response error code."}, "message": {"type": "string", "example": "The specified token is invalid or wrong.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "token_expired", "message": "token expired."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "token_expired", "description": "Response error code."}, "message": {"type": "string", "example": "token expired.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}, {"type": "object", "example": {"error": {"code": "token_mismatched", "message": "token and api does not match."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "token_mismatched", "description": "Response error code."}, "message": {"type": "string", "example": "token and api does not match.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Unauthorized, authorization token is invalid or missing."}, "403": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "used_up", "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "used_up", "description": "Response error code."}, "message": {"type": "string", "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Unauthorized, authorization token is invalid or missing."}, "404": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "no_api", "message": "API does not exist, please make sure url is correct."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "no_api", "description": "Response error code."}, "message": {"type": "string", "example": "API does not exist, please make sure url is correct.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Unauthorized, authorization token is invalid or missing."}, "429": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "too_many_requests", "message": "You have exceeded the rate limit."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "too_many_requests", "description": "Response error code."}, "message": {"type": "string", "example": "You have exceeded the rate limit.", "description": "Error message of the response."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Too many requests, rate limit exceeded."}, "500": {"content": {"application/json": {"schema": {"oneOf": [{"type": "object", "example": {"error": {"code": "api_error", "message": "Internal server error."}, "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"}, "properties": {"error": {"type": "object", "properties": {"code": {"type": "string", "example": "api_error", "description": "Response error code."}, "message": {"type": "string", "example": "Internal server error.", "description": "Response error message."}}}, "trace_id": {"type": "string", "description": "The tracking ID for this request."}}}]}}}, "description": "Internal server error, an exception occurred on the server side."}}, "parameters": [{"in": "header", "name": "accept", "schema": {"enum": ["application/json"], "type": "string"}, "required": false, "description": "Specify the format of the response returned by the server. If not specified, the default format is `application/json`."}, {"in": "header", "name": "model", "schema": {"enum": ["s1", "s2-pro", "s2.1-pro"], "type": "string"}, "required": false, "description": "The TTS model used can be `s1` or `s2-pro`, with `s2-pro` as the default."}], "requestBody": {"content": {"application/json": {"schema": {"type": "object", "required": ["text"], "properties": {"text": {"rank": 0, "type": "string", "example": "Hello, this is a Fish-Audio-compatible test.", "description": "Text content to be synthesized. Required, must be a non-empty string."}, "async": {"rank": 101, "type": "boolean", "description": "Whether to process in asynchronous mode. When set to `true`, the interface immediately returns `task_id`, without the need to provide `callback_url`, and then the result can be obtained by polling the corresponding task query interface; if `callback_url` is also provided, the result will be pushed to that callback address."}, "top_p": {"rank": 61, "type": "number", "description": "Top-p nucleus sampling parameter, controls output diversity."}, "format": {"enum": ["mp3", "wav", "pcm", "opus"], "rank": 20, "type": "string", "description": "Output audio format, default is `mp3`."}, "latency": {"enum": ["normal", "balanced"], "rank": 40, "type": "string", "description": "Delay mode. The upstream rejects null values, and defaults to `normal` when omitted."}, "prosody": {"rank": 80, "type": "object", "description": "Rhythm coverage parameters, forwarded as is to upstream (such as speech rate, volume, etc.)."}, "normalize": {"rank": 70, "type": "boolean", "description": "Is the input text subjected to text normalization processing by the upstream?"}, "references": {"rank": 81, "type": "array", "items": {"type": "object"}, "description": "Inline reference audio samples will be forwarded upstream as is, for zero-shot voice cloning."}, "mp3_bitrate": {"enum": [64, 128, 192], "rank": 31, "type": "integer", "description": "MP3 bitrate when `format=mp3`."}, "sample_rate": {"rank": 30, "type": "integer", "description": "Output the audio sampling rate (e.g., 16000, 22050, 44100)."}, "temperature": {"rank": 60, "type": "number", "description": "Sampling temperature (0.0\u20131.0). The higher the value, the more diverse the output; the lower the value, the more stable and consistent it is."}, "callback_url": {"rank": 100, "type": "string", "description": "Optional callback URL. When specified, the interface immediately returns `{\"task_id\": \"5872ab00-3cf4-4040-a798-8510aaa16756\", \"started_at\": \"2025-05-09T12:34:56.789Z\"}`, and after the upstream call is completed, the final `{audio_url, ...}` result will be pushed to this URL via POST."}, "chunk_length": {"rank": 50, "type": "integer", "description": "The chunk length passed to the upstream synthesizer."}, "opus_bitrate": {"rank": 32, "type": "integer", "description": "Opus bitrate when `format=opus`."}, "reference_id": {"rank": 10, "type": "string", "example": "d7900c21663f485ab63ebdb7e5905036", "description": "Voice model ID (single speaker). A string array can also be passed in multi-speaker scenarios."}, "max_new_tokens": {"rank": 63, "type": "integer", "description": "Maximum number of new tokens generated."}, "min_chunk_length": {"rank": 51, "type": "integer", "description": "Minimum block length."}, "repetition_penalty": {"rank": 62, "type": "number", "description": "The repetition penalty coefficient applied during the generation process."}}}}}, "required": true}}}}, "openapi": "3.0.0", "servers": [{"url": "https://api.acedata.cloud", "description": "Ace Data Cloud API Server"}], "components": {"securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer"}}}}
+{
+  "paths": {
+    "/fish/tts": {
+      "post": {
+        "summary": "Fish Audio text-to-speech API — convert text into natural speech using a chosen voice model.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "audio_url": "https://platform.r2.fish.audio/task/8a72ff9840234006a9f74cb2fa04f978.mp3"
+                  },
+                  "properties": {
+                    "audio_url": {
+                      "type": "string",
+                      "description": "The URL of the generated audio file."
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Request successful (OK)."
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "disabled",
+                          "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "disabled",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "model is invalid."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "model is invalid.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_token",
+                          "message": "No token specified for the request."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_token",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "No token specified for the request.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Request error, possibly due to missing or invalid parameters."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_expired",
+                          "message": "token expired."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_expired",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token expired.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "token and api does not match."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token and api does not match.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized, authorization token is invalid or missing."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "used_up",
+                          "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "used_up",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized, authorization token is invalid or missing."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_api",
+                          "message": "API does not exist, please make sure url is correct."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_api",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "API does not exist, please make sure url is correct.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unauthorized, authorization token is invalid or missing."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "Error message of the response."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Too many requests, rate limit exceeded."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "Response error code."
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "Response error message."
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "The tracking ID for this request."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Internal server error, an exception occurred on the server side."
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "Specify the format of the response returned by the server. If not specified, the default format is `application/json`."
+          },
+          {
+            "in": "header",
+            "name": "model",
+            "schema": {
+              "enum": [
+                "s1",
+                "s2-pro",
+                "s2.1-pro"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "The TTS model used can be `s1` or `s2-pro`, with `s2-pro` as the default."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "properties": {
+                  "text": {
+                    "rank": 0,
+                    "type": "string",
+                    "example": "Hello, this is a Fish-Audio-compatible test.",
+                    "description": "Text content to be synthesized. Required, must be a non-empty string."
+                  },
+                  "async": {
+                    "rank": 101,
+                    "type": "boolean",
+                    "description": "Whether to process in asynchronous mode. When set to `true`, the interface immediately returns `task_id`, without the need to provide `callback_url`, and then the result can be obtained by polling the corresponding task query interface; if `callback_url` is also provided, the result will be pushed to that callback address."
+                  },
+                  "top_p": {
+                    "rank": 61,
+                    "type": "number",
+                    "description": "Top-p nucleus sampling parameter, controls output diversity."
+                  },
+                  "format": {
+                    "enum": [
+                      "mp3",
+                      "wav",
+                      "pcm"
+                    ],
+                    "rank": 20,
+                    "type": "string",
+                    "description": "Output audio format, default is `mp3`."
+                  },
+                  "latency": {
+                    "enum": [
+                      "normal",
+                      "balanced"
+                    ],
+                    "rank": 40,
+                    "type": "string",
+                    "description": "Delay mode. The upstream rejects null values, and defaults to `normal` when omitted."
+                  },
+                  "prosody": {
+                    "rank": 80,
+                    "type": "object",
+                    "description": "Rhythm coverage parameters, forwarded as is to upstream (such as speech rate, volume, etc.)."
+                  },
+                  "normalize": {
+                    "rank": 70,
+                    "type": "boolean",
+                    "description": "Is the input text subjected to text normalization processing by the upstream?"
+                  },
+                  "references": {
+                    "rank": 81,
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "description": "One-shot voice clone reference; cannot be combined with reference_id.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "audio",
+                        "text"
+                      ],
+                      "properties": {
+                        "audio": {
+                          "type": "string",
+                          "format": "uri",
+                          "maxLength": 2048,
+                          "example": "https://cdn.acedata.cloud/reference-voice.mp3",
+                          "description": "Public HTTPS MP3/WAV reference audio URL."
+                        },
+                        "text": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 10000,
+                          "example": "春天的清晨，阳光穿过树叶。",
+                          "description": "Exact transcript of the reference audio."
+                        }
+                      }
+                    }
+                  },
+                  "mp3_bitrate": {
+                    "enum": [
+                      64,
+                      128,
+                      192
+                    ],
+                    "rank": 31,
+                    "type": "integer",
+                    "description": "MP3 bitrate when `format=mp3`."
+                  },
+                  "sample_rate": {
+                    "rank": 30,
+                    "type": "integer",
+                    "description": "Output the audio sampling rate (e.g., 16000, 22050, 44100)."
+                  },
+                  "temperature": {
+                    "rank": 60,
+                    "type": "number",
+                    "description": "Sampling temperature (0.0–1.0). The higher the value, the more diverse the output; the lower the value, the more stable and consistent it is."
+                  },
+                  "callback_url": {
+                    "rank": 100,
+                    "type": "string",
+                    "description": "Optional callback URL. When specified, the interface immediately returns `{\"task_id\": \"5872ab00-3cf4-4040-a798-8510aaa16756\", \"started_at\": \"2025-05-09T12:34:56.789Z\"}`, and after the upstream call is completed, the final `{audio_url, ...}` result will be pushed to this URL via POST."
+                  },
+                  "chunk_length": {
+                    "rank": 50,
+                    "type": "integer",
+                    "description": "The chunk length passed to the upstream synthesizer."
+                  },
+                  "opus_bitrate": {
+                    "rank": 32,
+                    "type": "integer",
+                    "description": "Opus bitrate when `format=opus`."
+                  },
+                  "reference_id": {
+                    "rank": 10,
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "example": "d7900c21663f485ab63ebdb7e5905036",
+                    "description": "Saved/public voice ID; cannot be combined with references."
+                  },
+                  "max_new_tokens": {
+                    "rank": 63,
+                    "type": "integer",
+                    "description": "Maximum number of new tokens generated."
+                  },
+                  "min_chunk_length": {
+                    "rank": 51,
+                    "type": "integer",
+                    "description": "Minimum block length."
+                  },
+                  "repetition_penalty": {
+                    "rank": 62,
+                    "type": "number",
+                    "description": "The repetition penalty coefficient applied during the generation process."
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "Ace Data Cloud API Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

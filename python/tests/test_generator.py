@@ -117,3 +117,45 @@ def test_optional_union_uses_nil_aware_go_any_type():
         required=False,
     )
     assert param.go_type() == "any"
+
+
+def test_strict_reference_array_gets_precise_types():
+    schema = {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["audio", "text"],
+            "properties": {
+                "audio": {"type": "string"},
+                "text": {"type": "string"},
+            },
+        },
+    }
+    param = Param("references", schema, required=False)
+    assert param.py_type() == "list[dict[str, str]]"
+    assert param.ts_type() == "Array<{ audio: string; text: string }>"
+
+
+def test_endpoint_extracts_non_accept_header_parameters():
+    spec = {
+        "paths": {
+            "/fish/tts": {
+                "post": {
+                    "parameters": [
+                        {"in": "header", "name": "accept", "schema": {"type": "string"}},
+                        {"in": "header", "name": "model", "schema": {"type": "string"}},
+                    ],
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {"type": "object", "properties": {"text": {"type": "string"}}}
+                            }
+                        }
+                    },
+                }
+            }
+        }
+    }
+    endpoint = Endpoint("fish", "/fish/tts", spec)
+    assert [param.name for param in endpoint.header_params] == ["model"]

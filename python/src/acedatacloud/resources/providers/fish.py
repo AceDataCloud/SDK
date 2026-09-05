@@ -35,20 +35,21 @@ class Fish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
-        references: list[dict[str, Any]] | None = None,
+        references: list[dict[str, str]] | None = None,
         mp3_bitrate: int | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
         opus_bitrate: int | None = None,
-        reference_id: str | None = None,
+        reference_id: str | list[str] | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
         repetition_penalty: float | None = None,
+        model: Literal["s1", "s2-pro", "s2.1-pro"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -92,8 +93,9 @@ class Fish:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
+        extra_headers = {k: v for k, v in {"model": model}.items() if v is not None}
         body["async"] = True if async_ is None else async_
-        result = self._transport.request("POST", "/fish/tts", json=body)
+        result = self._transport.request("POST", "/fish/tts", json=body, extra_headers=extra_headers)
         handle = TaskHandle(_task_id(result), "/fish/tasks", self._transport, submitted=result)
         if wait:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
@@ -149,20 +151,21 @@ class AsyncFish:
         *,
         text: str,
         top_p: float | None = None,
-        format: Literal["mp3", "wav", "pcm", "opus"] | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
         latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
         normalize: bool | None = None,
-        references: list[dict[str, Any]] | None = None,
+        references: list[dict[str, str]] | None = None,
         mp3_bitrate: int | None = None,
         sample_rate: int | None = None,
         temperature: float | None = None,
         chunk_length: int | None = None,
         opus_bitrate: int | None = None,
-        reference_id: str | None = None,
+        reference_id: str | list[str] | None = None,
         max_new_tokens: int | None = None,
         min_chunk_length: int | None = None,
         repetition_penalty: float | None = None,
+        model: Literal["s1", "s2-pro", "s2.1-pro"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -206,8 +209,9 @@ class AsyncFish:
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
+        extra_headers = {k: v for k, v in {"model": model}.items() if v is not None}
         body["async"] = True if async_ is None else async_
-        result = await self._transport.request("POST", "/fish/tts", json=body)
+        result = await self._transport.request("POST", "/fish/tts", json=body, extra_headers=extra_headers)
         handle = AsyncTaskHandle(_task_id(result), "/fish/tasks", self._transport, submitted=result)
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)

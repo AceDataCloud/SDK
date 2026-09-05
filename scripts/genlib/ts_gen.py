@@ -45,7 +45,7 @@ def _options_interface(svc: Service, ep) -> tuple[str, str]:
 
 def _body(ep, indent: str = "    ") -> list[str]:
     out = [f"{indent}const body: Record<string, unknown> = {{}};"]
-    for p in ep.callable_params:
+    for p in sorted(ep.body_params, key=lambda p: not p.required):
         prop = camel(p.name)
         if p.required:
             out.append(f"{indent}body[{json.dumps(p.name)}] = options.{prop};")
@@ -82,11 +82,22 @@ def _method(svc: Service, ep) -> str:
     else:
         lines.append(f"  async {ep.method}({arg}): Promise<Record<string, unknown>> {{")
     lines.extend(_body(ep))
+    header_entries = ", ".join(
+        f"{json.dumps(p.name)}: options.{camel(p.name)}" for p in ep.header_params
+    )
+    if len(ep.header_params) == 1:
+        header = ep.header_params[0]
+        prop = camel(header.name)
+        headers = f", headers: options.{prop} !== undefined ? {{{json.dumps(header.name)}: options.{prop}}} : {{}}"
+    elif header_entries:
+        headers = f", headers: {{{header_entries}}}"
+    else:
+        headers = ""
 
     if ep.pollable:
         lines.append("    body.async = options.async ?? true;")
         lines.append(
-            f"    const result = (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body }})) as Record<string, unknown>;"
+            f"    const result = (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body{headers} }})) as Record<string, unknown>;"
         )
         lines.append(
             f"    const handle = new TaskHandle(taskId(result), {json.dumps(tasks)}, this.transport, result);"
@@ -99,7 +110,7 @@ def _method(svc: Service, ep) -> str:
         lines.append("    return handle;")
     else:
         lines.append(
-            f"    return (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body }})) as Record<string, unknown>;"
+            f"    return (await this.transport.request('POST', {json.dumps(ep.path)}, {{ json: body{headers} }})) as Record<string, unknown>;"
         )
     lines.append("  }")
     return "\n".join(lines)
