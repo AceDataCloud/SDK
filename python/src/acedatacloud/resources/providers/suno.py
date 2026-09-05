@@ -68,7 +68,7 @@ class Suno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -78,7 +78,7 @@ class Suno:
         samples_end: float | None = None,
         audio_weight: float | None = None,
         instrumental: bool | None = None,
-        lyric_prompt: dict[str, Any] | None = None,
+        lyric_prompt: str | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
         negative_tags: str | None = None,
@@ -91,6 +91,7 @@ class Suno:
         replace_section_end: float | None = None,
         underpainting_start: float | None = None,
         replace_section_start: float | None = None,
+        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -158,6 +159,9 @@ class Suno:
             body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
             body["replace_section_start"] = replace_section_start
+        body["replace_section_result_mode"] = (
+            replace_section_result_mode if replace_section_result_mode is not None else "full_song"
+        )
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -254,8 +258,8 @@ class Suno:
         self,
         *,
         audio_id: str,
-        vocal_end: float | None = None,
-        vocal_start: float | None = None,
+        vocal_end: float,
+        vocal_start: float,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -268,10 +272,8 @@ class Suno:
         """
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
-        if vocal_end is not None:
-            body["vocal_end"] = vocal_end
-        if vocal_start is not None:
-            body["vocal_start"] = vocal_start
+        body["vocal_end"] = vocal_end
+        body["vocal_start"] = vocal_start
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -330,6 +332,30 @@ class Suno:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
+    def mp3(
+        self,
+        *,
+        audio_id: str,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> TaskHandle:
+        """Suno Mp3"""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = self._transport.request("POST", "/suno/mp3", json=body)
+        handle = TaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
+        if wait:
+            handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
     def style(
         self,
         *,
@@ -349,7 +375,7 @@ class Suno:
         self,
         *,
         model: SunoModel,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
@@ -385,12 +411,17 @@ class Suno:
         self,
         *,
         audio_url: str,
+        mode: Literal["standard", "enhanced"] | None = None,
+        name: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
         """Suno reference audio upload API, upload audio to get an audio_id for extended generation."""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
+        body["mode"] = mode if mode is not None else "standard"
+        if name is not None:
+            body["name"] = name
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -412,7 +443,7 @@ class AsyncSuno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -422,7 +453,7 @@ class AsyncSuno:
         samples_end: float | None = None,
         audio_weight: float | None = None,
         instrumental: bool | None = None,
-        lyric_prompt: dict[str, Any] | None = None,
+        lyric_prompt: str | None = None,
         vocal_gender: str | None = None,
         samples_start: float | None = None,
         negative_tags: str | None = None,
@@ -435,6 +466,7 @@ class AsyncSuno:
         replace_section_end: float | None = None,
         underpainting_start: float | None = None,
         replace_section_start: float | None = None,
+        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -502,6 +534,9 @@ class AsyncSuno:
             body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
             body["replace_section_start"] = replace_section_start
+        body["replace_section_result_mode"] = (
+            replace_section_result_mode if replace_section_result_mode is not None else "full_song"
+        )
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -598,8 +633,8 @@ class AsyncSuno:
         self,
         *,
         audio_id: str,
-        vocal_end: float | None = None,
-        vocal_start: float | None = None,
+        vocal_end: float,
+        vocal_start: float,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -612,10 +647,8 @@ class AsyncSuno:
         """
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
-        if vocal_end is not None:
-            body["vocal_end"] = vocal_end
-        if vocal_start is not None:
-            body["vocal_start"] = vocal_start
+        body["vocal_end"] = vocal_end
+        body["vocal_start"] = vocal_start
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -674,6 +707,30 @@ class AsyncSuno:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
+    async def mp3(
+        self,
+        *,
+        audio_id: str,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> AsyncTaskHandle:
+        """Suno Mp3"""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = await self._transport.request("POST", "/suno/mp3", json=body)
+        handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
+        if wait:
+            await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
     async def style(
         self,
         *,
@@ -693,7 +750,7 @@ class AsyncSuno:
         self,
         *,
         model: SunoModel,
-        prompt: dict[str, Any],
+        prompt: str,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
@@ -729,12 +786,17 @@ class AsyncSuno:
         self,
         *,
         audio_url: str,
+        mode: Literal["standard", "enhanced"] | None = None,
+        name: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
         """Suno reference audio upload API, upload audio to get an audio_id for extended generation."""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
+        body["mode"] = mode if mode is not None else "standard"
+        if name is not None:
+            body["name"] = name
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
