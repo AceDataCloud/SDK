@@ -233,8 +233,38 @@ def test_every_provider_has_a_callable_method(client, name):
 
 def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
-    for method in ("generate", "lyrics", "wav", "mp4"):
+    for method in ("generate", "lyrics", "wav", "mp4", "mp3"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_suno_syncs_latest_docs_contract(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "suno-1"}
+    client.suno._transport = transport
+
+    handle = client.suno.mp3(audio_id="audio-1", async_=False, callback_url="https://example.com/hook")
+    assert isinstance(handle, TaskHandle)
+    assert transport.request.call_args.args == ("POST", "/suno/mp3")
+    assert transport.request.call_args.kwargs["json"] == {
+        "audio_id": "audio-1",
+        "callback_url": "https://example.com/hook",
+        "async": False,
+    }
+
+    client.suno.generate(
+        prompt="a short prompt",
+        lyric_prompt="write a chorus",
+        replace_section_result_mode="candidates",
+    )
+    body = transport.request.call_args.kwargs["json"]
+    assert body["prompt"] == "a short prompt"
+    assert body["lyric_prompt"] == "write a chorus"
+    assert body["replace_section_result_mode"] == "candidates"
+
+    client.suno.upload(audio_url="https://cdn.example.com/ref.mp3", mode="enhanced", name="Reference")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["mode"] == "enhanced"
+    assert body["name"] == "Reference"
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):

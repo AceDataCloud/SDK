@@ -24,8 +24,8 @@ type SunoGenerateRequest struct {
 	Action string
 	// Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise,
 	Custom bool
-	// The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 50
-	Prompt map[string]any
+	// Suno Audios Prompt
+	Prompt string
 	// Audio ID used for generating additional audio based on existing audio. This field is required when `action` is
 	AudioID string
 	// Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is main
@@ -44,8 +44,8 @@ type SunoGenerateRequest struct {
 	AudioWeight float64
 	// Pure accompaniment mode (no lyrics), default is `false`. When set to `true`, the lyrics filled in above will b
 	Instrumental bool
-	// Prompts for automatically generating lyrics, effective only when `custom` is `true` and `lyric` is empty.
-	LyricPrompt map[string]any
+	// Suno Audios Lyric Prompt
+	LyricPrompt string
 	// Voice gender preference, selectable values are `'m'` (male voice) or `'f'` (female voice). Models `chirp-v4-5`
 	VocalGender string
 	// Add a default start time for the uploaded audio sample, with a default value of 0.
@@ -70,6 +70,8 @@ type SunoGenerateRequest struct {
 	UnderpaintingStart float64
 	// When `action` is `replace_section`, specify the start time (in seconds) of the segment to be replaced.
 	ReplaceSectionStart float64
+	// Suno Audios Replace Section Result Mode
+	ReplaceSectionResultMode string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -96,7 +98,7 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 		body["action"] = r.Action
 	}
 	body["custom"] = r.Custom
-	if r.Prompt != nil {
+	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
 	}
 	if r.AudioID != "" {
@@ -124,7 +126,7 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 		body["audio_weight"] = r.AudioWeight
 	}
 	body["instrumental"] = r.Instrumental
-	if r.LyricPrompt != nil {
+	if r.LyricPrompt != "" {
 		body["lyric_prompt"] = r.LyricPrompt
 	}
 	if r.VocalGender != "" {
@@ -162,6 +164,11 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	}
 	if r.ReplaceSectionStart != 0 {
 		body["replace_section_start"] = r.ReplaceSectionStart
+	}
+	if r.ReplaceSectionResultMode != "" {
+		body["replace_section_result_mode"] = r.ReplaceSectionResultMode
+	} else {
+		body["replace_section_result_mode"] = "full_song"
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -375,12 +382,8 @@ type SunoVoxRequest struct {
 func (r SunoVoxRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["audio_id"] = r.AudioID
-	if r.VocalEnd != 0 {
-		body["vocal_end"] = r.VocalEnd
-	}
-	if r.VocalStart != 0 {
-		body["vocal_start"] = r.VocalStart
-	}
+	body["vocal_end"] = r.VocalEnd
+	body["vocal_start"] = r.VocalStart
 	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async
@@ -495,6 +498,49 @@ func (c *Suno) Midi(ctx context.Context, req SunoMidiRequest) (*TaskHandle, erro
 	return newTaskHandle(taskIDFrom(result), "/suno/tasks", c.t, result), nil
 }
 
+// SunoMp3Request is the input to suno.Mp3.
+type SunoMp3Request struct {
+	// Suno Mp3 Audio Id
+	AudioID string
+	// Async submits without blocking; poll the returned handle. Defaults true.
+	Async *bool
+	// CallbackURL optionally receives the completion webhook.
+	CallbackURL string
+	// Extra fields merged into the request body.
+	Extra map[string]any
+}
+
+func (r SunoMp3Request) toBody() map[string]any {
+	body := map[string]any{}
+	body["audio_id"] = r.AudioID
+	body["async"] = true
+	if r.Async != nil {
+		body["async"] = *r.Async
+	}
+	if r.CallbackURL != "" {
+		body["callback_url"] = r.CallbackURL
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Mp3 Suno Mp3
+func (c *Suno) Mp3(ctx context.Context, req SunoMp3Request) (*TaskHandle, error) {
+	result, err := c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/suno/mp3",
+		Body:   req.toBody(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return newTaskHandle(taskIDFrom(result), "/suno/tasks", c.t, result), nil
+}
+
 // SunoStyleRequest is the input to suno.Style.
 type SunoStyleRequest struct {
 	// Style prompts that need optimization.
@@ -532,8 +578,8 @@ func (c *Suno) Style(ctx context.Context, req SunoStyleRequest) (map[string]any,
 type SunoLyricsRequest struct {
 	// The model used for generating lyrics has a default value of `default`, with optional values including `default
 	Model string
-	// Prompts for generating lyrics, describing the desired theme or style of the lyrics.
-	Prompt map[string]any
+	// Suno Lyrics Prompt
+	Prompt string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.
@@ -604,6 +650,10 @@ func (c *Suno) MashupLyrics(ctx context.Context, req SunoMashupLyricsRequest) (m
 type SunoUploadRequest struct {
 	// The CDN address (URL) for the custom audio file to be uploaded.
 	AudioURL string
+	// Suno Upload Mode
+	Mode string
+	// Suno Upload Name
+	Name string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.
@@ -613,6 +663,14 @@ type SunoUploadRequest struct {
 func (r SunoUploadRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["audio_url"] = r.AudioURL
+	if r.Mode != "" {
+		body["mode"] = r.Mode
+	} else {
+		body["mode"] = "standard"
+	}
+	if r.Name != "" {
+		body["name"] = r.Name
+	}
 	if r.CallbackURL != "" {
 		body["callback_url"] = r.CallbackURL
 	}
