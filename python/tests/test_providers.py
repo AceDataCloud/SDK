@@ -13,6 +13,9 @@ from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
 # Every service the platform exposes as a non-private generation API.
 GENERATED = (
+    "claude",
+    "coding",
+    "deepseek",
     "flux",
     "seedream",
     "nano_banana",
@@ -212,6 +215,44 @@ def test_model_enum_is_typed(client):
     literal = next((a for a in args if typing.get_origin(a) is typing.Literal), None)
     assert literal is not None, "model should be a Literal of the spec's enum"
     assert "flux-dev" in typing.get_args(literal)
+
+
+def test_deepseek_provider_uses_current_model_enum_and_path(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "chatcmpl-1"}
+    client.deepseek._transport = transport
+
+    client.deepseek.completions(model="deepseek-v4-pro", messages=[{"role": "user", "content": "hi"}])
+
+    assert transport.request.call_args.args == ("POST", "/deepseek/chat/completions")
+    assert transport.request.call_args.kwargs["json"]["model"] == "deepseek-v4-pro"
+
+
+def test_coding_responses_exposes_codex_model_sync(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "resp-1"}
+    client.coding._transport = transport
+
+    client.coding.responses(model="gpt-6-astra", input="Fix the failing test")
+
+    assert transport.request.call_args.args == ("POST", "/openai/responses")
+    assert transport.request.call_args.kwargs["json"]["model"] == "gpt-6-astra"
+
+
+def test_claude_messages_schema_is_resolved(client):
+    transport = Mock()
+    transport.request.return_value = {"id": "msg-1"}
+    client.claude._transport = transport
+
+    client.claude.messages(
+        model="claude-sonnet-5",
+        messages=[{"role": "user", "content": "hi"}],
+        max_tokens=32,
+    )
+
+    body = transport.request.call_args.kwargs["json"]
+    assert transport.request.call_args.args == ("POST", "/v1/messages")
+    assert body["max_tokens"] == 32
 
 
 def test_extra_parameters_pass_through(client):

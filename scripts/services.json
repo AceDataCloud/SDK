@@ -387,5 +387,93 @@
    }
   ],
   "tasks": "/qwen-image/tasks"
+ },
+ "claude": {
+  "category": "AI Chat",
+  "endpoints": [
+   {
+    "id": "claude",
+    "path": "/v1/chat/completions",
+    "name": "Claude Chat Completions"
+   },
+   {
+    "id": "claude",
+    "path": "/v1/messages",
+    "name": "Claude Messages"
+   },
+   {
+    "id": "claude",
+    "path": "/v1/messages/count_tokens",
+    "name": "Claude Messages Count Tokens"
+   }
+  ],
+  "tasks": null
+ },
+ "coding": {
+  "category": "AI Chat",
+  "endpoints": [
+   {
+    "id": "coding",
+    "path": "/v1/messages/count_tokens",
+    "name": "Claude Messages Count Tokens"
+   },
+   {
+    "id": "coding",
+    "path": "/v1/messages",
+    "name": "Claude Messages"
+   },
+   {
+    "id": "coding",
+    "path": "/openai/chat/completions",
+    "name": "OpenAI Chat Completions"
+   },
+   {
+    "id": "coding",
+    "path": "/v1/chat/completions",
+    "name": "Claude Chat Completions"
+   },
+   {
+    "id": "coding",
+    "path": "/deepseek/chat/completions",
+    "name": "DeepSeek Chat Completions"
+   },
+   {
+    "id": "coding",
+    "path": "/glm/chat/completions",
+    "name": "GLM Chat Completions"
+   },
+   {
+    "id": "coding",
+    "path": "/gemini/chat/completions",
+    "name": "Gemini Chat Completions"
+   },
+   {
+    "id": "coding",
+    "path": "/grok/chat/completions",
+    "name": "Grok Chat Completions"
+   },
+   {
+    "id": "coding",
+    "path": "/kimi/chat/completions",
+    "name": "Kimi Chat Completions"
+   },
+   {
+    "id": "coding",
+    "path": "/openai/responses",
+    "name": "OpenAI Responses"
+   }
+  ],
+  "tasks": null
+ },
+ "deepseek": {
+  "category": "AI Chat",
+  "endpoints": [
+   {
+    "id": "deepseek",
+    "path": "/deepseek/chat/completions",
+    "name": "DeepSeek Chat Completions"
+   }
+  ],
+  "tasks": null
  }
 }

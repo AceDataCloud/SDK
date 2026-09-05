@@ -59,7 +59,37 @@ def py_param(name: str) -> str:
     return f"{name}_" if keyword.iskeyword(name) else name
 
 
-def operation(spec: dict) -> dict:
+def _resolve_schema_ref(spec: dict, schema: Any, seen: set[str] | None = None) -> Any:
+    if isinstance(schema, list):
+        return [_resolve_schema_ref(spec, item, seen) for item in schema]
+    if not isinstance(schema, dict):
+        return schema
+
+    ref = schema.get("$ref")
+    if isinstance(ref, str) and ref.startswith("#/"):
+        seen = seen or set()
+        if ref in seen:
+            return {}
+        target: Any = spec
+        for part in ref[2:].split("/"):
+            target = target[part]
+        resolved = _resolve_schema_ref(spec, target, seen | {ref})
+        siblings = {k: v for k, v in schema.items() if k != "$ref"}
+        if siblings and isinstance(resolved, dict):
+            resolved = {**resolved, **siblings}
+        return resolved
+
+    return {
+        key: _resolve_schema_ref(spec, value, seen)
+        for key, value in schema.items()
+    }
+
+
+def operation(spec: dict, path: str | None = None) -> dict:
+    if path and path in (spec.get("paths") or {}):
+        for method, op in ((spec.get("paths") or {}).get(path) or {}).items():
+            if method.lower() == "post":
+                return op or {}
     for _path, methods in (spec.get("paths") or {}).items():
         for method, op in (methods or {}).items():
             if method.lower() == "post":
@@ -67,12 +97,18 @@ def operation(spec: dict) -> dict:
     return {}
 
 
-def request_schema(spec: dict) -> dict:
-    content = (operation(spec).get("requestBody") or {}).get("content") or {}
-    return (content.get("application/json") or {}).get("schema") or {}
+def request_schema(spec: dict, path: str | None = None) -> dict:
+    content = (operation(spec, path).get("requestBody") or {}).get("content") or {}
+    schema = (content.get("application/json") or {}).get("schema") or {}
+    return _resolve_schema_ref(spec, schema)
 
 
-def summary(spec: dict) -> str:
+def summary(spec: dict, path: str | None = None) -> str:
+    if path:
+        op = operation(spec, path)
+        text = op.get("summary") or op.get("description") or ""
+        if text and not text.startswith("$t("):
+            return " ".join(text.split())[:200]
     for _path, methods in (spec.get("paths") or {}).items():
         for _method, op in (methods or {}).items():
             text = op.get("summary") or op.get("description") or ""
@@ -257,13 +293,13 @@ class Endpoint:
         self.alias = alias
         self.path = path
         self.method = _method_name(path)
-        schema = request_schema(spec)
+        schema = request_schema(spec, path)
         required = set(schema.get("required") or [])
         props: dict[str, dict] = schema.get("properties") or {}
-        self.summary = summary(spec)
+        self.summary = summary(spec, path)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
         header_parameters = [
-            p for p in (operation(spec).get("parameters") or [])
+            p for p in (operation(spec, path).get("parameters") or [])
             if p.get("in") == "header" and p.get("name") != "accept"
         ]
         self.header_params = [

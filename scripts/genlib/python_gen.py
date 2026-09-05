@@ -27,11 +27,11 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 '''
 
 
-def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
+def _signature(params: list[Param], aliases: dict[tuple[str, str], str], *, method: str, pollable: bool) -> str:
     lines = ["self", "*"]
     for p in params:
         name = py_param(p.name)
-        annotation = aliases.get(p.name) or p.py_type()
+        annotation = aliases.get((method, p.name)) or p.py_type()
         if p.required:
             lines.append(f"{name}: {annotation}")
         else:
@@ -113,23 +113,37 @@ def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] 
     return "\n".join(out)
 
 
-def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
+def _aliases(svc: Service) -> tuple[dict[tuple[str, str], str], list[str]]:
     """Hoist long enums to module-level type aliases.
 
     An inline `Literal[...]` of fifteen model names blows past the 120-column
     limit and reads badly; a named alias is both shorter and self-documenting.
     """
-    mapping: dict[str, str] = {}
+    enum_shapes: dict[str, set[tuple[str, ...]]] = {}
+    for ep in svc.endpoints:
+        for p in ep.params:
+            if p.enum:
+                enum_shapes.setdefault(p.name, set()).add(tuple(p.enum))
+
+    mapping: dict[tuple[str, str], str] = {}
     lines: list[str] = []
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or not p.enum or p.name in mapping:
+            key = (ep.method, p.name)
+            if p.is_control or not p.enum or key in mapping:
                 continue
             inline = p.py_type()
             if len(inline) <= 40:
                 continue
-            alias = f"{svc.class_name}{pascal(p.name)}"
-            mapping[p.name] = alias
+            if len(enum_shapes.get(p.name, set())) > 1:
+                alias = f"{svc.class_name}{pascal(ep.method)}{pascal(p.name)}"
+            else:
+                alias = f"{svc.class_name}{pascal(p.name)}"
+                existing = next((value for (_, name), value in mapping.items() if name == p.name), None)
+                if existing:
+                    mapping[key] = existing
+                    continue
+            mapping[key] = alias
             values = ",\n    ".join(json.dumps(e) for e in p.enum)
             lines.append(f"{alias} = Literal[\n    {values},\n]")
     return mapping, lines
@@ -164,7 +178,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
 
     lines = [
         f"    {prefix}def {ep.method}(",
-        f"        {_signature(params, aliases, pollable=ep.pollable)},",
+        f"        {_signature(params, aliases, method=ep.method, pollable=ep.pollable)},",
     ]
     if ep.pollable:
         lines.append(f"    ) -> {handle}:")

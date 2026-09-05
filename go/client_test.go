@@ -107,6 +107,63 @@ func TestMinimaxGenerate(t *testing.T) {
 	}
 }
 
+func TestCodingRelatedGeneratedProviders(t *testing.T) {
+	seen := map[string]bool{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		seen[r.URL.Path] = true
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		switch r.URL.Path {
+		case "/deepseek/chat/completions":
+			if body["model"] != "deepseek-v4-pro" {
+				t.Errorf("bad deepseek model: %+v", body)
+			}
+		case "/openai/responses":
+			if body["model"] != "gpt-6-astra" || body["input"] != "Fix the failing test" {
+				t.Errorf("bad coding responses body: %+v", body)
+			}
+		case "/v1/messages":
+			if body["model"] != "claude-sonnet-5" || body["max_tokens"] != float64(32) {
+				t.Errorf("bad claude messages body: %+v", body)
+			}
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"ok"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if c.Deepseek() == nil || c.Coding() == nil || c.Claude() == nil {
+		t.Fatal("generated coding-related providers must be attached")
+	}
+	if _, err := c.Deepseek().Completions(context.Background(), DeepseekCompletionsRequest{
+		Model:    "deepseek-v4-pro",
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	}); err != nil {
+		t.Fatalf("Deepseek Completions: %v", err)
+	}
+	if _, err := c.Coding().Responses(context.Background(), CodingResponsesRequest{
+		Model: "gpt-6-astra",
+		Input: "Fix the failing test",
+	}); err != nil {
+		t.Fatalf("Coding Responses: %v", err)
+	}
+	if _, err := c.Claude().Messages(context.Background(), ClaudeMessagesRequest{
+		Model:     "claude-sonnet-5",
+		Messages:  []map[string]any{{"role": "user", "content": "hi"}},
+		MaxTokens: 32,
+	}); err != nil {
+		t.Fatalf("Claude Messages: %v", err)
+	}
+	for _, path := range []string{"/deepseek/chat/completions", "/openai/responses", "/v1/messages"} {
+		if !seen[path] {
+			t.Fatalf("expected request to %s", path)
+		}
+	}
+}
+
 func TestCaptchaEndpoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

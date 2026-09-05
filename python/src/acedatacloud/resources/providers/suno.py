@@ -11,7 +11,7 @@ from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-SunoModel = Literal[
+SunoGenerateModel = Literal[
     "chirp-v5-5",
     "chirp-v5",
     "chirp-v4-5-plus",
@@ -63,7 +63,7 @@ class Suno:
         self,
         *,
         lyric: str | None = None,
-        model: SunoModel | None = None,
+        model: SunoGenerateModel | None = None,
         style: str | None = None,
         title: str | None = None,
         action: SunoAction | None = None,
@@ -348,7 +348,7 @@ class Suno:
     def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: Literal["default", "remi-v1"],
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
@@ -407,7 +407,7 @@ class AsyncSuno:
         self,
         *,
         lyric: str | None = None,
-        model: SunoModel | None = None,
+        model: SunoGenerateModel | None = None,
         style: str | None = None,
         title: str | None = None,
         action: SunoAction | None = None,
@@ -692,7 +692,7 @@ class AsyncSuno:
     async def lyrics(
         self,
         *,
-        model: SunoModel,
+        model: Literal["default", "remi-v1"],
         prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,

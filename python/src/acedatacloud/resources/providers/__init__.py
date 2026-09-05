@@ -1,5 +1,11 @@
 """Provider-axis clients, generated from the platform OpenAPI specs."""
 
+from .claude import AsyncClaude as AsyncClaude
+from .claude import Claude as Claude
+from .coding import AsyncCoding as AsyncCoding
+from .coding import Coding as Coding
+from .deepseek import AsyncDeepseek as AsyncDeepseek
+from .deepseek import Deepseek as Deepseek
 from .digitalhuman import AsyncDigitalhuman as AsyncDigitalhuman
 from .digitalhuman import Digitalhuman as Digitalhuman
 from .dreamina import AsyncDreamina as AsyncDreamina
@@ -36,6 +42,12 @@ from .wan import AsyncWan as AsyncWan
 from .wan import Wan as Wan
 
 __all__ = [
+    "Claude",
+    "AsyncClaude",
+    "Coding",
+    "AsyncCoding",
+    "Deepseek",
+    "AsyncDeepseek",
     "Digitalhuman",
     "AsyncDigitalhuman",
     "Dreamina",
