@@ -418,38 +418,6 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 			return
 		}
 
-		func TestSunoMp3ReturnsTaskHandle(t *testing.T) {
-			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "application/json")
-				if r.URL.Path == "/suno/mp3" {
-					var body map[string]any
-					_ = json.NewDecoder(r.Body).Decode(&body)
-					if body["audio_id"] != "audio-123" {
-						t.Fatalf("unexpected body: %+v", body)
-					}
-					if body["async"] != true {
-						t.Fatalf("expected async=true in body: %+v", body)
-					}
-					_, _ = w.Write([]byte(`{"task_id":"suno-mp3"}`))
-					return
-				}
-				if r.URL.Path == "/suno/tasks" {
-					_, _ = w.Write([]byte(`{"response":{"status":"succeeded"}}`))
-					return
-				}
-				t.Fatalf("unexpected path %s", r.URL.Path)
-			}))
-			defer srv.Close()
-
-			c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
-			handle, err := c.Suno().Mp3(context.Background(), SunoMp3Request{AudioID: "audio-123"})
-			if err != nil {
-				t.Fatalf("Suno Mp3: %v", err)
-			}
-			if handle == nil || handle.ID != "suno-mp3" {
-				t.Fatalf("expected task handle with id=suno-mp3, got %+v", handle)
-			}
-		}
 		if r.URL.Path == "/nano-banana/tasks" {
 			_, _ = w.Write([]byte(`{"response":{"status":"succeeded","url":"https://cdn/x.png"}}`))
 			return
@@ -476,6 +444,39 @@ func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
 	resp := res["response"].(map[string]any)
 	if resp["url"] != "https://cdn/x.png" {
 		t.Fatalf("bad url: %+v", resp)
+	}
+}
+
+func TestSunoMp3ReturnsTaskHandle(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.URL.Path == "/suno/mp3" {
+			var body map[string]any
+			_ = json.NewDecoder(r.Body).Decode(&body)
+			if body["audio_id"] != "audio-123" {
+				t.Fatalf("unexpected body: %+v", body)
+			}
+			if body["async"] != true {
+				t.Fatalf("expected async=true in body: %+v", body)
+			}
+			_, _ = w.Write([]byte(`{"task_id":"suno-mp3"}`))
+			return
+		}
+		if r.URL.Path == "/suno/tasks" {
+			_, _ = w.Write([]byte(`{"response":{"status":"succeeded"}}`))
+			return
+		}
+		t.Fatalf("unexpected path %s", r.URL.Path)
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	handle, err := c.Suno().Mp3(context.Background(), SunoMp3Request{AudioID: "audio-123"})
+	if err != nil {
+		t.Fatalf("Suno Mp3: %v", err)
+	}
+	if handle == nil || handle.ID != "suno-mp3" {
+		t.Fatalf("expected task handle with id=suno-mp3, got %+v", handle)
 	}
 }
 
