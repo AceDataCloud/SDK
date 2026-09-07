@@ -12,6 +12,7 @@ def _py_literal(value: object) -> str:
     """A Python literal, not a JSON one — json.dumps(True) emits `true`."""
     return repr(value)
 
+
 HEADER = '''"""{title} — generated from the platform OpenAPI spec.
 
 Do not edit by hand: run ``python scripts/generate_providers.py``. Parameter
@@ -27,11 +28,15 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 '''
 
 
-def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
+def _signature(
+    params: list[Param], aliases: dict[str, str], *, method: str, pollable: bool
+) -> str:
     lines = ["self", "*"]
     for p in params:
         name = py_param(p.name)
-        annotation = aliases.get(p.name) or p.py_type()
+        annotation = (
+            aliases.get(f"{method}:{p.name}") or aliases.get(p.name) or p.py_type()
+        )
         if p.required:
             lines.append(f"{name}: {annotation}")
         else:
@@ -80,8 +85,12 @@ def _default_consts(svc: Service) -> tuple[dict[str, str], list[str]]:
     return mapping, lines
 
 
-def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] | None = None,
-          method: str = "") -> str:
+def _body(
+    params: list[Param],
+    indent: str = "        ",
+    consts: dict[str, str] | None = None,
+    method: str = "",
+) -> str:
     """Build the request body, applying only explicit schema defaults."""
     out: list[str] = [f"{indent}body: dict[str, Any] = {{}}"]
     for p in params:
@@ -93,7 +102,9 @@ def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] 
         default = p.default()
         const = (consts or {}).get(f"{method}:{p.name}")
         if const:
-            out.append(f'{indent}body["{p.name}"] = {name} if {name} is not None else {const}')
+            out.append(
+                f'{indent}body["{p.name}"] = {name} if {name} is not None else {const}'
+            )
             continue
         if default is None:
             out.append(f"{indent}if {name} is not None:")
@@ -104,8 +115,10 @@ def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] 
                 out.append(line)
             else:
                 # ruff caps lines at 120; a long example would otherwise fail lint.
-                out.append(f"{indent}body[\"{p.name}\"] = (")
-                out.append(f"{indent}    {name} if {name} is not None else {_py_literal(default)}")
+                out.append(f'{indent}body["{p.name}"] = (')
+                out.append(
+                    f"{indent}    {name} if {name} is not None else {_py_literal(default)}"
+                )
                 out.append(f"{indent})")
     out.append(f"{indent}body.update(extra)")
     out.append(f"{indent}if callback_url is not None:")
@@ -119,19 +132,33 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
     An inline `Literal[...]` of fifteen model names blows past the 120-column
     limit and reads badly; a named alias is both shorter and self-documenting.
     """
-    mapping: dict[str, str] = {}
-    lines: list[str] = []
+    enum_groups: dict[str, set[tuple[str, ...]]] = {}
+    candidates: list[tuple[str, Param]] = []
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or not p.enum or p.name in mapping:
+            if p.is_control or not p.enum:
                 continue
+            enum_groups.setdefault(p.name, set()).add(tuple(p.enum))
             inline = p.py_type()
             if len(inline) <= 40:
                 continue
+            candidates.append((ep.method, p))
+
+    mapping: dict[str, str] = {}
+    lines: list[str] = []
+    emitted: set[str] = set()
+    for method, p in candidates:
+        if len(enum_groups[p.name]) == 1:
             alias = f"{svc.class_name}{pascal(p.name)}"
-            mapping[p.name] = alias
+            key = p.name
+        else:
+            alias = f"{svc.class_name}{pascal(method)}{pascal(p.name)}"
+            key = f"{method}:{p.name}"
+        mapping[key] = alias
+        if alias not in emitted:
             values = ",\n    ".join(json.dumps(e) for e in p.enum)
             lines.append(f"{alias} = Literal[\n    {values},\n]")
+            emitted.add(alias)
     return mapping, lines
 
 
@@ -155,7 +182,9 @@ def _docstring(text: str, indent: str = "        ") -> list[str]:
     return out
 
 
-def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *, is_async: bool) -> str:
+def _method(
+    svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *, is_async: bool
+) -> str:
     handle = "AsyncTaskHandle" if is_async else "TaskHandle"
     prefix = "async " if is_async else ""
     await_ = "await " if is_async else ""
@@ -164,23 +193,31 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
 
     lines = [
         f"    {prefix}def {ep.method}(",
-        f"        {_signature(params, aliases, pollable=ep.pollable)},",
+        f"        {_signature(params, aliases, method=ep.method, pollable=ep.pollable)},",
     ]
     if ep.pollable:
         lines.append(f"    ) -> {handle}:")
     else:
         lines.append("    ) -> dict[str, Any]:")
     lines.extend(_docstring(doc))
-    lines.append(_body(sorted(ep.body_params, key=lambda p: not p.required), consts=consts, method=ep.method))
+    lines.append(
+        _body(
+            sorted(ep.body_params, key=lambda p: not p.required),
+            consts=consts,
+            method=ep.method,
+        )
+    )
 
     header_entries = ", ".join(
         f'"{p.name}": {py_param(p.name)}' for p in ep.header_params
     )
     headers = ", extra_headers=extra_headers" if header_entries else ""
     if header_entries:
-        lines.append(f"        extra_headers = {{k: v for k, v in {{{header_entries}}}.items() if v is not None}}")
+        lines.append(
+            f"        extra_headers = {{k: v for k, v in {{{header_entries}}}.items() if v is not None}}"
+        )
     if ep.pollable:
-        lines.append("        body[\"async\"] = True if async_ is None else async_")
+        lines.append('        body["async"] = True if async_ is None else async_')
         lines.append(
             f'        result = {await_}self._transport.request("POST", "{ep.path}", json=body{headers})'
         )
@@ -230,7 +267,9 @@ def render(svc: Service) -> str:
     for is_async in (False, True):
         name = ("Async" if is_async else "") + svc.class_name
         out.append(f"class {name}:")
-        out.append(f'    """{"Asynchronous" if is_async else "Synchronous"} {svc.alias} client."""')
+        out.append(
+            f'    """{"Asynchronous" if is_async else "Synchronous"} {svc.alias} client."""'
+        )
         out.append("")
         out.append("    def __init__(self, transport: Any) -> None:")
         out.append("        self._transport = transport")
@@ -250,7 +289,10 @@ def write_all(services: list[Service], root: Path) -> list[Path]:
         path.write_text(render(svc))
         written.append(path)
 
-    init = ['"""Provider-axis clients, generated from the platform OpenAPI specs."""', ""]
+    init = [
+        '"""Provider-axis clients, generated from the platform OpenAPI specs."""',
+        "",
+    ]
     for svc in services:
         init.append(
             f"from .{svc.py_module} import {svc.class_name} as {svc.class_name}, "

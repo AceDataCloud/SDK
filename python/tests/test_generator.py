@@ -1,11 +1,13 @@
 """Generator contract tests — Param.default() and request serialization."""
 
+import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 
-from genlib.model import Endpoint, Param
+from genlib.model import Endpoint, Param, Service
+from genlib.python_gen import render
 
 
 def test_default_only_reads_schema_default():
@@ -159,3 +161,53 @@ def test_endpoint_extracts_non_accept_header_parameters():
     }
     endpoint = Endpoint("fish", "/fish/tts", spec)
     assert [param.name for param in endpoint.header_params] == ["model"]
+
+
+def test_python_enum_aliases_do_not_cross_endpoint_streams(tmp_path):
+    specs = tmp_path / "specs"
+    specs.mkdir()
+    for name, path, values in [
+        ("generate", "/suno/audios", ["chirp-v5-5", "chirp-v5", "chirp-v4-5-plus", "chirp-v4-5"]),
+        ("lyrics", "/suno/lyrics", ["default", "remi-v1", "legacy-long-enough"]),
+    ]:
+        (specs / f"{name}.json").write_text(
+            json.dumps(
+                {
+                    "paths": {
+                        path: {
+                            "post": {
+                                "requestBody": {
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "required": ["model"],
+                                                "properties": {"model": {"type": "string", "enum": values}},
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        )
+
+    service = Service(
+        "suno",
+        {
+            "category": "AI Audio",
+            "endpoints": [
+                {"id": "generate", "path": "/suno/audios", "name": "Suno Audios"},
+                {"id": "lyrics", "path": "/suno/lyrics", "name": "Suno Lyrics"},
+            ],
+        },
+        specs,
+    )
+
+    source = render(service)
+    assert "SunoGenerateModel" in source
+    assert "SunoLyricsModel" in source
+    assert "model: SunoGenerateModel" in source
+    assert "model: SunoLyricsModel" in source
