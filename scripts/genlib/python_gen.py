@@ -27,11 +27,11 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 '''
 
 
-def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
+def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool, method: str) -> str:
     lines = ["self", "*"]
     for p in params:
         name = py_param(p.name)
-        annotation = aliases.get(p.name) or p.py_type()
+        annotation = aliases.get(f"{method}:{p.name}") or p.py_type()
         if p.required:
             lines.append(f"{name}: {annotation}")
         else:
@@ -129,7 +129,7 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
             if len(inline) <= 40:
                 continue
             alias = f"{svc.class_name}{pascal(p.name)}"
-            mapping[p.name] = alias
+            mapping[f"{ep.method}:{p.name}"] = alias
             values = ",\n    ".join(json.dumps(e) for e in p.enum)
             lines.append(f"{alias} = Literal[\n    {values},\n]")
     return mapping, lines
@@ -164,7 +164,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
 
     lines = [
         f"    {prefix}def {ep.method}(",
-        f"        {_signature(params, aliases, pollable=ep.pollable)},",
+        f"        {_signature(params, aliases, pollable=ep.pollable, method=ep.method)},",
     ]
     if ep.pollable:
         lines.append(f"    ) -> {handle}:")

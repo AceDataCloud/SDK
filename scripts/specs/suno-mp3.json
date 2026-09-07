@@ -1,8 +1,14 @@
 {
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Suno Music Generation",
+    "version": "1.0.0",
+    "description": "API reference for Suno Music Generation on Ace Data Cloud."
+  },
   "paths": {
-    "/suno/upload": {
+    "/suno/mp3": {
       "post": {
-        "summary": "Suno Upload",
+        "summary": "Suno Mp3",
         "security": [
           {
             "bearerAuth": []
@@ -13,33 +19,68 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "example": {
-                    "data": {
-                      "audio_id": "eae26f89-b64b-404d-a80c-761996660b1c"
-                    },
-                    "success": true
-                  },
-                  "properties": {
-                    "data": {
+                  "oneOf": [
+                    {
                       "type": "object",
                       "properties": {
-                        "audio_id": {
+                        "data": {
+                          "type": "array",
+                          "description": "Suno Mp3 Response 200 Data",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "file_url": {
+                                "type": "string",
+                                "description": "Suno Mp3 Response 200 Data File Url"
+                              }
+                            },
+                            "required": [
+                              "file_url"
+                            ]
+                          }
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "description": "Suno Mp3 Response 200 Success"
+                        },
+                        "task_id": {
                           "type": "string",
-                          "description": "The unique ID of the audio"
+                          "description": "Suno Mp3 Response 200 Task Id"
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Suno Mp3 Response 200 Trace Id"
                         }
                       },
-                      "description": "The data object returned after a successful upload contains `audio_id`, which can be used for subsequent custom music generation."
+                      "required": [
+                        "success",
+                        "task_id",
+                        "trace_id",
+                        "data"
+                      ]
                     },
-                    "success": {
-                      "type": "boolean",
-                      "description": "A boolean flag indicating whether this request was successful."
+                    {
+                      "type": "object",
+                      "required": [
+                        "task_id",
+                        "trace_id"
+                      ],
+                      "properties": {
+                        "task_id": {
+                          "type": "string",
+                          "description": "Suno Mp3 Response 200 Task Id"
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Suno Mp3 Response 200 Trace Id"
+                        }
+                      }
                     }
-                  }
+                  ]
                 }
               }
             },
-            "description": "Request successful."
+            "description": "Suno Mp3 Response 200"
           },
           "400": {
             "content": {
@@ -62,18 +103,18 @@
                             "code": {
                               "type": "string",
                               "example": "token_mismatched",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 400 Error Code"
                             },
                             "message": {
                               "type": "string",
                               "example": "The specified token is not matched with API.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 400 Error Message"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 400 Trace Id"
                         }
                       }
                     },
@@ -93,18 +134,18 @@
                             "code": {
                               "type": "string",
                               "example": "api_not_implemented",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 400 Error Code 2"
                             },
                             "message": {
                               "type": "string",
                               "example": "The API is not implemented.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 400 Error Message 2"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 400 Trace Id 2"
                         }
                       }
                     },
@@ -124,18 +165,18 @@
                             "code": {
                               "type": "string",
                               "example": "disabled",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 400 Error Code 3"
                             },
                             "message": {
                               "type": "string",
                               "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 400 Error Message 3"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 400 Trace Id 3"
                         }
                       }
                     },
@@ -155,18 +196,18 @@
                             "code": {
                               "type": "string",
                               "example": "bad_request",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 400 Error Code 4"
                             },
                             "message": {
                               "type": "string",
                               "example": "model is invalid.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 400 Error Message 4"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 400 Trace Id 4"
                         }
                       }
                     },
@@ -186,18 +227,18 @@
                             "code": {
                               "type": "string",
                               "example": "no_token",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 400 Error Code 5"
                             },
                             "message": {
                               "type": "string",
                               "example": "No token specified for the request.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 400 Error Message 5"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 400 Trace Id 5"
                         }
                       }
                     }
@@ -205,7 +246,7 @@
                 }
               }
             },
-            "description": "Request error, possibly due to missing or invalid parameters."
+            "description": "Suno Mp3 Response 400"
           },
           "401": {
             "content": {
@@ -228,18 +269,18 @@
                             "code": {
                               "type": "string",
                               "example": "invalid_token",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 401 Error Code"
                             },
                             "message": {
                               "type": "string",
                               "example": "The specified token is invalid or wrong.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 401 Error Message"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 401 Trace Id"
                         }
                       }
                     },
@@ -259,18 +300,18 @@
                             "code": {
                               "type": "string",
                               "example": "token_expired",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 401 Error Code 2"
                             },
                             "message": {
                               "type": "string",
                               "example": "token expired.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 401 Error Message 2"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 401 Trace Id 2"
                         }
                       }
                     },
@@ -290,18 +331,18 @@
                             "code": {
                               "type": "string",
                               "example": "token_mismatched",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 401 Error Code 3"
                             },
                             "message": {
                               "type": "string",
                               "example": "token and api does not match.",
-                              "description": "Response error message."
+                              "description": "Suno Mp3 Response 401 Error Message 3"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 401 Trace Id 3"
                         }
                       }
                     }
@@ -309,7 +350,7 @@
                 }
               }
             },
-            "description": "Unauthorized, authorization token is invalid or missing."
+            "description": "Suno Mp3 Response 401"
           },
           "403": {
             "content": {
@@ -332,18 +373,18 @@
                             "code": {
                               "type": "string",
                               "example": "used_up",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 403 Error Code"
                             },
                             "message": {
                               "type": "string",
                               "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
-                              "description": "Response error message."
+                              "description": "Suno Mp3 Response 403 Error Message"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 403 Trace Id"
                         }
                       }
                     }
@@ -351,7 +392,7 @@
                 }
               }
             },
-            "description": "Unauthorized, authorization token is invalid or missing."
+            "description": "Suno Mp3 Response 403"
           },
           "404": {
             "content": {
@@ -374,18 +415,18 @@
                             "code": {
                               "type": "string",
                               "example": "no_api",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 404 Error Code"
                             },
                             "message": {
                               "type": "string",
                               "example": "API does not exist, please make sure url is correct.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 404 Error Message"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 404 Trace Id"
                         }
                       }
                     }
@@ -393,7 +434,7 @@
                 }
               }
             },
-            "description": "Unauthorized, authorization token is invalid or missing."
+            "description": "Suno Mp3 Response 404"
           },
           "429": {
             "content": {
@@ -416,18 +457,18 @@
                             "code": {
                               "type": "string",
                               "example": "too_many_requests",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 429 Error Code"
                             },
                             "message": {
                               "type": "string",
                               "example": "You have exceeded the rate limit.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 429 Error Message"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 429 Trace Id"
                         }
                       }
                     }
@@ -435,7 +476,7 @@
                 }
               }
             },
-            "description": "Too many requests, rate limit exceeded."
+            "description": "Suno Mp3 Response 429"
           },
           "500": {
             "content": {
@@ -458,18 +499,18 @@
                             "code": {
                               "type": "string",
                               "example": "api_error",
-                              "description": "Response error code."
+                              "description": "Suno Mp3 Response 500 Error Code"
                             },
                             "message": {
                               "type": "string",
                               "example": "Internal server error.",
-                              "description": "Error message of the response."
+                              "description": "Suno Mp3 Response 500 Error Message"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "The tracking ID for this request."
+                          "description": "Suno Mp3 Response 500 Trace Id"
                         }
                       }
                     }
@@ -477,7 +518,49 @@
                 }
               }
             },
-            "description": "Internal server error, an exception occurred on the server."
+            "description": "Suno Mp3 Response 500"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "timeout",
+                          "message": "MP3 URL generation timed out."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "timeout",
+                              "description": "Suno Mp3 Response 500 Error Code"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "MP3 URL generation timed out.",
+                              "description": "Suno Mp3 Response 500 Error Message"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "Suno Mp3 Response 500 Trace Id"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Suno Mp3 Response 504"
           }
         },
         "parameters": [
@@ -486,13 +569,12 @@
             "name": "accept",
             "schema": {
               "enum": [
-                "application/json",
-                "application/x-ndjson"
+                "application/json"
               ],
               "type": "string"
             },
             "required": false,
-            "description": "Specify the format of the response returned by the server. If not specified, the default format is `application/json`; if specified as `application/x-ndjson`, the response will be returned in a block-streaming format of JSON separated by newline characters."
+            "description": "Suno Mp3 Param Accept"
           }
         ],
         "requestBody": {
@@ -501,57 +583,31 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "audio_url"
+                  "audio_id"
                 ],
                 "properties": {
-                  "audio_url": {
+                  "audio_id": {
                     "type": "string",
-                    "description": "Suno Upload Audio Url"
-                  },
-                  "mode": {
-                    "type": "string",
-                    "enum": [
-                      "standard",
-                      "enhanced"
-                    ],
-                    "default": "standard",
-                    "description": "Suno Upload Mode"
-                  },
-                  "name": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100,
-                    "description": "Suno Upload Name"
+                    "description": "Suno Mp3 Audio Id"
                   },
                   "callback_url": {
                     "type": "string",
-                    "format": "uri",
-                    "description": "Suno Upload Callback Url"
+                    "description": "Suno Mp3 Callback Url"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "description": "Suno Mp3 Async"
                   }
                 }
               },
               "example": {
-                "audio_url": "https://platform2.cdn.acedata.cloud/fish/5ade0339-5f11-487e-aacc-06a908271706.mp3"
+                "audio_id": "c5a97c83-ad13-4b0e-8655-0a68471062fb"
               }
             }
           },
           "required": true
-        }
-      }
-    }
-  },
-  "openapi": "3.0.0",
-  "servers": [
-    {
-      "url": "https://api.acedata.cloud",
-      "description": "Ace Data Cloud API Server"
-    }
-  ],
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+        },
+        "operationId": "createSunoMp3"
       }
     }
   }
