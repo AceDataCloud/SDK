@@ -185,6 +185,11 @@
     "id": "8823cd83-54f6-4ea8-979a-7fa448577186",
     "path": "/suno/upload",
     "name": "Suno Upload API"
+   },
+   {
+    "id": "bf7828bc-a0ec-4ef3-90cf-8f6df3f337d4",
+    "path": "/suno/mp3",
+    "name": "Suno Mp3"
    }
   ],
   "tasks": "/suno/tasks"
