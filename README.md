@@ -2,6 +2,9 @@
 
 Official SDK clients for the [AceDataCloud API](https://platform.acedata.cloud).
 
+<!-- canonical-acquisition -->
+[Get an API key](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=sdk-catalog)
+
 ## Languages
 
 | Language | Directory | Package |
