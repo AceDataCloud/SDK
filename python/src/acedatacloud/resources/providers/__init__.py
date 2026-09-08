@@ -32,6 +32,10 @@ from .seedream import AsyncSeedream as AsyncSeedream
 from .seedream import Seedream as Seedream
 from .suno import AsyncSuno as AsyncSuno
 from .suno import Suno as Suno
+from .tiktok import AsyncTiktok as AsyncTiktok
+from .tiktok import Tiktok as Tiktok
+from .tw import AsyncTw as AsyncTw
+from .tw import Tw as Tw
 from .wan import AsyncWan as AsyncWan
 from .wan import Wan as Wan
 
@@ -68,6 +72,10 @@ __all__ = [
     "AsyncSeedream",
     "Suno",
     "AsyncSuno",
+    "Tiktok",
+    "AsyncTiktok",
+    "Tw",
+    "AsyncTw",
     "Wan",
     "AsyncWan",
 ]

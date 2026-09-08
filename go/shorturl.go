@@ -7,8 +7,8 @@ type ShortURLResource struct{ t *transport }
 
 // Create shortens a URL. slug is optional (pass "" for an auto slug);
 // extra is merged into the request body for forward-compatible fields.
-func (s *ShortURLResource) Create(ctx context.Context, url, slug string, extra map[string]any) (map[string]any, error) {
-	body := map[string]any{"url": url}
+func (s *ShortURLResource) Create(ctx context.Context, content, slug string, extra map[string]any) (map[string]any, error) {
+	body := map[string]any{"content": content}
 	if slug != "" {
 		body["slug"] = slug
 	}

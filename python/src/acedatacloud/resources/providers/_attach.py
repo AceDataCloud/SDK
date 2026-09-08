@@ -25,6 +25,8 @@ from .qwen_image import AsyncQwenImage, QwenImage
 from .seedance import AsyncSeedance, Seedance
 from .seedream import AsyncSeedream, Seedream
 from .suno import AsyncSuno, Suno
+from .tiktok import AsyncTiktok, Tiktok
+from .tw import AsyncTw, Tw
 from .wan import AsyncWan, Wan
 
 
@@ -47,6 +49,8 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.seedance = AsyncSeedance(transport)
         client.seedream = AsyncSeedream(transport)
         client.suno = AsyncSuno(transport)
+        client.tiktok = AsyncTiktok(transport)
+        client.tw = AsyncTw(transport)
         client.wan = AsyncWan(transport)
     else:
         client.digitalhuman = Digitalhuman(transport)
@@ -65,4 +69,6 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.seedance = Seedance(transport)
         client.seedream = Seedream(transport)
         client.suno = Suno(transport)
+        client.tiktok = Tiktok(transport)
+        client.tw = Tw(transport)
         client.wan = Wan(transport)

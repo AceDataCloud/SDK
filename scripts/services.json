@@ -185,6 +185,11 @@
     "id": "8823cd83-54f6-4ea8-979a-7fa448577186",
     "path": "/suno/upload",
     "name": "Suno Upload API"
+   },
+   {
+    "id": "58cb92e9-107d-5128-a0a1-fbebc1d3c5eb",
+    "path": "/suno/mp3",
+    "name": "Suno MP3 API"
    }
   ],
   "tasks": "/suno/tasks"
@@ -387,5 +392,62 @@
    }
   ],
   "tasks": "/qwen-image/tasks"
+ },
+ "tiktok": {
+  "category": "Web & Data",
+  "endpoints": [
+   {
+    "id": "3ed841f5-893e-5a08-9403-4c3475a1e9c3",
+    "path": "/tiktok/posts",
+    "name": "TikTok Posts API"
+   },
+   {
+    "id": "98c2661a-cc93-54b5-81d1-bdda31b3868f",
+    "path": "/tiktok/search",
+    "name": "TikTok Search API"
+   },
+   {
+    "id": "6a7194d7-b923-5ed3-b5b7-8c72c5b5189a",
+    "path": "/tiktok/user",
+    "name": "TikTok User API"
+   },
+   {
+    "id": "a73f3d8c-cb44-58b9-b5c7-716cca561602",
+    "path": "/tiktok/video",
+    "name": "TikTok Video API"
+   }
+  ],
+  "tasks": null
+ },
+ "tw": {
+  "category": "Web & Data",
+  "endpoints": [
+   {
+    "id": "d2f7e291-b606-58e0-9493-72aec384c4bd",
+    "path": "/x/comments",
+    "name": "X Comments API"
+   },
+   {
+    "id": "5a143527-ee86-5acc-b785-01d62f57bbae",
+    "path": "/x/search",
+    "name": "X Search API"
+   },
+   {
+    "id": "2d135b10-da8c-58d6-8fb0-8990415fee2b",
+    "path": "/x/posts",
+    "name": "X Posts API"
+   },
+   {
+    "id": "1af9923c-4322-59df-811a-e095ab1126be",
+    "path": "/x/users",
+    "name": "X Users API"
+   },
+   {
+    "id": "08b153e5-fb8e-550c-bff4-74adefd292a1",
+    "path": "/x/retweets",
+    "name": "X Retweets API"
+   }
+  ],
+  "tasks": null
  }
 }

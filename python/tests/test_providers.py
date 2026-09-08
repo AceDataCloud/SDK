@@ -29,6 +29,8 @@ GENERATED = (
     "digitalhuman",
     "dreamina",
     "localization",
+    "tiktok",
+    "tw",
 )
 HAND_WRITTEN = ("kling", "veo", "openai", "webextrator", "shorturl")
 
@@ -233,8 +235,28 @@ def test_every_provider_has_a_callable_method(client, name):
 
 def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
-    for method in ("generate", "lyrics", "wav", "mp4"):
+    for method in ("generate", "lyrics", "wav", "mp4", "mp3"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_shorturl_uses_content_field(client):
+    transport = Mock()
+    transport.request.return_value = {"success": True}
+    client.shorturl._transport = transport
+
+    client.shorturl.create(content="https://platform.acedata.cloud/documents/x")
+    assert transport.request.call_args.kwargs["json"]["content"].startswith("https://")
+
+
+def test_shorturl_legacy_url_maps_to_content(client):
+    transport = Mock()
+    transport.request.return_value = {"success": True}
+    client.shorturl._transport = transport
+
+    client.shorturl.create(url="https://platform.acedata.cloud/documents/x")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["content"] == "https://platform.acedata.cloud/documents/x"
+    assert "url" not in body
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):

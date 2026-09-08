@@ -16,6 +16,8 @@ export { QwenImage } from './qwen-image';
 export { Seedance } from './seedance';
 export { Seedream } from './seedream';
 export { Suno } from './suno';
+export { Tiktok } from './tiktok';
+export { Tw } from './tw';
 export { Wan } from './wan';
 
 import { Transport } from '../../runtime/transport';
@@ -35,6 +37,8 @@ import { QwenImage } from './qwen-image';
 import { Seedance } from './seedance';
 import { Seedream } from './seedream';
 import { Suno } from './suno';
+import { Tiktok } from './tiktok';
+import { Tw } from './tw';
 import { Wan } from './wan';
 
 /** Bind every generated provider client onto `client`. */
@@ -55,5 +59,7 @@ export function attachProviders(client: Record<string, unknown>, transport: Tran
   client.seedance = new Seedance(transport);
   client.seedream = new Seedream(transport);
   client.suno = new Suno(transport);
+  client.tiktok = new Tiktok(transport);
+  client.tw = new Tw(transport);
   client.wan = new Wan(transport);
 }
