@@ -226,6 +226,44 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@respx.mock
+def test_openai_responses_new_options(client):
+    respx.post("https://api.acedata.cloud/openai/responses").mock(
+        return_value=httpx.Response(200, json={"id": "resp-123"})
+    )
+
+    client.openai.responses.create(
+        model="gpt-5.6-sol",
+        input="Hello",
+        include=["file_search_call.results"],
+        max_output_tokens=128,
+        parallel_tool_calls=False,
+        reasoning={"effort": "low"},
+        stream_options={"include_usage": True},
+        tool_choice="auto",
+    )
+
+    body = json.loads(respx.calls.last.request.content)
+    assert body["include"] == ["file_search_call.results"]
+    assert body["max_output_tokens"] == 128
+    assert body["parallel_tool_calls"] is False
+    assert body["reasoning"] == {"effort": "low"}
+    assert body["stream_options"] == {"include_usage": True}
+    assert body["tool_choice"] == "auto"
+
+
+@respx.mock
+def test_openai_models_list(client):
+    route = respx.get("https://api.acedata.cloud/openai/models").mock(
+        return_value=httpx.Response(200, json={"object": "list", "data": []})
+    )
+
+    result = client.openai.models.list()
+
+    assert route.called
+    assert result["object"] == "list"
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 

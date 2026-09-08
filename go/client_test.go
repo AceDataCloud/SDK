@@ -145,7 +145,7 @@ func TestCaptchaEndpoints(t *testing.T) {
 
 func TestChatCompletions_Create(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/chat/completions" {
+		if r.URL.Path != "/openai/chat/completions" {
 			t.Errorf("unexpected path %s", r.URL.Path)
 		}
 		if r.Header.Get("Authorization") != "Bearer token-abc" {
@@ -170,6 +170,70 @@ func TestChatCompletions_Create(t *testing.T) {
 		t.Fatalf("Create: %v", err)
 	}
 	if res["id"] != "c1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAIResponses_NewOptions(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/openai/responses" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["max_output_tokens"] != float64(128) {
+			t.Errorf("missing max_output_tokens: %+v", body)
+		}
+		if body["parallel_tool_calls"] != false {
+			t.Errorf("missing parallel_tool_calls=false: %+v", body)
+		}
+		if _, ok := body["reasoning"].(map[string]any); !ok {
+			t.Errorf("missing reasoning: %+v", body)
+		}
+		if body["tool_choice"] != "auto" {
+			t.Errorf("missing tool_choice: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"resp-123"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	parallel := false
+	res, err := c.OpenAI().Responses().Create(context.Background(), ResponsesRequest{
+		Model:             "gpt-5.6-sol",
+		Input:             "Hello",
+		Include:           []string{"file_search_call.results"},
+		MaxOutputTokens:   128,
+		ParallelToolCalls: &parallel,
+		Reasoning:         map[string]any{"effort": "low"},
+		StreamOptions:     map[string]any{"include_usage": true},
+		ToolChoice:        "auto",
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "resp-123" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestOpenAIModels_List(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/openai/models" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"object":"list","data":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Models().List(context.Background())
+	if err != nil {
+		t.Fatalf("List: %v", err)
+	}
+	if res["object"] != "list" {
 		t.Fatalf("bad response: %+v", res)
 	}
 }
