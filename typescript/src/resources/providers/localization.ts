@@ -9,13 +9,13 @@ import { Transport } from '../../runtime/transport';
 
 
 export interface LocalizationTranslateOptions {
-  /** Please provide the content that needs to be translated. */
-  input: Record<string, unknown>;
-  /** The target language area to be translated to. */
+  /** Localization Translate Input */
+  input: string | Record<string, unknown>;
+  /** Localization Translate Locale */
   locale: "en" | "de" | "pt" | "es" | "fr" | "zh-CN" | "zh-TW" | "it" | "ko" | "ja" | "ru" | "pl" | "fi" | "sv" | "el" | "uk" | "ar" | "sr";
-  /** The file type of the input text (such as `json` or `md`). */
-  extension: "json" | "md";
-  /** The large language model used for translation is `gpt-3.5` by default. */
+  /** Localization Translate Extension */
+  extension: "md" | "json";
+  /** Localization Translate Model */
   model?: "gpt-3.5" | "gpt-4";
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */

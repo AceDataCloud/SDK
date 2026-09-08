@@ -224,6 +224,24 @@ def test_extra_parameters_pass_through(client):
     assert transport.request.call_args.kwargs["json"]["brand_new_flag"] is True
 
 
+def test_localization_accepts_markdown_input(client):
+    input_hint = typing.get_type_hints(type(client.localization).translate)["input"]
+    assert str in typing.get_args(input_hint)
+
+    transport = Mock()
+    transport.request.return_value = {"locale": "de", "data": "# Titel"}
+    client.localization._transport = transport
+
+    client.localization.translate(input="# Title", locale="de", extension="md")
+
+    assert transport.request.call_args.args == ("POST", "/localization/translate")
+    assert transport.request.call_args.kwargs["json"] == {
+        "input": "# Title",
+        "locale": "de",
+        "extension": "md",
+    }
+
+
 @pytest.mark.parametrize("name", GENERATED)
 def test_every_provider_has_a_callable_method(client, name):
     provider = getattr(client, name)
