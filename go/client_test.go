@@ -74,6 +74,46 @@ func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
 	}
 }
 
+func TestSunoMp3UsesTaskEndpoint(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/suno/mp3" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["audio_id"] != "audio-1" || body["async"] != true {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"task_id":"task-mp3"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Suno().Mp3(context.Background(), SunoMp3Request{AudioID: "audio-1"})
+	if err != nil {
+		t.Fatalf("Suno Mp3: %v", err)
+	}
+	if task.ID != "task-mp3" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+}
+
+func TestSunoGenerateLatestParameters(t *testing.T) {
+	body := SunoGenerateRequest{
+		Model:                    "chirp-v6",
+		Prompt:                   "lofi track",
+		LyricPrompt:              "write warm lyrics",
+		ReplaceSectionResultMode: "candidates",
+	}.toBody()
+	if body["model"] != "chirp-v6" || body["prompt"] != "lofi track" {
+		t.Fatalf("unexpected generate body: %+v", body)
+	}
+	if body["lyric_prompt"] != "write warm lyrics" || body["replace_section_result_mode"] != "candidates" {
+		t.Fatalf("latest Suno parameters missing: %+v", body)
+	}
+}
+
 func TestMinimaxGenerate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/minimax/videos" {

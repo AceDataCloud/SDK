@@ -27,11 +27,11 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 '''
 
 
-def _signature(params: list[Param], aliases: dict[str, str], *, pollable: bool) -> str:
+def _signature(params: list[Param], aliases: dict[str, str], *, method: str, pollable: bool) -> str:
     lines = ["self", "*"]
     for p in params:
         name = py_param(p.name)
-        annotation = aliases.get(p.name) or p.py_type()
+        annotation = aliases.get(f"{method}:{p.name}") or aliases.get(p.name) or p.py_type()
         if p.required:
             lines.append(f"{name}: {annotation}")
         else:
@@ -121,15 +121,28 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
     """
     mapping: dict[str, str] = {}
     lines: list[str] = []
+    enum_values_by_name: dict[str, set[tuple[str, ...]]] = {}
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or not p.enum or p.name in mapping:
+            if not p.is_control and p.enum:
+                enum_values_by_name.setdefault(p.name, set()).add(tuple(p.enum))
+    duplicate_names = {name for name, values in enum_values_by_name.items() if len(values) > 1}
+    aliases: set[str] = set()
+    for ep in svc.endpoints:
+        for p in ep.params:
+            if p.is_control or not p.enum:
                 continue
             inline = p.py_type()
             if len(inline) <= 40:
                 continue
+            key = f"{ep.method}:{p.name}" if p.name in duplicate_names else p.name
+            if key in mapping:
+                continue
             alias = f"{svc.class_name}{pascal(p.name)}"
-            mapping[p.name] = alias
+            if alias in aliases:
+                alias = f"{svc.class_name}{pascal(ep.method)}{pascal(p.name)}"
+            mapping[key] = alias
+            aliases.add(alias)
             values = ",\n    ".join(json.dumps(e) for e in p.enum)
             lines.append(f"{alias} = Literal[\n    {values},\n]")
     return mapping, lines
@@ -164,7 +177,7 @@ def _method(svc: Service, ep, aliases: dict[str, str], consts: dict[str, str], *
 
     lines = [
         f"    {prefix}def {ep.method}(",
-        f"        {_signature(params, aliases, pollable=ep.pollable)},",
+        f"        {_signature(params, aliases, method=ep.method, pollable=ep.pollable)},",
     ]
     if ep.pollable:
         lines.append(f"    ) -> {handle}:")

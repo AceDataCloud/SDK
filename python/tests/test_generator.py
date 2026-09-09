@@ -5,6 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 
+from genlib import python_gen
 from genlib.model import Endpoint, Param
 
 
@@ -159,3 +160,49 @@ def test_endpoint_extracts_non_accept_header_parameters():
     }
     endpoint = Endpoint("fish", "/fish/tts", spec)
     assert [param.name for param in endpoint.header_params] == ["model"]
+
+
+def test_python_enum_aliases_are_scoped_by_method():
+    class FakeService:
+        class_name = "Suno"
+        endpoints = [
+            type(
+                "Endpoint",
+                (),
+                {
+                    "method": "generate",
+                    "params": [
+                        Param(
+                            "model",
+                            {
+                                "type": "string",
+                                "enum": ["chirp-v6", "chirp-v6-wild", "chirp-v6-mini", "chirp-v5-5"],
+                            },
+                            required=False,
+                        )
+                    ],
+                },
+            )(),
+            type(
+                "Endpoint",
+                (),
+                {
+                    "method": "lyrics",
+                    "params": [
+                        Param(
+                            "model",
+                            {
+                                "type": "string",
+                                "enum": ["default", "remi-v1", "remi-v2", "remi-v3", "remi-v4"],
+                            },
+                            required=True,
+                        )
+                    ],
+                },
+            )(),
+        ]
+
+    aliases, _ = python_gen._aliases(FakeService())
+
+    assert aliases["generate:model"] == "SunoModel"
+    assert aliases["lyrics:model"] == "SunoLyricsModel"
