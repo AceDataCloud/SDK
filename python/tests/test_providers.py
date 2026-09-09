@@ -237,6 +237,33 @@ def test_suno_keeps_its_secondary_endpoints(client):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
 
 
+def test_suno_upload_serializes_current_options(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "upload-1"}
+    client.suno._transport = transport
+
+    client.suno.upload(
+        audio_url="https://cdn.example.com/reference.wav",
+        mode="enhanced",
+        name="Reference",
+        callback_url="https://example.com/callback",
+    )
+
+    assert transport.request.call_args.args == ("POST", "/suno/upload")
+    assert transport.request.call_args.kwargs["json"] == {
+        "audio_url": "https://cdn.example.com/reference.wav",
+        "mode": "enhanced",
+        "name": "Reference",
+        "callback_url": "https://example.com/callback",
+    }
+
+
+def test_suno_vox_requires_vocal_range(client):
+    parameters = inspect.signature(type(client.suno).vox).parameters
+    assert parameters["vocal_start"].default is inspect.Parameter.empty
+    assert parameters["vocal_end"].default is inspect.Parameter.empty
+
+
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):
     """Some endpoints return the artifact inline. `.wait()` must not then poll
     for a task that already finished — which is what made the documented
