@@ -3,7 +3,6 @@
 from typing import Any
 
 import pytest
-
 from acedatacloud.resources.captcha import AsyncCaptcha, Captcha
 
 

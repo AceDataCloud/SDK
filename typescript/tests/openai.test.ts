@@ -18,4 +18,16 @@ describe('OpenAI resource', () => {
       });
     }
   );
+
+  it('keeps dynamically discovered image model IDs compatible', async () => {
+    const request = jest.fn().mockResolvedValue({ data: [] });
+    const openai = new OpenAI({ request } as any);
+    const model: string = 'future-image-model';
+
+    await openai.images.generate({ prompt: 'A cat', model });
+
+    expect(request).toHaveBeenCalledWith('POST', '/openai/images/generations', {
+      json: { prompt: 'A cat', model },
+    });
+  });
 });

@@ -17,7 +17,8 @@ export type OpenAIImageModel =
   | 'nano-banana'
   | 'nano-banana-2-lite'
   | 'nano-banana-2'
-  | 'nano-banana-pro';
+  | 'nano-banana-pro'
+  | (string & {});
 
 class Completions {
   constructor(private transport: Transport) {}

@@ -33,12 +33,45 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 }
 
-func TestOpenAIImageModelOfficialVariants(t *testing.T) {
-	if OpenAIImageModelGPTImage25FlareOfficial != "gpt-image-2.5-flare:official" {
-		t.Errorf("unexpected Flare official model: %q", OpenAIImageModelGPTImage25FlareOfficial)
+func TestOpenAIImageOfficialVariants(t *testing.T) {
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		switch calls {
+		case 1:
+			if r.URL.Path != "/openai/images/generations" || body["model"] != string(OpenAIImageModelGPTImage25FlareOfficial) {
+				t.Fatalf("unexpected generation request: path=%s body=%+v", r.URL.Path, body)
+			}
+		case 2:
+			if r.URL.Path != "/openai/images/edits" || body["model"] != string(OpenAIImageModelGPTImage25SunburstOfficial) {
+				t.Fatalf("unexpected edit request: path=%s body=%+v", r.URL.Path, body)
+			}
+			if body["image"] != "https://example.com/cat.png" {
+				t.Fatalf("unexpected edit image: %+v", body)
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"data":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	_, err := c.OpenAI().Images().Generate(context.Background(), OpenAIImageRequest{
+		Model: OpenAIImageModelGPTImage25FlareOfficial, Prompt: "A cat",
+	})
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
 	}
-	if OpenAIImageModelGPTImage25SunburstOfficial != "gpt-image-2.5-sunburst:official" {
-		t.Errorf("unexpected Sunburst official model: %q", OpenAIImageModelGPTImage25SunburstOfficial)
+	_, err = c.OpenAI().Images().Edit(context.Background(), OpenAIImageRequest{
+		Model: OpenAIImageModelGPTImage25SunburstOfficial, Prompt: "Add a hat", Image: "https://example.com/cat.png",
+	})
+	if err != nil {
+		t.Fatalf("Edit: %v", err)
+	}
+	if calls != 2 {
+		t.Fatalf("expected 2 calls, got %d", calls)
 	}
 }
 
