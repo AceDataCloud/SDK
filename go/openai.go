@@ -5,6 +5,27 @@ import (
 	"encoding/json"
 )
 
+// OpenAIImageModel identifies a model supported by OpenAI image endpoints.
+type OpenAIImageModel string
+
+const (
+	OpenAIImageModelDallE2                     OpenAIImageModel = "dall-e-2"
+	OpenAIImageModelDallE3                     OpenAIImageModel = "dall-e-3"
+	OpenAIImageModelGPTImage1                  OpenAIImageModel = "gpt-image-1"
+	OpenAIImageModelGPTImage15                 OpenAIImageModel = "gpt-image-1.5"
+	OpenAIImageModelGPTImage2                  OpenAIImageModel = "gpt-image-2"
+	OpenAIImageModelGPTImage25Flare            OpenAIImageModel = "gpt-image-2.5-flare"
+	OpenAIImageModelGPTImage25FlareOfficial    OpenAIImageModel = "gpt-image-2.5-flare:official"
+	OpenAIImageModelGPTImage25Sunburst         OpenAIImageModel = "gpt-image-2.5-sunburst"
+	OpenAIImageModelGPTImage25SunburstOfficial OpenAIImageModel = "gpt-image-2.5-sunburst:official"
+	OpenAIImageModelGPTImage2Reverse           OpenAIImageModel = "gpt-image-2:reverse"
+	OpenAIImageModelGPTImage2Official          OpenAIImageModel = "gpt-image-2:official"
+	OpenAIImageModelNanoBanana                 OpenAIImageModel = "nano-banana"
+	OpenAIImageModelNanoBanana2Lite            OpenAIImageModel = "nano-banana-2-lite"
+	OpenAIImageModelNanoBanana2                OpenAIImageModel = "nano-banana-2"
+	OpenAIImageModelNanoBananaPro              OpenAIImageModel = "nano-banana-pro"
+)
+
 // ChatCompletionRequest is the input to OpenAI chat.completions.create.
 //
 // The struct exposes the common fields explicitly and an “Extra“ map

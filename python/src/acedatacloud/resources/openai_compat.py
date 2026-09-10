@@ -4,7 +4,25 @@ from __future__ import annotations
 
 import json as _json
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Literal
+
+OpenAIImageModel = Literal[
+    "dall-e-2",
+    "dall-e-3",
+    "gpt-image-1",
+    "gpt-image-1.5",
+    "gpt-image-2",
+    "gpt-image-2.5-flare",
+    "gpt-image-2.5-flare:official",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-sunburst:official",
+    "gpt-image-2:reverse",
+    "gpt-image-2:official",
+    "nano-banana",
+    "nano-banana-2-lite",
+    "nano-banana-2",
+    "nano-banana-pro",
+]
 
 
 class _Completions:
@@ -119,7 +137,7 @@ class _Images:
         self,
         *,
         prompt: str,
-        model: str,
+        model: OpenAIImageModel,
         background: str | None = None,
         moderation: str | None = None,
         n: int | None = None,
@@ -166,7 +184,7 @@ class _Images:
         *,
         image: str | list[str],
         prompt: str,
-        model: str | None = None,
+        model: OpenAIImageModel | None = None,
         n: int | None = None,
         background: str | None = None,
         input_fidelity: str | None = None,
@@ -219,7 +237,7 @@ class _AsyncImages:
         self,
         *,
         prompt: str,
-        model: str,
+        model: OpenAIImageModel,
         background: str | None = None,
         moderation: str | None = None,
         n: int | None = None,
@@ -266,7 +284,7 @@ class _AsyncImages:
         *,
         image: str | list[str],
         prompt: str,
-        model: str | None = None,
+        model: OpenAIImageModel | None = None,
         n: int | None = None,
         background: str | None = None,
         input_fidelity: str | None = None,

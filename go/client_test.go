@@ -33,6 +33,15 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 }
 
+func TestOpenAIImageModelOfficialVariants(t *testing.T) {
+	if OpenAIImageModelGPTImage25FlareOfficial != "gpt-image-2.5-flare:official" {
+		t.Errorf("unexpected Flare official model: %q", OpenAIImageModelGPTImage25FlareOfficial)
+	}
+	if OpenAIImageModelGPTImage25SunburstOfficial != "gpt-image-2.5-sunburst:official" {
+		t.Errorf("unexpected Sunburst official model: %q", OpenAIImageModelGPTImage25SunburstOfficial)
+	}
+}
+
 func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/seedream/images" {
