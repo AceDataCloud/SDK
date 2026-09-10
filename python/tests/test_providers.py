@@ -10,6 +10,7 @@ import pytest
 
 from acedatacloud import AceDataCloud, AsyncAceDataCloud
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
+from acedatacloud.resources.providers.suno import SunoModel
 
 # Every service the platform exposes as a non-private generation API.
 GENERATED = (
@@ -96,6 +97,10 @@ def test_caller_value_beats_the_spec_default(client):
 
     client.flux.generate(action="generate", prompt="a cat", size="512x512")
     assert transport.request.call_args.kwargs["json"]["size"] == "512x512"
+
+
+def test_suno_v6_models_are_in_the_public_type():
+    assert {"chirp-v6", "chirp-v6-wild", "chirp-v6-mini"} <= set(typing.get_args(SunoModel))
 
 
 def test_seedance_25_serializes_public_contract(client):

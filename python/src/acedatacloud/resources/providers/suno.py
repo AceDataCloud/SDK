@@ -12,6 +12,9 @@ from typing import Any, Literal  # noqa: F401
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
 SunoModel = Literal[
+    "chirp-v6",
+    "chirp-v6-wild",
+    "chirp-v6-mini",
     "chirp-v5-5",
     "chirp-v5",
     "chirp-v4-5-plus",

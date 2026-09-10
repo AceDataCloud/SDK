@@ -20,7 +20,7 @@ export interface SunoGenerateOptions {
   /** Lyrics for generating music under custom mode (`custom` is `true`). `chirp-v3-5` and `chirp-v4` have a maximum of 3000 characters; `chirp-v4-5` and above (including `chirp-v5`, `chirp-v5-5`) have a maximum of 5000 characters. */
   lyric?: string;
   /** The model used for generating music has a default value of `chirp-v4`. */
-  model?: "chirp-v5-5" | "chirp-v5" | "chirp-v4-5-plus" | "chirp-v4-5" | "chirp-v4" | "chirp-v3-5" | "chirp-v3-0";
+  model?: "chirp-v6" | "chirp-v6-wild" | "chirp-v6-mini" | "chirp-v5-5" | "chirp-v5" | "chirp-v4-5-plus" | "chirp-v4-5" | "chirp-v4" | "chirp-v3-5" | "chirp-v3-0";
   /** Music style description. `chirp-v3-5` and `chirp-v4` up to 200 characters; `chirp-v4-5` and above (including `chirp-v5`, `chirp-v5-5`) up to 1000 characters. */
   style?: string;
   /** Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including `chirp-v5`, `chirp-v5-5`) up to 100 characters. */
