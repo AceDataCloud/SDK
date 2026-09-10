@@ -2,6 +2,24 @@
 
 import { Transport } from '../runtime/transport';
 
+export type OpenAIImageModel =
+  | 'dall-e-2'
+  | 'dall-e-3'
+  | 'gpt-image-1'
+  | 'gpt-image-1.5'
+  | 'gpt-image-2'
+  | 'gpt-image-2.5-flare'
+  | 'gpt-image-2.5-flare:official'
+  | 'gpt-image-2.5-sunburst'
+  | 'gpt-image-2.5-sunburst:official'
+  | 'gpt-image-2:reverse'
+  | 'gpt-image-2:official'
+  | 'nano-banana'
+  | 'nano-banana-2-lite'
+  | 'nano-banana-2'
+  | 'nano-banana-pro'
+  | (string & {});
+
 class Completions {
   constructor(private transport: Transport) {}
 
@@ -90,7 +108,7 @@ class Images {
 
   async generate(opts: {
     prompt: string;
-    model: string;
+    model: OpenAIImageModel;
     background?: string;
     moderation?: string;
     n?: number;
@@ -118,7 +136,7 @@ class Images {
   async edit(opts: {
     image: string | string[];
     prompt: string;
-    model?: string;
+    model?: OpenAIImageModel;
     n?: number;
     background?: string;
     inputFidelity?: string;

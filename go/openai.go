@@ -5,6 +5,27 @@ import (
 	"encoding/json"
 )
 
+// OpenAIImageModel identifies a model supported by OpenAI image endpoints.
+type OpenAIImageModel = string
+
+const (
+	OpenAIImageModelDallE2                     OpenAIImageModel = "dall-e-2"
+	OpenAIImageModelDallE3                     OpenAIImageModel = "dall-e-3"
+	OpenAIImageModelGPTImage1                  OpenAIImageModel = "gpt-image-1"
+	OpenAIImageModelGPTImage15                 OpenAIImageModel = "gpt-image-1.5"
+	OpenAIImageModelGPTImage2                  OpenAIImageModel = "gpt-image-2"
+	OpenAIImageModelGPTImage25Flare            OpenAIImageModel = "gpt-image-2.5-flare"
+	OpenAIImageModelGPTImage25FlareOfficial    OpenAIImageModel = "gpt-image-2.5-flare:official"
+	OpenAIImageModelGPTImage25Sunburst         OpenAIImageModel = "gpt-image-2.5-sunburst"
+	OpenAIImageModelGPTImage25SunburstOfficial OpenAIImageModel = "gpt-image-2.5-sunburst:official"
+	OpenAIImageModelGPTImage2Reverse           OpenAIImageModel = "gpt-image-2:reverse"
+	OpenAIImageModelGPTImage2Official          OpenAIImageModel = "gpt-image-2:official"
+	OpenAIImageModelNanoBanana                 OpenAIImageModel = "nano-banana"
+	OpenAIImageModelNanoBanana2Lite            OpenAIImageModel = "nano-banana-2-lite"
+	OpenAIImageModelNanoBanana2                OpenAIImageModel = "nano-banana-2"
+	OpenAIImageModelNanoBananaPro              OpenAIImageModel = "nano-banana-pro"
+)
+
 // ChatCompletionRequest is the input to OpenAI chat.completions.create.
 //
 // The struct exposes the common fields explicitly and an “Extra“ map
@@ -78,6 +99,43 @@ func (o *OpenAIResource) Chat() *OpenAIChat { return &OpenAIChat{t: o.t} }
 
 // Responses returns the responses sub-namespace.
 func (o *OpenAIResource) Responses() *OpenAIResponses { return &OpenAIResponses{t: o.t} }
+
+// Images returns the OpenAI-compatible image sub-namespace.
+func (o *OpenAIResource) Images() *OpenAIImages { return &OpenAIImages{t: o.t} }
+
+// OpenAIImageRequest is the JSON input for OpenAI-compatible image endpoints.
+type OpenAIImageRequest struct {
+	Model  OpenAIImageModel `json:"model"`
+	Prompt string           `json:"prompt"`
+	Image  any              `json:"image,omitempty"`
+	Extra  map[string]any   `json:"-"`
+}
+
+func (r OpenAIImageRequest) toBody() map[string]any {
+	body := map[string]any{"model": r.Model, "prompt": r.Prompt}
+	if r.Image != nil {
+		body["image"] = r.Image
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// OpenAIImages exposes the OpenAI-compatible image generation and editing endpoints.
+type OpenAIImages struct{ t *transport }
+
+// Generate creates images from a text prompt.
+func (i *OpenAIImages) Generate(ctx context.Context, req OpenAIImageRequest) (map[string]any, error) {
+	return i.t.do(ctx, requestOpts{Method: "POST", Path: "/openai/images/generations", Body: req.toBody()})
+}
+
+// Edit edits one or more input images.
+func (i *OpenAIImages) Edit(ctx context.Context, req OpenAIImageRequest) (map[string]any, error) {
+	return i.t.do(ctx, requestOpts{Method: "POST", Path: "/openai/images/edits", Body: req.toBody()})
+}
 
 // OpenAIChat exposes “/v1/chat/completions“.
 type OpenAIChat struct{ t *transport }

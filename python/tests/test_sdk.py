@@ -226,6 +226,25 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
+@pytest.mark.parametrize("model", ["gpt-image-2.5-flare:official", "gpt-image-2.5-sunburst:official"])
+@respx.mock
+def test_openai_images_support_official_gpt_image_25_variants(client, model):
+    generation = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
+        return_value=httpx.Response(200, json={"data": []})
+    )
+    edit = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+        return_value=httpx.Response(200, json={"data": []})
+    )
+
+    client.openai.images.generate(prompt="A cat", model=model)
+    client.openai.images.edit(image="https://example.com/cat.png", prompt="Add a hat", model=model)
+
+    assert generation.calls.last.request.content == (f'{{"prompt":"A cat","model":"{model}"}}'.encode())
+    assert edit.calls.last.request.content == (
+        f'{{"image":"https://example.com/cat.png","prompt":"Add a hat","model":"{model}"}}'.encode()
+    )
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
