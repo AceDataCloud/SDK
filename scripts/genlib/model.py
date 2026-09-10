@@ -223,7 +223,9 @@ class Param:
         if self.type == "object":
             return "map[string]any"
         scalar = GO_TYPES.get(self.type, "any")
-        if self.schema.get("x-go-optional-pointer") is True:
+        if self.schema.get("x-go-optional-pointer") is True or (
+            self.type == "boolean" and not self.required
+        ):
             return f"*{scalar}"
         return scalar
 

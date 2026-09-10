@@ -29,7 +29,7 @@ type HappyhorseGenerateRequest struct {
 	// URL of the video to be edited. For `video_edit` use only.
 	VideoURL string
 	// Whether to add the HappyHorse watermark. Default is off.
-	Watermark bool
+	Watermark *bool
 	// Reference image URL array. `reference_to_video` supports 1–9 images, `video_edit` supports 0–5 images.
 	ImageURLs []string
 	// Output video resolution, optional 720P or 1080P.
@@ -78,7 +78,11 @@ func (r HappyhorseGenerateRequest) toBody() map[string]any {
 	if r.VideoURL != "" {
 		body["video_url"] = r.VideoURL
 	}
-	body["watermark"] = r.Watermark
+	if r.Watermark != nil {
+		body["watermark"] = *r.Watermark
+	} else {
+		body["watermark"] = false
+	}
 	if r.ImageURLs != nil {
 		body["image_urls"] = r.ImageURLs
 	}

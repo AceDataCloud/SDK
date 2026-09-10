@@ -89,9 +89,9 @@ def test_schema_can_request_optional_pointer_in_go():
     assert param.go_type() == "*bool"
 
 
-def test_plain_optional_boolean_preserves_go_value_type():
+def test_plain_optional_boolean_uses_pointer_in_go():
     param = Param("watermark", {"type": "boolean"}, required=False)
-    assert param.go_type() == "bool"
+    assert param.go_type() == "*bool"
 
 
 def test_pattern_string_becomes_precise_typescript_literals():

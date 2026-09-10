@@ -124,7 +124,7 @@ type ProducerGenerateRequest struct {
 	// Title used for generating songs.
 	Title string
 	// Is it a custom mode? If `true`, the audio will be generated based on the `lyric`; otherwise, it will be genera
-	Custom bool
+	Custom *bool
 	// The unique ID of the reference song.
 	AudioID string
 	// The degree of uniqueness of style can be selected between 0 and 1, with a default value of 0.5.
@@ -132,7 +132,7 @@ type ProducerGenerateRequest struct {
 	// Specify the time point (in seconds) from which to continue writing the song.
 	ContinueAt float64
 	// If `true`, the generated audio will only contain the accompaniment, without vocal lyrics.
-	Instrumental bool
+	Instrumental *bool
 	// The impact intensity of the audio prompt words can be selected between 0.2 and 1, with a default value of 0.5.
 	SoundStrength float64
 	// The degree of influence of lyrics on audio generation can be selected between 0 and 1, with a default value of
@@ -163,7 +163,9 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 	if r.Title != "" {
 		body["title"] = r.Title
 	}
-	body["custom"] = r.Custom
+	if r.Custom != nil {
+		body["custom"] = *r.Custom
+	}
 	if r.AudioID != "" {
 		body["audio_id"] = r.AudioID
 	}
@@ -177,7 +179,11 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 	} else {
 		body["continue_at"] = false
 	}
-	body["instrumental"] = r.Instrumental
+	if r.Instrumental != nil {
+		body["instrumental"] = *r.Instrumental
+	} else {
+		body["instrumental"] = false
+	}
 	if r.SoundStrength != 0 {
 		body["sound_strength"] = r.SoundStrength
 	} else {

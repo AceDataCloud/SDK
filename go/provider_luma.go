@@ -13,7 +13,7 @@ type Luma struct {
 // LumaGenerateRequest is the input to luma.Generate.
 type LumaGenerateRequest struct {
 	// Whether to enable loop playback for the generated video.
-	Loop bool
+	Loop *bool
 	// Operation type. Use `generate` when creating a video for the first time, and use `extend` when continuing an e
 	Action string
 	// Text prompts for generating videos.
@@ -25,7 +25,7 @@ type LumaGenerateRequest struct {
 	// The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time,
 	VideoURL string
 	// Whether to enable automatic optimization enhancement for the input prompt text, suitable for use when unsure h
-	Enhancement bool
+	Enhancement *bool
 	// Generate the aspect ratio of the video, for example `16:9`.
 	AspectRatio string
 	// The URL of the ending frame image, which will be used as the last frame of the generated video.
@@ -42,7 +42,11 @@ type LumaGenerateRequest struct {
 
 func (r LumaGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
-	body["loop"] = r.Loop
+	if r.Loop != nil {
+		body["loop"] = *r.Loop
+	} else {
+		body["loop"] = false
+	}
 	if r.Action != "" {
 		body["action"] = r.Action
 	} else {
@@ -62,7 +66,11 @@ func (r LumaGenerateRequest) toBody() map[string]any {
 	if r.VideoURL != "" {
 		body["video_url"] = r.VideoURL
 	}
-	body["enhancement"] = r.Enhancement
+	if r.Enhancement != nil {
+		body["enhancement"] = *r.Enhancement
+	} else {
+		body["enhancement"] = true
+	}
 	if r.AspectRatio != "" {
 		body["aspect_ratio"] = r.AspectRatio
 	}

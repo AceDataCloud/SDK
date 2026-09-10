@@ -67,7 +67,13 @@ def _to_body(struct: str, svc: Service, ep) -> str:
             lines.append(f"\tbody[{key}] = r.{field}")
             continue
         if default is not None:
-            if zero:
+            if go_type.startswith("*"):
+                lines.append(f"\tif r.{field} != nil {{")
+                lines.append(f"\t\tbody[{key}] = *r.{field}")
+                lines.append("\t} else {")
+                lines.append(f"\t\tbody[{key}] = {_go_literal(default)}")
+                lines.append("\t}")
+            elif zero:
                 lines.append(f"\tif r.{field} != {zero} {{")
                 lines.append(f"\t\tbody[{key}] = r.{field}")
                 lines.append("\t} else {")
@@ -80,7 +86,7 @@ def _to_body(struct: str, svc: Service, ep) -> str:
             lines.append(f"\tif r.{field} != {zero} {{")
             lines.append(f"\t\tbody[{key}] = r.{field}")
             lines.append("\t}")
-        elif go_type == "any" or go_type.startswith("[]") or go_type.startswith("map[") or go_type.startswith("*"):
+        elif go_type == "any" or go_type.startswith(("[]", "map[", "*")):
             lines.append(f"\tif r.{field} != nil {{")
             value = f"*r.{field}" if go_type.startswith("*") else f"r.{field}"
             lines.append(f"\t\tbody[{key}] = {value}")

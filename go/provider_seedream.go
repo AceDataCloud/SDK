@@ -12,33 +12,33 @@ type Seedream struct {
 
 // SeedreamGenerateRequest is the input to seedream.Generate.
 type SeedreamGenerateRequest struct {
-	// Full model ID. Seedream 5.0 Pro supports single-image generation, precise editing, transparent backgrounds, an
+	// Seedream Images Model
 	Model string
-	// Generation or editing prompt. Optional only for Seedream 5.0 Pro layer decomposition, where omission automatic
+	// Seedream Images Prompt
 	Prompt string
-	// One reference image URL/base64 string or an array. Pro accepts up to 10 images in regular mode and exactly one
+	// Seedream Images Image
 	Image any
-	// Output size. Pro supports 1K/1.5K/2K or valid dimensions; decomposition also supports auto. Lite supports 2K/3
+	// Seedream Images Size
 	Size string
-	// Sequential image mode. auto lets supported Lite/4.x models generate a related set; disabled returns one image.
+	// Seedream Images Sequential Image Generation
 	SequentialImageGeneration string
-	// Sequential image options. max_images is 1-15 and input images plus outputs must not exceed 15.
+	// Seedream Images Sequential Image Generation Options
 	SequentialImageGenerationOptions map[string]any
-	// Stream normalized image events. Supported by Lite/4.x only and cannot be combined with async or callback_url.
+	// Seedream Images Stream
 	Stream *bool
-	// Image response format: url or b64_json.
+	// Seedream Images Response Format
 	ResponseFormat string
-	// Whether to add the AI-generated watermark.
-	Watermark bool
-	// Output image format, jpeg or png. Supported by Seedream 5.0 Pro and Lite.
+	// Seedream Images Watermark
+	Watermark *bool
+	// Seedream Images Output Format
 	OutputFormat string
-	// Model tools. Seedream 5.0 Lite supports web_search.
+	// Seedream Images Tools
 	Tools []map[string]any
-	// Prompt optimization. Pro supports standard/fast; Lite and 4.5 support standard; 4.0 supports standard/fast.
+	// Seedream Images Optimize Prompt Options
 	OptimizePromptOptions map[string]any
-	// Seedream 5.0 Pro layer decomposition. Requires exactly one PNG/JPEG and returns one base image plus up to 16 t
+	// Seedream Images Layer Decomposition
 	LayerDecomposition *bool
-	// Seedream 5.0 Pro background mode. transparent requires one transparent PNG input and PNG output; opaque produc
+	// Seedream Images Background
 	Background string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -72,7 +72,9 @@ func (r SeedreamGenerateRequest) toBody() map[string]any {
 	if r.ResponseFormat != "" {
 		body["response_format"] = r.ResponseFormat
 	}
-	body["watermark"] = r.Watermark
+	if r.Watermark != nil {
+		body["watermark"] = *r.Watermark
+	}
 	if r.OutputFormat != "" {
 		body["output_format"] = r.OutputFormat
 	}
@@ -103,7 +105,7 @@ func (r SeedreamGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Call /seedream/images.
+// Generate Seedream Images
 func (c *Seedream) Generate(ctx context.Context, req SeedreamGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

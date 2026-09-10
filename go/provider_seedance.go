@@ -27,13 +27,13 @@ type SeedanceGenerateRequest struct {
 	// $t(seedance_videos_seed)
 	Seed int
 	// $t(seedance_videos_camerafixed)
-	Camerafixed bool
+	Camerafixed *bool
 	// $t(seedance_videos_watermark)
-	Watermark bool
+	Watermark *bool
 	// $t(seedance_videos_generate_audio)
-	GenerateAudio bool
+	GenerateAudio *bool
 	// $t(seedance_videos_return_last_frame)
-	ReturnLastFrame bool
+	ReturnLastFrame *bool
 	// $t(seedance_videos_execution_expires_after)
 	ExecutionExpiresAfter int
 	// $t(seedance_videos_omni_reference_task_type)
@@ -71,10 +71,22 @@ func (r SeedanceGenerateRequest) toBody() map[string]any {
 	if r.Seed != 0 {
 		body["seed"] = r.Seed
 	}
-	body["camerafixed"] = r.Camerafixed
-	body["watermark"] = r.Watermark
-	body["generate_audio"] = r.GenerateAudio
-	body["return_last_frame"] = r.ReturnLastFrame
+	if r.Camerafixed != nil {
+		body["camerafixed"] = *r.Camerafixed
+	}
+	if r.Watermark != nil {
+		body["watermark"] = *r.Watermark
+	}
+	if r.GenerateAudio != nil {
+		body["generate_audio"] = *r.GenerateAudio
+	} else {
+		body["generate_audio"] = false
+	}
+	if r.ReturnLastFrame != nil {
+		body["return_last_frame"] = *r.ReturnLastFrame
+	} else {
+		body["return_last_frame"] = false
+	}
 	if r.ExecutionExpiresAfter != 0 {
 		body["execution_expires_after"] = r.ExecutionExpiresAfter
 	} else {

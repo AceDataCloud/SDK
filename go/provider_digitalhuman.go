@@ -25,7 +25,7 @@ type DigitalhumanGenerateRequest struct {
 	// Lip-sync strength (LatentSync). Lower loosens sync.
 	Guidance float64
 	// Apply the mouth-seam reduction blend.
-	SeamFix bool
+	SeamFix *bool
 	// A cloned voice from POST /digital-human/voices.
 	VoiceID string
 	// Public URL of the driving audio (.wav/.mp3/.m4a). OR supply text(+voice_id).
@@ -68,7 +68,11 @@ func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	} else {
 		body["guidance"] = 2.0
 	}
-	body["seam_fix"] = r.SeamFix
+	if r.SeamFix != nil {
+		body["seam_fix"] = *r.SeamFix
+	} else {
+		body["seam_fix"] = true
+	}
 	if r.VoiceID != "" {
 		body["voice_id"] = r.VoiceID
 	}

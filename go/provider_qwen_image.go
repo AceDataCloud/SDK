@@ -23,17 +23,17 @@ type QwenImageGenerateRequest struct {
 	// $t(qwen_image_images_size)
 	Size string
 	// $t(qwen_image_images_prompt_extend)
-	PromptExtend bool
+	PromptExtend *bool
 	// $t(qwen_image_images_prompt_extend_mode)
 	PromptExtendMode string
 	// $t(qwen_image_images_enable_thinking)
-	EnableThinking bool
+	EnableThinking *bool
 	// $t(qwen_image_images_negative_prompt)
 	NegativePrompt string
 	// $t(qwen_image_images_seed)
 	Seed int
 	// $t(qwen_image_images_watermark)
-	Watermark bool
+	Watermark *bool
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -57,20 +57,32 @@ func (r QwenImageGenerateRequest) toBody() map[string]any {
 	if r.Size != "" {
 		body["size"] = r.Size
 	}
-	body["prompt_extend"] = r.PromptExtend
+	if r.PromptExtend != nil {
+		body["prompt_extend"] = *r.PromptExtend
+	} else {
+		body["prompt_extend"] = true
+	}
 	if r.PromptExtendMode != "" {
 		body["prompt_extend_mode"] = r.PromptExtendMode
 	} else {
 		body["prompt_extend_mode"] = "direct"
 	}
-	body["enable_thinking"] = r.EnableThinking
+	if r.EnableThinking != nil {
+		body["enable_thinking"] = *r.EnableThinking
+	} else {
+		body["enable_thinking"] = true
+	}
 	if r.NegativePrompt != "" {
 		body["negative_prompt"] = r.NegativePrompt
 	}
 	if r.Seed != 0 {
 		body["seed"] = r.Seed
 	}
-	body["watermark"] = r.Watermark
+	if r.Watermark != nil {
+		body["watermark"] = *r.Watermark
+	} else {
+		body["watermark"] = false
+	}
 	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async

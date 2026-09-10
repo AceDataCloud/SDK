@@ -43,7 +43,7 @@ func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
 		if _, ok := body["size"]; ok {
 			t.Errorf("example-only size must be omitted: %+v", body)
 		}
-		if body["model"] != "doubao-seedream-5-0-260128" || body["prompt"] != "a cat" {
+		if body["model"] != "doubao-seedream-5-0-lite-260128" || body["prompt"] != "a cat" {
 			t.Errorf("unexpected body: %+v", body)
 		}
 		w.Header().Set("Content-Type", "application/json")
@@ -53,7 +53,7 @@ func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
 
 	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
 	task, err := c.Seedream().Generate(context.Background(), SeedreamGenerateRequest{
-		Model:  "doubao-seedream-5-0-260128",
+		Model:  "doubao-seedream-5-0-lite-260128",
 		Prompt: "a cat",
 	})
 	if err != nil {

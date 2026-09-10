@@ -15,9 +15,9 @@ type WanGenerateRequest struct {
 	// $t(wan_videos_model)
 	Model string
 	// $t(wan_videos_audio)
-	Audio bool
+	Audio *bool
 	// $t(wan_videos_prompt_extend)
-	PromptExtend bool
+	PromptExtend *bool
 	// $t(wan_videos_action)
 	Action string
 	// $t(wan_videos_resolution)
@@ -45,7 +45,7 @@ type WanGenerateRequest struct {
 	// $t(wan_videos_seed)
 	Seed int
 	// $t(wan_videos_watermark)
-	Watermark bool
+	Watermark *bool
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -57,8 +57,16 @@ type WanGenerateRequest struct {
 func (r WanGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["model"] = r.Model
-	body["audio"] = r.Audio
-	body["prompt_extend"] = r.PromptExtend
+	if r.Audio != nil {
+		body["audio"] = *r.Audio
+	} else {
+		body["audio"] = false
+	}
+	if r.PromptExtend != nil {
+		body["prompt_extend"] = *r.PromptExtend
+	} else {
+		body["prompt_extend"] = false
+	}
 	if r.Action != "" {
 		body["action"] = r.Action
 	} else {
@@ -100,7 +108,11 @@ func (r WanGenerateRequest) toBody() map[string]any {
 	if r.Seed != 0 {
 		body["seed"] = r.Seed
 	}
-	body["watermark"] = r.Watermark
+	if r.Watermark != nil {
+		body["watermark"] = *r.Watermark
+	} else {
+		body["watermark"] = false
+	}
 	body["async"] = true
 	if r.Async != nil {
 		body["async"] = *r.Async

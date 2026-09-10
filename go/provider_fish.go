@@ -23,7 +23,7 @@ type FishGenerateRequest struct {
 	// Rhythm coverage parameters, forwarded as is to upstream (such as speech rate, volume, etc.).
 	Prosody map[string]any
 	// Is the input text subjected to text normalization processing by the upstream?
-	Normalize bool
+	Normalize *bool
 	// One-shot voice clone reference; cannot be combined with reference_id.
 	References []map[string]any
 	// MP3 bitrate when `format=mp3`.
@@ -69,7 +69,9 @@ func (r FishGenerateRequest) toBody() map[string]any {
 	if r.Prosody != nil {
 		body["prosody"] = r.Prosody
 	}
-	body["normalize"] = r.Normalize
+	if r.Normalize != nil {
+		body["normalize"] = *r.Normalize
+	}
 	if r.References != nil {
 		body["references"] = r.References
 	}
@@ -152,9 +154,9 @@ type FishModelRequest struct {
 	// Description of the voice model (optional).
 	Description string
 	// If it is `true`, the upstream service will generate a sample voice after the training is completed.
-	GenerateSample bool
+	GenerateSample *bool
 	// If it is `true`, the upstream service will perform quality enhancement processing on the audio samples before
-	EnhanceAudioQuality bool
+	EnhanceAudioQuality *bool
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.
@@ -180,8 +182,12 @@ func (r FishModelRequest) toBody() map[string]any {
 	if r.Description != "" {
 		body["description"] = r.Description
 	}
-	body["generate_sample"] = r.GenerateSample
-	body["enhance_audio_quality"] = r.EnhanceAudioQuality
+	if r.GenerateSample != nil {
+		body["generate_sample"] = *r.GenerateSample
+	}
+	if r.EnhanceAudioQuality != nil {
+		body["enhance_audio_quality"] = *r.EnhanceAudioQuality
+	}
 	if r.CallbackURL != "" {
 		body["callback_url"] = r.CallbackURL
 	}

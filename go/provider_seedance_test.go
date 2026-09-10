@@ -7,7 +7,7 @@ func TestSeedance25RequestUsesPublicFields(t *testing.T) {
 		Model:                 "doubao-seedance-2-5-260628",
 		Content:               []map[string]any{{"type": "text", "text": "Extend the scene"}},
 		Duration:              30,
-		Camerafixed:           true,
+		Camerafixed:           boolPtr(true),
 		OmniReferenceTaskType: "extend",
 		OutputFormat:          "mov",
 		Tools:                 []map[string]any{{"type": "web_search"}},

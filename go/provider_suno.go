@@ -23,7 +23,7 @@ type SunoGenerateRequest struct {
 	// Types of operations for generating music. `generate`: Generate audio based on prompts; `extend`: Continue gene
 	Action string
 	// Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise,
-	Custom bool
+	Custom *bool
 	// The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 50
 	Prompt map[string]any
 	// Audio ID used for generating additional audio based on existing audio. This field is required when `action` is
@@ -43,7 +43,7 @@ type SunoGenerateRequest struct {
 	// The weight of the uploaded reference audio, with a value range from 0 to 1, where a higher value indicates gre
 	AudioWeight float64
 	// Pure accompaniment mode (no lyrics), default is `false`. When set to `true`, the lyrics filled in above will b
-	Instrumental bool
+	Instrumental *bool
 	// Prompts for automatically generating lyrics, effective only when `custom` is `true` and `lyric` is empty.
 	LyricPrompt map[string]any
 	// Voice gender preference, selectable values are `'m'` (male voice) or `'f'` (female voice). Models `chirp-v4-5`
@@ -95,7 +95,9 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	if r.Action != "" {
 		body["action"] = r.Action
 	}
-	body["custom"] = r.Custom
+	if r.Custom != nil {
+		body["custom"] = *r.Custom
+	}
 	if r.Prompt != nil {
 		body["prompt"] = r.Prompt
 	}
@@ -123,7 +125,9 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	if r.AudioWeight != 0 {
 		body["audio_weight"] = r.AudioWeight
 	}
-	body["instrumental"] = r.Instrumental
+	if r.Instrumental != nil {
+		body["instrumental"] = *r.Instrumental
+	}
 	if r.LyricPrompt != nil {
 		body["lyric_prompt"] = r.LyricPrompt
 	}
