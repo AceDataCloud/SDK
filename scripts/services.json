@@ -167,6 +167,11 @@
     "name": "Suno MIDI Generation API"
    },
    {
+    "id": "7c848f00-bde2-4cd4-878d-f95df7e6f4f5",
+    "path": "/suno/mp3",
+    "name": "Suno MP3 API"
+   },
+   {
     "id": "e5ff24c0-ae4e-46bb-93db-2d678610a8d3",
     "path": "/suno/style",
     "name": "Suno Style API"

@@ -233,8 +233,38 @@ def test_every_provider_has_a_callable_method(client, name):
 
 def test_suno_keeps_its_secondary_endpoints(client):
     """A service with many endpoints must not collapse to just `generate`."""
-    for method in ("generate", "lyrics", "wav", "mp4"):
+    for method in ("generate", "lyrics", "wav", "mp4", "mp3"):
         assert hasattr(client.suno, method), f"suno.{method} is missing"
+
+
+def test_suno_generate_includes_replace_section_result_mode_default_and_v6_model(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "suno-1"}
+    client.suno._transport = transport
+
+    client.suno.generate(model="chirp-v6", prompt="a song")
+
+    body = transport.request.call_args.kwargs["json"]
+    assert body["model"] == "chirp-v6"
+    assert body["replace_section_result_mode"] == "full_song"
+
+
+def test_suno_upload_defaults_mode_and_supports_name(client):
+    transport = Mock()
+    transport.request.return_value = {"success": True}
+    client.suno._transport = transport
+
+    client.suno.upload(audio_url="https://cdn.example.com/input.mp3", name="voice-sample")
+
+    body = transport.request.call_args.kwargs["json"]
+    assert body["mode"] == "standard"
+    assert body["name"] == "voice-sample"
+
+
+def test_suno_vox_requires_vocal_range_parameters(client):
+    params = inspect.signature(type(client.suno).vox).parameters
+    assert params["vocal_start"].default is inspect._empty
+    assert params["vocal_end"].default is inspect._empty
 
 
 def test_handle_is_born_complete_when_the_server_answered_synchronously(client):
