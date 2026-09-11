@@ -20,7 +20,7 @@ func TestSeedreamLayerDecompositionSerializesExplicitTrue(t *testing.T) {
 }
 
 func TestSeedreamLiteOmitsProOnlyOptionalBooleans(t *testing.T) {
-	body := SeedreamGenerateRequest{Model: "doubao-seedream-5-0-260128", Prompt: "a cat"}.toBody()
+	body := SeedreamGenerateRequest{Model: "doubao-seedream-5-0-lite-260128", Prompt: "a cat"}.toBody()
 	if _, ok := body["layer_decomposition"]; ok {
 		t.Fatalf("zero-value request leaked Pro-only layer_decomposition: %#v", body)
 	}

@@ -2,6 +2,12 @@ import { Seedream, SeedreamGenerateOptions } from '../src/resources/providers/se
 import { TaskHandle } from '../src/runtime/tasks';
 
 describe('Seedream provider', () => {
+  it('does not expose the retired Lite model alias', () => {
+    // @ts-expect-error The retired model is not part of the generated contract.
+    const retired: SeedreamGenerateOptions = { model: 'doubao-seedream-5-0-260128' };
+    expect(retired).toBeDefined();
+  });
+
   it('omits example-only size and consumes array response data', async () => {
     const request = jest.fn().mockResolvedValue({
       success: true,
@@ -11,7 +17,7 @@ describe('Seedream provider', () => {
     const seedream = new Seedream({ request } as any);
 
     const task = await seedream.generate({
-      model: 'doubao-seedream-5-0-260128',
+      model: 'doubao-seedream-5-0-lite-260128',
       prompt: 'a cat',
     });
 
@@ -20,7 +26,7 @@ describe('Seedream provider', () => {
     expect(task.urls()).toEqual(['https://cdn.example.com/seedream.png']);
     expect(request).toHaveBeenCalledWith('POST', '/seedream/images', {
       json: {
-        model: 'doubao-seedream-5-0-260128',
+        model: 'doubao-seedream-5-0-lite-260128',
         prompt: 'a cat',
         async: true,
       },
@@ -32,7 +38,7 @@ describe('Seedream provider', () => {
     const seedream = new Seedream({ request } as any);
 
     await seedream.generate({
-      model: 'doubao-seedream-5-0-260128',
+      model: 'doubao-seedream-5-0-lite-260128',
       prompt: 'a cat',
       size: '4K',
     });
