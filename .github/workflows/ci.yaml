@@ -28,6 +28,9 @@ jobs:
 
       - name: Regenerate provider clients
         run: |
+          ruff check scripts/sync_from_platformbackend.py scripts/tests
+          ruff format --check scripts/sync_from_platformbackend.py scripts/tests
+          python3 -m unittest discover -s scripts/tests -v
           python3 scripts/generate_providers.py \
             --manifest scripts/services.json \
             --specs scripts/specs \

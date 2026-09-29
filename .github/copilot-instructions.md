@@ -15,10 +15,10 @@ step.** Go has historically lagged; do not add to that gap.
 
 ## Source of Truth
 
-The **AceDataCloud/Docs** repo:
-
-- `openapi/<service>.json` — OpenAPI specs, pre-localized to English
-- `guides/<service>.md` — usage guides (optional reference)
+The **AceDataCloud/PlatformBackend** commit linked in the sync PR is authoritative.
+`scripts/sync_from_platformbackend.py` imports its API IDs using the backend's
+OpenAPI normalizer. `scripts/specs/` pins those inputs for reproducible generation.
+Docs is a published reference, not a second synchronization source.
 
 ## The SDK has two axes
 
@@ -52,7 +52,7 @@ must not require touching the modality class.
 
 ## What to Sync
 
-When Docs changes, update **the provider class** for that service:
+When PlatformBackend changes, review the generated **provider class** for that service:
 
 1. **Parameters** — compare the closed signature against the OpenAPI request
    schema. Add new parameters; do not remove existing ones unless the API did.
@@ -106,5 +106,6 @@ cd typescript && npx tsc --noEmit && npm test
 cd go         && go vet ./... && go test ./...
 ```
 
-All three must pass. The sync workflow can merge with `--admin`, so a failing
-check will not necessarily block a merge — **do not rely on that; fix it.**
+All three must pass. The sync workflow opens a draft PR and never merges it.
+Review new endpoints, hand-written clients and compatibility before marking ready;
+never bypass failing checks.

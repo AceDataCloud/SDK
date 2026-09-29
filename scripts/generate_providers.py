@@ -4,8 +4,8 @@
     python scripts/generate_providers.py --manifest specs/services.json --specs specs/
 
 The manifest lists which services and endpoints to expose (derived from the
-platform's own service→api mapping). The specs are the localized OpenAPI
-documents from `/api/v1/apis/<id>?lang=en`.
+platform's own service→api mapping). The specs are pinned OpenAPI
+documents normalized from the exact PlatformBackend source commit.
 
 Hand-syncing this surface is what let Go drift, `model` enums go stale, and
 Midjourney get deleted rather than modeled. Generating it means the three
