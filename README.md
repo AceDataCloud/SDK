@@ -102,3 +102,25 @@ do not fully express. CI reruns the generator and requires a clean working tree.
 
 The older files in [spec/overlays](spec/overlays/) are inactive design artifacts;
 they are not generator inputs and cover only the original nine domains.
+
+## Contract synchronization
+
+PlatformBackend sends `platform-contracts-updated` with an immutable source SHA.
+The sync workflow imports existing API IDs from that checkout using its canonical
+OpenAPI normalizer, refreshes `scripts/specs/`, and runs the provider generator for
+Python, TypeScript and Go. It opens a draft PR through the bot identity and returns;
+normal CI and review gate the merge. There is no Docs-triggered code sync, agent
+polling, PR cleanup or admin merge.
+
+For an offline preview, use a clean SDK checkout and a PlatformBackend checkout at
+the source SHA:
+
+```bash
+python3 scripts/sync_from_platformbackend.py --backend-dir ../PlatformBackend --services flux
+python3 scripts/generate_providers.py --manifest scripts/services.json --specs scripts/specs --languages python,typescript,go
+```
+
+The curated manifest is not expanded automatically. New endpoints and the six
+hand-written client families above need review; missing or moved operations fail
+before any snapshot is written. A schema removal or stricter parameter may be a
+breaking API change, so generated PRs remain drafts until compatibility is checked.

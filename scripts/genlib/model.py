@@ -9,10 +9,10 @@ this turns them into code so the three languages cannot disagree.
 Usage:
     python scripts/generate_providers.py --manifest <services.json> --specs <dir>
 
-The manifest is produced from `cost/service_api_mapping.json` — it says which
-services and endpoints to expose. The specs are the localized OpenAPI documents
-served by `/api/v1/apis/<id>?lang=en` (read over HTTP, never off disk: the
-on-disk copies still carry raw `$t(...)` tokens).
+The curated manifest says which services and endpoints to expose. The pinned
+specs are imported from an exact PlatformBackend checkout by
+`sync_from_platformbackend.py`, which uses the canonical OpenAPI normalizer
+to resolve source translation tokens before generation.
 """
 
 from __future__ import annotations
