@@ -17,33 +17,33 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface SeedreamGenerateOptions {
-  /** Full model ID. Seedream 5.0 Pro supports single-image generation, precise editing, transparent backgrounds, and layer decomposition; Seedream 5.0 Lite supports single or sequential images, streaming, and web search. */
-  model: "doubao-seedream-5-0-pro-260628" | "doubao-seedream-5-0-260128" | "doubao-seedream-5-0-lite-260128" | "doubao-seedream-4-0-250828" | "doubao-seedream-4-5-251128";
-  /** Generation or editing prompt. Optional only for Seedream 5.0 Pro layer decomposition, where omission automatically decomposes the main elements. */
+  /** Seedream Images Model */
+  model: "doubao-seedream-5-0-pro-260628" | "doubao-seedream-5-0-lite-260128" | "doubao-seedream-4-0-250828" | "doubao-seedream-4-5-251128";
+  /** Seedream Images Prompt */
   prompt?: string;
-  /** One reference image URL/base64 string or an array. Pro accepts up to 10 images in regular mode and exactly one for decomposition; Lite/4.x accept up to 14. Each image must be at most 30 MB. */
+  /** Seedream Images Image */
   image?: string | string[];
-  /** Output size. Pro supports 1K/1.5K/2K or valid dimensions; decomposition also supports auto. Lite supports 2K/3K/4K or valid dimensions. */
+  /** Seedream Images Size */
   size?: "1K" | "1.5K" | "2K" | "3K" | "4K" | "auto" | `${number}x${number}`;
-  /** Sequential image mode. auto lets supported Lite/4.x models generate a related set; disabled returns one image. Not supported by Pro. */
+  /** Seedream Images Sequential Image Generation */
   sequentialImageGeneration?: "auto" | "disabled";
-  /** Sequential image options. max_images is 1-15 and input images plus outputs must not exceed 15. */
+  /** Seedream Images Sequential Image Generation Options */
   sequentialImageGenerationOptions?: Record<string, unknown>;
-  /** Stream normalized image events. Supported by Lite/4.x only and cannot be combined with async or callback_url. */
+  /** Seedream Images Stream */
   stream?: boolean;
-  /** Image response format: url or b64_json. */
+  /** Seedream Images Response Format */
   responseFormat?: "url" | "b64_json";
-  /** Whether to add the AI-generated watermark. */
+  /** Seedream Images Watermark */
   watermark?: boolean;
-  /** Output image format, jpeg or png. Supported by Seedream 5.0 Pro and Lite. */
+  /** Seedream Images Output Format */
   outputFormat?: "jpeg" | "png";
-  /** Model tools. Seedream 5.0 Lite supports web_search. */
+  /** Seedream Images Tools */
   tools?: Array<Record<string, unknown>>;
-  /** Prompt optimization. Pro supports standard/fast; Lite and 4.5 support standard; 4.0 supports standard/fast. */
+  /** Seedream Images Optimize Prompt Options */
   optimizePromptOptions?: Record<string, unknown>;
-  /** Seedream 5.0 Pro layer decomposition. Requires exactly one PNG/JPEG and returns one base image plus up to 16 transparent PNG layers. */
+  /** Seedream Images Layer Decomposition */
   layerDecomposition?: boolean;
-  /** Seedream 5.0 Pro background mode. transparent requires one transparent PNG input and PNG output; opaque produces a regular background. */
+  /** Seedream Images Background */
   background?: "transparent" | "opaque";
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -60,7 +60,7 @@ export interface SeedreamGenerateOptions {
 export class Seedream {
   constructor(private transport: Transport) {}
 
-  /** Call /seedream/images. */
+  /** Seedream Images */
   async generate(options: SeedreamGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;
