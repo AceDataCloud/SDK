@@ -17,17 +17,17 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface FluxGenerateOptions {
-  /** Image size specifications. */
+  /** Flux Images Size */
   size: string;
-  /** Types of operations for generating images. If it is `generate`, a new image will be created based on the prompt; if it is `edit`, the original image will be edited according to the prompt and `image_url`. */
+  /** Flux Images Action */
   action: "generate" | "edit";
-  /** Prompts for generating images. */
+  /** Flux Images Prompt */
   prompt: string;
-  /** Number of generated images. */
+  /** Flux Images Count */
   count?: number;
-  /** Model used for generating images. */
+  /** Flux Images Model */
   model?: "flux-dev" | "flux-pro" | "flux-kontext-pro" | "flux-kontext-max" | "flux-2-flex" | "flux-2-pro" | "flux-2-max" | "flux-2-klein";
-  /** Link to the original image that needs editing. */
+  /** Flux Images Image Url */
   imageUrl?: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -44,7 +44,7 @@ export interface FluxGenerateOptions {
 export class Flux {
   constructor(private transport: Transport) {}
 
-  /** Flux AI image generation API, generates 1 image per request. */
+  /** Flux Images */
   async generate(options: FluxGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["size"] = options.size;
