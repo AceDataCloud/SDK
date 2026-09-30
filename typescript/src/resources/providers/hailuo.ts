@@ -17,13 +17,13 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface HailuoGenerateOptions {
-  /** The operation type for video generation. When set to `generate`, it will generate a video based on the prompt. */
+  /** Hailuo Videos Action */
   action: "generate";
-  /** The model used for generating videos has a default value of `minimax-t2v`. */
+  /** Hailuo Videos Model */
   model?: "minimax-i2v" | "minimax-t2v" | "minimax-i2v-director";
-  /** Prompts for generating videos. */
+  /** Hailuo Videos Prompt */
   prompt?: string;
-  /** You can specify the URL of the first frame image to generate a video from the image. */
+  /** Hailuo Videos First Image Url */
   firstImageUrl?: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -40,7 +40,7 @@ export interface HailuoGenerateOptions {
 export class Hailuo {
   constructor(private transport: Transport) {}
 
-  /** Minimax Hailuo AI video generation API. Supports minimax-t2v for text-to-video, minimax-i2v for image-to-video, and minimax-i2v-director for director mode with camera/movement instructions. */
+  /** Hailuo Videos */
   async generate(options: HailuoGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["action"] = options.action;
