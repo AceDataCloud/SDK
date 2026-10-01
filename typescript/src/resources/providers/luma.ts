@@ -17,25 +17,25 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface LumaGenerateOptions {
-  /** Whether to enable loop playback for the generated video. */
+  /** Luma Videos Loop */
   loop?: boolean;
-  /** Operation type. Use `generate` when creating a video for the first time, and use `extend` when continuing an existing video. */
+  /** Luma Videos Action */
   action?: "generate" | "extend";
-  /** Text prompts for generating videos. */
+  /** Luma Videos Prompt */
   prompt?: string;
-  /** The timeout for the API return data (unit: seconds). */
+  /** Luma Videos Timeout */
   timeout?: number;
-  /** The unique identifier of the generated video used for the continuation operation (`extend`). If both are specified, `video_id` takes precedence over `video_url`. */
+  /** Luma Videos Video Id */
   videoId?: string;
-  /** The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time, then `video_id` shall prevail. */
-  videoUrl?: string;
-  /** Whether to enable automatic optimization enhancement for the input prompt text, suitable for use when unsure how to write prompt words. */
-  enhancement?: boolean;
-  /** Generate the aspect ratio of the video, for example `16:9`. */
+  /** Luma Videos Aspect Ratio */
   aspectRatio?: string;
-  /** The URL of the ending frame image, which will be used as the last frame of the generated video. */
+  /** Luma Videos Video Url */
+  videoUrl?: string;
+  /** Luma Videos Enhancement */
+  enhancement?: boolean;
+  /** Luma Videos End Image Url */
   endImageUrl?: string;
-  /** The URL of the starting frame image, which will be used as the first frame of the generated video. */
+  /** Luma Videos Start Image Url */
   startImageUrl?: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -60,9 +60,9 @@ export class Luma {
     if (options.prompt !== undefined) body["prompt"] = options.prompt;
     body["timeout"] = options.timeout ?? 300;
     if (options.videoId !== undefined) body["video_id"] = options.videoId;
+    if (options.aspectRatio !== undefined) body["aspect_ratio"] = options.aspectRatio;
     if (options.videoUrl !== undefined) body["video_url"] = options.videoUrl;
     body["enhancement"] = options.enhancement ?? true;
-    if (options.aspectRatio !== undefined) body["aspect_ratio"] = options.aspectRatio;
     if (options.endImageUrl !== undefined) body["end_image_url"] = options.endImageUrl;
     if (options.startImageUrl !== undefined) body["start_image_url"] = options.startImageUrl;
     for (const [key, value] of Object.entries(options)) {
