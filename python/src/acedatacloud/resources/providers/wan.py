@@ -73,7 +73,7 @@ class Wan:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Generate videos based on prompt and image frames"""
+        """Wan Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["audio"] = audio if audio is not None else False
@@ -148,7 +148,7 @@ class AsyncWan:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Generate videos based on prompt and image frames"""
+        """Wan Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["audio"] = audio if audio is not None else False
