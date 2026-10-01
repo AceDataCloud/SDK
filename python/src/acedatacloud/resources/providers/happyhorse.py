@@ -11,6 +11,12 @@ from typing import Any, Literal  # noqa: F401
 
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
+HappyhorseAction = Literal[
+    "generate",
+    "image_to_video",
+    "reference_to_video",
+    "video_edit",
+]
 HappyhorseModel = Literal[
     "happyhorse-1.0-t2v",
     "happyhorse-1.1-t2v",
@@ -26,12 +32,6 @@ HappyhorseRatio = Literal[
     "1:1",
     "4:3",
     "3:4",
-]
-HappyhorseAction = Literal[
-    "generate",
-    "image_to_video",
-    "reference_to_video",
-    "video_edit",
 ]
 
 
@@ -56,18 +56,18 @@ class Happyhorse:
     def generate(
         self,
         *,
-        seed: int | None = None,
-        model: HappyhorseModel | None = None,
-        ratio: HappyhorseRatio | None = None,
         action: HappyhorseAction | None = None,
+        model: HappyhorseModel | None = None,
         prompt: str | None = None,
-        duration: int | None = None,
         image_url: str | None = None,
-        video_url: str | None = None,
-        watermark: bool | None = None,
         image_urls: list[str] | None = None,
+        video_url: str | None = None,
         resolution: Literal["720P", "1080P"] | None = None,
+        ratio: HappyhorseRatio | None = None,
+        duration: int | None = None,
+        watermark: bool | None = None,
         audio_setting: Literal["auto", "origin"] | None = None,
+        seed: int | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -75,25 +75,25 @@ class Happyhorse:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Call /happyhorse/videos."""
+        """Happyhorse Videos"""
         body: dict[str, Any] = {}
-        if seed is not None:
-            body["seed"] = seed
-        body["model"] = model if model is not None else "happyhorse-1.1-t2v"
-        body["ratio"] = ratio if ratio is not None else "16:9"
         body["action"] = action if action is not None else "generate"
+        body["model"] = model if model is not None else "happyhorse-1.1-t2v"
         if prompt is not None:
             body["prompt"] = prompt
-        body["duration"] = duration if duration is not None else 5
         if image_url is not None:
             body["image_url"] = image_url
-        if video_url is not None:
-            body["video_url"] = video_url
-        body["watermark"] = watermark if watermark is not None else False
         if image_urls is not None:
             body["image_urls"] = image_urls
+        if video_url is not None:
+            body["video_url"] = video_url
         body["resolution"] = resolution if resolution is not None else "1080P"
+        body["ratio"] = ratio if ratio is not None else "16:9"
+        body["duration"] = duration if duration is not None else 5
+        body["watermark"] = watermark if watermark is not None else False
         body["audio_setting"] = audio_setting if audio_setting is not None else "auto"
+        if seed is not None:
+            body["seed"] = seed
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -114,18 +114,18 @@ class AsyncHappyhorse:
     async def generate(
         self,
         *,
-        seed: int | None = None,
-        model: HappyhorseModel | None = None,
-        ratio: HappyhorseRatio | None = None,
         action: HappyhorseAction | None = None,
+        model: HappyhorseModel | None = None,
         prompt: str | None = None,
-        duration: int | None = None,
         image_url: str | None = None,
-        video_url: str | None = None,
-        watermark: bool | None = None,
         image_urls: list[str] | None = None,
+        video_url: str | None = None,
         resolution: Literal["720P", "1080P"] | None = None,
+        ratio: HappyhorseRatio | None = None,
+        duration: int | None = None,
+        watermark: bool | None = None,
         audio_setting: Literal["auto", "origin"] | None = None,
+        seed: int | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -133,25 +133,25 @@ class AsyncHappyhorse:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Call /happyhorse/videos."""
+        """Happyhorse Videos"""
         body: dict[str, Any] = {}
-        if seed is not None:
-            body["seed"] = seed
-        body["model"] = model if model is not None else "happyhorse-1.1-t2v"
-        body["ratio"] = ratio if ratio is not None else "16:9"
         body["action"] = action if action is not None else "generate"
+        body["model"] = model if model is not None else "happyhorse-1.1-t2v"
         if prompt is not None:
             body["prompt"] = prompt
-        body["duration"] = duration if duration is not None else 5
         if image_url is not None:
             body["image_url"] = image_url
-        if video_url is not None:
-            body["video_url"] = video_url
-        body["watermark"] = watermark if watermark is not None else False
         if image_urls is not None:
             body["image_urls"] = image_urls
+        if video_url is not None:
+            body["video_url"] = video_url
         body["resolution"] = resolution if resolution is not None else "1080P"
+        body["ratio"] = ratio if ratio is not None else "16:9"
+        body["duration"] = duration if duration is not None else 5
+        body["watermark"] = watermark if watermark is not None else False
         body["audio_setting"] = audio_setting if audio_setting is not None else "auto"
+        if seed is not None:
+            body["seed"] = seed
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

@@ -13,7 +13,7 @@
   "paths": {
     "/maestro/videos": {
       "post": {
-        "summary": "$t(api_description_maestro_videos)",
+        "summary": "Maestro Videos",
         "description": "Maestro is an agent-native video producer: describe the video you want in `prompt` (optionally attaching reference images/videos/audio via `file_urls`) and a headless creative director plans, generates the assets (images, voiceover, music, clips), composes and renders a finished, captioned video. This is an async job — it returns a `task_id` immediately; poll `POST /maestro/tasks` for the result, or supply `callback_url`. Use `action: remix` / `edit` / `extend` with `ref_task_id` to iterate on a previous video.",
         "security": [
           {
@@ -44,7 +44,7 @@
                       "extend"
                     ],
                     "default": "generate",
-                    "description": "Production action. Lite supports generate/edit; Standard adds remix; Pro adds extend. remix/edit/extend require `ref_task_id`."
+                    "description": "Production action. generate creates a new video; remix/edit/extend require ref_task_id."
                   },
                   "ref_task_id": {
                     "type": "string",
@@ -55,7 +55,8 @@
                     "items": {
                       "type": "string"
                     },
-                    "description": "Optional reference media (image / video / audio URLs) the agent can use — e.g. a product shot or logo to feature, footage to caption."
+                    "description": "Optional reference media (image / video / audio URLs) the agent can use — e.g. a product shot or logo to feature, footage to caption.",
+                    "maxItems": 20
                   },
                   "langs": {
                     "type": "array",
@@ -65,7 +66,7 @@
                     "default": [
                       "zh-cn"
                     ],
-                    "description": "Output languages. Lite supports 1, Standard up to 2, and Pro up to 4. The first is primary; each additional delivered language is billed +6 credits.",
+                    "description": "Output languages, up to 4. The first is primary; each additional delivered language is billed +6 credits.",
                     "maxItems": 4
                   },
                   "aspect": {
@@ -76,24 +77,14 @@
                       "1:1"
                     ],
                     "default": "9:16",
-                    "description": "Required output aspect ratio. Lite renders 720p/24fps; Standard and Pro render 1080p/30fps."
+                    "description": "Required output aspect ratio. All videos render at 1080p/30fps."
                   },
                   "duration": {
                     "type": "integer",
                     "default": 30,
                     "minimum": 5,
                     "maximum": 300,
-                    "description": "Target video length in seconds. Lite: 5–30; Standard: 5–120; Pro: 5–300. Successful jobs are billed by actual delivered duration, never above the requested duration."
-                  },
-                  "quality": {
-                    "type": "string",
-                    "enum": [
-                      "lite",
-                      "standard",
-                      "pro"
-                    ],
-                    "default": "standard",
-                    "description": "Production SKU. `lite` = fast 720p short video at 0.20 credits/s (up to 30s); `standard` = balanced 1080p at 0.60 credits/s (up to 120s); `pro` = advanced production at 1.20 credits/s (up to 300s). Default: standard."
+                    "description": "Target video length in seconds, from 5 to 300. Successful jobs are billed by actual delivered duration, never above the requested duration."
                   },
                   "scenario": {
                     "type": "string",
@@ -105,7 +96,7 @@
                       "drama"
                     ],
                     "default": "auto",
-                    "description": "Production route. Lite supports auto/narrated/captions; Standard adds avatar; Pro adds drama. `captions` requires source video in `file_urls`; `avatar` requires a portrait. avatar bills at 1.15× and drama at 1.35×."
+                    "description": "Production route: auto, narrated, captions, avatar, or drama. captions requires source video in file_urls; avatar requires a portrait. avatar bills at 1.15× and drama at 1.35×."
                   },
                   "style": {
                     "type": "string",
