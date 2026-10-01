@@ -38,9 +38,9 @@ class Luma:
         prompt: str | None = None,
         timeout: float | None = None,
         video_id: str | None = None,
+        aspect_ratio: str | None = None,
         video_url: str | None = None,
         enhancement: bool | None = None,
-        aspect_ratio: str | None = None,
         end_image_url: str | None = None,
         start_image_url: str | None = None,
         async_: bool | None = None,
@@ -59,11 +59,11 @@ class Luma:
         body["timeout"] = timeout if timeout is not None else 300
         if video_id is not None:
             body["video_id"] = video_id
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
         if video_url is not None:
             body["video_url"] = video_url
         body["enhancement"] = enhancement if enhancement is not None else True
-        if aspect_ratio is not None:
-            body["aspect_ratio"] = aspect_ratio
         if end_image_url is not None:
             body["end_image_url"] = end_image_url
         if start_image_url is not None:
@@ -93,9 +93,9 @@ class AsyncLuma:
         prompt: str | None = None,
         timeout: float | None = None,
         video_id: str | None = None,
+        aspect_ratio: str | None = None,
         video_url: str | None = None,
         enhancement: bool | None = None,
-        aspect_ratio: str | None = None,
         end_image_url: str | None = None,
         start_image_url: str | None = None,
         async_: bool | None = None,
@@ -114,11 +114,11 @@ class AsyncLuma:
         body["timeout"] = timeout if timeout is not None else 300
         if video_id is not None:
             body["video_id"] = video_id
+        if aspect_ratio is not None:
+            body["aspect_ratio"] = aspect_ratio
         if video_url is not None:
             body["video_url"] = video_url
         body["enhancement"] = enhancement if enhancement is not None else True
-        if aspect_ratio is not None:
-            body["aspect_ratio"] = aspect_ratio
         if end_image_url is not None:
             body["end_image_url"] = end_image_url
         if start_image_url is not None:
