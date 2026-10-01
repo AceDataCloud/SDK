@@ -55,11 +55,11 @@ class NanoBanana:
         *,
         action: Literal["generate", "edit"],
         prompt: str,
-        count: int | None = None,
         model: NanoBananaModel | None = None,
         image_urls: list[str] | None = None,
-        resolution: Literal["1K", "2K", "4K"] | None = None,
+        count: int | None = None,
         aspect_ratio: NanoBananaAspectRatio | None = None,
+        resolution: Literal["1K", "2K", "4K"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -67,21 +67,19 @@ class NanoBanana:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Google Nano Banana image generation and editing API. Supports nano-banana, nano-banana-2, and
-        nano-banana-pro for text-to-image generation and reference-image editing.
-        """
+        """Nano Banana Images"""
         body: dict[str, Any] = {}
         body["action"] = action
         body["prompt"] = prompt
-        body["count"] = count if count is not None else 1
         if model is not None:
             body["model"] = model
         if image_urls is not None:
             body["image_urls"] = image_urls
-        if resolution is not None:
-            body["resolution"] = resolution
+        body["count"] = count if count is not None else 1
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
+        if resolution is not None:
+            body["resolution"] = resolution
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -104,11 +102,11 @@ class AsyncNanoBanana:
         *,
         action: Literal["generate", "edit"],
         prompt: str,
-        count: int | None = None,
         model: NanoBananaModel | None = None,
         image_urls: list[str] | None = None,
-        resolution: Literal["1K", "2K", "4K"] | None = None,
+        count: int | None = None,
         aspect_ratio: NanoBananaAspectRatio | None = None,
+        resolution: Literal["1K", "2K", "4K"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -116,21 +114,19 @@ class AsyncNanoBanana:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Google Nano Banana image generation and editing API. Supports nano-banana, nano-banana-2, and
-        nano-banana-pro for text-to-image generation and reference-image editing.
-        """
+        """Nano Banana Images"""
         body: dict[str, Any] = {}
         body["action"] = action
         body["prompt"] = prompt
-        body["count"] = count if count is not None else 1
         if model is not None:
             body["model"] = model
         if image_urls is not None:
             body["image_urls"] = image_urls
-        if resolution is not None:
-            body["resolution"] = resolution
+        body["count"] = count if count is not None else 1
         if aspect_ratio is not None:
             body["aspect_ratio"] = aspect_ratio
+        if resolution is not None:
+            body["resolution"] = resolution
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
