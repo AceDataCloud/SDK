@@ -43,10 +43,10 @@ class Minimax:
     def generate(
         self,
         *,
-        model: Literal["MiniMax-H3"],
+        model: Literal["MiniMax-H3", "MiniMax-H3-Max"],
         content: list[dict[str, Any]],
+        resolution: Literal["480P", "768P", "2K"],
         duration: int,
-        resolution: Literal["768P", "2K"],
         ratio: MinimaxRatio | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -55,12 +55,12 @@ class Minimax:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Call /minimax/videos."""
+        """Minimax Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
-        body["duration"] = duration
         body["resolution"] = resolution
+        body["duration"] = duration
         if ratio is not None:
             body["ratio"] = ratio
         body.update(extra)
@@ -83,10 +83,10 @@ class AsyncMinimax:
     async def generate(
         self,
         *,
-        model: Literal["MiniMax-H3"],
+        model: Literal["MiniMax-H3", "MiniMax-H3-Max"],
         content: list[dict[str, Any]],
+        resolution: Literal["480P", "768P", "2K"],
         duration: int,
-        resolution: Literal["768P", "2K"],
         ratio: MinimaxRatio | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -95,12 +95,12 @@ class AsyncMinimax:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Call /minimax/videos."""
+        """Minimax Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
-        body["duration"] = duration
         body["resolution"] = resolution
+        body["duration"] = duration
         if ratio is not None:
             body["ratio"] = ratio
         body.update(extra)
