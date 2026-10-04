@@ -12,22 +12,22 @@ type Kling struct {
 
 // KlingMotionRequest is the input to kling.Motion.
 type KlingMotionRequest struct {
-	// Video generation mode, optional, enumeration values: `std` (standard mode, 720p, lower consumption) or `pro` (
+	// Kling Motion Mode
 	Mode string
-	// Reference image URL: The characters, background, and other elements in the generated video are all based on th
+	// Kling Motion Image Url
 	ImageURL string
-	// Reference video URL: The character movements in the generated video will be consistent with this reference vid
+	// Kling Motion Video Url
 	VideoURL string
-	// Generate the orientation of characters in the video, which can be chosen to be consistent with the reference i
+	// Kling Motion Character Orientation
 	CharacterOrientation string
-	// Text prompts can contain both positive and negative descriptions simultaneously.
-	Prompt string
-	// Model name, optional, enumeration values: `kling-v2-6` or `kling-v3`. If not provided, the server's default mo
+	// Kling Motion Model Name
 	ModelName string
-	// Watermark configuration, optional. The object format is `{ "enabled": true }`. When `enabled` is set to `true`
-	WatermarkInfo map[string]any
-	// Whether to keep the original audio of the reference video, optional, enumeration values: `yes` (keep) or `no`
+	// Kling Motion Keep Original Sound
 	KeepOriginalSound string
+	// Kling Motion Watermark Info
+	WatermarkInfo map[string]any
+	// Kling Motion Prompt
+	Prompt string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -42,17 +42,17 @@ func (r KlingMotionRequest) toBody() map[string]any {
 	body["image_url"] = r.ImageURL
 	body["video_url"] = r.VideoURL
 	body["character_orientation"] = r.CharacterOrientation
-	if r.Prompt != "" {
-		body["prompt"] = r.Prompt
-	}
 	if r.ModelName != "" {
 		body["model_name"] = r.ModelName
+	}
+	if r.KeepOriginalSound != "" {
+		body["keep_original_sound"] = r.KeepOriginalSound
 	}
 	if r.WatermarkInfo != nil {
 		body["watermark_info"] = r.WatermarkInfo
 	}
-	if r.KeepOriginalSound != "" {
-		body["keep_original_sound"] = r.KeepOriginalSound
+	if r.Prompt != "" {
+		body["prompt"] = r.Prompt
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -69,7 +69,7 @@ func (r KlingMotionRequest) toBody() map[string]any {
 	return body
 }
 
-// Motion Kling motion-control video generation API. Generates controllable-motion video clips from a reference image and motion trajectory (motion brush, etc.)
+// Motion Kling Motion
 func (c *Kling) Motion(ctx context.Context, req KlingMotionRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -84,35 +84,35 @@ func (c *Kling) Motion(ctx context.Context, req KlingMotionRequest) (*TaskHandle
 
 // KlingGenerateRequest is the input to kling.Generate.
 type KlingGenerateRequest struct {
-	// Video generation action. If the value is `text2video`, then generate a video based on the prompt.
+	// Kling Videos Action
 	Action string
-	// Video generation mode, optional. Supported values: `std` (high performance mode), `pro` (high quality mode), `
+	// Kling Videos Mode
 	Mode string
-	// The model used for generating videos, with a default value of kling-v1.
+	// Kling Videos Model
 	Model string
-	// Prompts for generating videos. When using Omni All-Purpose Reference (model `kling-o1` or `kling-v3-omni`), yo
+	// Kling Videos Prompt
 	Prompt string
-	// Video generation duration, measured in seconds, is optional. For kling-v3/kling-v3-omni: supports flexible set
+	// Kling Videos Duration
 	Duration float64
-	// When the action is extend, you can specify the video_id to continue the extension of that video.
-	VideoID string
-	// The strength of relevance of the prompt words, used to control the degree of alignment between the generated v
-	CfgScale float64
-	// Omni reference image list, applicable only to models `kling-o1` and `kling-v3-omni`. Array elements pass image
-	ImageList []map[string]any
-	// Omni reference video list, applicable only to models `kling-o1` and `kling-v3-omni`. Upload a reference video
-	VideoList []map[string]any
-	// Video aspect ratio, optional, enumeration values: 16:9, 9:16, 1:1. The default value is 16:9.
-	AspectRatio string
-	// End frame reference image URL. Valid only when `action=image2video` and `start_image_url` is not empty. Model/
-	EndImageURL string
-	// Contains 6 fields used to specify the movement or change of the camera in different directions. `camera_contro
-	CameraControl map[string]any
-	// Whether to generate audio while generating video, optional. Only `kling-v3`, `kling-v3-omni`, and `kling-v2-6`
+	// Kling Videos Generate Audio
 	GenerateAudio bool
-	// Optional parameters, supporting up to 200 characters, used to describe content that you do not wish to appear
+	// Kling Videos Video Id
+	VideoID string
+	// Kling Videos Cfg Scale
+	CfgScale float64
+	// Kling Videos Aspect Ratio
+	AspectRatio string
+	// Kling Videos End Image Url
+	EndImageURL string
+	// Kling Videos Camera Control
+	CameraControl map[string]any
+	// Kling Videos Image List
+	ImageList []map[string]any
+	// Kling Videos Video List
+	VideoList []map[string]any
+	// Kling Videos Negative Prompt
 	NegativePrompt string
-	// You can specify the first frame reference image of the video, which is effective when the action is image2vide
+	// Kling Videos Start Image Url
 	StartImageURL string
 	// Kling Videos Multi Shot
 	MultiShot bool
@@ -137,27 +137,28 @@ func (r KlingGenerateRequest) toBody() map[string]any {
 	body["action"] = r.Action
 	if r.Mode != "" {
 		body["mode"] = r.Mode
+	} else {
+		body["mode"] = "std"
 	}
 	if r.Model != "" {
 		body["model"] = r.Model
+	} else {
+		body["model"] = "kling-v1"
 	}
 	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
 	}
 	if r.Duration != 0 {
 		body["duration"] = r.Duration
+	} else {
+		body["duration"] = 5
 	}
+	body["generate_audio"] = r.GenerateAudio
 	if r.VideoID != "" {
 		body["video_id"] = r.VideoID
 	}
 	if r.CfgScale != 0 {
 		body["cfg_scale"] = r.CfgScale
-	}
-	if r.ImageList != nil {
-		body["image_list"] = r.ImageList
-	}
-	if r.VideoList != nil {
-		body["video_list"] = r.VideoList
 	}
 	if r.AspectRatio != "" {
 		body["aspect_ratio"] = r.AspectRatio
@@ -168,7 +169,12 @@ func (r KlingGenerateRequest) toBody() map[string]any {
 	if r.CameraControl != nil {
 		body["camera_control"] = r.CameraControl
 	}
-	body["generate_audio"] = r.GenerateAudio
+	if r.ImageList != nil {
+		body["image_list"] = r.ImageList
+	}
+	if r.VideoList != nil {
+		body["video_list"] = r.VideoList
+	}
 	if r.NegativePrompt != "" {
 		body["negative_prompt"] = r.NegativePrompt
 	}
@@ -203,7 +209,7 @@ func (r KlingGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Kuaishou Kling AI video generation API. Supports text-to-video, image-to-video, and start/end frame control across kling-v1, kling-v1-6, kling-v2-mast
+// Generate Kling Videos
 func (c *Kling) Generate(ctx context.Context, req KlingGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -218,26 +224,26 @@ func (c *Kling) Generate(ctx context.Context, req KlingGenerateRequest) (*TaskHa
 
 // KlingLipSyncRequest is the input to kling.Lip_Sync.
 type KlingLipSyncRequest struct {
-	// audio2video: Drive with audio clips; text2video: Drive with text + tone.
+	// Kling Lip Sync Mode
 	Mode string
-	// Text to be read aloud (required when mode is text2video, up to 120 characters).
-	Text string
-	// The ID of the video generated by Kling (for example, from /kling/videos image2video) must be generated within
+	// Kling Lip Sync Video Id
 	VideoID string
-	// The tone used (required when mode is text2video).
-	VoiceID string
-	// The public URL for the audio drive (required when mode is audio2video).
-	AudioURL string
-	// The public URL of the 5-second/10-second video that matches the lip sync. Choose one between video_id.
+	// Kling Lip Sync Video Url
 	VideoURL string
-	// Base64 of the audio file (required when audio_type is file). Supports .mp3/.wav/.m4a/.aac, not exceeding 5MB.
-	AudioFile string
-	// The method of providing audio (for audio2video).
+	// Kling Lip Sync Audio Url
+	AudioURL string
+	// Kling Lip Sync Audio Type
 	AudioType string
-	// The speech rate of text2video (0.8–2.0, keep one decimal place).
-	VoiceSpeed float64
-	// The tone language of text2video.
+	// Kling Lip Sync Audio File
+	AudioFile string
+	// Kling Lip Sync Text
+	Text string
+	// Kling Lip Sync Voice Id
+	VoiceID string
+	// Kling Lip Sync Voice Language
 	VoiceLanguage string
+	// Kling Lip Sync Voice Speed
+	VoiceSpeed float64
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -249,38 +255,38 @@ type KlingLipSyncRequest struct {
 func (r KlingLipSyncRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["mode"] = r.Mode
-	if r.Text != "" {
-		body["text"] = r.Text
-	}
 	if r.VideoID != "" {
 		body["video_id"] = r.VideoID
-	}
-	if r.VoiceID != "" {
-		body["voice_id"] = r.VoiceID
-	}
-	if r.AudioURL != "" {
-		body["audio_url"] = r.AudioURL
 	}
 	if r.VideoURL != "" {
 		body["video_url"] = r.VideoURL
 	}
-	if r.AudioFile != "" {
-		body["audio_file"] = r.AudioFile
+	if r.AudioURL != "" {
+		body["audio_url"] = r.AudioURL
 	}
 	if r.AudioType != "" {
 		body["audio_type"] = r.AudioType
 	} else {
 		body["audio_type"] = "url"
 	}
-	if r.VoiceSpeed != 0 {
-		body["voice_speed"] = r.VoiceSpeed
-	} else {
-		body["voice_speed"] = 1.0
+	if r.AudioFile != "" {
+		body["audio_file"] = r.AudioFile
+	}
+	if r.Text != "" {
+		body["text"] = r.Text
+	}
+	if r.VoiceID != "" {
+		body["voice_id"] = r.VoiceID
 	}
 	if r.VoiceLanguage != "" {
 		body["voice_language"] = r.VoiceLanguage
 	} else {
 		body["voice_language"] = "zh"
+	}
+	if r.VoiceSpeed != 0 {
+		body["voice_speed"] = r.VoiceSpeed
+	} else {
+		body["voice_speed"] = 1.0
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -297,7 +303,7 @@ func (r KlingLipSyncRequest) toBody() map[string]any {
 	return body
 }
 
-// LipSync Kling lip-sync API — sync a character's mouth in a video to audio or text.
+// LipSync Kling Lip Sync
 func (c *Kling) LipSync(ctx context.Context, req KlingLipSyncRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -312,18 +318,18 @@ func (c *Kling) LipSync(ctx context.Context, req KlingLipSyncRequest) (*TaskHand
 
 // KlingTalkingPhotoRequest is the input to kling.Talking_Photo.
 type KlingTalkingPhotoRequest struct {
-	// Public URL for audio (.mp3/.wav/.m4a/.aac, no more than 5MB), characters will lip-sync according to its conten
-	AudioURL string
-	// Public URL of the character photo, it is recommended to use a clear frontal photo.
+	// Kling Talking Photo Image Url
 	ImageURL string
-	// The generation quality of photo animation stage.
-	Mode string
-	// The Kling model used in the photo animation stage.
-	Model string
-	// Optional: Action/expression prompts for the photo animation stage.
+	// Kling Talking Photo Audio Url
+	AudioURL string
+	// Kling Talking Photo Prompt
 	Prompt string
-	// Video duration (seconds), while also limiting the length of the audio reading.
+	// Kling Talking Photo Model
+	Model string
+	// Kling Talking Photo Duration
 	Duration int
+	// Kling Talking Photo Mode
+	Mode string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -334,25 +340,25 @@ type KlingTalkingPhotoRequest struct {
 
 func (r KlingTalkingPhotoRequest) toBody() map[string]any {
 	body := map[string]any{}
-	body["audio_url"] = r.AudioURL
 	body["image_url"] = r.ImageURL
-	if r.Mode != "" {
-		body["mode"] = r.Mode
-	} else {
-		body["mode"] = "pro"
+	body["audio_url"] = r.AudioURL
+	if r.Prompt != "" {
+		body["prompt"] = r.Prompt
 	}
 	if r.Model != "" {
 		body["model"] = r.Model
 	} else {
 		body["model"] = "kling-v2-1-master"
 	}
-	if r.Prompt != "" {
-		body["prompt"] = r.Prompt
-	}
 	if r.Duration != 0 {
 		body["duration"] = r.Duration
 	} else {
 		body["duration"] = 5
+	}
+	if r.Mode != "" {
+		body["mode"] = r.Mode
+	} else {
+		body["mode"] = "pro"
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -369,7 +375,7 @@ func (r KlingTalkingPhotoRequest) toBody() map[string]any {
 	return body
 }
 
-// TalkingPhoto Kling talking-photo API — make a still portrait speak from audio or text.
+// TalkingPhoto Kling Talking Photo
 func (c *Kling) TalkingPhoto(ctx context.Context, req KlingTalkingPhotoRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
