@@ -17,26 +17,27 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface DigitalhumanGenerateOptions {
-  /** Public URL of the source face video (preferred). One of video_url/image_url required. */
-  videoUrl: string;
+  /** Public URL of the source face video (preferred). Supply either video_url or image_url. */
+  videoUrl?: string;
+  /** Public URL of a source face photo (photo-driven path). Supply either video_url or image_url. */
+  imageUrl?: string;
+  /** Public URL of the driving audio (.wav/.mp3/.m4a). OR supply text(+voice_id). */
+  audioUrl?: string;
   /** Spoken text -> TTS (requires voice_id). */
   text?: string;
-  /** Audio tempo multiplier. */
-  speed?: number;
-  /** Diffusion steps (LatentSync). */
-  steps?: number;
-  /** latentsync = quality (default); heygem = fast tier. */
+  /** A cloned voice from POST /digital-human/voices. */
+  voiceId?: string;
+  /** [Deprecated] Accepted for backward compatibility but no longer changes the output or the price — every request is billed at the unified rate. */
   engine?: "latentsync" | "heygem";
   /** Lip-sync strength (LatentSync). Lower loosens sync. */
   guidance?: number;
+  /** Diffusion steps (LatentSync). */
+  steps?: number;
   /** Apply the mouth-seam reduction blend. */
   seamFix?: boolean;
-  /** A cloned voice from POST /digital-human/voices. */
-  voiceId?: string;
-  /** Public URL of the driving audio (.wav/.mp3/.m4a). OR supply text(+voice_id). */
-  audioUrl?: string;
-  /** Public URL of a source face photo (photo-driven path). */
-  imageUrl?: string;
+  /** Audio tempo multiplier. */
+  speed?: number;
+  /** [Deprecated] Output is always rendered at 720p. */
   resolution?: "720p" | "540p";
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -70,19 +71,19 @@ export interface DigitalhumanVoicesOptions {
 export class Digitalhuman {
   constructor(private transport: Transport) {}
 
-  /** Digital Human video generation API — turn a portrait plus audio or text into a talking-head video. */
-  async generate(options: DigitalhumanGenerateOptions): Promise<TaskHandle> {
+  /** Digital Human Videos */
+  async generate(options: DigitalhumanGenerateOptions = {}): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
-    body["video_url"] = options.videoUrl;
+    if (options.videoUrl !== undefined) body["video_url"] = options.videoUrl;
+    if (options.imageUrl !== undefined) body["image_url"] = options.imageUrl;
+    if (options.audioUrl !== undefined) body["audio_url"] = options.audioUrl;
     if (options.text !== undefined) body["text"] = options.text;
-    body["speed"] = options.speed ?? 1.0;
-    body["steps"] = options.steps ?? 40;
+    if (options.voiceId !== undefined) body["voice_id"] = options.voiceId;
     body["engine"] = options.engine ?? "latentsync";
     body["guidance"] = options.guidance ?? 2.0;
+    body["steps"] = options.steps ?? 40;
     body["seam_fix"] = options.seamFix ?? true;
-    if (options.voiceId !== undefined) body["voice_id"] = options.voiceId;
-    if (options.audioUrl !== undefined) body["audio_url"] = options.audioUrl;
-    if (options.imageUrl !== undefined) body["image_url"] = options.imageUrl;
+    body["speed"] = options.speed ?? 1.0;
     body["resolution"] = options.resolution ?? "720p";
     for (const [key, value] of Object.entries(options)) {
       if (!["async", "audioUrl", "callbackUrl", "engine", "guidance", "imageUrl", "maxWait", "pollInterval", "resolution", "seamFix", "speed", "steps", "text", "videoUrl", "voiceId", "wait"].includes(key) && value !== undefined) {
@@ -99,7 +100,7 @@ export class Digitalhuman {
     return handle;
   }
 
-  /** Digital Human voice-clone API — upload an audio sample to clone a custom voice for speech synthesis. */
+  /** Digital Human Voices */
   async voices(options: DigitalhumanVoicesOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["audio_url"] = options.audioUrl;

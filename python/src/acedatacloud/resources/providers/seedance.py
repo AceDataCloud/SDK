@@ -84,7 +84,7 @@ class Seedance:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Call /seedance/videos."""
+        """Seedance Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content
@@ -157,7 +157,7 @@ class AsyncSeedance:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Call /seedance/videos."""
+        """Seedance Videos"""
         body: dict[str, Any] = {}
         body["model"] = model
         body["content"] = content

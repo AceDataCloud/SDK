@@ -19,21 +19,19 @@ function taskId(result: Record<string, unknown>): string {
 export interface MaestroGenerateOptions {
   /** Natural-language brief describing the video to produce (the topic, what to show, tone, audience). The agent decides the script, visuals, voiceover and edit. */
   prompt: string;
-  /** Production action. Lite supports generate/edit; Standard adds remix; Pro adds extend. remix/edit/extend require `ref_task_id`. */
+  /** Production action. generate creates a new video; remix/edit/extend require ref_task_id. */
   action?: "generate" | "remix" | "edit" | "extend";
   /** Required when `action` is remix / edit / extend: the task_id of the previous video to start from. */
   refTaskId?: string;
   /** Optional reference media (image / video / audio URLs) the agent can use — e.g. a product shot or logo to feature, footage to caption. */
   fileUrls?: string[];
-  /** Output languages. Lite supports 1, Standard up to 2, and Pro up to 4. The first is primary; each additional delivered language is billed +6 credits. */
+  /** Output languages, up to 4. The first is primary; each additional delivered language is billed +6 credits. */
   langs?: string[];
-  /** Required output aspect ratio. Lite renders 720p/24fps; Standard and Pro render 1080p/30fps. */
+  /** Required output aspect ratio. All videos render at 1080p/30fps. */
   aspect?: "9:16" | "16:9" | "1:1";
-  /** Target video length in seconds. Lite: 5–30; Standard: 5–120; Pro: 5–300. Successful jobs are billed by actual delivered duration, never above the requested duration. */
+  /** Target video length in seconds, from 5 to 300. Successful jobs are billed by actual delivered duration, never above the requested duration. */
   duration?: number;
-  /** Production SKU. `lite` = fast 720p short video at 0.20 credits/s (up to 30s); `standard` = balanced 1080p at 0.60 credits/s (up to 120s); `pro` = advanced production at 1.20 credits/s (up to 300s). Default: standard. */
-  quality?: "lite" | "standard" | "pro";
-  /** Production route. Lite supports auto/narrated/captions; Standard adds avatar; Pro adds drama. `captions` requires source video in `file_urls`; `avatar` requires a portrait. avatar bills at 1.15× and drama at 1.35×. */
+  /** Production route: auto, narrated, captions, avatar, or drama. captions requires source video in file_urls; avatar requires a portrait. avatar bills at 1.15× and drama at 1.35×. */
   scenario?: "auto" | "narrated" | "captions" | "avatar" | "drama";
   /** Optional visual-style preset — expressed through typography, palette, motion, image treatment and pacing. Orthogonal to `scenario` (it does NOT change routing). `auto` (default) lets the director pick; every other value adopts a real named look: `cinematic` = dark film-noir (black + blood-red, Oswald); `glass` = Apple / iOS-26 frosted liquid glass; `luxury` = timeless near-black + indigo, huge whitespace; `swiss` = precise grid + electric blue + oversized numerals; `modern` = clean light SaaS; `editorial` = cream magazine + serif; `warm` = intimate cream + amber; `vibrant` = festive folk colour; `neon` = electric neon glow; `mono` = grayscale, type-led; `pastel` = soft candy pastels; `bold` = huge poster type; `industrial` = raw glitch + rust; `futuristic` = particle glow. A freeform string is also accepted as a soft hint. */
   style?: "auto" | "cinematic" | "glass" | "luxury" | "swiss" | "modern" | "editorial" | "warm" | "vibrant" | "neon" | "mono" | "pastel" | "bold" | "industrial" | "futuristic" | "retro";
@@ -54,7 +52,7 @@ export interface MaestroGenerateOptions {
 export class Maestro {
   constructor(private transport: Transport) {}
 
-  /** Call /maestro/videos. */
+  /** Maestro Videos */
   async generate(options: MaestroGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["prompt"] = options.prompt;
@@ -64,12 +62,11 @@ export class Maestro {
     body["langs"] = options.langs ?? ["zh-cn"];
     body["aspect"] = options.aspect ?? "9:16";
     body["duration"] = options.duration ?? 30;
-    body["quality"] = options.quality ?? "standard";
     body["scenario"] = options.scenario ?? "auto";
     body["style"] = options.style ?? "auto";
     body["voice"] = options.voice ?? "auto";
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "aspect", "async", "callbackUrl", "duration", "fileUrls", "langs", "maxWait", "pollInterval", "prompt", "quality", "refTaskId", "scenario", "style", "voice", "wait"].includes(key) && value !== undefined) {
+      if (!["action", "aspect", "async", "callbackUrl", "duration", "fileUrls", "langs", "maxWait", "pollInterval", "prompt", "refTaskId", "scenario", "style", "voice", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
