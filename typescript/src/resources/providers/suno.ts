@@ -214,6 +214,20 @@ export interface SunoUploadOptions {
   [key: string]: unknown;
 }
 
+export interface SunoMp3Options {
+  /** Suno Mp3 Audio Id */
+  audioId: string;
+  /** Submit asynchronously and poll. Defaults to true. */
+  async?: boolean;
+  /** Wait for completion before returning the handle. */
+  wait?: boolean;
+  pollInterval?: number;
+  maxWait?: number;
+  callbackUrl?: string;
+  /** Any parameter added upstream before the SDK is regenerated. */
+  [key: string]: unknown;
+}
+
 /** suno client. */
 export class Suno {
   constructor(private transport: Transport) {}
@@ -435,6 +449,25 @@ export class Suno {
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
     return (await this.transport.request('POST', "/suno/upload", { json: body })) as Record<string, unknown>;
+  }
+
+  /** Suno Mp3 */
+  async mp3(options: SunoMp3Options): Promise<TaskHandle> {
+    const body: Record<string, unknown> = {};
+    body["audio_id"] = options.audioId;
+    for (const [key, value] of Object.entries(options)) {
+      if (!["async", "audioId", "callbackUrl", "maxWait", "pollInterval", "wait"].includes(key) && value !== undefined) {
+        body[key] = value;
+      }
+    }
+    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
+    body.async = options.async ?? true;
+    const result = (await this.transport.request('POST', "/suno/mp3", { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), "/suno/tasks", this.transport, result);
+    if (options.wait) {
+      await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });
+    }
+    return handle;
   }
 
 }

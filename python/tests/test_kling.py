@@ -242,3 +242,17 @@ def test_generate_rejects_model_and_reference_constraints(options: dict[str, Any
         client.generate(**request)  # type: ignore[arg-type]
 
     assert transport.calls == []
+
+
+def test_turbo_and_storyboard_fields_reach_transport():
+    transport = SyncTransport()
+    client = Kling(transport)
+    client.generate(action="text2video", model="kling-v3-turbo", prompt="ocean", duration=7)
+    assert transport.calls[-1][2]["duration"] == 7
+    with pytest.raises(ValueError, match="included audio"):
+        client.generate(action="text2video", model="kling-v3-turbo", prompt="ocean", generate_audio=False)
+    shots = [{"index": 1, "prompt": "ocean", "duration": 5}]
+    client.generate(action="text2video", model="kling-v3", multi_shot=True, shot_type="customize", multi_prompt=shots)
+    assert transport.calls[-1][2]["multi_prompt"] == shots
+    client.goods_studio(contents=[{"type": "goods_title", "text": "shirt"}], settings={"duration": 15})
+    assert transport.calls[-1][1] == "/kling/goods-studio"

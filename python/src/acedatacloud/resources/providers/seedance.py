@@ -31,6 +31,12 @@ SeedanceRatio = Literal[
     "21:9",
     "adaptive",
 ]
+SeedanceOmniReferenceTaskType = Literal[
+    "auto",
+    "reference",
+    "edit",
+    "extend",
+]
 
 
 def _task_id(result: Any) -> str:
@@ -66,9 +72,11 @@ class Seedance:
         generate_audio: bool | None = None,
         return_last_frame: bool | None = None,
         execution_expires_after: int | None = None,
-        omni_reference_task_type: Literal["auto", "edit", "extend"] | None = None,
+        omni_reference_task_type: SeedanceOmniReferenceTaskType | None = None,
         output_format: Literal["mp4", "mov"] | None = None,
         tools: list[dict[str, Any]] | None = None,
+        priority: int | None = None,
+        safety_identifier: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -102,6 +110,9 @@ class Seedance:
             body["output_format"] = output_format
         if tools is not None:
             body["tools"] = tools
+        body["priority"] = priority if priority is not None else 0
+        if safety_identifier is not None:
+            body["safety_identifier"] = safety_identifier
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -134,9 +145,11 @@ class AsyncSeedance:
         generate_audio: bool | None = None,
         return_last_frame: bool | None = None,
         execution_expires_after: int | None = None,
-        omni_reference_task_type: Literal["auto", "edit", "extend"] | None = None,
+        omni_reference_task_type: SeedanceOmniReferenceTaskType | None = None,
         output_format: Literal["mp4", "mov"] | None = None,
         tools: list[dict[str, Any]] | None = None,
+        priority: int | None = None,
+        safety_identifier: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -170,6 +183,9 @@ class AsyncSeedance:
             body["output_format"] = output_format
         if tools is not None:
             body["tools"] = tools
+        body["priority"] = priority if priority is not None else 0
+        if safety_identifier is not None:
+            body["safety_identifier"] = safety_identifier
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

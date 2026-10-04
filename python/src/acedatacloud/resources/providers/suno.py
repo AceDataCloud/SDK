@@ -396,6 +396,30 @@ class Suno:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/suno/upload", json=body)
 
+    def mp3(
+        self,
+        *,
+        audio_id: str,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> TaskHandle:
+        """Suno Mp3"""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = self._transport.request("POST", "/suno/mp3", json=body)
+        handle = TaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
+        if wait:
+            handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
 
 class AsyncSuno:
     """Asynchronous suno client."""
@@ -739,3 +763,27 @@ class AsyncSuno:
         if callback_url is not None:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/suno/upload", json=body)
+
+    async def mp3(
+        self,
+        *,
+        audio_id: str,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> AsyncTaskHandle:
+        """Suno Mp3"""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = await self._transport.request("POST", "/suno/mp3", json=body)
+        handle = AsyncTaskHandle(_task_id(result), "/suno/tasks", self._transport, submitted=result)
+        if wait:
+            await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle

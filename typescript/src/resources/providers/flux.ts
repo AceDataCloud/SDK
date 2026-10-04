@@ -40,6 +40,32 @@ export interface FluxGenerateOptions {
   [key: string]: unknown;
 }
 
+export interface FluxVideosOptions {
+  mode: "t2v" | "i2v" | "v2v" | "draft_enhance";
+  action?: "generate";
+  prompt?: string;
+  aspectRatio?: "21:9" | "2:1" | "16:9" | "4:3" | "1:1" | "3:4" | "9:16" | "9:21" | "auto";
+  duration?: number | "auto";
+  resolution?: "hd" | "fhd" | "qhd" | "uhd";
+  version?: "latest";
+  generateAudio?: boolean;
+  safetyTolerance?: number;
+  draft?: boolean;
+  model?: "flux-3";
+  keyframes?: string | unknown[] | string[];
+  startVideo?: string;
+  draftTaskId?: string;
+  /** Submit asynchronously and poll. Defaults to true. */
+  async?: boolean;
+  /** Wait for completion before returning the handle. */
+  wait?: boolean;
+  pollInterval?: number;
+  maxWait?: number;
+  callbackUrl?: string;
+  /** Any parameter added upstream before the SDK is regenerated. */
+  [key: string]: unknown;
+}
+
 /** flux client. */
 export class Flux {
   constructor(private transport: Transport) {}
@@ -61,6 +87,38 @@ export class Flux {
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
     body.async = options.async ?? true;
     const result = (await this.transport.request('POST', "/flux/images", { json: body })) as Record<string, unknown>;
+    const handle = new TaskHandle(taskId(result), "/flux/tasks", this.transport, result);
+    if (options.wait) {
+      await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });
+    }
+    return handle;
+  }
+
+  /** Flux Generate Summary */
+  async videos(options: FluxVideosOptions): Promise<TaskHandle> {
+    const body: Record<string, unknown> = {};
+    body["mode"] = options.mode;
+    body["action"] = options.action ?? "generate";
+    if (options.prompt !== undefined) body["prompt"] = options.prompt;
+    body["aspect_ratio"] = options.aspectRatio ?? "auto";
+    if (options.duration !== undefined) body["duration"] = options.duration;
+    body["resolution"] = options.resolution ?? "hd";
+    body["version"] = options.version ?? "latest";
+    if (options.generateAudio !== undefined) body["generate_audio"] = options.generateAudio;
+    body["safety_tolerance"] = options.safetyTolerance ?? 2;
+    if (options.draft !== undefined) body["draft"] = options.draft;
+    body["model"] = options.model ?? "flux-3";
+    if (options.keyframes !== undefined) body["keyframes"] = options.keyframes;
+    if (options.startVideo !== undefined) body["start_video"] = options.startVideo;
+    if (options.draftTaskId !== undefined) body["draft_task_id"] = options.draftTaskId;
+    for (const [key, value] of Object.entries(options)) {
+      if (!["action", "aspectRatio", "async", "callbackUrl", "draft", "draftTaskId", "duration", "generateAudio", "keyframes", "maxWait", "mode", "model", "pollInterval", "prompt", "resolution", "safetyTolerance", "startVideo", "version", "wait"].includes(key) && value !== undefined) {
+        body[key] = value;
+      }
+    }
+    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
+    body.async = options.async ?? true;
+    const result = (await this.transport.request('POST', "/flux/videos", { json: body })) as Record<string, unknown>;
     const handle = new TaskHandle(taskId(result), "/flux/tasks", this.transport, result);
     if (options.wait) {
       await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });

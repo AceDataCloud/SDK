@@ -11,7 +11,7 @@ describe('Seedream provider', () => {
     const seedream = new Seedream({ request } as any);
 
     const task = await seedream.generate({
-      model: 'doubao-seedream-5-0-260128',
+      model: 'doubao-seedream-5-0-lite-260128',
       prompt: 'a cat',
     });
 
@@ -20,7 +20,7 @@ describe('Seedream provider', () => {
     expect(task.urls()).toEqual(['https://cdn.example.com/seedream.png']);
     expect(request).toHaveBeenCalledWith('POST', '/seedream/images', {
       json: {
-        model: 'doubao-seedream-5-0-260128',
+        model: 'doubao-seedream-5-0-lite-260128',
         prompt: 'a cat',
         async: true,
       },
@@ -32,7 +32,7 @@ describe('Seedream provider', () => {
     const seedream = new Seedream({ request } as any);
 
     await seedream.generate({
-      model: 'doubao-seedream-5-0-260128',
+      model: 'doubao-seedream-5-0-lite-260128',
       prompt: 'a cat',
       size: '4K',
     });

@@ -10,6 +10,7 @@ export const KLING_MODELS = [
   'kling-v2-5-turbo',
   'kling-v2-6',
   'kling-v3',
+  'kling-v3-turbo',
   'kling-v3-omni',
   'kling-o1',
 ] as const;
@@ -58,6 +59,11 @@ export interface KlingGenerateOptions {
   videoList?: KlingReferenceVideo[];
   negativePrompt?: string;
   startImageUrl?: string;
+  multiShot?: boolean;
+  shotType?: 'intelligence' | 'customize';
+  multiPrompt?: Array<{ index: number; prompt: string; duration: number }>;
+  elementList?: Array<Record<string, unknown>>;
+  voiceList?: Array<Record<string, unknown>>;
 }
 
 function isHttpUrl(value: string): boolean {
@@ -73,7 +79,16 @@ function validateGenerateOptions(opts: KlingGenerateOptions): void {
   if (!KLING_MODELS.includes(opts.model)) {
     throw new Error(`model must be one of: ${KLING_MODELS.join(', ')}`);
   }
-  const isV3 = opts.model === 'kling-v3' || opts.model === 'kling-v3-omni';
+  const isTurbo = opts.model === 'kling-v3-turbo';
+  const isV3 = opts.model === 'kling-v3' || opts.model === 'kling-v3-omni' || isTurbo;
+  if (isTurbo) {
+    if ((opts.mode !== undefined && !['std', 'pro'].includes(opts.mode)) || opts.generateAudio === false) {
+      throw new Error('Turbo supports std/pro with included audio');
+    }
+    if ([opts.endImageUrl, opts.cameraControl, opts.cfgScale, opts.negativePrompt, opts.imageList, opts.videoList, opts.elementList, opts.voiceList].some(value => value !== undefined) || opts.multiShot || opts.multiPrompt) {
+      throw new Error('Turbo does not support tail frames, camera controls, Omni references or storyboards');
+    }
+  }
   const hasReferences = Boolean(opts.imageList?.length || opts.videoList?.length);
 
   if (opts.imageList !== undefined && opts.imageList.length === 0) {
@@ -83,7 +98,7 @@ function validateGenerateOptions(opts: KlingGenerateOptions): void {
     throw new Error('videoList must be non-empty or omitted');
   }
 
-  if ((opts.action === 'text2video' || opts.action === 'image2video') && !opts.prompt) {
+  if ((opts.action === 'text2video' || opts.action === 'image2video') && !opts.prompt && !opts.multiPrompt?.length) {
     throw new Error('prompt is required for text2video and image2video');
   }
   if (opts.action === 'image2video' && !opts.startImageUrl) {
@@ -217,6 +232,11 @@ export class Kling {
       startImageUrl,
     } = opts;
     const body: Record<string, unknown> = { action };
+    if (opts.multiShot !== undefined) body.multi_shot = opts.multiShot;
+    if (opts.shotType !== undefined) body.shot_type = opts.shotType;
+    if (opts.multiPrompt !== undefined) body.multi_prompt = opts.multiPrompt;
+    if (opts.elementList !== undefined) body.element_list = opts.elementList;
+    if (opts.voiceList !== undefined) body.voice_list = opts.voiceList;
     if (mode !== undefined) body.mode = mode;
     if (model !== undefined) body.model = model;
     if (prompt !== undefined) body.prompt = prompt;
@@ -277,5 +297,21 @@ export class Kling {
     if (callbackUrl !== undefined) body.callback_url = callbackUrl;
     if (opts.async !== undefined) body.async = opts.async;
     return this.transport.request('POST', '/kling/motion', { json: body });
+  }
+
+  async lipSync(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return this.transport.request('POST', '/kling/lip-sync', { json: request });
+  }
+
+  async talkingPhoto(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return this.transport.request('POST', '/kling/talking-photo', { json: request });
+  }
+
+  async goodsStudio(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return this.transport.request('POST', '/kling/goods-studio', { json: request });
+  }
+
+  async videoCommerce(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return this.transport.request('POST', '/kling/video-commerce', { json: request });
   }
 }

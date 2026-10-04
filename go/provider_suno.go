@@ -632,3 +632,46 @@ func (c *Suno) Upload(ctx context.Context, req SunoUploadRequest) (map[string]an
 		Body:   req.toBody(),
 	})
 }
+
+// SunoMp3Request is the input to suno.Mp3.
+type SunoMp3Request struct {
+	// Suno Mp3 Audio Id
+	AudioID string
+	// Async submits without blocking; poll the returned handle. Defaults true.
+	Async *bool
+	// CallbackURL optionally receives the completion webhook.
+	CallbackURL string
+	// Extra fields merged into the request body.
+	Extra map[string]any
+}
+
+func (r SunoMp3Request) toBody() map[string]any {
+	body := map[string]any{}
+	body["audio_id"] = r.AudioID
+	body["async"] = true
+	if r.Async != nil {
+		body["async"] = *r.Async
+	}
+	if r.CallbackURL != "" {
+		body["callback_url"] = r.CallbackURL
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Mp3 Suno Mp3
+func (c *Suno) Mp3(ctx context.Context, req SunoMp3Request) (*TaskHandle, error) {
+	result, err := c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/suno/mp3",
+		Body:   req.toBody(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return newTaskHandle(taskIDFrom(result), "/suno/tasks", c.t, result), nil
+}

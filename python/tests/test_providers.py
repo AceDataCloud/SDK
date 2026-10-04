@@ -389,3 +389,19 @@ def test_fish_one_shot_reference_and_model_header(client):
     ]
     assert "model" not in kwargs["json"]
     assert "reference_id" not in kwargs["json"]
+
+
+def test_flux_video_and_suno_mp3_keep_public_fields(client):
+    transport = Mock()
+    transport.request.return_value = {"task_id": "task-1"}
+    client.flux._transport = transport
+    handle = client.flux.videos(mode="t2v", prompt="ocean", generate_audio=False, draft=False, duration=5)
+    assert isinstance(handle, TaskHandle)
+    method, path = transport.request.call_args.args
+    assert (method, path) == ("POST", "/flux/videos")
+    body = transport.request.call_args.kwargs["json"]
+    assert body["generate_audio"] is False and body["draft"] is False
+    assert body["mode"] == "t2v"
+    client.suno._transport = transport
+    client.suno.mp3(audio_id="owned-audio")
+    assert transport.request.call_args.args == ("POST", "/suno/mp3")

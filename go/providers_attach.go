@@ -38,6 +38,7 @@ type providers struct {
 	seedream     *Seedream
 	suno         *Suno
 	wan          *Wan
+	kling        *Kling
 }
 
 func newProviders(tr *transport) *providers {
@@ -59,6 +60,7 @@ func newProviders(tr *transport) *providers {
 		seedream:     &Seedream{t: tr},
 		suno:         &Suno{t: tr},
 		wan:          &Wan{t: tr},
+		kling:        &Kling{t: tr},
 	}
 }
 
@@ -112,3 +114,6 @@ func (c *Client) Suno() *Suno { return c.providers.suno }
 
 // Wan returns the wan provider client.
 func (c *Client) Wan() *Wan { return c.providers.wan }
+
+// Kling returns the kling provider client.
+func (c *Client) Kling() *Kling { return c.providers.kling }

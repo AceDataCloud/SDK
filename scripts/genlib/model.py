@@ -69,7 +69,43 @@ def operation(spec: dict) -> dict:
 
 def request_schema(spec: dict) -> dict:
     content = (operation(spec).get("requestBody") or {}).get("content") or {}
-    return (content.get("application/json") or {}).get("schema") or {}
+    schema = (content.get("application/json") or {}).get("schema") or {}
+    def resolve(node, seen=()):
+        ref = node.get("$ref")
+        if ref and ref.startswith("#/") and ref not in seen:
+            value = spec
+            for part in ref[2:].split("/"):
+                value = value[part.replace("~1", "/").replace("~0", "~")]
+            return resolve(value, (*seen, ref))
+        if "allOf" in node and not node.get("properties"):
+            result = dict(node)
+            properties = dict(node.get("properties", {}))
+            required = list(node.get("required", []))
+            for child in node["allOf"]:
+                value = resolve(child, seen)
+                properties.update(value.get("properties", {}))
+                required.extend(value.get("required", []))
+            result.update(properties=properties, required=list(dict.fromkeys(required)))
+            return result
+        variants = node.get("oneOf") or node.get("anyOf")
+        if (not node.get("properties") or set(node.get("properties", {})) == {"action"}) and isinstance(variants, list) and variants:
+            branches = [resolve(child, seen) for child in variants]
+            properties = dict(node.get("properties", {}))
+            required = set(branches[0].get("required", []))
+            for branch in branches:
+                required &= set(branch.get("required", []))
+                for name, field in branch.get("properties", {}).items():
+                    if name not in properties:
+                        properties[name] = dict(field)
+                    elif properties[name] != field:
+                        previous = properties[name]
+                        if previous.get("type") == field.get("type") and previous.get("enum") and field.get("enum"):
+                            properties[name] = {**previous, "enum": list(dict.fromkeys(previous["enum"] + field["enum"]))}
+                        else:
+                            properties[name] = {"anyOf": [previous, field]}
+            return {**node, "properties": properties, "required": sorted(required | set(node.get("required", [])))}
+        return node
+    return resolve(schema)
 
 
 def summary(spec: dict) -> str:

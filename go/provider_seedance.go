@@ -36,12 +36,16 @@ type SeedanceGenerateRequest struct {
 	ReturnLastFrame bool
 	// $t(seedance_videos_execution_expires_after)
 	ExecutionExpiresAfter int
-	// $t(seedance_videos_omni_reference_task_type)
+	// Seedance Videos Omni Reference Task Type
 	OmniReferenceTaskType string
 	// $t(seedance_videos_output_format)
 	OutputFormat string
 	// $t(seedance_videos_tools)
 	Tools []map[string]any
+	// Seedance Videos Priority
+	Priority int
+	// Seedance Videos Safety Identifier
+	SafetyIdentifier string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -88,6 +92,14 @@ func (r SeedanceGenerateRequest) toBody() map[string]any {
 	}
 	if r.Tools != nil {
 		body["tools"] = r.Tools
+	}
+	if r.Priority != 0 {
+		body["priority"] = r.Priority
+	} else {
+		body["priority"] = 0
+	}
+	if r.SafetyIdentifier != "" {
+		body["safety_identifier"] = r.SafetyIdentifier
 	}
 	body["async"] = true
 	if r.Async != nil {

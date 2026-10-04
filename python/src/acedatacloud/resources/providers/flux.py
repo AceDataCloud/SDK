@@ -21,6 +21,12 @@ FluxModel = Literal[
     "flux-2-max",
     "flux-2-klein",
 ]
+FluxMode = Literal[
+    "t2v",
+    "i2v",
+    "v2v",
+    "draft_enhance",
+]
 
 
 def _task_id(result: Any) -> str:
@@ -78,6 +84,65 @@ class Flux:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
+    def videos(
+        self,
+        *,
+        mode: FluxMode,
+        action: Literal["generate"] | None = None,
+        prompt: str | None = None,
+        aspect_ratio: Literal["21:9", "2:1", "16:9", "4:3", "1:1", "3:4", "9:16", "9:21"]
+        | Literal["auto"]
+        | None = None,
+        duration: int | Literal["auto"] | None = None,
+        resolution: Literal["hd", "fhd", "qhd", "uhd"] | None = None,
+        version: Literal["latest"] | None = None,
+        generate_audio: bool | None = None,
+        safety_tolerance: int | None = None,
+        draft: bool | None = None,
+        model: FluxModel | None = None,
+        keyframes: str | list[Any] | list[str] | None = None,
+        start_video: str | None = None,
+        draft_task_id: str | None = None,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> TaskHandle:
+        """Flux Generate Summary"""
+        body: dict[str, Any] = {}
+        body["mode"] = mode
+        body["action"] = action if action is not None else "generate"
+        if prompt is not None:
+            body["prompt"] = prompt
+        body["aspect_ratio"] = aspect_ratio if aspect_ratio is not None else "auto"
+        if duration is not None:
+            body["duration"] = duration
+        body["resolution"] = resolution if resolution is not None else "hd"
+        body["version"] = version if version is not None else "latest"
+        if generate_audio is not None:
+            body["generate_audio"] = generate_audio
+        body["safety_tolerance"] = safety_tolerance if safety_tolerance is not None else 2
+        if draft is not None:
+            body["draft"] = draft
+        body["model"] = model if model is not None else "flux-3"
+        if keyframes is not None:
+            body["keyframes"] = keyframes
+        if start_video is not None:
+            body["start_video"] = start_video
+        if draft_task_id is not None:
+            body["draft_task_id"] = draft_task_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = self._transport.request("POST", "/flux/videos", json=body)
+        handle = TaskHandle(_task_id(result), "/flux/tasks", self._transport, submitted=result)
+        if wait:
+            handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
 
 class AsyncFlux:
     """Asynchronous flux client."""
@@ -117,6 +182,65 @@ class AsyncFlux:
             body["callback_url"] = callback_url
         body["async"] = True if async_ is None else async_
         result = await self._transport.request("POST", "/flux/images", json=body)
+        handle = AsyncTaskHandle(_task_id(result), "/flux/tasks", self._transport, submitted=result)
+        if wait:
+            await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
+        return handle
+
+    async def videos(
+        self,
+        *,
+        mode: FluxMode,
+        action: Literal["generate"] | None = None,
+        prompt: str | None = None,
+        aspect_ratio: Literal["21:9", "2:1", "16:9", "4:3", "1:1", "3:4", "9:16", "9:21"]
+        | Literal["auto"]
+        | None = None,
+        duration: int | Literal["auto"] | None = None,
+        resolution: Literal["hd", "fhd", "qhd", "uhd"] | None = None,
+        version: Literal["latest"] | None = None,
+        generate_audio: bool | None = None,
+        safety_tolerance: int | None = None,
+        draft: bool | None = None,
+        model: FluxModel | None = None,
+        keyframes: str | list[Any] | list[str] | None = None,
+        start_video: str | None = None,
+        draft_task_id: str | None = None,
+        async_: bool | None = None,
+        wait: bool = False,
+        poll_interval: float = 3.0,
+        max_wait: float = 600.0,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> AsyncTaskHandle:
+        """Flux Generate Summary"""
+        body: dict[str, Any] = {}
+        body["mode"] = mode
+        body["action"] = action if action is not None else "generate"
+        if prompt is not None:
+            body["prompt"] = prompt
+        body["aspect_ratio"] = aspect_ratio if aspect_ratio is not None else "auto"
+        if duration is not None:
+            body["duration"] = duration
+        body["resolution"] = resolution if resolution is not None else "hd"
+        body["version"] = version if version is not None else "latest"
+        if generate_audio is not None:
+            body["generate_audio"] = generate_audio
+        body["safety_tolerance"] = safety_tolerance if safety_tolerance is not None else 2
+        if draft is not None:
+            body["draft"] = draft
+        body["model"] = model if model is not None else "flux-3"
+        if keyframes is not None:
+            body["keyframes"] = keyframes
+        if start_video is not None:
+            body["start_video"] = start_video
+        if draft_task_id is not None:
+            body["draft_task_id"] = draft_task_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        body["async"] = True if async_ is None else async_
+        result = await self._transport.request("POST", "/flux/videos", json=body)
         handle = AsyncTaskHandle(_task_id(result), "/flux/tasks", self._transport, submitted=result)
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)

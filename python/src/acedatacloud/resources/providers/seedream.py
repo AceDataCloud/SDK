@@ -13,7 +13,6 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
 SeedreamModel = Literal[
     "doubao-seedream-5-0-pro-260628",
-    "doubao-seedream-5-0-260128",
     "doubao-seedream-5-0-lite-260128",
     "doubao-seedream-4-0-250828",
     "doubao-seedream-4-5-251128",

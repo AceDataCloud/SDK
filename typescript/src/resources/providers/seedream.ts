@@ -18,7 +18,7 @@ function taskId(result: Record<string, unknown>): string {
 
 export interface SeedreamGenerateOptions {
   /** Full model ID. Seedream 5.0 Pro supports single-image generation, precise editing, transparent backgrounds, and layer decomposition; Seedream 5.0 Lite supports single or sequential images, streaming, and web search. */
-  model: "doubao-seedream-5-0-pro-260628" | "doubao-seedream-5-0-260128" | "doubao-seedream-5-0-lite-260128" | "doubao-seedream-4-0-250828" | "doubao-seedream-4-5-251128";
+  model: "doubao-seedream-5-0-pro-260628" | "doubao-seedream-5-0-lite-260128" | "doubao-seedream-4-0-250828" | "doubao-seedream-4-5-251128";
   /** Generation or editing prompt. Optional only for Seedream 5.0 Pro layer decomposition, where omission automatically decomposes the main elements. */
   prompt?: string;
   /** One reference image URL/base64 string or an array. Pro accepts up to 10 images in regular mode and exactly one for decomposition; Lite/4.x accept up to 14. Each image must be at most 30 MB. */

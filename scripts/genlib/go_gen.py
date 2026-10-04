@@ -63,6 +63,11 @@ def _to_body(struct: str, svc: Service, ep) -> str:
         go_type = p.go_type()
         zero = {"string": '""', "int": "0", "float64": "0"}.get(go_type)
 
+        if go_type.startswith("*"):
+            lines.append(f"\tif r.{field} != nil {{")
+            lines.append(f"\t\tbody[{key}] = *r.{field}")
+            lines.append("\t}")
+            continue
         if p.required:
             lines.append(f"\tbody[{key}] = r.{field}")
             continue

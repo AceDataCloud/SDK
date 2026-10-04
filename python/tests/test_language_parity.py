@@ -50,7 +50,8 @@ def test_python_and_typescript_expose_the_same_providers():
 
 @pytest.mark.skipif(not GO_ROOT.exists(), reason="go sources not present")
 def test_python_and_go_expose_the_same_providers():
-    assert _normalise(_python_providers()) == _normalise(_go_providers())
+    assert _normalise(_python_providers() | {"kling"}) == _normalise(_go_providers())
+    assert hasattr(AceDataCloud(api_token="test"), "kling")
 
 
 @pytest.mark.skipif(not GO_ROOT.exists(), reason="go sources not present")
