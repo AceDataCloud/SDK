@@ -12,15 +12,15 @@ type Dreamina struct {
 
 // DreaminaGenerateRequest is the input to dreamina.Generate.
 type DreaminaGenerateRequest struct {
-	// Dreamina Videos Image Url
-	ImageURL string
-	// Dreamina Videos Audio Url
+	// Public URL for audio (mp3/wav). The character will lip-sync to it, and it is recommended that the duration be
 	AudioURL string
-	// Dreamina Videos Model
+	// Public URL of portrait images. Clear frontal face effects are best.
+	ImageURL string
+	// The model being used is OmniHuman 1.5.
 	Model string
-	// Dreamina Videos Prompt
+	// Optional text prompts for guiding expressions, emotions, stability, and style.
 	Prompt string
-	// Dreamina Videos Mask Url
+	// Optional subject mask URL (from object detection) to specify and drive a particular person in a multi-person i
 	MaskURL []string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -32,8 +32,8 @@ type DreaminaGenerateRequest struct {
 
 func (r DreaminaGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
-	body["image_url"] = r.ImageURL
 	body["audio_url"] = r.AudioURL
+	body["image_url"] = r.ImageURL
 	if r.Model != "" {
 		body["model"] = r.Model
 	} else {
@@ -60,7 +60,7 @@ func (r DreaminaGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Dreamina Videos
+// Generate Audio-driven talking-photo digital human video generation (OmniHuman 1.5)
 func (c *Dreamina) Generate(ctx context.Context, req DreaminaGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

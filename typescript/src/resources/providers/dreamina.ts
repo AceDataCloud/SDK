@@ -17,15 +17,15 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface DreaminaGenerateOptions {
-  /** Dreamina Videos Image Url */
-  imageUrl: string;
-  /** Dreamina Videos Audio Url */
+  /** Public URL for audio (mp3/wav). The character will lip-sync to it, and it is recommended that the duration be controlled within 60 seconds. */
   audioUrl: string;
-  /** Dreamina Videos Model */
+  /** Public URL of portrait images. Clear frontal face effects are best. */
+  imageUrl: string;
+  /** The model being used is OmniHuman 1.5. */
   model?: "omnihuman-1.5";
-  /** Dreamina Videos Prompt */
+  /** Optional text prompts for guiding expressions, emotions, stability, and style. */
   prompt?: string;
-  /** Dreamina Videos Mask Url */
+  /** Optional subject mask URL (from object detection) to specify and drive a particular person in a multi-person image. */
   maskUrl?: string[];
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -42,11 +42,11 @@ export interface DreaminaGenerateOptions {
 export class Dreamina {
   constructor(private transport: Transport) {}
 
-  /** Dreamina Videos */
+  /** Audio-driven talking-photo digital human video generation (OmniHuman 1.5) */
   async generate(options: DreaminaGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
-    body["image_url"] = options.imageUrl;
     body["audio_url"] = options.audioUrl;
+    body["image_url"] = options.imageUrl;
     body["model"] = options.model ?? "omnihuman-1.5";
     if (options.prompt !== undefined) body["prompt"] = options.prompt;
     if (options.maskUrl !== undefined) body["mask_url"] = options.maskUrl;

@@ -12,25 +12,25 @@ type Luma struct {
 
 // LumaGenerateRequest is the input to luma.Generate.
 type LumaGenerateRequest struct {
-	// Luma Videos Loop
+	// Whether to enable loop playback for the generated video.
 	Loop bool
-	// Luma Videos Action
+	// Operation type. Use `generate` when creating a video for the first time, and use `extend` when continuing an e
 	Action string
-	// Luma Videos Prompt
+	// Text prompts for generating videos.
 	Prompt string
-	// Luma Videos Timeout
+	// The timeout for the API return data (unit: seconds).
 	Timeout float64
-	// Luma Videos Video Id
+	// The unique identifier of the generated video used for the continuation operation (`extend`). If both are speci
 	VideoID string
-	// Luma Videos Aspect Ratio
-	AspectRatio string
-	// Luma Videos Video Url
+	// The original video URL used for the extend operation (`extend`). If `video_id` is specified at the same time,
 	VideoURL string
-	// Luma Videos Enhancement
+	// Whether to enable automatic optimization enhancement for the input prompt text, suitable for use when unsure h
 	Enhancement bool
-	// Luma Videos End Image Url
+	// Generate the aspect ratio of the video, for example `16:9`.
+	AspectRatio string
+	// The URL of the ending frame image, which will be used as the last frame of the generated video.
 	EndImageURL string
-	// Luma Videos Start Image Url
+	// The URL of the starting frame image, which will be used as the first frame of the generated video.
 	StartImageURL string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -59,13 +59,13 @@ func (r LumaGenerateRequest) toBody() map[string]any {
 	if r.VideoID != "" {
 		body["video_id"] = r.VideoID
 	}
-	if r.AspectRatio != "" {
-		body["aspect_ratio"] = r.AspectRatio
-	}
 	if r.VideoURL != "" {
 		body["video_url"] = r.VideoURL
 	}
 	body["enhancement"] = r.Enhancement
+	if r.AspectRatio != "" {
+		body["aspect_ratio"] = r.AspectRatio
+	}
 	if r.EndImageURL != "" {
 		body["end_image_url"] = r.EndImageURL
 	}

@@ -56,7 +56,7 @@ class QwenImage:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Qwen Image Images"""
+        """Call /qwen-image/images."""
         body: dict[str, Any] = {}
         body["model"] = model
         body["prompt"] = prompt
@@ -111,7 +111,7 @@ class AsyncQwenImage:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Qwen Image Images"""
+        """Call /qwen-image/images."""
         body: dict[str, Any] = {}
         body["model"] = model
         body["prompt"] = prompt

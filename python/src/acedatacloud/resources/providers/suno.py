@@ -12,9 +12,6 @@ from typing import Any, Literal  # noqa: F401
 from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 
 SunoModel = Literal[
-    "chirp-v6",
-    "chirp-v6-wild",
-    "chirp-v6-mini",
     "chirp-v5-5",
     "chirp-v5",
     "chirp-v4-5-plus",
@@ -22,13 +19,6 @@ SunoModel = Literal[
     "chirp-v4",
     "chirp-v3-5",
     "chirp-v3-0",
-]
-SunoVariety = Literal[
-    "off",
-    "normal",
-    "high",
-    "extra",
-    "max",
 ]
 SunoAction = Literal[
     "generate",
@@ -41,10 +31,6 @@ SunoAction = Literal[
     "artist_consistency_vox",
     "stems",
     "all_stems",
-    "add_stem",
-    "extract_stem",
-    "sounds",
-    "adjust_speed",
     "replace_section",
     "underpainting",
     "overpainting",
@@ -52,20 +38,6 @@ SunoAction = Literal[
     "mashup",
     "samples",
     "inspo",
-]
-SunoStemType = Literal[
-    "vocals",
-    "backing_vocals",
-    "drums",
-    "bass",
-    "guitar",
-    "keyboard",
-    "percussion",
-    "strings",
-    "synth",
-    "fx",
-    "brass",
-    "woodwinds",
 ]
 
 
@@ -92,43 +64,32 @@ class Suno:
         *,
         lyric: str | None = None,
         model: SunoModel | None = None,
-        max_mode: bool | None = None,
-        variety: SunoVariety | None = None,
         style: str | None = None,
-        variation_category: Literal["high", "normal", "subtle"] | None = None,
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: str | None = None,
-        lyric_prompt: str | None = None,
+        prompt: dict[str, Any] | None = None,
         audio_id: str | None = None,
-        stem_type: SunoStemType | None = None,
-        audio_format: Literal["mp3"] | None = None,
-        sound: str | None = None,
-        sound_type: Literal["one-shot", "loop"] | None = None,
-        bpm: int | None = None,
-        key: str | None = None,
-        speed_multiplier: float | None = None,
-        keep_pitch: bool | None = None,
-        mashup_audio_ids: list[str] | None = None,
-        audio_urls: list[str] | None = None,
+        duration: int | None = None,
         weirdness: float | None = None,
+        audio_urls: list[str] | None = None,
         persona_id: str | None = None,
-        overpainting_start: float | None = None,
-        overpainting_end: float | None = None,
-        samples_start: float | None = None,
-        samples_end: float | None = None,
-        underpainting_start: float | None = None,
-        underpainting_end: float | None = None,
         continue_at: float | None = None,
+        samples_end: float | None = None,
+        audio_weight: float | None = None,
         instrumental: bool | None = None,
-        vocal_gender: Literal["f", "m"] | None = None,
+        lyric_prompt: dict[str, Any] | None = None,
+        vocal_gender: str | None = None,
+        samples_start: float | None = None,
         negative_tags: str | None = None,
         style_influence: float | None = None,
-        audio_weight: float | None = None,
-        duration: int | None = None,
+        mashup_audio_ids: list[str] | None = None,
+        overpainting_end: float | None = None,
+        underpainting_end: float | None = None,
+        overpainting_start: float | None = None,
+        variation_category: str | None = None,
         replace_section_end: float | None = None,
-        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
+        underpainting_start: float | None = None,
         replace_section_start: float | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -137,83 +98,64 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Suno Audios"""
+        """Suno AI music generation API, generates 2 songs per request with extension support."""
         body: dict[str, Any] = {}
         if lyric is not None:
             body["lyric"] = lyric
         if model is not None:
             body["model"] = model
-        body["max_mode"] = max_mode if max_mode is not None else False
-        if variety is not None:
-            body["variety"] = variety
         if style is not None:
             body["style"] = style
-        if variation_category is not None:
-            body["variation_category"] = variation_category
         if title is not None:
             body["title"] = title
-        body["action"] = action if action is not None else "generate"
-        body["custom"] = custom if custom is not None else False
+        if action is not None:
+            body["action"] = action
+        if custom is not None:
+            body["custom"] = custom
         if prompt is not None:
             body["prompt"] = prompt
-        if lyric_prompt is not None:
-            body["lyric_prompt"] = lyric_prompt
         if audio_id is not None:
             body["audio_id"] = audio_id
-        if stem_type is not None:
-            body["stem_type"] = stem_type
-        if audio_format is not None:
-            body["audio_format"] = audio_format
-        if sound is not None:
-            body["sound"] = sound
-        if sound_type is not None:
-            body["sound_type"] = sound_type
-        if bpm is not None:
-            body["bpm"] = bpm
-        if key is not None:
-            body["key"] = key
-        if speed_multiplier is not None:
-            body["speed_multiplier"] = speed_multiplier
-        body["keep_pitch"] = keep_pitch if keep_pitch is not None else False
-        if mashup_audio_ids is not None:
-            body["mashup_audio_ids"] = mashup_audio_ids
-        if audio_urls is not None:
-            body["audio_urls"] = audio_urls
+        if duration is not None:
+            body["duration"] = duration
         if weirdness is not None:
             body["weirdness"] = weirdness
+        if audio_urls is not None:
+            body["audio_urls"] = audio_urls
         if persona_id is not None:
             body["persona_id"] = persona_id
-        if overpainting_start is not None:
-            body["overpainting_start"] = overpainting_start
-        if overpainting_end is not None:
-            body["overpainting_end"] = overpainting_end
-        if samples_start is not None:
-            body["samples_start"] = samples_start
-        if samples_end is not None:
-            body["samples_end"] = samples_end
-        if underpainting_start is not None:
-            body["underpainting_start"] = underpainting_start
-        if underpainting_end is not None:
-            body["underpainting_end"] = underpainting_end
         if continue_at is not None:
             body["continue_at"] = continue_at
+        if samples_end is not None:
+            body["samples_end"] = samples_end
+        if audio_weight is not None:
+            body["audio_weight"] = audio_weight
         if instrumental is not None:
             body["instrumental"] = instrumental
+        if lyric_prompt is not None:
+            body["lyric_prompt"] = lyric_prompt
         if vocal_gender is not None:
             body["vocal_gender"] = vocal_gender
+        if samples_start is not None:
+            body["samples_start"] = samples_start
         if negative_tags is not None:
             body["negative_tags"] = negative_tags
         if style_influence is not None:
             body["style_influence"] = style_influence
-        if audio_weight is not None:
-            body["audio_weight"] = audio_weight
-        if duration is not None:
-            body["duration"] = duration
+        if mashup_audio_ids is not None:
+            body["mashup_audio_ids"] = mashup_audio_ids
+        if overpainting_end is not None:
+            body["overpainting_end"] = overpainting_end
+        if underpainting_end is not None:
+            body["underpainting_end"] = underpainting_end
+        if overpainting_start is not None:
+            body["overpainting_start"] = overpainting_start
+        if variation_category is not None:
+            body["variation_category"] = variation_category
         if replace_section_end is not None:
             body["replace_section_end"] = replace_section_end
-        body["replace_section_result_mode"] = (
-            replace_section_result_mode if replace_section_result_mode is not None else "full_song"
-        )
+        if underpainting_start is not None:
+            body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
             body["replace_section_start"] = replace_section_start
         body.update(extra)
@@ -231,25 +173,25 @@ class Suno:
         *,
         name: str,
         audio_id: str,
-        vox_audio_id: str | None = None,
-        vocal_start: float | None = None,
         vocal_end: float | None = None,
         description: str | None = None,
+        vocal_start: float | None = None,
+        vox_audio_id: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Persona"""
+        """Suno singer style API, set song style based on a generated song ID."""
         body: dict[str, Any] = {}
         body["name"] = name
         body["audio_id"] = audio_id
-        if vox_audio_id is not None:
-            body["vox_audio_id"] = vox_audio_id
-        if vocal_start is not None:
-            body["vocal_start"] = vocal_start
         if vocal_end is not None:
             body["vocal_end"] = vocal_end
         if description is not None:
             body["description"] = description
+        if vocal_start is not None:
+            body["vocal_start"] = vocal_start
+        if vox_audio_id is not None:
+            body["vox_audio_id"] = vox_audio_id
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -262,7 +204,7 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Mp4"""
+        """Suno MP4 API, get MP4 file link via audio_id."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -279,7 +221,9 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Voices"""
+        """Suno Voice Clone API. Create a custom voice persona from an uploaded audio file for voice cloning in music
+        generation.
+        """
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
         if name is not None:
@@ -298,7 +242,7 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Timing"""
+        """Suno timeline API, get lyrics and audio timeline of generated music."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -310,8 +254,8 @@ class Suno:
         self,
         *,
         audio_id: str,
-        vocal_start: float,
-        vocal_end: float,
+        vocal_end: float | None = None,
+        vocal_start: float | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -319,11 +263,15 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Suno Vox"""
+        """Suno vocal/instrumental stems API. Pass an audio_id to asynchronously produce vocal-only and
+        instrumental-only stem files for remixing and creative reuse.
+        """
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
-        body["vocal_start"] = vocal_start
-        body["vocal_end"] = vocal_end
+        if vocal_end is not None:
+            body["vocal_end"] = vocal_end
+        if vocal_start is not None:
+            body["vocal_start"] = vocal_start
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -345,7 +293,7 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Suno Wav"""
+        """SUNO allows generating higher quality wav files based on the existing audio_id."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -369,7 +317,7 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Suno Midi"""
+        """Suno MIDI API, retrieve MIDI data from generated music."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -389,7 +337,7 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Style"""
+        """SUNO allows us to input prompts to generate enhanced song styles."""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body.update(extra)
@@ -401,11 +349,13 @@ class Suno:
         self,
         *,
         model: SunoModel,
-        prompt: str,
+        prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Lyrics"""
+        """Suno lyrics generation API. Generates structured song lyrics from a prompt; supports the default and
+        remi-v1 models.
+        """
         body: dict[str, Any] = {}
         body["model"] = model
         body["prompt"] = prompt
@@ -422,7 +372,7 @@ class Suno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Mashup Lyrics"""
+        """Suno mashup lyrics API, merge two lyrics into a blended version."""
         body: dict[str, Any] = {}
         body["lyrics_a"] = lyrics_a
         body["lyrics_b"] = lyrics_b
@@ -435,17 +385,12 @@ class Suno:
         self,
         *,
         audio_url: str,
-        mode: Literal["standard", "enhanced"] | None = None,
-        name: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Upload"""
+        """Suno reference audio upload API, upload audio to get an audio_id for extended generation."""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
-        body["mode"] = mode if mode is not None else "standard"
-        if name is not None:
-            body["name"] = name
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -487,43 +432,32 @@ class AsyncSuno:
         *,
         lyric: str | None = None,
         model: SunoModel | None = None,
-        max_mode: bool | None = None,
-        variety: SunoVariety | None = None,
         style: str | None = None,
-        variation_category: Literal["high", "normal", "subtle"] | None = None,
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: str | None = None,
-        lyric_prompt: str | None = None,
+        prompt: dict[str, Any] | None = None,
         audio_id: str | None = None,
-        stem_type: SunoStemType | None = None,
-        audio_format: Literal["mp3"] | None = None,
-        sound: str | None = None,
-        sound_type: Literal["one-shot", "loop"] | None = None,
-        bpm: int | None = None,
-        key: str | None = None,
-        speed_multiplier: float | None = None,
-        keep_pitch: bool | None = None,
-        mashup_audio_ids: list[str] | None = None,
-        audio_urls: list[str] | None = None,
+        duration: int | None = None,
         weirdness: float | None = None,
+        audio_urls: list[str] | None = None,
         persona_id: str | None = None,
-        overpainting_start: float | None = None,
-        overpainting_end: float | None = None,
-        samples_start: float | None = None,
-        samples_end: float | None = None,
-        underpainting_start: float | None = None,
-        underpainting_end: float | None = None,
         continue_at: float | None = None,
+        samples_end: float | None = None,
+        audio_weight: float | None = None,
         instrumental: bool | None = None,
-        vocal_gender: Literal["f", "m"] | None = None,
+        lyric_prompt: dict[str, Any] | None = None,
+        vocal_gender: str | None = None,
+        samples_start: float | None = None,
         negative_tags: str | None = None,
         style_influence: float | None = None,
-        audio_weight: float | None = None,
-        duration: int | None = None,
+        mashup_audio_ids: list[str] | None = None,
+        overpainting_end: float | None = None,
+        underpainting_end: float | None = None,
+        overpainting_start: float | None = None,
+        variation_category: str | None = None,
         replace_section_end: float | None = None,
-        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
+        underpainting_start: float | None = None,
         replace_section_start: float | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -532,83 +466,64 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Suno Audios"""
+        """Suno AI music generation API, generates 2 songs per request with extension support."""
         body: dict[str, Any] = {}
         if lyric is not None:
             body["lyric"] = lyric
         if model is not None:
             body["model"] = model
-        body["max_mode"] = max_mode if max_mode is not None else False
-        if variety is not None:
-            body["variety"] = variety
         if style is not None:
             body["style"] = style
-        if variation_category is not None:
-            body["variation_category"] = variation_category
         if title is not None:
             body["title"] = title
-        body["action"] = action if action is not None else "generate"
-        body["custom"] = custom if custom is not None else False
+        if action is not None:
+            body["action"] = action
+        if custom is not None:
+            body["custom"] = custom
         if prompt is not None:
             body["prompt"] = prompt
-        if lyric_prompt is not None:
-            body["lyric_prompt"] = lyric_prompt
         if audio_id is not None:
             body["audio_id"] = audio_id
-        if stem_type is not None:
-            body["stem_type"] = stem_type
-        if audio_format is not None:
-            body["audio_format"] = audio_format
-        if sound is not None:
-            body["sound"] = sound
-        if sound_type is not None:
-            body["sound_type"] = sound_type
-        if bpm is not None:
-            body["bpm"] = bpm
-        if key is not None:
-            body["key"] = key
-        if speed_multiplier is not None:
-            body["speed_multiplier"] = speed_multiplier
-        body["keep_pitch"] = keep_pitch if keep_pitch is not None else False
-        if mashup_audio_ids is not None:
-            body["mashup_audio_ids"] = mashup_audio_ids
-        if audio_urls is not None:
-            body["audio_urls"] = audio_urls
+        if duration is not None:
+            body["duration"] = duration
         if weirdness is not None:
             body["weirdness"] = weirdness
+        if audio_urls is not None:
+            body["audio_urls"] = audio_urls
         if persona_id is not None:
             body["persona_id"] = persona_id
-        if overpainting_start is not None:
-            body["overpainting_start"] = overpainting_start
-        if overpainting_end is not None:
-            body["overpainting_end"] = overpainting_end
-        if samples_start is not None:
-            body["samples_start"] = samples_start
-        if samples_end is not None:
-            body["samples_end"] = samples_end
-        if underpainting_start is not None:
-            body["underpainting_start"] = underpainting_start
-        if underpainting_end is not None:
-            body["underpainting_end"] = underpainting_end
         if continue_at is not None:
             body["continue_at"] = continue_at
+        if samples_end is not None:
+            body["samples_end"] = samples_end
+        if audio_weight is not None:
+            body["audio_weight"] = audio_weight
         if instrumental is not None:
             body["instrumental"] = instrumental
+        if lyric_prompt is not None:
+            body["lyric_prompt"] = lyric_prompt
         if vocal_gender is not None:
             body["vocal_gender"] = vocal_gender
+        if samples_start is not None:
+            body["samples_start"] = samples_start
         if negative_tags is not None:
             body["negative_tags"] = negative_tags
         if style_influence is not None:
             body["style_influence"] = style_influence
-        if audio_weight is not None:
-            body["audio_weight"] = audio_weight
-        if duration is not None:
-            body["duration"] = duration
+        if mashup_audio_ids is not None:
+            body["mashup_audio_ids"] = mashup_audio_ids
+        if overpainting_end is not None:
+            body["overpainting_end"] = overpainting_end
+        if underpainting_end is not None:
+            body["underpainting_end"] = underpainting_end
+        if overpainting_start is not None:
+            body["overpainting_start"] = overpainting_start
+        if variation_category is not None:
+            body["variation_category"] = variation_category
         if replace_section_end is not None:
             body["replace_section_end"] = replace_section_end
-        body["replace_section_result_mode"] = (
-            replace_section_result_mode if replace_section_result_mode is not None else "full_song"
-        )
+        if underpainting_start is not None:
+            body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
             body["replace_section_start"] = replace_section_start
         body.update(extra)
@@ -626,25 +541,25 @@ class AsyncSuno:
         *,
         name: str,
         audio_id: str,
-        vox_audio_id: str | None = None,
-        vocal_start: float | None = None,
         vocal_end: float | None = None,
         description: str | None = None,
+        vocal_start: float | None = None,
+        vox_audio_id: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Persona"""
+        """Suno singer style API, set song style based on a generated song ID."""
         body: dict[str, Any] = {}
         body["name"] = name
         body["audio_id"] = audio_id
-        if vox_audio_id is not None:
-            body["vox_audio_id"] = vox_audio_id
-        if vocal_start is not None:
-            body["vocal_start"] = vocal_start
         if vocal_end is not None:
             body["vocal_end"] = vocal_end
         if description is not None:
             body["description"] = description
+        if vocal_start is not None:
+            body["vocal_start"] = vocal_start
+        if vox_audio_id is not None:
+            body["vox_audio_id"] = vox_audio_id
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -657,7 +572,7 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Mp4"""
+        """Suno MP4 API, get MP4 file link via audio_id."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -674,7 +589,9 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Voices"""
+        """Suno Voice Clone API. Create a custom voice persona from an uploaded audio file for voice cloning in music
+        generation.
+        """
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
         if name is not None:
@@ -693,7 +610,7 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Timing"""
+        """Suno timeline API, get lyrics and audio timeline of generated music."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -705,8 +622,8 @@ class AsyncSuno:
         self,
         *,
         audio_id: str,
-        vocal_start: float,
-        vocal_end: float,
+        vocal_end: float | None = None,
+        vocal_start: float | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -714,11 +631,15 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Suno Vox"""
+        """Suno vocal/instrumental stems API. Pass an audio_id to asynchronously produce vocal-only and
+        instrumental-only stem files for remixing and creative reuse.
+        """
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
-        body["vocal_start"] = vocal_start
-        body["vocal_end"] = vocal_end
+        if vocal_end is not None:
+            body["vocal_end"] = vocal_end
+        if vocal_start is not None:
+            body["vocal_start"] = vocal_start
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -740,7 +661,7 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Suno Wav"""
+        """SUNO allows generating higher quality wav files based on the existing audio_id."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -764,7 +685,7 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Suno Midi"""
+        """Suno MIDI API, retrieve MIDI data from generated music."""
         body: dict[str, Any] = {}
         body["audio_id"] = audio_id
         body.update(extra)
@@ -784,7 +705,7 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Style"""
+        """SUNO allows us to input prompts to generate enhanced song styles."""
         body: dict[str, Any] = {}
         body["prompt"] = prompt
         body.update(extra)
@@ -796,11 +717,13 @@ class AsyncSuno:
         self,
         *,
         model: SunoModel,
-        prompt: str,
+        prompt: dict[str, Any],
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Lyrics"""
+        """Suno lyrics generation API. Generates structured song lyrics from a prompt; supports the default and
+        remi-v1 models.
+        """
         body: dict[str, Any] = {}
         body["model"] = model
         body["prompt"] = prompt
@@ -817,7 +740,7 @@ class AsyncSuno:
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Mashup Lyrics"""
+        """Suno mashup lyrics API, merge two lyrics into a blended version."""
         body: dict[str, Any] = {}
         body["lyrics_a"] = lyrics_a
         body["lyrics_b"] = lyrics_b
@@ -830,17 +753,12 @@ class AsyncSuno:
         self,
         *,
         audio_url: str,
-        mode: Literal["standard", "enhanced"] | None = None,
-        name: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Suno Upload"""
+        """Suno reference audio upload API, upload audio to get an audio_id for extended generation."""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
-        body["mode"] = mode if mode is not None else "standard"
-        if name is not None:
-            body["name"] = name
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

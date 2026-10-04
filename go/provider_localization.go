@@ -12,13 +12,13 @@ type Localization struct {
 
 // LocalizationTranslateRequest is the input to localization.Translate.
 type LocalizationTranslateRequest struct {
-	// Localization Translate Input
-	Input any
-	// Localization Translate Locale
+	// Please provide the content that needs to be translated.
+	Input map[string]any
+	// The target language area to be translated to.
 	Locale string
-	// Localization Translate Extension
+	// The file type of the input text (such as `json` or `md`).
 	Extension string
-	// Localization Translate Model
+	// The large language model used for translation is `gpt-3.5` by default.
 	Model string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string

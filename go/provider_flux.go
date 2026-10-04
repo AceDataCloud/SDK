@@ -12,17 +12,17 @@ type Flux struct {
 
 // FluxGenerateRequest is the input to flux.Generate.
 type FluxGenerateRequest struct {
-	// Flux Images Size
+	// Image size specifications.
 	Size string
-	// Flux Images Action
+	// Types of operations for generating images. If it is `generate`, a new image will be created based on the promp
 	Action string
-	// Flux Images Prompt
+	// Prompts for generating images.
 	Prompt string
-	// Flux Images Count
+	// Number of generated images.
 	Count float64
-	// Flux Images Model
+	// Model used for generating images.
 	Model string
-	// Flux Images Image Url
+	// Link to the original image that needs editing.
 	ImageURL string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -61,7 +61,7 @@ func (r FluxGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Flux Images
+// Generate Flux AI image generation API, generates 1 image per request.
 func (c *Flux) Generate(ctx context.Context, req FluxGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

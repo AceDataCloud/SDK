@@ -34,20 +34,21 @@ class Fish:
         self,
         *,
         text: str,
-        reference_id: str | list[str] | None = None,
-        format: Literal["mp3", "wav", "pcm"] | None = None,
-        sample_rate: int | None = None,
-        mp3_bitrate: int | None = None,
-        latency: Literal["normal", "balanced"] | None = None,
-        chunk_length: int | None = None,
-        min_chunk_length: int | None = None,
-        temperature: float | None = None,
         top_p: float | None = None,
-        repetition_penalty: float | None = None,
-        max_new_tokens: int | None = None,
-        normalize: bool | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
+        latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
+        normalize: bool | None = None,
         references: list[dict[str, str]] | None = None,
+        mp3_bitrate: int | None = None,
+        sample_rate: int | None = None,
+        temperature: float | None = None,
+        chunk_length: int | None = None,
+        opus_bitrate: int | None = None,
+        reference_id: str | list[str] | None = None,
+        max_new_tokens: int | None = None,
+        min_chunk_length: int | None = None,
+        repetition_penalty: float | None = None,
         model: Literal["s1", "s2-pro", "s2.1-pro"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -56,37 +57,39 @@ class Fish:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Fish Tts"""
+        """Fish Audio text-to-speech API — convert text into natural speech using a chosen voice model."""
         body: dict[str, Any] = {}
         body["text"] = text
-        if reference_id is not None:
-            body["reference_id"] = reference_id
-        if format is not None:
-            body["format"] = format
-        if sample_rate is not None:
-            body["sample_rate"] = sample_rate
-        if mp3_bitrate is not None:
-            body["mp3_bitrate"] = mp3_bitrate
-        if latency is not None:
-            body["latency"] = latency
-        if chunk_length is not None:
-            body["chunk_length"] = chunk_length
-        if min_chunk_length is not None:
-            body["min_chunk_length"] = min_chunk_length
-        if temperature is not None:
-            body["temperature"] = temperature
         if top_p is not None:
             body["top_p"] = top_p
-        if repetition_penalty is not None:
-            body["repetition_penalty"] = repetition_penalty
-        if max_new_tokens is not None:
-            body["max_new_tokens"] = max_new_tokens
-        if normalize is not None:
-            body["normalize"] = normalize
+        if format is not None:
+            body["format"] = format
+        if latency is not None:
+            body["latency"] = latency
         if prosody is not None:
             body["prosody"] = prosody
+        if normalize is not None:
+            body["normalize"] = normalize
         if references is not None:
             body["references"] = references
+        if mp3_bitrate is not None:
+            body["mp3_bitrate"] = mp3_bitrate
+        if sample_rate is not None:
+            body["sample_rate"] = sample_rate
+        if temperature is not None:
+            body["temperature"] = temperature
+        if chunk_length is not None:
+            body["chunk_length"] = chunk_length
+        if opus_bitrate is not None:
+            body["opus_bitrate"] = opus_bitrate
+        if reference_id is not None:
+            body["reference_id"] = reference_id
+        if max_new_tokens is not None:
+            body["max_new_tokens"] = max_new_tokens
+        if min_chunk_length is not None:
+            body["min_chunk_length"] = min_chunk_length
+        if repetition_penalty is not None:
+            body["repetition_penalty"] = repetition_penalty
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -103,31 +106,34 @@ class Fish:
         *,
         title: str,
         voices: str,
-        description: str | None = None,
-        cover_image: str | None = None,
         tags: list[str] | None = None,
         texts: list[str] | None = None,
-        enhance_audio_quality: bool | None = None,
+        visibility: Literal["public", "private"] | None = None,
+        cover_image: str | None = None,
+        description: str | None = None,
         generate_sample: bool | None = None,
+        enhance_audio_quality: bool | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Fish Model Create"""
+        """Fish Audio model creation API — upload reference audio to create a custom voice-clone model."""
         body: dict[str, Any] = {}
         body["title"] = title
         body["voices"] = voices
-        if description is not None:
-            body["description"] = description
-        if cover_image is not None:
-            body["cover_image"] = cover_image
         if tags is not None:
             body["tags"] = tags
         if texts is not None:
             body["texts"] = texts
-        if enhance_audio_quality is not None:
-            body["enhance_audio_quality"] = enhance_audio_quality
+        if visibility is not None:
+            body["visibility"] = visibility
+        if cover_image is not None:
+            body["cover_image"] = cover_image
+        if description is not None:
+            body["description"] = description
         if generate_sample is not None:
             body["generate_sample"] = generate_sample
+        if enhance_audio_quality is not None:
+            body["enhance_audio_quality"] = enhance_audio_quality
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -144,20 +150,21 @@ class AsyncFish:
         self,
         *,
         text: str,
-        reference_id: str | list[str] | None = None,
-        format: Literal["mp3", "wav", "pcm"] | None = None,
-        sample_rate: int | None = None,
-        mp3_bitrate: int | None = None,
-        latency: Literal["normal", "balanced"] | None = None,
-        chunk_length: int | None = None,
-        min_chunk_length: int | None = None,
-        temperature: float | None = None,
         top_p: float | None = None,
-        repetition_penalty: float | None = None,
-        max_new_tokens: int | None = None,
-        normalize: bool | None = None,
+        format: Literal["mp3", "wav", "pcm"] | None = None,
+        latency: Literal["normal", "balanced"] | None = None,
         prosody: dict[str, Any] | None = None,
+        normalize: bool | None = None,
         references: list[dict[str, str]] | None = None,
+        mp3_bitrate: int | None = None,
+        sample_rate: int | None = None,
+        temperature: float | None = None,
+        chunk_length: int | None = None,
+        opus_bitrate: int | None = None,
+        reference_id: str | list[str] | None = None,
+        max_new_tokens: int | None = None,
+        min_chunk_length: int | None = None,
+        repetition_penalty: float | None = None,
         model: Literal["s1", "s2-pro", "s2.1-pro"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -166,37 +173,39 @@ class AsyncFish:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Fish Tts"""
+        """Fish Audio text-to-speech API — convert text into natural speech using a chosen voice model."""
         body: dict[str, Any] = {}
         body["text"] = text
-        if reference_id is not None:
-            body["reference_id"] = reference_id
-        if format is not None:
-            body["format"] = format
-        if sample_rate is not None:
-            body["sample_rate"] = sample_rate
-        if mp3_bitrate is not None:
-            body["mp3_bitrate"] = mp3_bitrate
-        if latency is not None:
-            body["latency"] = latency
-        if chunk_length is not None:
-            body["chunk_length"] = chunk_length
-        if min_chunk_length is not None:
-            body["min_chunk_length"] = min_chunk_length
-        if temperature is not None:
-            body["temperature"] = temperature
         if top_p is not None:
             body["top_p"] = top_p
-        if repetition_penalty is not None:
-            body["repetition_penalty"] = repetition_penalty
-        if max_new_tokens is not None:
-            body["max_new_tokens"] = max_new_tokens
-        if normalize is not None:
-            body["normalize"] = normalize
+        if format is not None:
+            body["format"] = format
+        if latency is not None:
+            body["latency"] = latency
         if prosody is not None:
             body["prosody"] = prosody
+        if normalize is not None:
+            body["normalize"] = normalize
         if references is not None:
             body["references"] = references
+        if mp3_bitrate is not None:
+            body["mp3_bitrate"] = mp3_bitrate
+        if sample_rate is not None:
+            body["sample_rate"] = sample_rate
+        if temperature is not None:
+            body["temperature"] = temperature
+        if chunk_length is not None:
+            body["chunk_length"] = chunk_length
+        if opus_bitrate is not None:
+            body["opus_bitrate"] = opus_bitrate
+        if reference_id is not None:
+            body["reference_id"] = reference_id
+        if max_new_tokens is not None:
+            body["max_new_tokens"] = max_new_tokens
+        if min_chunk_length is not None:
+            body["min_chunk_length"] = min_chunk_length
+        if repetition_penalty is not None:
+            body["repetition_penalty"] = repetition_penalty
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -213,31 +222,34 @@ class AsyncFish:
         *,
         title: str,
         voices: str,
-        description: str | None = None,
-        cover_image: str | None = None,
         tags: list[str] | None = None,
         texts: list[str] | None = None,
-        enhance_audio_quality: bool | None = None,
+        visibility: Literal["public", "private"] | None = None,
+        cover_image: str | None = None,
+        description: str | None = None,
         generate_sample: bool | None = None,
+        enhance_audio_quality: bool | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
-        """Fish Model Create"""
+        """Fish Audio model creation API — upload reference audio to create a custom voice-clone model."""
         body: dict[str, Any] = {}
         body["title"] = title
         body["voices"] = voices
-        if description is not None:
-            body["description"] = description
-        if cover_image is not None:
-            body["cover_image"] = cover_image
         if tags is not None:
             body["tags"] = tags
         if texts is not None:
             body["texts"] = texts
-        if enhance_audio_quality is not None:
-            body["enhance_audio_quality"] = enhance_audio_quality
+        if visibility is not None:
+            body["visibility"] = visibility
+        if cover_image is not None:
+            body["cover_image"] = cover_image
+        if description is not None:
+            body["description"] = description
         if generate_sample is not None:
             body["generate_sample"] = generate_sample
+        if enhance_audio_quality is not None:
+            body["enhance_audio_quality"] = enhance_audio_quality
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

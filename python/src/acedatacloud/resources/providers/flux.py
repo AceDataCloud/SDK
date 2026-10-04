@@ -63,7 +63,7 @@ class Flux:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Flux Images"""
+        """Flux AI image generation API, generates 1 image per request."""
         body: dict[str, Any] = {}
         body["size"] = size
         body["action"] = action
@@ -166,7 +166,7 @@ class AsyncFlux:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Flux Images"""
+        """Flux AI image generation API, generates 1 image per request."""
         body: dict[str, Any] = {}
         body["size"] = size
         body["action"] = action

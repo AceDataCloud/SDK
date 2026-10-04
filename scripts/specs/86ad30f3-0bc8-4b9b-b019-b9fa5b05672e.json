@@ -2,7 +2,7 @@
   "paths": {
     "/seedream/images": {
       "post": {
-        "summary": "Seedream Images",
+        "summary": "$t(api_description_seedream_images)",
         "security": [
           {
             "bearerAuth": []
@@ -28,37 +28,37 @@
                   "properties": {
                     "success": {
                       "type": "boolean",
-                      "description": "Seedream Images Response 200 Success"
+                      "description": "标识本次请求是否成功的布尔标志。"
                     },
                     "task_id": {
                       "type": "string",
-                      "description": "Seedream Images Response 200 Task Id"
+                      "description": "本次请求的任务 ID。"
                     },
                     "trace_id": {
                       "type": "string",
-                      "description": "Seedream Images Response 200 Trace Id"
+                      "description": "本次请求的追踪 ID。"
                     },
                     "data": {
                       "type": "array",
-                      "description": "Seedream Images Response 200 Data",
+                      "description": "根据提示词生成或编辑的输出图像列表。",
                       "items": {
                         "type": "object",
                         "properties": {
                           "prompt": {
                             "type": "string",
-                            "description": "Seedream Images Response 200 Data Prompt"
+                            "description": "生成时所使用的提示词"
                           },
                           "image_url": {
                             "type": "string",
-                            "description": "Seedream Images Response 200 Data Image Url"
+                            "description": "封面或预览图片的 URL"
                           },
                           "b64_json": {
                             "type": "string",
-                            "description": "Seedream Images Response 200 Data B64 Json"
+                            "description": "response_format=b64_json 时返回的 Base64 图片。"
                           },
                           "size": {
                             "type": "string",
-                            "description": "Seedream Images Response 200 Data Size"
+                            "description": "该输出图片的实际宽高，格式为 <宽>x<高>。"
                           },
                           "output_format": {
                             "type": "string",
@@ -66,11 +66,11 @@
                               "jpeg",
                               "png"
                             ],
-                            "description": "Seedream Images Response 200 Data Output Format"
+                            "description": "该输出图片的格式。拆分图层始终为 PNG。"
                           },
                           "error": {
                             "type": "object",
-                            "description": "Seedream Images Response 200 Data Error",
+                            "description": "Lite 组图中单个输出失败时的错误；其他成功输出仍会保留。",
                             "properties": {
                               "code": {
                                 "type": "string"
@@ -83,19 +83,19 @@
                           "z_index": {
                             "type": "integer",
                             "minimum": 0,
-                            "description": "Seedream Images Response 200 Data Z Index"
+                            "description": "图层叠放顺序；底图为 0，值越大越靠上。"
                           },
                           "name": {
                             "type": "string",
-                            "description": "Seedream Images Response 200 Data Name"
+                            "description": "模型识别出的图层名称。"
                           },
                           "description": {
                             "type": "string",
-                            "description": "Seedream Images Response 200 Data Description"
+                            "description": "模型生成的图层内容描述。"
                           },
                           "bounding_box": {
                             "type": "object",
-                            "description": "Seedream Images Response 200 Data Bounding Box",
+                            "description": "图层在底图中的 absolute 像素坐标与 normalized 归一化坐标。",
                             "properties": {
                               "absolute": {
                                 "type": "array",
@@ -122,7 +122,7 @@
                     },
                     "usage": {
                       "type": "object",
-                      "description": "Seedream Images Response 200 Usage",
+                      "description": "本次请求的最终可信用量，仅成功生成的图片计入 generated_images。",
                       "properties": {
                         "generated_images": {
                           "type": "integer",
@@ -153,7 +153,7 @@
                     },
                     "tools": {
                       "type": "array",
-                      "description": "Seedream Images Response 200 Tools",
+                      "description": "本次请求实际调用的工具列表。",
                       "items": {
                         "type": "object",
                         "properties": {
@@ -176,7 +176,7 @@
                 "example": "{\"type\":\"image_generation.partial_succeeded\",\"data\":[{\"image_url\":\"https://...\",\"size\":\"2048x2048\"}]}\\n"
               }
             },
-            "description": "Seedream Images Response 200"
+            "description": "请求成功（OK）。"
           },
           "400": {
             "content": {
@@ -199,18 +199,18 @@
                             "code": {
                               "type": "string",
                               "example": "token_mismatched",
-                              "description": "Seedream Images Response 400 Error Code"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "The specified token is not matched with API.",
-                              "description": "Seedream Images Response 400 Error Message"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 400 Trace Id"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     },
@@ -230,18 +230,18 @@
                             "code": {
                               "type": "string",
                               "example": "api_not_implemented",
-                              "description": "Seedream Images Response 400 Error Code 2"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "The API is not implemented.",
-                              "description": "Seedream Images Response 400 Error Message 2"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 400 Trace Id 2"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     },
@@ -261,18 +261,18 @@
                             "code": {
                               "type": "string",
                               "example": "disabled",
-                              "description": "Seedream Images Response 400 Error Code 3"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
-                              "description": "Seedream Images Response 400 Error Message 3"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 400 Trace Id 3"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     },
@@ -292,18 +292,18 @@
                             "code": {
                               "type": "string",
                               "example": "bad_request",
-                              "description": "Seedream Images Response 400 Error Code 4"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "model is invalid.",
-                              "description": "Seedream Images Response 400 Error Message 4"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 400 Trace Id 4"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     },
@@ -323,18 +323,18 @@
                             "code": {
                               "type": "string",
                               "example": "no_token",
-                              "description": "Seedream Images Response 400 Error Code 5"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "No token specified for the request.",
-                              "description": "Seedream Images Response 400 Error Message 5"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 400 Trace Id 5"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     }
@@ -342,7 +342,7 @@
                 }
               }
             },
-            "description": "Seedream Images Response 400"
+            "description": "请求错误，可能是参数缺失或无效。"
           },
           "401": {
             "content": {
@@ -365,18 +365,18 @@
                             "code": {
                               "type": "string",
                               "example": "invalid_token",
-                              "description": "Seedream Images Response 401 Error Code"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "The specified token is invalid or wrong.",
-                              "description": "Seedream Images Response 401 Error Message"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 401 Trace Id"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     },
@@ -396,18 +396,18 @@
                             "code": {
                               "type": "string",
                               "example": "token_expired",
-                              "description": "Seedream Images Response 401 Error Code 2"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "token expired.",
-                              "description": "Seedream Images Response 401 Error Message 2"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 401 Trace Id 2"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     },
@@ -427,18 +427,18 @@
                             "code": {
                               "type": "string",
                               "example": "token_mismatched",
-                              "description": "Seedream Images Response 401 Error Code 3"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "token and api does not match.",
-                              "description": "Seedream Images Response 401 Error Message 3"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 401 Trace Id 3"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     }
@@ -446,7 +446,7 @@
                 }
               }
             },
-            "description": "Seedream Images Response 401"
+            "description": "未授权，授权令牌无效或缺失。"
           },
           "403": {
             "content": {
@@ -469,18 +469,18 @@
                             "code": {
                               "type": "string",
                               "example": "used_up",
-                              "description": "Seedream Images Response 403 Error Code"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
-                              "description": "Seedream Images Response 403 Error Message"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 403 Trace Id"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     }
@@ -488,7 +488,7 @@
                 }
               }
             },
-            "description": "Seedream Images Response 403"
+            "description": "未授权，授权令牌无效或缺失。"
           },
           "404": {
             "content": {
@@ -511,18 +511,18 @@
                             "code": {
                               "type": "string",
                               "example": "no_api",
-                              "description": "Seedream Images Response 404 Error Code"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "API does not exist, please make sure url is correct.",
-                              "description": "Seedream Images Response 404 Error Message"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 404 Trace Id"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     }
@@ -530,7 +530,7 @@
                 }
               }
             },
-            "description": "Seedream Images Response 404"
+            "description": "未授权，授权令牌无效或缺失。"
           },
           "413": {
             "content": {
@@ -553,18 +553,18 @@
                             "code": {
                               "type": "string",
                               "example": "request_too_large",
-                              "description": "Seedream Images Response 413 Error Code"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "Request body is too large.",
-                              "description": "Seedream Images Response 413 Error Message"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 413 Trace Id"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     }
@@ -572,7 +572,7 @@
                 }
               }
             },
-            "description": "Seedream Images Response 413"
+            "description": "未授权，授权令牌无效或缺失。"
           },
           "429": {
             "content": {
@@ -595,18 +595,18 @@
                             "code": {
                               "type": "string",
                               "example": "too_many_requests",
-                              "description": "Seedream Images Response 429 Error Code"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "You have exceeded the rate limit.",
-                              "description": "Seedream Images Response 429 Error Message"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 429 Trace Id"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     }
@@ -614,7 +614,7 @@
                 }
               }
             },
-            "description": "Seedream Images Response 429"
+            "description": "请求过多，已超出速率限制。"
           },
           "500": {
             "content": {
@@ -637,18 +637,18 @@
                             "code": {
                               "type": "string",
                               "example": "api_error",
-                              "description": "Seedream Images Response 500 Error Code"
+                              "description": "响应的错误码。"
                             },
                             "message": {
                               "type": "string",
                               "example": "Internal server error.",
-                              "description": "Seedream Images Response 500 Error Message"
+                              "description": "响应的错误信息。"
                             }
                           }
                         },
                         "trace_id": {
                           "type": "string",
-                          "description": "Seedream Images Response 500 Trace Id"
+                          "description": "本次请求的追踪 ID。"
                         }
                       }
                     }
@@ -656,7 +656,7 @@
                 }
               }
             },
-            "description": "Seedream Images Response 500"
+            "description": "服务器内部错误，服务端发生异常。"
           }
         },
         "parameters": [
@@ -671,7 +671,7 @@
               "type": "string"
             },
             "required": false,
-            "description": "Seedream Images Param Accept"
+            "description": "指定服务器返回响应的格式。如未指定，默认格式为 `application/json`。"
           }
         ],
         "requestBody": {
@@ -684,6 +684,7 @@
                 ],
                 "properties": {
                   "model": {
+                    "rank": 10,
                     "type": "string",
                     "enum": [
                       "doubao-seedream-5-0-pro-260628",
@@ -691,14 +692,16 @@
                       "doubao-seedream-4-0-250828",
                       "doubao-seedream-4-5-251128"
                     ],
-                    "description": "Seedream Images Model"
+                    "description": "Full model ID. Seedream 5.0 Pro supports single-image generation, precise editing, transparent backgrounds, and layer decomposition; Seedream 5.0 Lite supports single or sequential images, streaming, and web search."
                   },
                   "prompt": {
+                    "rank": 20,
                     "type": "string",
                     "example": "a white siamese cat",
-                    "description": "Seedream Images Prompt"
+                    "description": "Generation or editing prompt. Optional only for Seedream 5.0 Pro layer decomposition, where omission automatically decomposes the main elements."
                   },
                   "image": {
+                    "rank": 30,
                     "oneOf": [
                       {
                         "type": "string"
@@ -711,60 +714,68 @@
                         "maxItems": 14
                       }
                     ],
-                    "description": "Seedream Images Image"
+                    "description": "One reference image URL/base64 string or an array. Pro accepts up to 10 images in regular mode and exactly one for decomposition; Lite/4.x accept up to 14. Each image must be at most 30 MB."
                   },
                   "size": {
+                    "rank": 40,
                     "type": "string",
                     "example": "2K",
-                    "description": "Seedream Images Size",
+                    "description": "Output size. Pro supports 1K/1.5K/2K or valid dimensions; decomposition also supports auto. Lite supports 2K/3K/4K or valid dimensions.",
                     "pattern": "^(1K|1\\.5K|2K|3K|4K|auto|[0-9]+x[0-9]+)$"
                   },
                   "sequential_image_generation": {
+                    "rank": 60,
                     "type": "string",
                     "enum": [
                       "auto",
                       "disabled"
                     ],
-                    "description": "Seedream Images Sequential Image Generation"
+                    "description": "Sequential image mode. auto lets supported Lite/4.x models generate a related set; disabled returns one image. Not supported by Pro."
                   },
                   "sequential_image_generation_options": {
+                    "rank": 61,
                     "type": "object",
                     "properties": {
                       "max_images": {
                         "type": "integer",
                         "minimum": 1,
                         "maximum": 15,
-                        "description": "Seedream Images Sequential Image Generation Options Max Images"
+                        "description": "本次请求最多生成的图像数量，范围 [1, 15]。注意：`（`image` 中的参考图数量）+（本次生成的图像数量）不得超过 15`。"
                       }
                     },
-                    "description": "Seedream Images Sequential Image Generation Options"
+                    "description": "Sequential image options. max_images is 1-15 and input images plus outputs must not exceed 15."
                   },
                   "stream": {
+                    "rank": 70,
                     "type": "boolean",
-                    "description": "Seedream Images Stream",
+                    "description": "Stream normalized image events. Supported by Lite/4.x only and cannot be combined with async or callback_url.",
                     "x-go-optional-pointer": true
                   },
                   "response_format": {
+                    "rank": 90,
                     "type": "string",
-                    "description": "Seedream Images Response Format",
+                    "description": "Image response format: url or b64_json.",
                     "enum": [
                       "url",
                       "b64_json"
                     ]
                   },
                   "watermark": {
+                    "rank": 91,
                     "type": "boolean",
-                    "description": "Seedream Images Watermark"
+                    "description": "Whether to add the AI-generated watermark."
                   },
                   "output_format": {
+                    "rank": 92,
                     "type": "string",
                     "enum": [
                       "jpeg",
                       "png"
                     ],
-                    "description": "Seedream Images Output Format"
+                    "description": "Output image format, jpeg or png. Supported by Seedream 5.0 Pro and Lite."
                   },
                   "tools": {
+                    "rank": 93,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -777,9 +788,10 @@
                         }
                       }
                     },
-                    "description": "Seedream Images Tools"
+                    "description": "Model tools. Seedream 5.0 Lite supports web_search."
                   },
                   "optimize_prompt_options": {
+                    "rank": 94,
                     "type": "object",
                     "properties": {
                       "mode": {
@@ -788,31 +800,35 @@
                           "standard",
                           "fast"
                         ],
-                        "description": "Seedream Images Optimize Prompt Options Mode"
+                        "description": "提示词优化模式。`standard` 质量更高但速度较慢；`fast` 速度更快但质量相对较低。"
                       }
                     },
-                    "description": "Seedream Images Optimize Prompt Options"
+                    "description": "Prompt optimization. Pro supports standard/fast; Lite and 4.5 support standard; 4.0 supports standard/fast."
                   },
                   "callback_url": {
+                    "rank": 100,
                     "type": "string",
-                    "description": "Seedream Images Callback Url"
+                    "description": "图像生成完成后的回调 URL，该 URL 须可从公网访问。指定后接口将立即返回，生成结果就绪时会异步推送至此回调地址。"
                   },
                   "async": {
+                    "rank": 101,
                     "type": "boolean",
-                    "description": "Seedream Images Async"
+                    "description": "是否以异步模式处理。设为 `true` 时接口立即返回 `task_id`，无需提供 `callback_url`，随后通过 `/seedream/tasks` 轮询获取结果；若同时提供了 `callback_url`，结果会推送至该回调地址。"
                   },
                   "layer_decomposition": {
+                    "rank": 41,
                     "type": "boolean",
-                    "description": "Seedream Images Layer Decomposition",
+                    "description": "Seedream 5.0 Pro layer decomposition. Requires exactly one PNG/JPEG and returns one base image plus up to 16 transparent PNG layers.",
                     "x-go-optional-pointer": true
                   },
                   "background": {
+                    "rank": 42,
                     "type": "string",
                     "enum": [
                       "transparent",
                       "opaque"
                     ],
-                    "description": "Seedream Images Background"
+                    "description": "Seedream 5.0 Pro background mode. transparent requires one transparent PNG input and PNG output; opaque produces a regular background."
                   }
                 },
                 "allOf": [
@@ -923,6 +939,7 @@
                         "properties": {
                           "model": {
                             "enum": [
+                              "doubao-seedream-5-0-260128",
                               "doubao-seedream-5-0-lite-260128"
                             ]
                           },
@@ -999,7 +1016,7 @@
                 ]
               },
               "example": {
-                "model": "doubao-seedream-5-0-lite-260128",
+                "model": "doubao-seedream-5-0-260128",
                 "prompt": "a white siamese cat",
                 "size": "2K"
               }
@@ -1015,7 +1032,7 @@
   "servers": [
     {
       "url": "https://api.acedata.cloud",
-      "description": "Seedream Images Servers"
+      "description": "Ace Data Cloud API 服务器"
     }
   ],
   "components": {

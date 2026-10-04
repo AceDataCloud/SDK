@@ -50,7 +50,9 @@ class Hailuo:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Hailuo Videos"""
+        """Minimax Hailuo AI video generation API. Supports minimax-t2v for text-to-video, minimax-i2v for
+        image-to-video, and minimax-i2v-director for director mode with camera/movement instructions.
+        """
         body: dict[str, Any] = {}
         body["action"] = action
         if model is not None:
@@ -90,7 +92,9 @@ class AsyncHailuo:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Hailuo Videos"""
+        """Minimax Hailuo AI video generation API. Supports minimax-t2v for text-to-video, minimax-i2v for
+        image-to-video, and minimax-i2v-director for director mode with camera/movement instructions.
+        """
         body: dict[str, Any] = {}
         body["action"] = action
         if model is not None:

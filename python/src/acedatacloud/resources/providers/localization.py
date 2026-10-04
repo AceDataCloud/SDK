@@ -52,9 +52,9 @@ class Localization:
     def translate(
         self,
         *,
-        input: str | dict[str, Any],
+        input: dict[str, Any],
         locale: LocalizationLocale,
-        extension: Literal["md", "json"],
+        extension: Literal["json", "md"],
         model: Literal["gpt-3.5", "gpt-4"] | None = None,
         callback_url: str | None = None,
         **extra: Any,
@@ -81,9 +81,9 @@ class AsyncLocalization:
     async def translate(
         self,
         *,
-        input: str | dict[str, Any],
+        input: dict[str, Any],
         locale: LocalizationLocale,
-        extension: Literal["md", "json"],
+        extension: Literal["json", "md"],
         model: Literal["gpt-3.5", "gpt-4"] | None = None,
         callback_url: str | None = None,
         **extra: Any,

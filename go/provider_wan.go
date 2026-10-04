@@ -12,39 +12,39 @@ type Wan struct {
 
 // WanGenerateRequest is the input to wan.Generate.
 type WanGenerateRequest struct {
-	// Wan Videos Model
+	// $t(wan_videos_model)
 	Model string
-	// Wan Videos Audio
+	// $t(wan_videos_audio)
 	Audio bool
-	// Wan Videos Prompt Extend
+	// $t(wan_videos_prompt_extend)
 	PromptExtend bool
-	// Wan Videos Action
+	// $t(wan_videos_action)
 	Action string
-	// Wan Videos Resolution
+	// $t(wan_videos_resolution)
 	Resolution string
-	// Wan Videos Shot Type
+	// $t(wan_videos_shot_type)
 	ShotType string
-	// Wan Videos Duration
+	// $t(wan_videos_duration)
 	Duration float64
-	// Wan Videos Prompt
+	// $t(wan_videos_prompt)
 	Prompt string
-	// Wan Videos Negative Prompt
+	// $t(wan_videos_negative_prompt)
 	NegativePrompt string
-	// Wan Videos Size
+	// $t(wan_videos_size)
 	Size string
-	// Wan Videos Audio Url
+	// $t(wan_videos_audio_url)
 	AudioURL string
-	// Wan Videos Reference Video Urls
+	// $t(wan_videos_reference_video_urls)
 	ReferenceVideoURLs []string
-	// Wan Videos Image Url
+	// $t(wan_videos_image_url)
 	ImageURL string
-	// Wan Videos Media
+	// $t(wan_videos_media)
 	Media []map[string]any
-	// Wan Videos Ratio
+	// $t(wan_videos_ratio)
 	Ratio string
-	// Wan Videos Seed
+	// $t(wan_videos_seed)
 	Seed int
-	// Wan Videos Watermark
+	// $t(wan_videos_watermark)
 	Watermark bool
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -116,7 +116,7 @@ func (r WanGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Wan Videos
+// Generate Generate videos based on prompt and image frames
 func (c *Wan) Generate(ctx context.Context, req WanGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

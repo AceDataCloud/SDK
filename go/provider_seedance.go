@@ -12,35 +12,35 @@ type Seedance struct {
 
 // SeedanceGenerateRequest is the input to seedance.Generate.
 type SeedanceGenerateRequest struct {
-	// Seedance Videos Model
+	// $t(seedance_videos_model)
 	Model string
-	// Seedance Videos
+	// $t(seedance_videos)
 	Content []map[string]any
-	// Seedance Videos Resolution
+	// $t(seedance_videos_resolution)
 	Resolution string
-	// Seedance Videos Ratio
+	// $t(seedance_videos_ratio)
 	Ratio string
-	// Seedance Videos Duration
+	// $t(seedance_videos_duration)
 	Duration int
-	// Seedance Videos Frames
+	// $t(seedance_videos_frames)
 	Frames int
-	// Seedance Videos Seed
+	// $t(seedance_videos_seed)
 	Seed int
-	// Seedance Videos Camerafixed
+	// $t(seedance_videos_camerafixed)
 	Camerafixed bool
-	// Seedance Videos Watermark
+	// $t(seedance_videos_watermark)
 	Watermark bool
-	// Seedance Videos Generate Audio
+	// $t(seedance_videos_generate_audio)
 	GenerateAudio bool
-	// Seedance Videos Return Last Frame
+	// $t(seedance_videos_return_last_frame)
 	ReturnLastFrame bool
-	// Seedance Videos Execution Expires After
+	// $t(seedance_videos_execution_expires_after)
 	ExecutionExpiresAfter int
 	// Seedance Videos Omni Reference Task Type
 	OmniReferenceTaskType string
-	// Seedance Videos Output Format
+	// $t(seedance_videos_output_format)
 	OutputFormat string
-	// Seedance Videos Tools
+	// $t(seedance_videos_tools)
 	Tools []map[string]any
 	// Seedance Videos Priority
 	Priority int
@@ -116,7 +116,7 @@ func (r SeedanceGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Seedance Videos
+// Generate Call /seedance/videos.
 func (c *Seedance) Generate(ctx context.Context, req SeedanceGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

@@ -17,27 +17,27 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface QwenImageGenerateOptions {
-  /** Qwen Image Images Model */
+  /** $t(qwen_image_images_model) */
   model: "qwen-image-3.0" | "qwen-image-3.0-pro";
-  /** Qwen Image Images Prompt */
+  /** $t(qwen_image_images_prompt) */
   prompt: string;
-  /** Qwen Image Images Image Urls */
+  /** $t(qwen_image_images_image_urls) */
   imageUrls?: string[];
-  /** Qwen Image Images N */
+  /** $t(qwen_image_images_n) */
   n?: number;
-  /** Qwen Image Images Size */
+  /** $t(qwen_image_images_size) */
   size?: string;
-  /** Qwen Image Images Prompt Extend */
+  /** $t(qwen_image_images_prompt_extend) */
   promptExtend?: boolean;
-  /** Qwen Image Images Prompt Extend Mode */
+  /** $t(qwen_image_images_prompt_extend_mode) */
   promptExtendMode?: "direct" | "agent";
-  /** Qwen Image Images Enable Thinking */
+  /** $t(qwen_image_images_enable_thinking) */
   enableThinking?: boolean;
-  /** Qwen Image Images Negative Prompt */
+  /** $t(qwen_image_images_negative_prompt) */
   negativePrompt?: string;
-  /** Qwen Image Images Seed */
+  /** $t(qwen_image_images_seed) */
   seed?: number;
-  /** Qwen Image Images Watermark */
+  /** $t(qwen_image_images_watermark) */
   watermark?: boolean;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -54,7 +54,7 @@ export interface QwenImageGenerateOptions {
 export class QwenImage {
   constructor(private transport: Transport) {}
 
-  /** Qwen Image Images */
+  /** Call /qwen-image/images. */
   async generate(options: QwenImageGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;

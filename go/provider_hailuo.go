@@ -12,13 +12,13 @@ type Hailuo struct {
 
 // HailuoGenerateRequest is the input to hailuo.Generate.
 type HailuoGenerateRequest struct {
-	// Hailuo Videos Action
+	// The operation type for video generation. When set to `generate`, it will generate a video based on the prompt.
 	Action string
-	// Hailuo Videos Model
+	// The model used for generating videos has a default value of `minimax-t2v`.
 	Model string
-	// Hailuo Videos Prompt
+	// Prompts for generating videos.
 	Prompt string
-	// Hailuo Videos First Image Url
+	// You can specify the URL of the first frame image to generate a video from the image.
 	FirstImageURL string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -55,7 +55,7 @@ func (r HailuoGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Hailuo Videos
+// Generate Minimax Hailuo AI video generation API. Supports minimax-t2v for text-to-video, minimax-i2v for image-to-video, and minimax-i2v-director for director
 func (c *Hailuo) Generate(ctx context.Context, req HailuoGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

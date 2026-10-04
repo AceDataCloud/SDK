@@ -14,19 +14,21 @@ type Maestro struct {
 type MaestroGenerateRequest struct {
 	// Natural-language brief describing the video to produce (the topic, what to show, tone, audience). The agent de
 	Prompt string
-	// Production action. generate creates a new video; remix/edit/extend require ref_task_id.
+	// Production action. Lite supports generate/edit; Standard adds remix; Pro adds extend. remix/edit/extend requir
 	Action string
 	// Required when `action` is remix / edit / extend: the task_id of the previous video to start from.
 	RefTaskID string
 	// Optional reference media (image / video / audio URLs) the agent can use — e.g. a product shot or logo to featu
 	FileURLs []string
-	// Output languages, up to 4. The first is primary; each additional delivered language is billed +6 credits.
+	// Output languages. Lite supports 1, Standard up to 2, and Pro up to 4. The first is primary; each additional de
 	Langs []string
-	// Required output aspect ratio. All videos render at 1080p/30fps.
+	// Required output aspect ratio. Lite renders 720p/24fps; Standard and Pro render 1080p/30fps.
 	Aspect string
-	// Target video length in seconds, from 5 to 300. Successful jobs are billed by actual delivered duration, never
+	// Target video length in seconds. Lite: 5–30; Standard: 5–120; Pro: 5–300. Successful jobs are billed by actual
 	Duration int
-	// Production route: auto, narrated, captions, avatar, or drama. captions requires source video in file_urls; ava
+	// Production SKU. `lite` = fast 720p short video at 0.20 credits/s (up to 30s); `standard` = balanced 1080p at 0
+	Quality string
+	// Production route. Lite supports auto/narrated/captions; Standard adds avatar; Pro adds drama. `captions` requi
 	Scenario string
 	// Optional visual-style preset — expressed through typography, palette, motion, image treatment and pacing. Orth
 	Style string
@@ -65,6 +67,11 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 	} else {
 		body["duration"] = 30
 	}
+	if r.Quality != "" {
+		body["quality"] = r.Quality
+	} else {
+		body["quality"] = "standard"
+	}
 	if r.Scenario != "" {
 		body["scenario"] = r.Scenario
 	} else {
@@ -95,7 +102,7 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Maestro Videos
+// Generate Call /maestro/videos.
 func (c *Maestro) Generate(ctx context.Context, req MaestroGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

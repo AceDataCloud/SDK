@@ -17,39 +17,39 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface WanGenerateOptions {
-  /** Wan Videos Model */
+  /** $t(wan_videos_model) */
   model: "wan2.6-i2v" | "wan2.6-r2v" | "wan2.6-i2v-flash" | "wan2.6-t2v" | "wan3.0-video";
-  /** Wan Videos Audio */
+  /** $t(wan_videos_audio) */
   audio?: boolean;
-  /** Wan Videos Prompt Extend */
+  /** $t(wan_videos_prompt_extend) */
   promptExtend?: boolean;
-  /** Wan Videos Action */
+  /** $t(wan_videos_action) */
   action?: "text2video" | "image2video";
-  /** Wan Videos Resolution */
+  /** $t(wan_videos_resolution) */
   resolution?: "480P" | "720P" | "1080P";
-  /** Wan Videos Shot Type */
+  /** $t(wan_videos_shot_type) */
   shotType?: "single" | "multi";
-  /** Wan Videos Duration */
+  /** $t(wan_videos_duration) */
   duration?: number;
-  /** Wan Videos Prompt */
+  /** $t(wan_videos_prompt) */
   prompt?: string;
-  /** Wan Videos Negative Prompt */
+  /** $t(wan_videos_negative_prompt) */
   negativePrompt?: string;
-  /** Wan Videos Size */
+  /** $t(wan_videos_size) */
   size?: string;
-  /** Wan Videos Audio Url */
+  /** $t(wan_videos_audio_url) */
   audioUrl?: string;
-  /** Wan Videos Reference Video Urls */
+  /** $t(wan_videos_reference_video_urls) */
   referenceVideoUrls?: string[];
-  /** Wan Videos Image Url */
+  /** $t(wan_videos_image_url) */
   imageUrl?: string;
-  /** Wan Videos Media */
+  /** $t(wan_videos_media) */
   media?: Array<Record<string, unknown>>;
-  /** Wan Videos Ratio */
+  /** $t(wan_videos_ratio) */
   ratio?: "adaptive" | "16:9" | "4:3" | "1:1" | "3:4" | "9:16";
-  /** Wan Videos Seed */
+  /** $t(wan_videos_seed) */
   seed?: number;
-  /** Wan Videos Watermark */
+  /** $t(wan_videos_watermark) */
   watermark?: boolean;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -66,7 +66,7 @@ export interface WanGenerateOptions {
 export class Wan {
   constructor(private transport: Transport) {}
 
-  /** Wan Videos */
+  /** Generate videos based on prompt and image frames */
   async generate(options: WanGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;

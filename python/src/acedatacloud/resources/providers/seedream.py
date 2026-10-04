@@ -61,7 +61,7 @@ class Seedream:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Seedream Images"""
+        """Call /seedream/images."""
         body: dict[str, Any] = {}
         body["model"] = model
         if prompt is not None:
@@ -131,7 +131,7 @@ class AsyncSeedream:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Seedream Images"""
+        """Call /seedream/images."""
         body: dict[str, Any] = {}
         body["model"] = model
         if prompt is not None:

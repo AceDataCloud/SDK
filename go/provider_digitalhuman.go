@@ -12,27 +12,27 @@ type Digitalhuman struct {
 
 // DigitalhumanGenerateRequest is the input to digitalhuman.Generate.
 type DigitalhumanGenerateRequest struct {
-	// Public URL of the source face video (preferred). Supply either video_url or image_url.
+	// Public URL of the source face video (preferred). One of video_url/image_url required.
 	VideoURL string
-	// Public URL of a source face photo (photo-driven path). Supply either video_url or image_url.
-	ImageURL string
-	// Public URL of the driving audio (.wav/.mp3/.m4a). OR supply text(+voice_id).
-	AudioURL string
 	// Spoken text -> TTS (requires voice_id).
 	Text string
-	// A cloned voice from POST /digital-human/voices.
-	VoiceID string
-	// [Deprecated] Accepted for backward compatibility but no longer changes the output or the price — every request
+	// Audio tempo multiplier.
+	Speed float64
+	// Diffusion steps (LatentSync).
+	Steps int
+	// latentsync = quality (default); heygem = fast tier.
 	Engine string
 	// Lip-sync strength (LatentSync). Lower loosens sync.
 	Guidance float64
-	// Diffusion steps (LatentSync).
-	Steps int
 	// Apply the mouth-seam reduction blend.
 	SeamFix bool
-	// Audio tempo multiplier.
-	Speed float64
-	// [Deprecated] Output is always rendered at 720p.
+	// A cloned voice from POST /digital-human/voices.
+	VoiceID string
+	// Public URL of the driving audio (.wav/.mp3/.m4a). OR supply text(+voice_id).
+	AudioURL string
+	// Public URL of a source face photo (photo-driven path).
+	ImageURL string
+	// optional
 	Resolution string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
@@ -44,20 +44,19 @@ type DigitalhumanGenerateRequest struct {
 
 func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
-	if r.VideoURL != "" {
-		body["video_url"] = r.VideoURL
-	}
-	if r.ImageURL != "" {
-		body["image_url"] = r.ImageURL
-	}
-	if r.AudioURL != "" {
-		body["audio_url"] = r.AudioURL
-	}
+	body["video_url"] = r.VideoURL
 	if r.Text != "" {
 		body["text"] = r.Text
 	}
-	if r.VoiceID != "" {
-		body["voice_id"] = r.VoiceID
+	if r.Speed != 0 {
+		body["speed"] = r.Speed
+	} else {
+		body["speed"] = 1.0
+	}
+	if r.Steps != 0 {
+		body["steps"] = r.Steps
+	} else {
+		body["steps"] = 40
 	}
 	if r.Engine != "" {
 		body["engine"] = r.Engine
@@ -69,16 +68,15 @@ func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	} else {
 		body["guidance"] = 2.0
 	}
-	if r.Steps != 0 {
-		body["steps"] = r.Steps
-	} else {
-		body["steps"] = 40
-	}
 	body["seam_fix"] = r.SeamFix
-	if r.Speed != 0 {
-		body["speed"] = r.Speed
-	} else {
-		body["speed"] = 1.0
+	if r.VoiceID != "" {
+		body["voice_id"] = r.VoiceID
+	}
+	if r.AudioURL != "" {
+		body["audio_url"] = r.AudioURL
+	}
+	if r.ImageURL != "" {
+		body["image_url"] = r.ImageURL
 	}
 	if r.Resolution != "" {
 		body["resolution"] = r.Resolution
@@ -100,7 +98,7 @@ func (r DigitalhumanGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Digital Human Videos
+// Generate Digital Human video generation API — turn a portrait plus audio or text into a talking-head video.
 func (c *Digitalhuman) Generate(ctx context.Context, req DigitalhumanGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
@@ -155,7 +153,7 @@ func (r DigitalhumanVoicesRequest) toBody() map[string]any {
 	return body
 }
 
-// Voices Digital Human Voices
+// Voices Digital Human voice-clone API — upload an audio sample to clone a custom voice for speech synthesis.
 func (c *Digitalhuman) Voices(ctx context.Context, req DigitalhumanVoicesRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",

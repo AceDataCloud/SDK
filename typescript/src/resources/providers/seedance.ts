@@ -17,36 +17,36 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface SeedanceGenerateOptions {
-  /** Seedance Videos Model */
+  /** $t(seedance_videos_model) */
   model: "doubao-seedance-1-0-pro-250528" | "doubao-seedance-1-0-pro-fast-251015" | "doubao-seedance-1-5-pro-251215" | "doubao-seedance-1-0-lite-t2v-250428" | "doubao-seedance-1-0-lite-i2v-250428" | "doubao-seedance-2-0-260128" | "doubao-seedance-2-0-fast-260128" | "doubao-seedance-2-0-mini-260615" | "doubao-seedance-2-5-260628";
-  /** Seedance Videos */
+  /** $t(seedance_videos) */
   content: Array<Record<string, unknown>>;
-  /** Seedance Videos Resolution */
+  /** $t(seedance_videos_resolution) */
   resolution?: "480p" | "720p" | "1080p" | "4k";
-  /** Seedance Videos Ratio */
+  /** $t(seedance_videos_ratio) */
   ratio?: "16:9" | "4:3" | "1:1" | "3:4" | "9:16" | "21:9" | "adaptive";
-  /** Seedance Videos Duration */
+  /** $t(seedance_videos_duration) */
   duration?: number;
-  /** Seedance Videos Frames */
+  /** $t(seedance_videos_frames) */
   frames?: number;
-  /** Seedance Videos Seed */
+  /** $t(seedance_videos_seed) */
   seed?: number;
-  /** Seedance Videos Camerafixed */
+  /** $t(seedance_videos_camerafixed) */
   camerafixed?: boolean;
-  /** Seedance Videos Watermark */
+  /** $t(seedance_videos_watermark) */
   watermark?: boolean;
-  /** Seedance Videos Generate Audio */
+  /** $t(seedance_videos_generate_audio) */
   generateAudio?: boolean;
-  /** Seedance Videos Return Last Frame */
+  /** $t(seedance_videos_return_last_frame) */
   returnLastFrame?: boolean;
-  /** Seedance Videos Execution Expires After */
+  /** $t(seedance_videos_execution_expires_after) */
   executionExpiresAfter?: number;
   /** Seedance Videos Omni Reference Task Type */
   omniReferenceTaskType?: "auto" | "reference" | "edit" | "extend";
-  /** Seedance Videos Output Format */
+  /** $t(seedance_videos_output_format) */
   outputFormat?: "mp4" | "mov";
-  /** Seedance Videos Tools */
-  tools?: Array<{ type: string; limit?: number; maxKeyword?: number; sources?: unknown }>;
+  /** $t(seedance_videos_tools) */
+  tools?: Array<Record<string, unknown>>;
   /** Seedance Videos Priority */
   priority?: number;
   /** Seedance Videos Safety Identifier */
@@ -66,7 +66,7 @@ export interface SeedanceGenerateOptions {
 export class Seedance {
   constructor(private transport: Transport) {}
 
-  /** Seedance Videos */
+  /** Call /seedance/videos. */
   async generate(options: SeedanceGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;

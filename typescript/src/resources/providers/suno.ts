@@ -17,85 +17,63 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface SunoGenerateOptions {
-  /** Suno Audios Lyric */
+  /** Lyrics for generating music under custom mode (`custom` is `true`). `chirp-v3-5` and `chirp-v4` have a maximum of 3000 characters; `chirp-v4-5` and above (including `chirp-v5`, `chirp-v5-5`) have a maximum of 5000 characters. */
   lyric?: string;
-  /** Suno Audios Model */
-  model?: "chirp-v6" | "chirp-v6-wild" | "chirp-v6-mini" | "chirp-v5-5" | "chirp-v5" | "chirp-v4-5-plus" | "chirp-v4-5" | "chirp-v4" | "chirp-v3-5" | "chirp-v3-0";
-  /** Suno Audios Max Mode */
-  maxMode?: boolean;
-  /** Suno Audios Variety */
-  variety?: "off" | "normal" | "high" | "extra" | "max";
-  /** Suno Audios Style */
+  /** The model used for generating music has a default value of `chirp-v4`. */
+  model?: "chirp-v5-5" | "chirp-v5" | "chirp-v4-5-plus" | "chirp-v4-5" | "chirp-v4" | "chirp-v3-5" | "chirp-v3-0";
+  /** Music style description. `chirp-v3-5` and `chirp-v4` up to 200 characters; `chirp-v4-5` and above (including `chirp-v5`, `chirp-v5-5`) up to 1000 characters. */
   style?: string;
-  /** Suno Audios Variation Category */
-  variationCategory?: "high" | "normal" | "subtle";
-  /** Suno Audios Title */
+  /** Music Title (Custom Mode). `chirp-v3-5` and `chirp-v4` up to 80 characters; `chirp-v4-5` and above (including `chirp-v5`, `chirp-v5-5`) up to 100 characters. */
   title?: string;
-  /** Suno Audios Action */
-  action?: "generate" | "extend" | "upload_extend" | "upload_cover" | "concat" | "cover" | "artist_consistency" | "artist_consistency_vox" | "stems" | "all_stems" | "add_stem" | "extract_stem" | "sounds" | "adjust_speed" | "replace_section" | "underpainting" | "overpainting" | "remaster" | "mashup" | "samples" | "inspo";
-  /** Suno Audios Custom */
+  /** Types of operations for generating music. `generate`: Generate audio based on prompts; `extend`: Continue generating based on existing audio; `concat`: Stitch existing audio clips into a complete track; `cover`: Copy the musical style of an existing track and reinterpret it; `upload_cover`: Style cover of uploaded audio; `upload_extend`: Extend and continue generating uploaded audio; `artist_consistency`: Sing new songs in the style of a specified artist (Persona); `artist_consistency_vox`: Sing new songs in the style of a specified artist using VOX mode; `stems`: Separate the song into vocal and accompaniment tracks; `all_stems`: Separate the song into all independent tracks (vocals, drums, bass, other instruments); `replace_section`: Replace segments within a specified time period; `underpainting`: Generate and add AI accompaniment to the uploaded vocal track; `overpainting`: Generate and add AI vocals to the uploaded accompaniment track; `samples`: Add AI samples to the uploaded audio within a specified time period; `remaster`: Remaster existing audio to enhance sound quality; `mashup`: Mix and stitch multiple songs into one track; `inspo`: Generate new music inspired by 1 to 4 reference audio segments. */
+  action?: "generate" | "extend" | "upload_extend" | "upload_cover" | "concat" | "cover" | "artist_consistency" | "artist_consistency_vox" | "stems" | "all_stems" | "replace_section" | "underpainting" | "overpainting" | "remaster" | "mashup" | "samples" | "inspo";
+  /** Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise, it will be generated based on the prompts. */
   custom?: boolean;
-  /** Suno Audios Prompt */
-  prompt?: string;
-  /** Suno Audios Lyric Prompt */
-  lyricPrompt?: string;
-  /** Suno Audios Audio Id */
+  /** The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 500 characters. For custom mode, please use `lyric` and `style`. */
+  prompt?: Record<string, unknown>;
+  /** Audio ID used for generating additional audio based on existing audio. This field is required when `action` is `extend` or `concat`. */
   audioId?: string;
-  /** Suno Audios Stem Type */
-  stemType?: "vocals" | "backing_vocals" | "drums" | "bass" | "guitar" | "keyboard" | "percussion" | "strings" | "synth" | "fx" | "brass" | "woodwinds";
-  /** Suno Audios Audio Format */
-  audioFormat?: "mp3";
-  /** Suno Audios Sound */
-  sound?: string;
-  /** Suno Audios Sound Type */
-  soundType?: "one-shot" | "loop";
-  /** Suno Audios Bpm */
-  bpm?: number;
-  /** Suno Audios Key */
-  key?: string;
-  /** Suno Audios Speed Multiplier */
-  speedMultiplier?: number;
-  /** Suno Audios Keep Pitch */
-  keepPitch?: boolean;
-  /** Suno Audios Mashup Audio Ids */
-  mashupAudioIds?: string[];
-  /** Suno Audios Audio Urls */
-  audioUrls?: string[];
-  /** Suno Audios Weirdness */
-  weirdness?: number;
-  /** Suno Audios Persona Id */
-  personaId?: string;
-  /** Suno Audios Overpainting Start */
-  overpaintingStart?: number;
-  /** Suno Audios Overpainting End */
-  overpaintingEnd?: number;
-  /** Suno Audios Samples Start */
-  samplesStart?: number;
-  /** Suno Audios Samples End */
-  samplesEnd?: number;
-  /** Suno Audios Underpainting Start */
-  underpaintingStart?: number;
-  /** Suno Audios Underpainting End */
-  underpaintingEnd?: number;
-  /** Suno Audios Continue At */
-  continueAt?: number;
-  /** Suno Audios Instrumental */
-  instrumental?: boolean;
-  /** Suno Audios Vocal Gender */
-  vocalGender?: "f" | "m";
-  /** Suno Audios Negative Tags */
-  negativeTags?: string;
-  /** Suno Audios Style Influence */
-  styleInfluence?: number;
-  /** Suno Audios Audio Weight */
-  audioWeight?: number;
-  /** Suno Audios Duration */
+  /** Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is mainly used for generation in custom mode (`custom` is `true`); some models or actions may not support it, in which case the value is ignored or an error is returned. It is a target only — the finished length is reported by the `duration` field in the response and may differ slightly. */
   duration?: number;
-  /** Suno Audios Replace Section End */
+  /** The "Weirdness" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with higher values resulting in more creative and experimental outputs. It is only effective in custom mode. */
+  weirdness?: number;
+  /** A list of reference audio URLs for inspiration, requiring 1 to 4 publicly accessible audio addresses. This field is mandatory when `action` is `inspo`. */
+  audioUrls?: string[];
+  /** Generate the singer Persona ID used when creating songs based on the unique style characteristics of the specified singer. */
+  personaId?: string;
+  /** Continue generating from the specified time point (seconds) of the existing audio. For example, 213.5 means to continue from 3 minutes and 33.5 seconds. */
+  continueAt?: number;
+  /** Add the end time of the sample for the uploaded audio, which must be less than the total duration of the song. */
+  samplesEnd?: number;
+  /** The weight of the uploaded reference audio, with a value range from 0 to 1, where a higher value indicates greater reliance on the reference audio. This only takes effect during the cover operation. */
+  audioWeight?: number;
+  /** Pure accompaniment mode (no lyrics), default is `false`. When set to `true`, the lyrics filled in above will be ignored. */
+  instrumental?: boolean;
+  /** Prompts for automatically generating lyrics, effective only when `custom` is `true` and `lyric` is empty. */
+  lyricPrompt?: Record<string, unknown>;
+  /** Voice gender preference, selectable values are `'m'` (male voice) or `'f'` (female voice). Models `chirp-v4-5` and above are effective; this parameter is a preference item that can increase the probability of the target gender, but it does not guarantee strict adherence. */
+  vocalGender?: string;
+  /** Add a default start time for the uploaded audio sample, with a default value of 0. */
+  samplesStart?: number;
+  /** Styles of description that are not desired in music generation. */
+  negativeTags?: string;
+  /** The "Style Influence" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with higher values being closer to the selected style. It is only effective in custom mode. */
+  styleInfluence?: number;
+  /** Audio ID list for mixing and mashup. This field is required when `action` is `mashup`. */
+  mashupAudioIds?: string[];
+  /** Add the end time of the AI voice to the uploaded audio, which must be less than the total duration of the song. */
+  overpaintingEnd?: number;
+  /** Add the end time for the AI accompaniment to the uploaded audio, which must be less than the total duration of the song. */
+  underpaintingEnd?: number;
+  /** Set the default start time for the AI voice of the uploaded audio to 0. */
+  overpaintingStart?: number;
+  /** `variation_category` only supports version v5 and above, with only three optional values: `high`, `normal`, `subtle`. */
+  variationCategory?: string;
+  /** When `action` is `replace_section`, specify the end time (in seconds) of the segment to be replaced. */
   replaceSectionEnd?: number;
-  /** Suno Audios Replace Section Result Mode */
-  replaceSectionResultMode?: "candidates" | "full_song";
-  /** Suno Audios Replace Section Start */
+  /** Set the default start time for the AI accompaniment added to the uploaded audio, with a default value of 0. */
+  underpaintingStart?: number;
+  /** When `action` is `replace_section`, specify the start time (in seconds) of the segment to be replaced. */
   replaceSectionStart?: number;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -109,25 +87,25 @@ export interface SunoGenerateOptions {
 }
 
 export interface SunoPersonaOptions {
-  /** Suno Persona Name */
+  /** Names of singer styles. */
   name: string;
-  /** Suno Persona Audio Id */
+  /** Used to create generated song IDs in the style of the singer. */
   audioId: string;
-  /** Suno Persona Vox Audio Id */
-  voxAudioId?: string;
-  /** Suno Persona Vocal Start */
-  vocalStart?: number;
-  /** Suno Persona Vocal End */
+  /** The end time of the vocal segment in the audio (seconds). */
   vocalEnd?: number;
-  /** Suno Persona Description */
+  /** A textual description of the singer's style. */
   description?: string;
+  /** The starting time (in seconds) of the vocal segment in the audio. */
+  vocalStart?: number;
+  /** Used to generate audio IDs in the style of new singers (vocal reference audio). */
+  voxAudioId?: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;
 }
 
 export interface SunoMp4Options {
-  /** Suno Mp4 Audio Id */
+  /** Used to obtain the song ID for the corresponding MP4 of the song. */
   audioId: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
@@ -135,11 +113,11 @@ export interface SunoMp4Options {
 }
 
 export interface SunoVoicesOptions {
-  /** Suno Voices Audio Url */
+  /** Publicly accessible URL for audio files used to create sound. Must be in MP3 or WAV format, at least 10 seconds long, and must contain clear human voice of a single speaker, without background noise or background music. */
   audioUrl: string;
-  /** Suno Voices Name */
+  /** Custom voice personality name. */
   name?: string;
-  /** Suno Voices Description */
+  /** Description information for custom voice personality. */
   description?: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
@@ -147,7 +125,7 @@ export interface SunoVoicesOptions {
 }
 
 export interface SunoTimingOptions {
-  /** Suno Timing Audio Id */
+  /** Need to obtain the audio ID for timing/caption data, which is the generated Suno song ID. */
   audioId: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
@@ -155,12 +133,12 @@ export interface SunoTimingOptions {
 }
 
 export interface SunoVoxOptions {
-  /** Suno Vox Audio Id */
+  /** The source audio ID used to extract human voice, which is the unique identifier of the Suno audio segment to be processed. */
   audioId: string;
-  /** Suno Vox Vocal Start */
-  vocalStart: number;
-  /** Suno Vox Vocal End */
-  vocalEnd: number;
+  /** End time point for vocal extraction (unit: seconds). */
+  vocalEnd?: number;
+  /** The starting time point for vocal extraction (unit: seconds). */
+  vocalStart?: number;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -173,7 +151,7 @@ export interface SunoVoxOptions {
 }
 
 export interface SunoWavOptions {
-  /** Suno Wav Audio Id */
+  /** Used to obtain the existing audio ID of WAV format audio. */
   audioId: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -187,7 +165,7 @@ export interface SunoWavOptions {
 }
 
 export interface SunoMidiOptions {
-  /** Suno Midi Audio Id */
+  /** The source audio ID for generating MIDI will extract MIDI content based on the existing audio. */
   audioId: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -201,7 +179,7 @@ export interface SunoMidiOptions {
 }
 
 export interface SunoStyleOptions {
-  /** Suno Style Prompt */
+  /** Style prompts that need optimization. */
   prompt: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
@@ -209,19 +187,19 @@ export interface SunoStyleOptions {
 }
 
 export interface SunoLyricsOptions {
-  /** Suno Lyrics Model */
+  /** The model used for generating lyrics has a default value of `default`, with optional values including `default` and `remi-v1`. */
   model: "default" | "remi-v1";
-  /** Suno Lyrics Prompt */
-  prompt: string;
+  /** Prompts for generating lyrics, describing the desired theme or style of the lyrics. */
+  prompt: Record<string, unknown>;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;
 }
 
 export interface SunoMashupLyricsOptions {
-  /** Suno Mashup Lyrics Lyrics A */
+  /** The first paragraph of lyrics content used for mixed generation. */
   lyricsA: string;
-  /** Suno Mashup Lyrics Lyrics B */
+  /** The content of the second verse for mixed-generated lyrics. */
   lyricsB: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
@@ -229,12 +207,8 @@ export interface SunoMashupLyricsOptions {
 }
 
 export interface SunoUploadOptions {
-  /** Suno Upload Audio Url */
+  /** The CDN address (URL) for the custom audio file to be uploaded. */
   audioUrl: string;
-  /** Suno Upload Mode */
-  mode?: "standard" | "enhanced";
-  /** Suno Upload Name */
-  name?: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;
@@ -258,51 +232,40 @@ export interface SunoMp3Options {
 export class Suno {
   constructor(private transport: Transport) {}
 
-  /** Suno Audios */
+  /** Suno AI music generation API, generates 2 songs per request with extension support. */
   async generate(options: SunoGenerateOptions = {}): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     if (options.lyric !== undefined) body["lyric"] = options.lyric;
     if (options.model !== undefined) body["model"] = options.model;
-    body["max_mode"] = options.maxMode ?? false;
-    if (options.variety !== undefined) body["variety"] = options.variety;
     if (options.style !== undefined) body["style"] = options.style;
-    if (options.variationCategory !== undefined) body["variation_category"] = options.variationCategory;
     if (options.title !== undefined) body["title"] = options.title;
-    body["action"] = options.action ?? "generate";
-    body["custom"] = options.custom ?? false;
+    if (options.action !== undefined) body["action"] = options.action;
+    if (options.custom !== undefined) body["custom"] = options.custom;
     if (options.prompt !== undefined) body["prompt"] = options.prompt;
-    if (options.lyricPrompt !== undefined) body["lyric_prompt"] = options.lyricPrompt;
     if (options.audioId !== undefined) body["audio_id"] = options.audioId;
-    if (options.stemType !== undefined) body["stem_type"] = options.stemType;
-    if (options.audioFormat !== undefined) body["audio_format"] = options.audioFormat;
-    if (options.sound !== undefined) body["sound"] = options.sound;
-    if (options.soundType !== undefined) body["sound_type"] = options.soundType;
-    if (options.bpm !== undefined) body["bpm"] = options.bpm;
-    if (options.key !== undefined) body["key"] = options.key;
-    if (options.speedMultiplier !== undefined) body["speed_multiplier"] = options.speedMultiplier;
-    body["keep_pitch"] = options.keepPitch ?? false;
-    if (options.mashupAudioIds !== undefined) body["mashup_audio_ids"] = options.mashupAudioIds;
-    if (options.audioUrls !== undefined) body["audio_urls"] = options.audioUrls;
+    if (options.duration !== undefined) body["duration"] = options.duration;
     if (options.weirdness !== undefined) body["weirdness"] = options.weirdness;
+    if (options.audioUrls !== undefined) body["audio_urls"] = options.audioUrls;
     if (options.personaId !== undefined) body["persona_id"] = options.personaId;
-    if (options.overpaintingStart !== undefined) body["overpainting_start"] = options.overpaintingStart;
-    if (options.overpaintingEnd !== undefined) body["overpainting_end"] = options.overpaintingEnd;
-    if (options.samplesStart !== undefined) body["samples_start"] = options.samplesStart;
-    if (options.samplesEnd !== undefined) body["samples_end"] = options.samplesEnd;
-    if (options.underpaintingStart !== undefined) body["underpainting_start"] = options.underpaintingStart;
-    if (options.underpaintingEnd !== undefined) body["underpainting_end"] = options.underpaintingEnd;
     if (options.continueAt !== undefined) body["continue_at"] = options.continueAt;
+    if (options.samplesEnd !== undefined) body["samples_end"] = options.samplesEnd;
+    if (options.audioWeight !== undefined) body["audio_weight"] = options.audioWeight;
     if (options.instrumental !== undefined) body["instrumental"] = options.instrumental;
+    if (options.lyricPrompt !== undefined) body["lyric_prompt"] = options.lyricPrompt;
     if (options.vocalGender !== undefined) body["vocal_gender"] = options.vocalGender;
+    if (options.samplesStart !== undefined) body["samples_start"] = options.samplesStart;
     if (options.negativeTags !== undefined) body["negative_tags"] = options.negativeTags;
     if (options.styleInfluence !== undefined) body["style_influence"] = options.styleInfluence;
-    if (options.audioWeight !== undefined) body["audio_weight"] = options.audioWeight;
-    if (options.duration !== undefined) body["duration"] = options.duration;
+    if (options.mashupAudioIds !== undefined) body["mashup_audio_ids"] = options.mashupAudioIds;
+    if (options.overpaintingEnd !== undefined) body["overpainting_end"] = options.overpaintingEnd;
+    if (options.underpaintingEnd !== undefined) body["underpainting_end"] = options.underpaintingEnd;
+    if (options.overpaintingStart !== undefined) body["overpainting_start"] = options.overpaintingStart;
+    if (options.variationCategory !== undefined) body["variation_category"] = options.variationCategory;
     if (options.replaceSectionEnd !== undefined) body["replace_section_end"] = options.replaceSectionEnd;
-    body["replace_section_result_mode"] = options.replaceSectionResultMode ?? "full_song";
+    if (options.underpaintingStart !== undefined) body["underpainting_start"] = options.underpaintingStart;
     if (options.replaceSectionStart !== undefined) body["replace_section_start"] = options.replaceSectionStart;
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "async", "audioFormat", "audioId", "audioUrls", "audioWeight", "bpm", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "keepPitch", "key", "lyric", "lyricPrompt", "mashupAudioIds", "maxMode", "maxWait", "model", "negativeTags", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionResultMode", "replaceSectionStart", "samplesEnd", "samplesStart", "sound", "soundType", "speedMultiplier", "stemType", "style", "styleInfluence", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "variety", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
+      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "negativeTags", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
@@ -316,15 +279,15 @@ export class Suno {
     return handle;
   }
 
-  /** Suno Persona */
+  /** Suno singer style API, set song style based on a generated song ID. */
   async persona(options: SunoPersonaOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["name"] = options.name;
     body["audio_id"] = options.audioId;
-    if (options.voxAudioId !== undefined) body["vox_audio_id"] = options.voxAudioId;
-    if (options.vocalStart !== undefined) body["vocal_start"] = options.vocalStart;
     if (options.vocalEnd !== undefined) body["vocal_end"] = options.vocalEnd;
     if (options.description !== undefined) body["description"] = options.description;
+    if (options.vocalStart !== undefined) body["vocal_start"] = options.vocalStart;
+    if (options.voxAudioId !== undefined) body["vox_audio_id"] = options.voxAudioId;
     for (const [key, value] of Object.entries(options)) {
       if (!["async", "audioId", "callbackUrl", "description", "maxWait", "name", "pollInterval", "vocalEnd", "vocalStart", "voxAudioId", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
@@ -334,7 +297,7 @@ export class Suno {
     return (await this.transport.request('POST', "/suno/persona", { json: body })) as Record<string, unknown>;
   }
 
-  /** Suno Mp4 */
+  /** Suno MP4 API, get MP4 file link via audio_id. */
   async mp4(options: SunoMp4Options): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["audio_id"] = options.audioId;
@@ -347,7 +310,7 @@ export class Suno {
     return (await this.transport.request('POST', "/suno/mp4", { json: body })) as Record<string, unknown>;
   }
 
-  /** Suno Voices */
+  /** Suno Voice Clone API. Create a custom voice persona from an uploaded audio file for voice cloning in music generation. */
   async voices(options: SunoVoicesOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["audio_url"] = options.audioUrl;
@@ -362,7 +325,7 @@ export class Suno {
     return (await this.transport.request('POST', "/suno/voices", { json: body })) as Record<string, unknown>;
   }
 
-  /** Suno Timing */
+  /** Suno timeline API, get lyrics and audio timeline of generated music. */
   async timing(options: SunoTimingOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["audio_id"] = options.audioId;
@@ -375,12 +338,12 @@ export class Suno {
     return (await this.transport.request('POST', "/suno/timing", { json: body })) as Record<string, unknown>;
   }
 
-  /** Suno Vox */
+  /** Suno vocal/instrumental stems API. Pass an audio_id to asynchronously produce vocal-only and instrumental-only stem files for remixing and creative reuse. */
   async vox(options: SunoVoxOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["audio_id"] = options.audioId;
-    body["vocal_start"] = options.vocalStart;
-    body["vocal_end"] = options.vocalEnd;
+    if (options.vocalEnd !== undefined) body["vocal_end"] = options.vocalEnd;
+    if (options.vocalStart !== undefined) body["vocal_start"] = options.vocalStart;
     for (const [key, value] of Object.entries(options)) {
       if (!["async", "audioId", "callbackUrl", "maxWait", "pollInterval", "vocalEnd", "vocalStart", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
@@ -396,7 +359,7 @@ export class Suno {
     return handle;
   }
 
-  /** Suno Wav */
+  /** SUNO allows generating higher quality wav files based on the existing audio_id. */
   async wav(options: SunoWavOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["audio_id"] = options.audioId;
@@ -415,7 +378,7 @@ export class Suno {
     return handle;
   }
 
-  /** Suno Midi */
+  /** Suno MIDI API, retrieve MIDI data from generated music. */
   async midi(options: SunoMidiOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["audio_id"] = options.audioId;
@@ -434,7 +397,7 @@ export class Suno {
     return handle;
   }
 
-  /** Suno Style */
+  /** SUNO allows us to input prompts to generate enhanced song styles. */
   async style(options: SunoStyleOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["prompt"] = options.prompt;
@@ -447,7 +410,7 @@ export class Suno {
     return (await this.transport.request('POST', "/suno/style", { json: body })) as Record<string, unknown>;
   }
 
-  /** Suno Lyrics */
+  /** Suno lyrics generation API. Generates structured song lyrics from a prompt; supports the default and remi-v1 models. */
   async lyrics(options: SunoLyricsOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["model"] = options.model;
@@ -461,7 +424,7 @@ export class Suno {
     return (await this.transport.request('POST', "/suno/lyrics", { json: body })) as Record<string, unknown>;
   }
 
-  /** Suno Mashup Lyrics */
+  /** Suno mashup lyrics API, merge two lyrics into a blended version. */
   async mashup_lyrics(options: SunoMashupLyricsOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["lyrics_a"] = options.lyricsA;
@@ -475,14 +438,12 @@ export class Suno {
     return (await this.transport.request('POST', "/suno/mashup-lyrics", { json: body })) as Record<string, unknown>;
   }
 
-  /** Suno Upload */
+  /** Suno reference audio upload API, upload audio to get an audio_id for extended generation. */
   async upload(options: SunoUploadOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["audio_url"] = options.audioUrl;
-    body["mode"] = options.mode ?? "standard";
-    if (options.name !== undefined) body["name"] = options.name;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "audioUrl", "callbackUrl", "maxWait", "mode", "name", "pollInterval", "wait"].includes(key) && value !== undefined) {
+      if (!["async", "audioUrl", "callbackUrl", "maxWait", "pollInterval", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
