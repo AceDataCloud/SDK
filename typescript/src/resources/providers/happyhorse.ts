@@ -17,30 +17,30 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface HappyhorseGenerateOptions {
-  /** Random seed, range 0–2147483647. */
-  seed?: number;
-  /** HappyHorse model name. Different actions only support the corresponding model family. */
-  model?: "happyhorse-1.0-t2v" | "happyhorse-1.1-t2v" | "happyhorse-1.0-i2v" | "happyhorse-1.1-i2v" | "happyhorse-1.0-r2v" | "happyhorse-1.1-r2v" | "happyhorse-1.0-video-edit";
-  /** Output video aspect ratio. Text-to-video and reference image-to-video support this parameter; the first frame image-to-video will follow the aspect ratio of the first frame image. */
-  ratio?: "16:9" | "9:16" | "1:1" | "4:3" | "3:4";
-  /** Operation types. `generate` is for generating video from text, `image_to_video` is for generating video from the first frame image, `reference_to_video` is for generating video from reference images, and `video_edit` is for video editing based on video and reference images. */
+  /** Happyhorse Videos Action */
   action?: "generate" | "image_to_video" | "reference_to_video" | "video_edit";
-  /** Text prompt words. Text-to-video, reference image to video, and video editing scenarios are required. */
+  /** Happyhorse Videos Model */
+  model?: "happyhorse-1.0-t2v" | "happyhorse-1.1-t2v" | "happyhorse-1.0-i2v" | "happyhorse-1.1-i2v" | "happyhorse-1.0-r2v" | "happyhorse-1.1-r2v" | "happyhorse-1.0-video-edit";
+  /** Happyhorse Videos Prompt */
   prompt?: string;
-  /** Output video duration (seconds), value range 3–15. The output duration of `video_edit` is determined by the input video. */
-  duration?: number;
-  /** The input image URL for the first frame of the video. Only used by `image_to_video`. */
+  /** Happyhorse Videos Image Url */
   imageUrl?: string;
-  /** URL of the video to be edited. For `video_edit` use only. */
-  videoUrl?: string;
-  /** Whether to add the HappyHorse watermark. Default is off. */
-  watermark?: boolean;
-  /** Reference image URL array. `reference_to_video` supports 1–9 images, `video_edit` supports 0–5 images. */
+  /** Happyhorse Videos Image Urls */
   imageUrls?: string[];
-  /** Output video resolution, optional 720P or 1080P. */
+  /** Happyhorse Videos Video Url */
+  videoUrl?: string;
+  /** Happyhorse Videos Resolution */
   resolution?: "720P" | "1080P";
-  /** Audio strategy for video editing. `auto` is determined by the model, `origin` retains the original audio of the input video. */
+  /** Happyhorse Videos Ratio */
+  ratio?: "16:9" | "9:16" | "1:1" | "4:3" | "3:4";
+  /** Happyhorse Videos Duration */
+  duration?: number;
+  /** Happyhorse Videos Watermark */
+  watermark?: boolean;
+  /** Happyhorse Videos Audio Setting */
   audioSetting?: "auto" | "origin";
+  /** Happyhorse Videos Seed */
+  seed?: number;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -56,21 +56,21 @@ export interface HappyhorseGenerateOptions {
 export class Happyhorse {
   constructor(private transport: Transport) {}
 
-  /** Call /happyhorse/videos. */
+  /** Happyhorse Videos */
   async generate(options: HappyhorseGenerateOptions = {}): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
-    if (options.seed !== undefined) body["seed"] = options.seed;
-    body["model"] = options.model ?? "happyhorse-1.1-t2v";
-    body["ratio"] = options.ratio ?? "16:9";
     body["action"] = options.action ?? "generate";
+    body["model"] = options.model ?? "happyhorse-1.1-t2v";
     if (options.prompt !== undefined) body["prompt"] = options.prompt;
-    body["duration"] = options.duration ?? 5;
     if (options.imageUrl !== undefined) body["image_url"] = options.imageUrl;
-    if (options.videoUrl !== undefined) body["video_url"] = options.videoUrl;
-    body["watermark"] = options.watermark ?? false;
     if (options.imageUrls !== undefined) body["image_urls"] = options.imageUrls;
+    if (options.videoUrl !== undefined) body["video_url"] = options.videoUrl;
     body["resolution"] = options.resolution ?? "1080P";
+    body["ratio"] = options.ratio ?? "16:9";
+    body["duration"] = options.duration ?? 5;
+    body["watermark"] = options.watermark ?? false;
     body["audio_setting"] = options.audioSetting ?? "auto";
+    if (options.seed !== undefined) body["seed"] = options.seed;
     for (const [key, value] of Object.entries(options)) {
       if (!["action", "async", "audioSetting", "callbackUrl", "duration", "imageUrl", "imageUrls", "maxWait", "model", "pollInterval", "prompt", "ratio", "resolution", "seed", "videoUrl", "wait", "watermark"].includes(key) && value !== undefined) {
         body[key] = value;
