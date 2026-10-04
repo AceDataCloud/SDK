@@ -235,3 +235,16 @@ describe('Kling resource', () => {
     expect(request).not.toHaveBeenCalled();
   });
 });
+
+
+it('submits Turbo, storyboards and commerce through public routes', async () => {
+  const request = jest.fn().mockResolvedValue({ task_id: 'task-kling' });
+  const client = new Kling({ request } as any);
+  await client.generate({action: 'text2video', model: 'kling-v3-turbo', prompt: 'ocean', duration: 7});
+  await expect(client.generate({action: 'text2video', model: 'kling-v3-turbo', prompt: 'ocean', generateAudio: false})).rejects.toThrow('included audio');
+  const shots = [{index: 1, prompt: 'ocean', duration: 5}];
+  await client.generate({action: 'text2video', model: 'kling-v3', multiShot: true, shotType: 'customize', multiPrompt: shots});
+  expect(request).toHaveBeenLastCalledWith('POST', '/kling/videos', {json: {action: 'text2video', model: 'kling-v3', multi_shot: true, shot_type: 'customize', multi_prompt: shots}});
+  await client.goodsStudio({contents: [], settings: {duration: 15}});
+  expect(request).toHaveBeenLastCalledWith('POST', '/kling/goods-studio', {json: {contents: [], settings: {duration: 15}}});
+});

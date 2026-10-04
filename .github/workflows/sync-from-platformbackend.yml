@@ -3,11 +3,13 @@ name: Sync from PlatformBackend
 on:
   repository_dispatch:
     types: [platform-contracts-updated]
+  schedule:
+    - cron: '31 6 * * *'
   workflow_dispatch:
     inputs:
       source_sha:
         description: Full PlatformBackend commit SHA
-        required: true
+        required: false
         type: string
       services:
         description: Comma-separated service aliases, or all
@@ -40,12 +42,15 @@ jobs:
           SYNC_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         run: |
           test -n "$SYNC_TOKEN" || { echo "::error::BOT_GITHUB_TOKEN is required to open a PR and trigger CI."; exit 1; }
-          sha="$EVENT_SHA"
-          services="$MANUAL_SERVICES"
+          sha=""
+          services="${MANUAL_SERVICES:-all}"
           if [ "$EVENT_NAME" = repository_dispatch ]; then
             services=$(jq -er 'if type == "array" then join(",") elif type == "string" then . else error("Missing changed_services") end' <<<"$EVENT_SERVICES")
           else
             sha="$MANUAL_SHA"
+          fi
+          if [ "$EVENT_NAME" = schedule ] || [ -z "$sha" ]; then
+            sha=$(GH_TOKEN="$SYNC_TOKEN" gh api repos/AceDataCloud/PlatformBackend/commits/main --jq .sha)
           fi
           if ! [[ "$sha" =~ ^[0-9a-f]{40}$ ]]; then
             echo "::error::A full PlatformBackend source SHA is required."
@@ -88,11 +93,11 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
-          branch: codex/sync-platform-${{ steps.source.outputs.sha }}
+          branch: codex/sync-platform-current
           author: Ace Data Cloud Dev <dev@acedata.cloud>
           committer: Ace Data Cloud Dev <dev@acedata.cloud>
           commit-message: "chore: regenerate SDK from PlatformBackend contracts"
-          title: "sync: SDK contracts from PlatformBackend ${{ steps.source.outputs.sha }}"
+          title: "sync: current public PlatformBackend SDK contracts"
           draft: true
           add-paths: |
             scripts/specs/*.json

@@ -38,6 +38,18 @@ def operations(spec: dict) -> set[tuple[str, str]]:
     }
 
 
+def preserve_client_hints(current: object, incoming: object) -> None:
+    """Keep representation hints owned by the SDK, never stale API constraints."""
+    if isinstance(current, dict) and isinstance(incoming, dict):
+        if (
+            current.get("x-go-optional-pointer") is True
+            and incoming.get("type") == "boolean"
+        ):
+            incoming["x-go-optional-pointer"] = True
+        for key in current.keys() & incoming.keys():
+            preserve_client_hints(current[key], incoming[key])
+
+
 def sync_specs(
     backend: Path, manifest: Path, snapshots: Path, requested: list[str]
 ) -> list[str]:
@@ -58,6 +70,16 @@ def sync_specs(
                 )
             current = json.loads(target.read_text(encoding="utf-8"))
             incoming = normalize(json.loads(source.read_text(encoding="utf-8")))
+            preserve_client_hints(current, incoming)
+            if endpoint["path"] == "/flux/videos":
+                for schema in (
+                    incoming.get("components", {}).get("schemas", {}).values()
+                ):
+                    for field in ("generate_audio", "draft"):
+                        value = schema.get("properties", {}).get(field)
+                        if isinstance(value, dict) and value.get("type") == "boolean":
+                            value["x-go-optional-pointer"] = True
+                            value.pop("default", None)
             if endpoint["path"] not in incoming.get("paths", {}):
                 raise ValueError(
                     f"{alias}/{api_id}: endpoint moved; review the SDK method mapping"

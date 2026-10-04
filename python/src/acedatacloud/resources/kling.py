@@ -13,6 +13,7 @@ KLING_MODELS = (
     "kling-v2-5-turbo",
     "kling-v2-6",
     "kling-v3",
+    "kling-v3-turbo",
     "kling-v3-omni",
     "kling-o1",
 )
@@ -24,6 +25,7 @@ KlingModel = Literal[
     "kling-v2-5-turbo",
     "kling-v2-6",
     "kling-v3",
+    "kling-v3-turbo",
     "kling-v3-omni",
     "kling-o1",
 ]
@@ -83,6 +85,11 @@ def _build_generate_body(
     video_list: list[KlingReferenceVideo] | None,
     negative_prompt: str | None,
     start_image_url: str | None,
+    multi_shot: bool | None = None,
+    shot_type: str | None = None,
+    multi_prompt: list[dict[str, Any]] | None = None,
+    element_list: list[dict[str, Any]] | None = None,
+    voice_list: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if model not in KLING_MODELS:
         raise ValueError(f"model must be one of: {', '.join(KLING_MODELS)}")
@@ -93,9 +100,29 @@ def _build_generate_body(
     if video_list is not None and not video_list:
         raise ValueError("video_list must be non-empty or omitted")
 
-    is_v3 = model in {"kling-v3", "kling-v3-omni"}
+    is_turbo = model == "kling-v3-turbo"
+    is_v3 = model in {"kling-v3", "kling-v3-omni", "kling-v3-turbo"}
+    if is_turbo:
+        if mode not in {None, "std", "pro"} or generate_audio is False:
+            raise ValueError("Turbo supports std/pro with included audio; omit generate_audio or use true")
+        if any(
+            value is not None
+            for value in (
+                end_image_url,
+                camera_control,
+                cfg_scale,
+                negative_prompt,
+                image_list,
+                video_list,
+                element_list,
+                voice_list,
+            )
+        ):
+            raise ValueError("Turbo does not support tail frames, camera controls or Omni references")
+        if multi_shot or multi_prompt:
+            raise ValueError("Turbo does not support storyboards")
     has_references = bool(image_list or video_list)
-    if action in {"text2video", "image2video"} and not prompt:
+    if action in {"text2video", "image2video"} and not prompt and not multi_prompt:
         raise ValueError("prompt is required for text2video and image2video")
     if action == "image2video" and not start_image_url:
         raise ValueError("start_image_url is required for image2video")
@@ -188,6 +215,11 @@ def _build_generate_body(
         "camera_control": camera_control,
         "negative_prompt": negative_prompt,
         "start_image_url": start_image_url,
+        "multi_shot": multi_shot,
+        "shot_type": shot_type,
+        "multi_prompt": multi_prompt,
+        "element_list": element_list,
+        "voice_list": voice_list,
     }
     body.update({key: value for key, value in optional_fields.items() if value is not None})
     if image_list is not None:
@@ -274,6 +306,11 @@ class Kling:
         video_list: list[KlingReferenceVideo] | None = None,
         negative_prompt: str | None = None,
         start_image_url: str | None = None,
+        multi_shot: bool | None = None,
+        shot_type: str | None = None,
+        multi_prompt: list[dict[str, Any]] | None = None,
+        element_list: list[dict[str, Any]] | None = None,
+        voice_list: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         body = _build_generate_body(
             action=action,
@@ -294,6 +331,11 @@ class Kling:
             video_list=video_list,
             negative_prompt=negative_prompt,
             start_image_url=start_image_url,
+            multi_shot=multi_shot,
+            shot_type=shot_type,
+            multi_prompt=multi_prompt,
+            element_list=element_list,
+            voice_list=voice_list,
         )
         return self._transport.request("POST", "/kling/videos", json=body)
 
@@ -320,6 +362,22 @@ class Kling:
             async_=async_,
         )
         return self._transport.request("POST", "/kling/motion", json=body)
+
+    def lip_sync(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/lip-sync body; poll the returned task ID."""
+        return self._transport.request("POST", "/kling/lip-sync", json=request)
+
+    def talking_photo(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/talking-photo body; poll the returned task ID."""
+        return self._transport.request("POST", "/kling/talking-photo", json=request)
+
+    def goods_studio(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/goods-studio body; poll the returned task ID."""
+        return self._transport.request("POST", "/kling/goods-studio", json=request)
+
+    def video_commerce(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/video-commerce body; poll the returned task ID."""
+        return self._transport.request("POST", "/kling/video-commerce", json=request)
 
 
 class AsyncKling:
@@ -349,6 +407,11 @@ class AsyncKling:
         video_list: list[KlingReferenceVideo] | None = None,
         negative_prompt: str | None = None,
         start_image_url: str | None = None,
+        multi_shot: bool | None = None,
+        shot_type: str | None = None,
+        multi_prompt: list[dict[str, Any]] | None = None,
+        element_list: list[dict[str, Any]] | None = None,
+        voice_list: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         body = _build_generate_body(
             action=action,
@@ -369,6 +432,11 @@ class AsyncKling:
             video_list=video_list,
             negative_prompt=negative_prompt,
             start_image_url=start_image_url,
+            multi_shot=multi_shot,
+            shot_type=shot_type,
+            multi_prompt=multi_prompt,
+            element_list=element_list,
+            voice_list=voice_list,
         )
         return await self._transport.request("POST", "/kling/videos", json=body)
 
@@ -395,3 +463,19 @@ class AsyncKling:
             async_=async_,
         )
         return await self._transport.request("POST", "/kling/motion", json=body)
+
+    async def lip_sync(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/lip-sync body; poll the returned task ID."""
+        return await self._transport.request("POST", "/kling/lip-sync", json=request)
+
+    async def talking_photo(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/talking-photo body; poll the returned task ID."""
+        return await self._transport.request("POST", "/kling/talking-photo", json=request)
+
+    async def goods_studio(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/goods-studio body; poll the returned task ID."""
+        return await self._transport.request("POST", "/kling/goods-studio", json=request)
+
+    async def video_commerce(self, **request: Any) -> dict[str, Any]:
+        """Submit the public /kling/video-commerce body; poll the returned task ID."""
+        return await self._transport.request("POST", "/kling/video-commerce", json=request)

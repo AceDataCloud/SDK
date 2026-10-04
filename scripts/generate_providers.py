@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from genlib import go_gen, python_gen, ts_gen  # noqa: E402
-from genlib.model import load  # noqa: E402
+from genlib.model import Service, load  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -83,7 +83,10 @@ def main() -> int:
         print(f"typescript: {len(written)} files")
 
     if "go" in languages:
-        written = go_gen.write_all(services, ROOT / "go")
+        import json
+        manifest = json.loads(args.manifest.read_text())
+        go_services = [*services, Service("kling", manifest["kling"], args.specs)] if "kling" in manifest else services
+        written = go_gen.write_all(go_services, ROOT / "go")
         for path in written:
             _format_go(path)
         total += len(written)

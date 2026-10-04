@@ -185,6 +185,12 @@
     "id": "8823cd83-54f6-4ea8-979a-7fa448577186",
     "path": "/suno/upload",
     "name": "Suno Upload API"
+   },
+   {
+    "id": "32141b95-043f-5845-b832-77c32ddd6fa6",
+    "path": "/suno/mp3",
+    "name": "Suno MP3 URL API",
+    "pollable": true
    }
   ],
   "tasks": "/suno/tasks"
@@ -196,6 +202,12 @@
     "id": "deefc5d7-7f22-43e9-929e-f2b6afee60b7",
     "path": "/flux/images",
     "name": "Flux Images Generation API"
+   },
+   {
+    "id": "79bc5b19-5ae8-5931-8b9e-643165c02c64",
+    "path": "/flux/videos",
+    "name": "Flux Videos API",
+    "pollable": true
    }
   ],
   "tasks": "/flux/tasks"
@@ -233,6 +245,18 @@
     "id": "1daf8204-7306-4c54-8014-a00c5996cbfe",
     "path": "/kling/talking-photo",
     "name": "Kling Talking Photo API"
+   },
+   {
+    "id": "f60184f9-3174-5d54-8b97-5b2e6d3753a5",
+    "path": "/kling/goods-studio",
+    "name": "Kling Goods Studio",
+    "pollable": true
+   },
+   {
+    "id": "ad648b8c-ae07-5852-a9c5-c0fcda578908",
+    "path": "/kling/video-commerce",
+    "name": "Kling Video Commerce",
+    "pollable": true
    }
   ],
   "tasks": "/kling/tasks"

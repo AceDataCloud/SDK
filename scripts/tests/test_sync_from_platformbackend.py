@@ -102,6 +102,23 @@ class SnapshotSyncTests(unittest.TestCase):
         self.run_sync()
         self.assertEqual(json.loads((self.snapshots / f"{A}.json").read_text()), spec)
 
+    def test_go_representation_hint_survives_snapshot_refresh(self):
+        old = {
+            "properties": {
+                "flag": {
+                    "type": "boolean",
+                    "x-go-optional-pointer": True,
+                    "enum": [True],
+                }
+            }
+        }
+        new = {"properties": {"flag": {"type": "boolean"}}}
+        sync.preserve_client_hints(old, new)
+        self.assertEqual(
+            new["properties"]["flag"],
+            {"type": "boolean", "x-go-optional-pointer": True},
+        )
+
     def test_missing_source_does_not_partially_write_or_delete(self):
         before = (self.snapshots / f"{A}.json").read_bytes()
         self.change(A)
