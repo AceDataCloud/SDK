@@ -12,30 +12,30 @@ type Happyhorse struct {
 
 // HappyhorseGenerateRequest is the input to happyhorse.Generate.
 type HappyhorseGenerateRequest struct {
-	// Random seed, range 0–2147483647.
-	Seed int
-	// HappyHorse model name. Different actions only support the corresponding model family.
-	Model string
-	// Output video aspect ratio. Text-to-video and reference image-to-video support this parameter; the first frame
-	Ratio string
-	// Operation types. `generate` is for generating video from text, `image_to_video` is for generating video from t
+	// Happyhorse Videos Action
 	Action string
-	// Text prompt words. Text-to-video, reference image to video, and video editing scenarios are required.
+	// Happyhorse Videos Model
+	Model string
+	// Happyhorse Videos Prompt
 	Prompt string
-	// Output video duration (seconds), value range 3–15. The output duration of `video_edit` is determined by the in
-	Duration int
-	// The input image URL for the first frame of the video. Only used by `image_to_video`.
+	// Happyhorse Videos Image Url
 	ImageURL string
-	// URL of the video to be edited. For `video_edit` use only.
-	VideoURL string
-	// Whether to add the HappyHorse watermark. Default is off.
-	Watermark bool
-	// Reference image URL array. `reference_to_video` supports 1–9 images, `video_edit` supports 0–5 images.
+	// Happyhorse Videos Image Urls
 	ImageURLs []string
-	// Output video resolution, optional 720P or 1080P.
+	// Happyhorse Videos Video Url
+	VideoURL string
+	// Happyhorse Videos Resolution
 	Resolution string
-	// Audio strategy for video editing. `auto` is determined by the model, `origin` retains the original audio of th
+	// Happyhorse Videos Ratio
+	Ratio string
+	// Happyhorse Videos Duration
+	Duration int
+	// Happyhorse Videos Watermark
+	Watermark bool
+	// Happyhorse Videos Audio Setting
 	AudioSetting string
+	// Happyhorse Videos Seed
+	Seed int
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -46,51 +46,51 @@ type HappyhorseGenerateRequest struct {
 
 func (r HappyhorseGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
-	if r.Seed != 0 {
-		body["seed"] = r.Seed
+	if r.Action != "" {
+		body["action"] = r.Action
+	} else {
+		body["action"] = "generate"
 	}
 	if r.Model != "" {
 		body["model"] = r.Model
 	} else {
 		body["model"] = "happyhorse-1.1-t2v"
 	}
-	if r.Ratio != "" {
-		body["ratio"] = r.Ratio
-	} else {
-		body["ratio"] = "16:9"
-	}
-	if r.Action != "" {
-		body["action"] = r.Action
-	} else {
-		body["action"] = "generate"
-	}
 	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
-	}
-	if r.Duration != 0 {
-		body["duration"] = r.Duration
-	} else {
-		body["duration"] = 5
 	}
 	if r.ImageURL != "" {
 		body["image_url"] = r.ImageURL
 	}
-	if r.VideoURL != "" {
-		body["video_url"] = r.VideoURL
-	}
-	body["watermark"] = r.Watermark
 	if r.ImageURLs != nil {
 		body["image_urls"] = r.ImageURLs
+	}
+	if r.VideoURL != "" {
+		body["video_url"] = r.VideoURL
 	}
 	if r.Resolution != "" {
 		body["resolution"] = r.Resolution
 	} else {
 		body["resolution"] = "1080P"
 	}
+	if r.Ratio != "" {
+		body["ratio"] = r.Ratio
+	} else {
+		body["ratio"] = "16:9"
+	}
+	if r.Duration != 0 {
+		body["duration"] = r.Duration
+	} else {
+		body["duration"] = 5
+	}
+	body["watermark"] = r.Watermark
 	if r.AudioSetting != "" {
 		body["audio_setting"] = r.AudioSetting
 	} else {
 		body["audio_setting"] = "auto"
+	}
+	if r.Seed != 0 {
+		body["seed"] = r.Seed
 	}
 	body["async"] = true
 	if r.Async != nil {
@@ -107,7 +107,7 @@ func (r HappyhorseGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Call /happyhorse/videos.
+// Generate Happyhorse Videos
 func (c *Happyhorse) Generate(ctx context.Context, req HappyhorseGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
