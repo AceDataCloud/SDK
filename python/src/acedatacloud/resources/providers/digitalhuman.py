@@ -33,16 +33,16 @@ class Digitalhuman:
     def generate(
         self,
         *,
-        video_url: str,
+        video_url: str | None = None,
+        image_url: str | None = None,
+        audio_url: str | None = None,
         text: str | None = None,
-        speed: float | None = None,
-        steps: int | None = None,
+        voice_id: str | None = None,
         engine: Literal["latentsync", "heygem"] | None = None,
         guidance: float | None = None,
+        steps: int | None = None,
         seam_fix: bool | None = None,
-        voice_id: str | None = None,
-        audio_url: str | None = None,
-        image_url: str | None = None,
+        speed: float | None = None,
         resolution: Literal["720p", "540p"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -51,22 +51,23 @@ class Digitalhuman:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Digital Human video generation API — turn a portrait plus audio or text into a talking-head video."""
+        """Digital Human Videos"""
         body: dict[str, Any] = {}
-        body["video_url"] = video_url
-        if text is not None:
-            body["text"] = text
-        body["speed"] = speed if speed is not None else 1.0
-        body["steps"] = steps if steps is not None else 40
-        body["engine"] = engine if engine is not None else "latentsync"
-        body["guidance"] = guidance if guidance is not None else 2.0
-        body["seam_fix"] = seam_fix if seam_fix is not None else True
-        if voice_id is not None:
-            body["voice_id"] = voice_id
-        if audio_url is not None:
-            body["audio_url"] = audio_url
+        if video_url is not None:
+            body["video_url"] = video_url
         if image_url is not None:
             body["image_url"] = image_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if text is not None:
+            body["text"] = text
+        if voice_id is not None:
+            body["voice_id"] = voice_id
+        body["engine"] = engine if engine is not None else "latentsync"
+        body["guidance"] = guidance if guidance is not None else 2.0
+        body["steps"] = steps if steps is not None else 40
+        body["seam_fix"] = seam_fix if seam_fix is not None else True
+        body["speed"] = speed if speed is not None else 1.0
         body["resolution"] = resolution if resolution is not None else "720p"
         body.update(extra)
         if callback_url is not None:
@@ -91,7 +92,7 @@ class Digitalhuman:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Digital Human voice-clone API — upload an audio sample to clone a custom voice for speech synthesis."""
+        """Digital Human Voices"""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
         body["lang"] = lang if lang is not None else "zh"
@@ -117,16 +118,16 @@ class AsyncDigitalhuman:
     async def generate(
         self,
         *,
-        video_url: str,
+        video_url: str | None = None,
+        image_url: str | None = None,
+        audio_url: str | None = None,
         text: str | None = None,
-        speed: float | None = None,
-        steps: int | None = None,
+        voice_id: str | None = None,
         engine: Literal["latentsync", "heygem"] | None = None,
         guidance: float | None = None,
+        steps: int | None = None,
         seam_fix: bool | None = None,
-        voice_id: str | None = None,
-        audio_url: str | None = None,
-        image_url: str | None = None,
+        speed: float | None = None,
         resolution: Literal["720p", "540p"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -135,22 +136,23 @@ class AsyncDigitalhuman:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Digital Human video generation API — turn a portrait plus audio or text into a talking-head video."""
+        """Digital Human Videos"""
         body: dict[str, Any] = {}
-        body["video_url"] = video_url
-        if text is not None:
-            body["text"] = text
-        body["speed"] = speed if speed is not None else 1.0
-        body["steps"] = steps if steps is not None else 40
-        body["engine"] = engine if engine is not None else "latentsync"
-        body["guidance"] = guidance if guidance is not None else 2.0
-        body["seam_fix"] = seam_fix if seam_fix is not None else True
-        if voice_id is not None:
-            body["voice_id"] = voice_id
-        if audio_url is not None:
-            body["audio_url"] = audio_url
+        if video_url is not None:
+            body["video_url"] = video_url
         if image_url is not None:
             body["image_url"] = image_url
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if text is not None:
+            body["text"] = text
+        if voice_id is not None:
+            body["voice_id"] = voice_id
+        body["engine"] = engine if engine is not None else "latentsync"
+        body["guidance"] = guidance if guidance is not None else 2.0
+        body["steps"] = steps if steps is not None else 40
+        body["seam_fix"] = seam_fix if seam_fix is not None else True
+        body["speed"] = speed if speed is not None else 1.0
         body["resolution"] = resolution if resolution is not None else "720p"
         body.update(extra)
         if callback_url is not None:
@@ -175,7 +177,7 @@ class AsyncDigitalhuman:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Digital Human voice-clone API — upload an audio sample to clone a custom voice for speech synthesis."""
+        """Digital Human Voices"""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
         body["lang"] = lang if lang is not None else "zh"
