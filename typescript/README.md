@@ -71,7 +71,6 @@ const claude = new AceDataCloud({
 const response = await claude.chat.messages.create({
   model: 'claude-sonnet-5-5',
   messages: [{ role: 'user', content: 'Explain this code.' }],
-  metadata: { user_id: 'example-user-001' },
   thinking: { type: 'adaptive', display: 'updates' },
   output_config: { effort: 'high' },
 });
@@ -80,10 +79,6 @@ const response = await claude.chat.messages.create({
 Streaming and `claude.chat.messages.countTokens(...)` also preserve thinking
 configuration. Parameter pass-through does not guarantee model support; API errors
 are returned through the SDK's normal error handling.
-
-Optional `metadata.user_id` is passed as request metadata, not conversation content.
-Use a stable identifier without personal information; it does not replace Bearer
-authentication or require the thinking beta header.
 
 ## OpenAI Embeddings
 
