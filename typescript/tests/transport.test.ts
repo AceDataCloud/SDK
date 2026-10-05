@@ -44,6 +44,7 @@ describe('Transport API base URL', () => {
         ...(operation === 'countTokens'
           ? {}
           : {
+              metadata: { user_id: 'example-user-001' },
               output_config: { effort: 'future-effort', extension: true },
               temperature: 0.7,
             }),

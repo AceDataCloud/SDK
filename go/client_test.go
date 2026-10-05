@@ -43,6 +43,7 @@ func TestChatConfigurationPassthrough(t *testing.T) {
 				},
 			}
 			if operation != "count_tokens" {
+				extra["metadata"] = map[string]any{"user_id": "example-user-001"}
 				extra["output_config"] = map[string]any{"effort": "future-effort", "extension": true}
 				extra["temperature"] = 0.7
 			}
