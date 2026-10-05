@@ -63,6 +63,37 @@ for chunk := range chunks {
 if err := <-errs; err != nil { panic(err) }
 ```
 
+## Native Claude Messages
+
+Use `MessagesRequest.Extra` for thinking and output configuration. These fields
+are passed through without SDK model-specific enum or combination checks; the
+selected model determines which values it accepts. For the beta `display: "updates"`
+mode, set the required header on a dedicated client (headers apply to every request):
+
+```go
+client, err := acedatacloud.NewClient(
+    acedatacloud.WithAPIToken("<token>"),
+    acedatacloud.WithHeaders(map[string]string{
+        "anthropic-beta": "thinking-display-updates-2026-08-18",
+    }),
+)
+if err != nil { panic(err) }
+
+response, err := client.Chat().Messages().Create(ctx, acedatacloud.MessagesRequest{
+    Model: "claude-sonnet-5-5",
+    Messages: []map[string]any{{"role": "user", "content": "Explain this code."}},
+    Extra: map[string]any{
+        "thinking": map[string]any{"type": "adaptive", "display": "updates"},
+        "output_config": map[string]any{"effort": "high"},
+    },
+})
+if err != nil { panic(err) }
+```
+
+`CreateStream` and `CountTokens` also preserve thinking configuration. Parameter
+pass-through does not guarantee model support; API errors are returned through
+the SDK's normal error handling.
+
 ## Images (task-based)
 
 ```go

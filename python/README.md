@@ -64,6 +64,31 @@ asyncio.run(main())
 | `client.files` | File uploads |
 | `client.platform` | Applications, credentials, models management |
 
+## Native Claude Messages
+
+Thinking and output configuration are passed through without SDK model-specific
+enum or combination checks. The selected model determines which values it accepts.
+For the beta `display: "updates"` mode, set the required header on a dedicated
+client (client headers apply to every request):
+
+```python
+with AceDataCloud(
+    api_token="your-token",
+    headers={"anthropic-beta": "thinking-display-updates-2026-08-18"},
+) as client:
+    response = client.chat.messages.create(
+        model="claude-sonnet-5-5",
+        messages=[{"role": "user", "content": "Explain this code."}],
+        thinking={"type": "adaptive", "display": "updates"},
+        output_config={"effort": "high"},
+    )
+```
+
+`AsyncAceDataCloud` accepts the same header and fields. Streaming and
+`client.chat.messages.count_tokens(...)` also preserve thinking configuration.
+Parameter pass-through does not guarantee model support; API errors are returned
+through the SDK's normal error handling.
+
 ## Image Generation (with Task Polling)
 
 ```python

@@ -1,3 +1,4 @@
+import { AceDataCloud } from '../src/client';
 import { Transport } from '../src/runtime/transport';
 import { TimeoutError } from '../src/runtime/errors';
 
@@ -22,6 +23,59 @@ describe('Transport API base URL', () => {
       expect.any(Object)
     );
   });
+
+  it.each(['create', 'stream', 'countTokens'] as const)(
+    'preserves native Messages configuration and beta headers for %s',
+    async (operation) => {
+      const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+        operation === 'stream'
+          ? new Response('', { status: 200, headers: { 'content-type': 'text/event-stream' } })
+          : new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } })
+      );
+      const client = new AceDataCloud({
+        apiToken: 'test-token',
+        maxRetries: 0,
+        headers: { 'anthropic-beta': 'thinking-display-updates-2026-08-18' },
+      });
+      const opts = {
+        model: 'claude-sonnet-5-5',
+        messages: [],
+        thinking: { type: 'between_tools', display: 'updates', extension: { enabled: true } },
+        ...(operation === 'countTokens'
+          ? {}
+          : {
+              output_config: { effort: 'future-effort', extension: true },
+              temperature: 0.7,
+            }),
+      };
+
+      if (operation === 'countTokens') {
+        await client.chat.messages.countTokens(opts);
+      } else if (operation === 'stream') {
+        const chunks = [];
+        for await (const chunk of await client.chat.messages.create({ ...opts, stream: true })) {
+          chunks.push(chunk);
+        }
+        expect(chunks).toEqual([]);
+      } else {
+        await client.chat.messages.create(opts);
+      }
+
+      const path = operation === 'countTokens' ? '/v1/messages/count_tokens' : '/v1/messages';
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock.mock.calls[0][0]).toBe(`https://x402.acedata.cloud${path}`);
+      const request = fetchMock.mock.calls[0][1]!;
+      expect(request.method).toBe('POST');
+      expect(request.headers).toMatchObject({
+        'anthropic-beta': 'thinking-display-updates-2026-08-18',
+      });
+      expect(JSON.parse(request.body as string)).toEqual({
+        ...opts,
+        ...(operation === 'countTokens' ? {} : { max_tokens: 4096 }),
+        ...(operation === 'stream' ? { stream: true } : {}),
+      });
+    }
+  );
 
   it('preserves an explicit API base URL override', async () => {
     const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
