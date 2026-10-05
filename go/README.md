@@ -83,6 +83,7 @@ response, err := client.Chat().Messages().Create(ctx, acedatacloud.MessagesReque
     Model: "claude-sonnet-5-5",
     Messages: []map[string]any{{"role": "user", "content": "Explain this code."}},
     Extra: map[string]any{
+        "metadata": map[string]any{"user_id": "example-user-001"},
         "thinking": map[string]any{"type": "adaptive", "display": "updates"},
         "output_config": map[string]any{"effort": "high"},
     },
@@ -93,6 +94,11 @@ if err != nil { panic(err) }
 `CreateStream` and `CountTokens` also preserve thinking configuration. Parameter
 pass-through does not guarantee model support; API errors are returned through
 the SDK's normal error handling.
+
+Optional `metadata.user_id` in `MessagesRequest.Extra` is passed as request
+metadata, not conversation content. Use a stable identifier without personal
+information; it does not replace Bearer authentication or require the thinking
+beta header.
 
 ## Images (task-based)
 

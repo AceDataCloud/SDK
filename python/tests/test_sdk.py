@@ -245,6 +245,31 @@ def test_openai_images_support_official_gpt_image_25_variants(client, model):
     )
 
 
+@pytest.mark.parametrize("model", ["text-embedding-3-small", "text-embedding-3-large"])
+@respx.mock
+def test_openai_embeddings(client, model):
+    route = respx.post("https://api.acedata.cloud/openai/embeddings").mock(return_value=httpx.Response(200, json={}))
+    body = {"model": model, "input": ["Hello!", "Goodbye!"], "encoding_format": "base64", "dimensions": 256}
+
+    client.openai.embeddings.create(**body)
+
+    assert json.loads(route.calls.last.request.content) == body
+
+
+@pytest.mark.parametrize("model", ["text-embedding-3-small", "text-embedding-3-large"])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_openai_embeddings(async_client, model):
+    route = respx.post("https://api.acedata.cloud/openai/embeddings").mock(return_value=httpx.Response(200, json={}))
+    body = {"model": model, "input": "Hello!"}
+    try:
+        await async_client.openai.embeddings.create(**body)
+    finally:
+        await async_client.close()
+
+    assert json.loads(route.calls.last.request.content) == body
+
+
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
@@ -300,7 +325,11 @@ def test_chat_configuration_passthrough(operation, thinking):
     )
     body = {"model": "claude-sonnet-5-5", "messages": [], "thinking": thinking}
     if operation != "count_tokens":
-        body.update(output_config={"effort": "future-effort", "extension": True}, temperature=0.7)
+        body.update(
+            metadata={"user_id": "example-user-001"},
+            output_config={"effort": "future-effort", "extension": True},
+            temperature=0.7,
+        )
     with AceDataCloud(
         api_token="test-token",
         base_url="https://api.acedata.cloud",
@@ -339,6 +368,7 @@ async def test_async_chat_configuration_passthrough(operation):
         "thinking": {"type": "between_tools", "display": "updates", "extension": True},
     }
     if operation != "count_tokens":
+        body["metadata"] = {"user_id": "example-user-001"}
         body["output_config"] = {"effort": "future-effort", "extension": True}
     async with AsyncAceDataCloud(
         api_token="test-token",

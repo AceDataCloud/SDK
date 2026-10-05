@@ -1,6 +1,30 @@
 import { OpenAI } from '../src/resources/openai';
 
 describe('OpenAI resource', () => {
+  it.each(['text-embedding-3-small', 'text-embedding-3-large'])(
+    'sends supported embedding model %s and optional parameters',
+    async (model) => {
+      const request = jest.fn().mockResolvedValue({});
+      const openai = new OpenAI({ request } as any);
+
+      await openai.embeddings.create({
+        model,
+        input: ['Hello!', 'Goodbye!'],
+        encodingFormat: 'base64',
+        dimensions: 256,
+      });
+
+      expect(request).toHaveBeenCalledWith('POST', '/openai/embeddings', {
+        json: {
+          model,
+          input: ['Hello!', 'Goodbye!'],
+          encoding_format: 'base64',
+          dimensions: 256,
+        },
+      });
+    }
+  );
+
   it.each(['gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official'] as const)(
     'sends %s to both image endpoints',
     async (model) => {

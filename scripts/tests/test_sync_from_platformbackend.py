@@ -102,6 +102,16 @@ class SnapshotSyncTests(unittest.TestCase):
         self.run_sync()
         self.assertEqual(json.loads((self.snapshots / f"{A}.json").read_text()), spec)
 
+    def test_retired_embedding_model_is_not_in_pinned_contract(self):
+        path = SCRIPT.parent / "specs/a0840c8a-2b9a-4407-8aaf-0057f0e1f65c.json"
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        model = spec["paths"]["/openai/embeddings"]["post"]["requestBody"]["content"][
+            "application/json"
+        ]["schema"]["properties"]["model"]
+        self.assertEqual(
+            model["enum"], ["text-embedding-3-small", "text-embedding-3-large"]
+        )
+
     def test_go_representation_hint_survives_snapshot_refresh(self):
         old = {
             "properties": {
