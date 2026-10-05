@@ -105,12 +105,9 @@ they are not generator inputs and cover only the original nine domains.
 
 ## Contract synchronization
 
-PlatformBackend sends `platform-contracts-updated` with an immutable source SHA.
-The sync workflow imports existing API IDs from that checkout using its canonical
-OpenAPI normalizer, refreshes `scripts/specs/`, and runs the provider generator for
-Python, TypeScript and Go. It opens a draft PR through the bot identity and returns;
-normal CI and review gate the merge. There is no Docs-triggered code sync, agent
-polling, PR cleanup or admin merge.
+PlatformBackend's daily ecosystem CronJob prepares incremental capability PRs
+using a pinned Backend source. Existing CI and human review gate each update.
+The previous dispatch/Copilot sync workflows are retired.
 
 For an offline preview, use a clean SDK checkout and a PlatformBackend checkout at
 the source SHA:
@@ -124,3 +121,11 @@ The curated manifest is not expanded automatically. New endpoints and the six
 hand-written client families above need review; missing or moved operations fail
 before any snapshot is written. A schema removal or stricter parameter may be a
 breaking API change, so generated PRs remain drafts until compatibility is checked.
+
+## Daily capability updates
+
+PlatformBackend `scripts/sync_ecosystem.py` is the only scheduled coordinator.
+One daily Kubernetes Job reviews Backend docs and API changes with Claude Code,
+updates existing files, and creates or updates one reviewable PR per repository.
+It never merges PRs or duplicates the Backend guide tree. Normal CI and review
+remain required; publication and sub-repository mirroring run after merge.
