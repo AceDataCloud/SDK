@@ -281,6 +281,88 @@ def test_chat_count_tokens(client):
     assert result["input_tokens"] == 42
 
 
+@respx.mock
+@pytest.mark.parametrize("operation", ["create", "stream", "count_tokens"])
+@pytest.mark.parametrize(
+    "thinking",
+    [
+        {"type": "adaptive", "display": "updates"},
+        {"type": "between_tools", "display": "future-display", "extension": {"enabled": True}},
+        {"type": "enabled", "budget_tokens": 1},
+    ],
+)
+def test_chat_configuration_passthrough(operation, thinking):
+    path = "/v1/messages/count_tokens" if operation == "count_tokens" else "/v1/messages"
+    route = respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, json={})
+        if operation != "stream"
+        else httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+    )
+    body = {"model": "claude-sonnet-5-5", "messages": [], "thinking": thinking}
+    if operation != "count_tokens":
+        body.update(output_config={"effort": "future-effort", "extension": True}, temperature=0.7)
+    with AceDataCloud(
+        api_token="test-token",
+        base_url="https://api.acedata.cloud",
+        max_retries=0,
+        headers={"anthropic-beta": "thinking-display-updates-2026-08-18"},
+    ) as client:
+        if operation == "count_tokens":
+            client.chat.messages.count_tokens(**body)
+        elif operation == "stream":
+            list(client.chat.messages.create(**body, stream=True))
+        else:
+            client.chat.messages.create(**body)
+
+    expected = dict(body)
+    if operation != "count_tokens":
+        expected["max_tokens"] = 4096
+    if operation == "stream":
+        expected["stream"] = True
+    assert json.loads(route.calls.last.request.content) == expected
+    assert route.calls.last.request.headers["anthropic-beta"] == "thinking-display-updates-2026-08-18"
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("operation", ["create", "stream", "count_tokens"])
+async def test_async_chat_configuration_passthrough(operation):
+    path = "/v1/messages/count_tokens" if operation == "count_tokens" else "/v1/messages"
+    route = respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, json={})
+        if operation != "stream"
+        else httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+    )
+    body = {
+        "model": "claude-sonnet-5-5",
+        "messages": [],
+        "thinking": {"type": "between_tools", "display": "updates", "extension": True},
+    }
+    if operation != "count_tokens":
+        body["output_config"] = {"effort": "future-effort", "extension": True}
+    async with AsyncAceDataCloud(
+        api_token="test-token",
+        base_url="https://api.acedata.cloud",
+        max_retries=0,
+        headers={"anthropic-beta": "thinking-display-updates-2026-08-18"},
+    ) as client:
+        if operation == "count_tokens":
+            await client.chat.messages.count_tokens(**body)
+        elif operation == "stream":
+            stream = await client.chat.messages.create(**body, stream=True)
+            assert [chunk async for chunk in stream] == []
+        else:
+            await client.chat.messages.create(**body)
+
+    expected = dict(body)
+    if operation != "count_tokens":
+        expected["max_tokens"] = 4096
+    if operation == "stream":
+        expected["stream"] = True
+    assert json.loads(route.calls.last.request.content) == expected
+    assert route.calls.last.request.headers["anthropic-beta"] == "thinking-display-updates-2026-08-18"
+
+
 # ── Image Generation ──────────────────────────────────────────────────
 
 

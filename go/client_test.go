@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -30,6 +31,88 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestChatConfigurationPassthrough(t *testing.T) {
+	for _, operation := range []string{"create", "stream", "count_tokens"} {
+		t.Run(operation, func(t *testing.T) {
+			extra := map[string]any{
+				"thinking": map[string]any{
+					"type": "between_tools", "display": "updates", "extension": map[string]any{"enabled": true},
+				},
+			}
+			if operation != "count_tokens" {
+				extra["output_config"] = map[string]any{"effort": "future-effort", "extension": true}
+				extra["temperature"] = 0.7
+			}
+			expected := map[string]any{
+				"model": "claude-sonnet-5-5", "messages": []any{},
+			}
+			for key, value := range extra {
+				expected[key] = value
+			}
+			path := "/v1/messages"
+			if operation == "count_tokens" {
+				path += "/count_tokens"
+			} else {
+				expected["max_tokens"] = float64(4096)
+			}
+			if operation == "stream" {
+				expected["stream"] = true
+			}
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != path {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				if r.Header.Get("anthropic-beta") != "thinking-display-updates-2026-08-18" {
+					t.Errorf("missing beta header: %+v", r.Header)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("body = %+v, want %+v", body, expected)
+				}
+				if operation == "stream" {
+					w.Header().Set("Content-Type", "text/event-stream")
+				} else {
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{}`))
+				}
+			}))
+			defer srv.Close()
+
+			client, err := NewClient(
+				WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0),
+				WithHeaders(map[string]string{"anthropic-beta": "thinking-display-updates-2026-08-18"}),
+			)
+			if err != nil {
+				t.Fatalf("NewClient: %v", err)
+			}
+			req := MessagesRequest{Model: "claude-sonnet-5-5", Messages: []map[string]any{}, Extra: extra}
+			switch operation {
+			case "create":
+				_, err = client.Chat().Messages().Create(context.Background(), req)
+			case "count_tokens":
+				_, err = client.Chat().Messages().CountTokens(context.Background(), req)
+			case "stream":
+				chunks, errs := client.Chat().Messages().CreateStream(context.Background(), req)
+				for chunk := range chunks {
+					t.Errorf("unexpected chunk: %+v", chunk)
+				}
+				err = <-errs
+			}
+			if err != nil {
+				t.Fatalf("%s: %v", operation, err)
+			}
+			if calls != 1 {
+				t.Errorf("got %d calls, want 1", calls)
+			}
+		})
 	}
 }
 
