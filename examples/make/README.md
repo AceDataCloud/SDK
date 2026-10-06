@@ -23,6 +23,8 @@ This directory is a source-controlled [Make Apps Editor local app](https://devel
 4. Open this directory in VS Code. Right-click `makecomapp.json` and choose **Deploy to Make (beta)**. Select the testing origin and confirm creation of the Connection and both modules. Review their labels, code, output interfaces, and Base in Make's editor. [Make documents this deployment flow](https://developers.make.com/custom-apps-documentation/get-started/make-apps-editor/apps-sdk/local-development-for-apps/deploy-changes-from-local-app-to-make-app); the local development feature is beta, so use the editor's validation and inspect the installed version.
 5. Create an AceDataCloud connection inside Make. Enter only the raw AceDataCloud API token in the password field, without a `Bearer ` prefix. The connection sends a free `GET /v1/models` request to validate the token. This check establishes token validity; it does not prove that a specific chat model is enabled or funded.
 
+If a script or agent will create, run, and inspect the test scenario through the Make API, its Make token also needs `connections:read`, `connections:write`, `scenarios:read`, `scenarios:write`, and `scenarios:run`. The `sdk-apps` scopes alone cover only app development. The user or agent also needs access to the target Make team and its team ID.
+
 The Connection token is stored by Make and omitted from this repository. Both Base and Connection sanitize the Authorization header in Make request logs. Do not put either token in scenario fields, shared blueprints, screenshots, or support tickets.
 
 ## Verify in Make
