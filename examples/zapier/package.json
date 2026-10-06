@@ -1,0 +1,13 @@
+{
+  "name": "acedatacloud-zapier-poc",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Local Zapier Platform CLI POC for AceDataCloud chat",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "zapier-platform-core": "19.1.0"
+  }
+}
