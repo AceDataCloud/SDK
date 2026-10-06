@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 AiChatModel = Literal[
+    "gpt-5.6-sol-fast",
     "gpt-5.5",
     "gpt-5.5-pro",
     "gpt-5.4",
