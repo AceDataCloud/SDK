@@ -7,4 +7,4 @@ npm install
 npm test
 ```
 
-The token is supplied through Zapier's authentication field. No token or real API call is included in the tests. Before a public integration, run a real Zap in a Zapier developer account, validate its UI and error handling, provide support/privacy details, then submit it for Zapier review. The POC is intentionally private and has not been uploaded.
+The token is supplied through Zapier's secret authentication field. No token or real API call is included in the tests. The installed `zapier-platform-core` schema validator also accepts this app definition. Before a public integration, run a real Zap in a Zapier developer account, validate its UI and error handling, provide support/privacy details, then submit it for Zapier review. The POC is intentionally private and has not been uploaded.
