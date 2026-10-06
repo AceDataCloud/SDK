@@ -1,0 +1,14 @@
+[
+  {
+    "name": "model",
+    "label": "Model",
+    "type": "text",
+    "required": true
+  },
+  {
+    "name": "prompt",
+    "label": "Prompt",
+    "type": "text",
+    "required": true
+  }
+]

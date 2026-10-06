@@ -1,0 +1,23 @@
+{
+  "url": "/chat/completions",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "model": "{{parameters.model}}",
+    "messages": [
+      {
+        "role": "user",
+        "content": "{{parameters.prompt}}"
+      }
+    ],
+    "stream": false
+  },
+  "response": {
+    "output": {
+      "id": "{{body.id}}",
+      "content": "{{body.choices[1].message.content}}",
+      "model": "{{body.model}}",
+      "total_tokens": "{{body.usage.total_tokens}}"
+    }
+  }
+}

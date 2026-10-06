@@ -1,0 +1,14 @@
+{
+  "baseUrl": "https://api.acedata.cloud/v1",
+  "headers": {
+    "Authorization": "Bearer {{connection.apiKey}}"
+  },
+  "response": {
+    "error": {
+      "message": "{{body.error.message}}"
+    }
+  },
+  "log": {
+    "sanitize": ["request.headers.Authorization"]
+  }
+}
