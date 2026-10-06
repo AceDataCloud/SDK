@@ -1,12 +1,13 @@
 {
   "url": "https://api.acedata.cloud/v1/models",
+  "method": "GET",
   "headers": {
     "Authorization": "Bearer {{parameters.apiKey}}"
   },
   "response": {
-    "valid": "{{!body.error && statusCode === 200}}",
+    "valid": "{{!body.error && statusCode === 200 && body.object === 'list'}}",
     "error": {
-      "message": "[{{statusCode}}] {{body.error.message}}"
+      "message": "[{{statusCode}}] {{ifempty(body.error.message, 'Cannot verify the AceDataCloud token')}}"
     }
   },
   "log": {

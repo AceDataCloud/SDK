@@ -1,11 +1,20 @@
 {
-  "baseUrl": "https://api.acedata.cloud/v1",
+  "baseUrl": "https://api.acedata.cloud",
   "headers": {
     "Authorization": "Bearer {{connection.apiKey}}"
   },
   "response": {
     "error": {
-      "message": "[{{statusCode}}] {{body.error.message}}"
+      "message": "[{{statusCode}}] {{ifempty(body.error.message, 'AceDataCloud request failed')}}",
+      "type": "RuntimeError",
+      "401": {
+        "message": "[401] AceDataCloud token is invalid or expired. Reconnect with a valid token.",
+        "type": "InvalidAccessTokenError"
+      },
+      "429": {
+        "message": "[429] AceDataCloud rate limit reached. Make will retry after a delay.",
+        "type": "RateLimitError"
+      }
     }
   },
   "log": {

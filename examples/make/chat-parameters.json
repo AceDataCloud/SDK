@@ -3,12 +3,14 @@
     "name": "model",
     "label": "Model",
     "type": "text",
+    "help": "Enter a current chat model ID from the AceDataCloud model catalog. Model availability and pricing depend on your account.",
     "required": true
   },
   {
     "name": "prompt",
     "label": "Prompt",
     "type": "text",
+    "help": "Text to send as the user message. Each execution creates one billable chat request.",
     "required": true
   }
 ]

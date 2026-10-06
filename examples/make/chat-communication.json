@@ -1,5 +1,5 @@
 {
-  "url": "/chat/completions",
+  "url": "/v1/chat/completions",
   "method": "POST",
   "type": "json",
   "body": {
@@ -13,10 +13,18 @@
     "stream": false
   },
   "response": {
+    "valid": {
+      "condition": "{{!body.error && body.choices && body.choices[1]}}",
+      "message": "AceDataCloud did not return a chat completion. Check the request and its execution before retrying.",
+      "type": "RuntimeError"
+    },
     "output": {
       "id": "{{body.id}}",
       "content": "{{body.choices[1].message.content}}",
       "model": "{{body.model}}",
+      "finish_reason": "{{body.choices[1].finish_reason}}",
+      "prompt_tokens": "{{body.usage.prompt_tokens}}",
+      "completion_tokens": "{{body.usage.completion_tokens}}",
       "total_tokens": "{{body.usage.total_tokens}}"
     }
   }
