@@ -2,6 +2,10 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 const app = require('../index');
 
+test('API token is a secret authentication field', () => {
+  assert.equal(app.authentication.fields[0].type, 'password');
+});
+
 test('authentication checks models with a Bearer token', async () => {
   let request;
   await app.authentication.test({ request: async (value) => { request = value; return { status: 200 }; } }, {
