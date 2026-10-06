@@ -117,6 +117,99 @@ func TestChatConfigurationPassthrough(t *testing.T) {
 	}
 }
 
+func TestSolFastModelPassthrough(t *testing.T) {
+	for _, operation := range []string{"completions", "responses", "messages"} {
+		for _, streaming := range []bool{false, true} {
+			name := operation
+			if streaming {
+				name += "_stream"
+			}
+			t.Run(name, func(t *testing.T) {
+				model := "gpt-5.6-sol-fast"
+				messages := []map[string]any{{"role": "user", "content": "Hello"}}
+				expected := map[string]any{"model": model}
+				path := "/v1/chat/completions"
+				if operation == "responses" {
+					path = "/openai/responses"
+					expected["input"] = "Hello"
+				} else {
+					expected["messages"] = []any{map[string]any{"role": "user", "content": "Hello"}}
+					if operation == "messages" {
+						path = "/v1/messages"
+						expected["max_tokens"] = float64(64)
+					}
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != path {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Errorf("decode request: %v", err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					if streaming {
+						w.Header().Set("Content-Type", "text/event-stream")
+					} else {
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatalf("NewClient: %v", err)
+				}
+				ctx := context.Background()
+				var chunks <-chan map[string]any
+				var errs <-chan error
+				switch operation {
+				case "completions":
+					req := ChatCompletionRequest{Model: model, Messages: messages}
+					if streaming {
+						chunks, errs = client.OpenAI().Chat().Completions().CreateStream(ctx, req)
+					} else {
+						_, err = client.OpenAI().Chat().Completions().Create(ctx, req)
+					}
+				case "responses":
+					req := ResponsesRequest{Model: model, Input: "Hello"}
+					if streaming {
+						chunks, errs = client.OpenAI().Responses().CreateStream(ctx, req)
+					} else {
+						_, err = client.OpenAI().Responses().Create(ctx, req)
+					}
+				case "messages":
+					req := MessagesRequest{Model: model, Messages: messages, MaxTokens: 64}
+					if streaming {
+						chunks, errs = client.Chat().Messages().CreateStream(ctx, req)
+					} else {
+						_, err = client.Chat().Messages().Create(ctx, req)
+					}
+				}
+				if streaming {
+					for chunk := range chunks {
+						t.Errorf("unexpected chunk: %+v", chunk)
+					}
+					err = <-errs
+				}
+				if err != nil {
+					t.Fatalf("%s: %v", name, err)
+				}
+				if calls != 1 {
+					t.Errorf("got %d calls, want 1", calls)
+				}
+			})
+		}
+	}
+}
+
 func TestOpenAIImageOfficialVariants(t *testing.T) {
 	calls := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
