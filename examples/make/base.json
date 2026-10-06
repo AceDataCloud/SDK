@@ -9,6 +9,6 @@
     }
   },
   "log": {
-    "sanitize": ["request.headers.Authorization"]
+    "sanitize": ["request.headers.authorization"]
   }
 }
