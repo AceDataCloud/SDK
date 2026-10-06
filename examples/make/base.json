@@ -5,7 +5,7 @@
   },
   "response": {
     "error": {
-      "message": "{{body.error.message}}"
+      "message": "[{{statusCode}}] {{body.error.message}}"
     }
   },
   "log": {

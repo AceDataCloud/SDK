@@ -4,8 +4,9 @@
     "Authorization": "Bearer {{parameters.apiKey}}"
   },
   "response": {
+    "valid": "{{!body.error && statusCode === 200}}",
     "error": {
-      "message": "{{body.error.message}}"
+      "message": "[{{statusCode}}] {{body.error.message}}"
     }
   },
   "log": {
