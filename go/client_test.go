@@ -252,6 +252,109 @@ func TestOpenAIImageOfficialVariants(t *testing.T) {
 	}
 }
 
+func TestNanoBanana21Requests(t *testing.T) {
+	for _, action := range []string{"generate", "edit"} {
+		for _, resolution := range []string{"1K", "2K", "4K"} {
+			t.Run(action+"_"+resolution, func(t *testing.T) {
+				expected := map[string]any{
+					"action": action, "model": "nano-banana-2.1", "prompt": "A vase",
+					"resolution": resolution, "aspect_ratio": "1:1", "count": float64(1), "async": true,
+				}
+				req := NanoBananaGenerateRequest{
+					Action: action, Model: "nano-banana-2.1", Prompt: "A vase",
+					Resolution: resolution, AspectRatio: "1:1",
+				}
+				if action == "edit" {
+					req.ImageURLs = []string{"https://example.com/vase.png"}
+					expected["image_urls"] = []any{"https://example.com/vase.png"}
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != "/nano-banana/images" {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Errorf("decode request: %v", err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{}`))
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatalf("NewClient: %v", err)
+				}
+				handle, err := client.NanoBanana().Generate(context.Background(), req)
+				if err != nil || handle == nil {
+					t.Fatalf("Generate: handle=%v err=%v", handle, err)
+				}
+				if calls != 1 {
+					t.Errorf("got %d calls, want 1", calls)
+				}
+			})
+		}
+	}
+}
+
+func TestNanoBananaDefaults(t *testing.T) {
+	body := (NanoBananaGenerateRequest{Action: "generate", Prompt: "A vase"}).toBody()
+	for _, field := range []string{"model", "resolution"} {
+		if _, exists := body[field]; exists {
+			t.Errorf("backend default overridden: %+v", body)
+		}
+	}
+}
+
+func TestOpenAIImagesNanoBanana21(t *testing.T) {
+	for _, operation := range []string{"generations", "edits"} {
+		t.Run(operation, func(t *testing.T) {
+			req := OpenAIImageRequest{Model: OpenAIImageModelNanoBanana21, Prompt: "A vase"}
+			expected := map[string]any{"model": "nano-banana-2.1", "prompt": "A vase"}
+			if operation == "edits" {
+				req.Image = "https://example.com/vase.png"
+				expected["image"] = req.Image
+			}
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/openai/images/"+operation {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("body = %+v, want %+v", body, expected)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatalf("NewClient: %v", err)
+			}
+			if operation == "edits" {
+				_, err = client.OpenAI().Images().Edit(context.Background(), req)
+			} else {
+				_, err = client.OpenAI().Images().Generate(context.Background(), req)
+			}
+			if err != nil {
+				t.Fatalf("%s: %v", operation, err)
+			}
+			if calls != 1 {
+				t.Errorf("got %d calls, want 1", calls)
+			}
+		})
+	}
+}
+
 func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/seedream/images" {

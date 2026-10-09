@@ -79,6 +79,66 @@ async def test_async_generation_returns_an_async_handle():
     assert isinstance(await client.flux.generate(action="generate", prompt="a cat", size="1024x1024"), AsyncTaskHandle)
 
 
+@pytest.mark.parametrize("action", ["generate", "edit"])
+@pytest.mark.parametrize("resolution", ["1K", "2K", "4K"])
+def test_nano_banana_21_serializes_public_contract(client, action, resolution):
+    transport = Mock()
+    transport.request.return_value = {}
+    client.nano_banana._transport = transport
+    params = {
+        "action": action,
+        "model": "nano-banana-2.1",
+        "prompt": "A vase",
+        "resolution": resolution,
+        "aspect_ratio": "1:1",
+    }
+    if action == "edit":
+        params["image_urls"] = ["https://example.com/vase.png"]
+
+    handle = client.nano_banana.generate(**params)
+
+    assert isinstance(handle, TaskHandle)
+    transport.request.assert_called_once_with("POST", "/nano-banana/images", json={**params, "count": 1, "async": True})
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("action", ["generate", "edit"])
+@pytest.mark.parametrize("resolution", ["1K", "2K", "4K"])
+async def test_async_nano_banana_21_serializes_public_contract(action, resolution):
+    from unittest.mock import AsyncMock
+
+    async with AsyncAceDataCloud(api_token="test-token") as client:
+        transport = Mock(request=AsyncMock(return_value={}))
+        client.nano_banana._transport = transport
+        params = {"action": action, "model": "nano-banana-2.1", "prompt": "A vase", "resolution": resolution}
+        if action == "edit":
+            params["image_urls"] = ["https://example.com/vase.png"]
+
+        handle = await client.nano_banana.generate(**params)
+
+        assert isinstance(handle, AsyncTaskHandle)
+        transport.request.assert_awaited_once_with(
+            "POST", "/nano-banana/images", json={**params, "count": 1, "async": True}
+        )
+
+
+def test_nano_banana_model_defaults_and_public_variants(client):
+    from acedatacloud.resources.providers.nano_banana import NanoBananaModel
+
+    models = typing.get_args(NanoBananaModel)
+    assert "nano-banana-2.1" in models
+    assert "nano-banana-2.1:official" not in models
+    assert "nano-banana-2:official" in models
+    transport = Mock()
+    transport.request.return_value = {}
+    client.nano_banana._transport = transport
+
+    client.nano_banana.generate(action="generate", prompt="A vase")
+
+    assert "model" not in transport.request.call_args.kwargs["json"]
+    assert "resolution" not in transport.request.call_args.kwargs["json"]
+
+
 def test_required_flux_size_is_sent(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}

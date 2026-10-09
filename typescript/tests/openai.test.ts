@@ -1,6 +1,8 @@
 import { AiChat, AiChatModel } from '../src/resources/aichat';
 import { Chat } from '../src/resources/chat';
 import { OpenAI } from '../src/resources/openai';
+import { NanoBanana, NanoBananaGenerateOptions } from '../src/resources/providers/nano-banana';
+import { TaskHandle } from '../src/runtime/tasks';
 
 const solFastModel: AiChatModel = 'gpt-5.6-sol-fast';
 
@@ -67,6 +69,57 @@ describe('GPT-5.6 Sol Fast', () => {
   );
 });
 
+describe('Nano Banana 2.1', () => {
+  it.each(['generate', 'edit'] as const)(
+    'serializes %s at every supported resolution',
+    async (action) => {
+      for (const resolution of ['1K', '2K', '4K'] as const) {
+        const request = jest.fn().mockResolvedValue({});
+        const nanoBanana = new NanoBanana({ request } as any);
+        const options: NanoBananaGenerateOptions = {
+          action,
+          model: 'nano-banana-2.1',
+          prompt: 'A vase',
+          resolution,
+          aspectRatio: '1:1',
+        };
+        if (action === 'edit') options.imageUrls = ['https://example.com/vase.png'];
+
+        const task = await nanoBanana.generate(options);
+
+        expect(task).toBeInstanceOf(TaskHandle);
+        expect(request).toHaveBeenCalledTimes(1);
+        expect(request).toHaveBeenCalledWith('POST', '/nano-banana/images', {
+          json: {
+            action,
+            model: 'nano-banana-2.1',
+            prompt: 'A vase',
+            resolution,
+            aspect_ratio: '1:1',
+            ...(action === 'edit' ? { image_urls: options.imageUrls } : {}),
+            count: 1,
+            async: true,
+          },
+        });
+      }
+    }
+  );
+
+  it('preserves backend defaults and only advertises published variants', async () => {
+    type Model = NanoBananaGenerateOptions['model'];
+    const official21IsSupported: 'nano-banana-2.1:official' extends Model ? true : false = false;
+    const official2: Model = 'nano-banana-2:official';
+    expect(official21IsSupported).toBe(false);
+    expect(official2).toBe('nano-banana-2:official');
+    const request = jest.fn().mockResolvedValue({});
+
+    await new NanoBanana({ request } as any).generate({ action: 'generate', prompt: 'A vase' });
+
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('model');
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('resolution');
+  });
+});
+
 describe('OpenAI resource', () => {
   it.each(['text-embedding-3-small', 'text-embedding-3-large'])(
     'sends supported embedding model %s and optional parameters',
@@ -92,7 +145,7 @@ describe('OpenAI resource', () => {
     }
   );
 
-  it.each(['gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official'] as const)(
+  it.each(['gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official', 'nano-banana-2.1'] as const)(
     'sends %s to both image endpoints',
     async (model) => {
       const request = jest.fn().mockResolvedValue({ data: [] });

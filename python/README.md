@@ -114,6 +114,38 @@ print(result["image_url"])
 flux_task = client.images.generate(prompt="A sunset over mountains", provider="flux")
 ```
 
+### Nano Banana 2.1
+
+Select `model="nano-banana-2.1"` explicitly for generation or editing at
+1K, 2K, or 4K. Omitting `model` still uses `nano-banana`; there is no
+`nano-banana-2.1:official` variant.
+
+```python
+task = client.nano_banana.generate(
+    action="generate",
+    model="nano-banana-2.1",
+    prompt="A blue ceramic vase on a cream background",
+    resolution="2K",
+    aspect_ratio="1:1",
+)
+task.wait()
+image_urls = task.urls()
+
+edit_task = client.nano_banana.generate(
+    action="edit",
+    model="nano-banana-2.1",
+    prompt="Change the vase to green; preserve the background",
+    image_urls=image_urls,
+    resolution="4K",
+)
+edit_task.wait()
+```
+
+`AsyncAceDataCloud` exposes the same parameters (await `generate` and `wait`).
+The public model ID also works with `client.openai.images.generate(...)` and
+`client.openai.images.edit(...)`; those use the OpenAI-compatible fields
+(`image` for editing) and return response dictionaries, not task handles.
+
 ## Multi-Provider Support
 
 Image, video, and audio resources support a `provider` parameter to switch between services:
