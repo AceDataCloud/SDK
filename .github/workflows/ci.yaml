@@ -7,6 +7,31 @@ on:
     branches: [main]
 
 jobs:
+  zapier:
+    name: Zapier Integration
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/zapier
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: examples/zapier/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test action and auth
+        run: npm test
+
+      - name: Validate Zapier schema
+        run: npm run validate
+
   provider-generation:
     name: Provider Generation
     runs-on: ubuntu-latest

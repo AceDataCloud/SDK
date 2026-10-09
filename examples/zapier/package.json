@@ -1,0 +1,22 @@
+{
+  "name": "acedatacloud-zapier-poc",
+  "version": "0.0.1",
+  "private": true,
+  "description": "AceDataCloud is an API platform for AI models and services.",
+  "homepage": "https://platform.acedata.cloud",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "validate": "zapier-platform validate --without-style",
+    "validate:publish": "zapier-platform validate"
+  },
+  "dependencies": {
+    "zapier-platform-core": "19.1.0"
+  },
+  "devDependencies": {
+    "zapier-platform-cli": "19.1.0"
+  },
+  "overrides": {
+    "form-data": "4.0.6"
+  }
+}
