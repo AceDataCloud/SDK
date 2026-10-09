@@ -108,6 +108,37 @@ const fluxTask = await client.images.generate({
 });
 ```
 
+### Nano Banana 2.1
+
+Select `model: 'nano-banana-2.1'` explicitly for generation or editing at
+1K, 2K, or 4K. Omitting `model` still uses `nano-banana`; there is no
+`nano-banana-2.1:official` variant.
+
+```typescript
+const task = await client.nanobanana.generate({
+  action: 'generate',
+  model: 'nano-banana-2.1',
+  prompt: 'A blue ceramic vase on a cream background',
+  resolution: '2K',
+  aspectRatio: '1:1',
+});
+await task.wait();
+const imageUrls = task.urls();
+
+const editTask = await client.nanobanana.generate({
+  action: 'edit',
+  model: 'nano-banana-2.1',
+  prompt: 'Change the vase to green; preserve the background',
+  imageUrls,
+  resolution: '4K',
+});
+await editTask.wait();
+```
+
+The public model ID also works with `client.openai.images.generate(...)` and
+`client.openai.images.edit(...)`; those use the OpenAI-compatible fields
+(`image` for editing) and return response objects, not task handles.
+
 ## Multi-Provider Support
 
 Image, video, and audio resources support a `provider` parameter to switch between services:

@@ -105,6 +105,38 @@ handle, _, err := client.Images().Generate(ctx, acedatacloud.ImageGenerateReques
 res, err := handle.Wait(ctx, 3*time.Second, 5*time.Minute)
 ```
 
+### Nano Banana 2.1
+
+Select `Model: "nano-banana-2.1"` explicitly for generation or editing at
+1K, 2K, or 4K. Omitting `Model` still uses `nano-banana`; there is no
+`nano-banana-2.1:official` variant.
+
+```go
+handle, err := client.NanoBanana().Generate(ctx, acedatacloud.NanoBananaGenerateRequest{
+    Action: "generate",
+    Model: "nano-banana-2.1",
+    Prompt: "A blue ceramic vase on a cream background",
+    Resolution: "2K",
+    AspectRatio: "1:1",
+})
+if err != nil { panic(err) }
+if _, err = handle.Wait(ctx, 3*time.Second, 5*time.Minute); err != nil { panic(err) }
+
+editHandle, err := client.NanoBanana().Generate(ctx, acedatacloud.NanoBananaGenerateRequest{
+    Action: "edit",
+    Model: "nano-banana-2.1",
+    Prompt: "Change the vase to green; preserve the background",
+    ImageURLs: handle.URLs(),
+    Resolution: "4K",
+})
+if err != nil { panic(err) }
+if _, err = editHandle.Wait(ctx, 3*time.Second, 5*time.Minute); err != nil { panic(err) }
+```
+
+`OpenAIImageModelNanoBanana21` also works with `client.OpenAI().Images().Generate`
+and `.Edit` using `OpenAIImageRequest` (`Image` for editing). Those methods use
+the OpenAI-compatible fields and return response maps, not task handles.
+
 ## More resources
 
 ```go
