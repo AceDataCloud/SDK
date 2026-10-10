@@ -1,0 +1,48 @@
+[
+  {
+    "name": "url",
+    "label": "URL",
+    "type": "text",
+    "help": "Enter a path relative to https://api.acedata.cloud, such as /v1/models. Only AceDataCloud endpoints are supported.",
+    "required": true
+  },
+  {
+    "name": "method",
+    "label": "Method",
+    "type": "select",
+    "default": "GET",
+    "options": [
+      {"label": "GET", "value": "GET"},
+      {"label": "POST", "value": "POST"},
+      {"label": "PUT", "value": "PUT"},
+      {"label": "PATCH", "value": "PATCH"},
+      {"label": "DELETE", "value": "DELETE"}
+    ],
+    "required": true
+  },
+  {
+    "name": "headers",
+    "label": "Headers",
+    "type": "array",
+    "help": "Optional request headers. The AceDataCloud Authorization header is added by the connection; do not enter a token here.",
+    "spec": [
+      {"name": "key", "label": "Key", "type": "text"},
+      {"name": "value", "label": "Value", "type": "text"}
+    ]
+  },
+  {
+    "name": "qs",
+    "label": "Query string",
+    "type": "array",
+    "spec": [
+      {"name": "key", "label": "Key", "type": "text"},
+      {"name": "value", "label": "Value", "type": "text"}
+    ]
+  },
+  {
+    "name": "body",
+    "label": "Body",
+    "type": "any",
+    "help": "Optional raw request body. POST and other writes may incur AceDataCloud charges."
+  }
+]
