@@ -65,6 +65,11 @@ def _body(ep, indent: str = "    ") -> list[str]:
     out.append(f"{indent}    body[key] = value;")
     out.append(f"{indent}  }}")
     out.append(f"{indent}}}")
+    for p in ep.body_params:
+        if p.type == "array" and p.schema.get("items", {}).get("type") == "string" and p.schema.get("minItems") == p.schema.get("maxItems") == 1:
+            out.append(f'{indent}if ((body["{p.name}"] as string[]).length !== 1) {{')
+            out.append(f'{indent}  throw new Error("{p.name} must contain exactly one item");')
+            out.append(f"{indent}}}")
     out.append(f"{indent}if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;")
     return out
 

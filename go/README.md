@@ -137,6 +137,34 @@ if _, err = editHandle.Wait(ctx, 3*time.Second, 5*time.Minute); err != nil { pan
 and `.Edit` using `OpenAIImageRequest` (`Image` for editing). Those methods use
 the OpenAI-compatible fields and return response maps, not task handles.
 
+## Maestro video production
+
+Use the provider client to request one finished video in one language:
+
+```go
+handle, err := client.Maestro().Generate(ctx, acedatacloud.MaestroGenerateRequest{
+    Prompt: "Explain vector databases to beginners in 20 seconds",
+    Langs: []string{"en"},
+    Aspect: "9:16",
+    Duration: 20,
+    Scenario: "narrated",
+})
+if err != nil { panic(err) }
+result, err := handle.Wait(ctx, 3*time.Second, 10*time.Minute)
+if err != nil { panic(err) }
+```
+
+Omitting `Langs` defaults to `[]string{"zh-cn"}`; an explicit slice must contain
+exactly one language. Create separate tasks for other languages. The completed
+result contains one video in `response.data.variants`. To revise a video, use
+`Action: "remix"`, `"edit"`, or `"extend"` with `RefTaskID: handle.ID`.
+
+There is no quality tier: all videos use 1080p/30fps and target durations of
+5–300 seconds. Successful tasks cost **0.7 Credits per actual delivered second**,
+with integer billed seconds capped at the requested duration (falling back to
+that duration if it cannot be read). All scenarios, actions, and languages have
+the same rate; failed tasks and `/maestro/tasks` polling are free.
+
 ## More resources
 
 ```go

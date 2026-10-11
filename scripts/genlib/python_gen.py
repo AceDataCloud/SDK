@@ -108,6 +108,10 @@ def _body(params: list[Param], indent: str = "        ", consts: dict[str, str] 
                 out.append(f"{indent}    {name} if {name} is not None else {_py_literal(default)}")
                 out.append(f"{indent})")
     out.append(f"{indent}body.update(extra)")
+    for p in params:
+        if p.type == "array" and p.schema.get("items", {}).get("type") == "string" and p.schema.get("minItems") == p.schema.get("maxItems") == 1:
+            out.append(f'{indent}if len(body["{p.name}"]) != 1:')
+            out.append(f'{indent}    raise ValueError("{p.name} must contain exactly one item")')
     out.append(f"{indent}if callback_url is not None:")
     out.append(f'{indent}    body["callback_url"] = callback_url')
     return "\n".join(out)
