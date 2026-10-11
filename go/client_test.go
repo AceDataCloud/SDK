@@ -396,6 +396,56 @@ func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
 	}
 }
 
+func TestMaestroGenerate(t *testing.T) {
+	for _, langs := range [][]string{nil, {"en"}} {
+		t.Run(strings.Join(langs, ","), func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != "POST" || r.URL.Path != "/maestro/videos" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				_ = json.NewDecoder(r.Body).Decode(&body)
+				wantLang := "zh-cn"
+				if langs != nil {
+					wantLang = langs[0]
+				}
+				if !reflect.DeepEqual(body["langs"], []any{wantLang}) {
+					t.Errorf("unexpected languages: %+v", body["langs"])
+				}
+				if _, ok := body["quality"]; ok {
+					t.Errorf("retired quality sent: %+v", body)
+				}
+				if body["duration"] != float64(300) || body["scenario"] != "drama" || body["async"] != true {
+					t.Errorf("unexpected body: %+v", body)
+				}
+				_, _ = w.Write([]byte(`{"task_id":"task-maestro"}`))
+			}))
+			defer srv.Close()
+			c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+			task, err := c.Maestro().Generate(context.Background(), MaestroGenerateRequest{
+				Prompt: "Launch video", Langs: langs, Duration: 300, Scenario: "drama",
+			})
+			if err != nil {
+				t.Fatalf("Maestro Generate: %v", err)
+			}
+			if task.ID != "task-maestro" {
+				t.Fatalf("unexpected task id: %q", task.ID)
+			}
+		})
+	}
+}
+
+func TestMaestroRejectsInvalidLanguageCount(t *testing.T) {
+	for _, langs := range [][]string{{}, {"en", "de"}} {
+		task, err := (&Maestro{}).Generate(context.Background(), MaestroGenerateRequest{
+			Prompt: "Launch video", Langs: langs,
+		})
+		if task != nil || err == nil || !strings.Contains(err.Error(), "langs must contain exactly one item") {
+			t.Fatalf("expected language validation, got task=%v err=%v", task, err)
+		}
+	}
+}
+
 func TestMinimaxGenerate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/minimax/videos" {

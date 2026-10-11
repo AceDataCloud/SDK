@@ -102,6 +102,20 @@ class SnapshotSyncTests(unittest.TestCase):
         self.run_sync()
         self.assertEqual(json.loads((self.snapshots / f"{A}.json").read_text()), spec)
 
+    def test_maestro_pinned_contract_has_one_language_and_no_quality_tier(self):
+        path = SCRIPT.parent / "specs/ab512c42-324c-42e6-8d79-49a5042f3548.json"
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        operation = spec["paths"]["/maestro/videos"]["post"]
+        properties = operation["requestBody"]["content"]["application/json"]["schema"][
+            "properties"
+        ]
+        self.assertEqual(properties["langs"]["minItems"], 1)
+        self.assertEqual(properties["langs"]["maxItems"], 1)
+        self.assertEqual(properties["langs"]["default"], ["zh-cn"])
+        self.assertNotIn("quality", properties)
+        self.assertIn("0.7 Credits", operation["description"])
+        self.assertNotIn("Fish", properties["voice"]["description"])
+
     def test_retired_embedding_model_is_not_in_pinned_contract(self):
         path = SCRIPT.parent / "specs/a0840c8a-2b9a-4407-8aaf-0057f0e1f65c.json"
         spec = json.loads(path.read_text(encoding="utf-8"))

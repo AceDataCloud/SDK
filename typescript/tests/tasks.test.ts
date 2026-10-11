@@ -1,4 +1,38 @@
 import { TaskHandle, taskStatus } from '../src/runtime/tasks';
+import { Maestro } from '../src/resources/providers/maestro';
+
+describe('Maestro tasks', () => {
+  it.each([undefined, ['en']])('submits one language without a quality tier: %p', async (langs) => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'task-maestro' });
+    const maestro = new Maestro({ request } as any);
+    const task = await maestro.generate({
+      prompt: 'Launch video', langs, duration: 300, scenario: 'drama',
+      action: 'extend', refTaskId: 'task-before',
+    });
+    expect(task).toBeInstanceOf(TaskHandle);
+    expect(task.id).toBe('task-maestro');
+    expect(request).toHaveBeenCalledWith('POST', '/maestro/videos', {
+      json: {
+        prompt: 'Launch video', langs: langs ?? ['zh-cn'], duration: 300,
+        scenario: 'drama', action: 'extend', ref_task_id: 'task-before',
+        aspect: '9:16', style: 'auto', voice: 'auto', async: true,
+      },
+    });
+    await task.get();
+    expect(request).toHaveBeenLastCalledWith('POST', '/maestro/tasks', {
+      json: { id: 'task-maestro', action: 'retrieve' },
+    });
+  });
+
+  it.each([{ langs: [] }, { langs: ['en', 'de'] }])('rejects an invalid language count: %p', async ({ langs }) => {
+    const request = jest.fn();
+    const maestro = new Maestro({ request } as any);
+    await expect(maestro.generate({ prompt: 'Launch video', langs })).rejects.toThrow(
+      'langs must contain exactly one item',
+    );
+    expect(request).not.toHaveBeenCalled();
+  });
+});
 
 describe('TaskHandle', () => {
   it('waits through accepted responses and completes on success data without status', async () => {

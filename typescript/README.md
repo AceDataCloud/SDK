@@ -139,6 +139,32 @@ The public model ID also works with `client.openai.images.generate(...)` and
 `client.openai.images.edit(...)`; those use the OpenAI-compatible fields
 (`image` for editing) and return response objects, not task handles.
 
+## Maestro Video Production
+
+Use the provider client to request one finished video in one language:
+
+```typescript
+const task = await client.maestro.generate({
+  prompt: 'Explain vector databases to beginners in 20 seconds',
+  langs: ['en'],
+  aspect: '9:16',
+  duration: 20,
+  scenario: 'narrated',
+});
+const result = await task.wait();
+```
+
+`langs` defaults to `['zh-cn']` and must contain exactly one language; create
+separate tasks for other languages. The completed result contains one video in
+`response.data.variants`. To revise a video, use `action: 'remix'`, `'edit'`, or
+`'extend'` with `refTaskId: task.id`.
+
+There is no quality tier: all videos use 1080p/30fps and target durations of
+5–300 seconds. Successful tasks cost **0.7 Credits per actual delivered second**,
+with integer billed seconds capped at the requested duration (falling back to
+that duration if it cannot be read). All scenarios, actions, and languages have
+the same rate; failed tasks and `/maestro/tasks` polling are free.
+
 ## Multi-Provider Support
 
 Image, video, and audio resources support a `provider` parameter to switch between services:

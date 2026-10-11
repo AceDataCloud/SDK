@@ -21,6 +21,8 @@ def _go_literal(value: object) -> str:
         return "true" if value else "false"
     if isinstance(value, str):
         return json.dumps(value)
+    if isinstance(value, list):
+        return "[]string{" + ", ".join(json.dumps(item) for item in value) + "}"
     return str(value)
 
 
@@ -78,6 +80,12 @@ def _to_body(struct: str, svc: Service, ep) -> str:
                 lines.append("\t} else {")
                 lines.append(f"\t\tbody[{key}] = {_go_literal(default)}")
                 lines.append("\t}")
+            elif go_type == "[]string":
+                lines.append(f"\tif r.{field} != nil {{")
+                lines.append(f"\t\tbody[{key}] = r.{field}")
+                lines.append("\t} else {")
+                lines.append(f"\t\tbody[{key}] = {_go_literal(default)}")
+                lines.append("\t}")
             else:
                 # bool and composite types have no distinguishable zero value.
                 lines.append(f"\tbody[{key}] = r.{field}")
@@ -122,6 +130,12 @@ def _method(svc: Service, ep, struct: str) -> str:
         lines.append(
             f"func (c *{receiver}) {method}(ctx context.Context, req {struct}) (*TaskHandle, error) {{"
         )
+        for p in ep.body_params:
+            if p.type == "array" and p.schema.get("items", {}).get("type") == "string" and p.schema.get("minItems") == p.schema.get("maxItems") == 1:
+                field = _field_name(p.name)
+                lines.append(f"\tif req.{field} != nil && len(req.{field}) != 1 {{")
+                lines.append(f'\t\treturn nil, &ValidationError{{&APIError{{Message: "{p.name} must contain exactly one item"}}}}')
+                lines.append("\t}")
         lines.append("\tresult, err := c.t.do(ctx, requestOpts{")
         lines.append('\t\tMethod: "POST",')
         lines.append(f"\t\tPath:   {json.dumps(ep.path)},")

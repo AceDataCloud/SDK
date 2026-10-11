@@ -14,21 +14,19 @@ type Maestro struct {
 type MaestroGenerateRequest struct {
 	// Natural-language brief describing the video to produce (the topic, what to show, tone, audience). The agent de
 	Prompt string
-	// Production action. Lite supports generate/edit; Standard adds remix; Pro adds extend. remix/edit/extend requir
+	// Production action. generate creates a new video; remix/edit/extend require ref_task_id.
 	Action string
 	// Required when `action` is remix / edit / extend: the task_id of the previous video to start from.
 	RefTaskID string
 	// Optional reference media (image / video / audio URLs) the agent can use — e.g. a product shot or logo to featu
 	FileURLs []string
-	// Output languages. Lite supports 1, Standard up to 2, and Pro up to 4. The first is primary; each additional de
+	// Exactly one output language per task. Defaults to zh-cn. The same per-second rate applies to every language.
 	Langs []string
-	// Required output aspect ratio. Lite renders 720p/24fps; Standard and Pro render 1080p/30fps.
+	// Required output aspect ratio. All videos render at 1080p/30fps.
 	Aspect string
-	// Target video length in seconds. Lite: 5–30; Standard: 5–120; Pro: 5–300. Successful jobs are billed by actual
+	// Target video length in seconds, from 5 to 300. Successful jobs are billed by actual delivered duration, never
 	Duration int
-	// Production SKU. `lite` = fast 720p short video at 0.20 credits/s (up to 30s); `standard` = balanced 1080p at 0
-	Quality string
-	// Production route. Lite supports auto/narrated/captions; Standard adds avatar; Pro adds drama. `captions` requi
+	// Production route: auto, narrated, captions, avatar, or drama. captions requires source video in file_urls; ava
 	Scenario string
 	// Optional visual-style preset — expressed through typography, palette, motion, image treatment and pacing. Orth
 	Style string
@@ -56,7 +54,11 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 	if r.FileURLs != nil {
 		body["file_urls"] = r.FileURLs
 	}
-	body["langs"] = r.Langs
+	if r.Langs != nil {
+		body["langs"] = r.Langs
+	} else {
+		body["langs"] = []string{"zh-cn"}
+	}
 	if r.Aspect != "" {
 		body["aspect"] = r.Aspect
 	} else {
@@ -66,11 +68,6 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 		body["duration"] = r.Duration
 	} else {
 		body["duration"] = 30
-	}
-	if r.Quality != "" {
-		body["quality"] = r.Quality
-	} else {
-		body["quality"] = "standard"
 	}
 	if r.Scenario != "" {
 		body["scenario"] = r.Scenario
@@ -102,8 +99,11 @@ func (r MaestroGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Call /maestro/videos.
+// Generate Maestro Videos
 func (c *Maestro) Generate(ctx context.Context, req MaestroGenerateRequest) (*TaskHandle, error) {
+	if req.Langs != nil && len(req.Langs) != 1 {
+		return nil, &ValidationError{&APIError{Message: "langs must contain exactly one item"}}
+	}
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
 		Path:   "/maestro/videos",
