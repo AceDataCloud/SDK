@@ -4,6 +4,18 @@ This directory is a source-controlled [Make Apps Editor local app](https://devel
 
 **Current state:** The local components have not been installed in a Make account or run in a Make scenario. `makecomapp.json` has no origin until a Make developer pairs it with a private custom app. This is an Apps Editor project, not a Make scenario blueprint or a public listing.
 
+## Get your AceDataCloud API token
+
+1. Open [AceDataCloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=make_readme_api_key). Sign in or register, then open **General application** (initialize it if needed), or a dedicated application with access to the chat model you intend to use.
+2. Choose **Keys / Manage Keys → Create** and name a separate key for Make. Review its expiration, usage limitation, allowed APIs, and application balance before copying it. A task-query permission does not grant generation permission. Any trial allowance is whatever your account currently displays.
+3. Copy only the raw token into the Make Connection password field. An application API key is different from a `platform-...` account-management token and from the Make deployment API key used below.
+
+![Copy an application API key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+
+![Create a separately named key with optional restrictions](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/create-api-key-en.png)
+
+These links carry Make source tags. They provide an acquisition entry point; a successful click alone does not prove registration, installation, or first-use attribution.
+
 ## Set up a private testing app
 
 1. In the intended Make organization and zone, create a **private Custom App** with an available ID such as `acedatacloud`, label **AceDataCloud**, and version 1. Keep it private during testing.
@@ -49,4 +61,18 @@ Do not submit a public review until the installed app, connection, scenario outp
 
 Update these source files, deploy to a private testing app, and rerun the connection, safe GET, and one chat scenario before deploying to any shared/public version. Keep the local project and Make origin in sync with **Pull All Components from Make** when changes are made in Make's web editor. Never commit `.secrets` or connection data.
 
-Make's [public app review prerequisites](https://developers.make.com/custom-apps-documentation/app-review/prerequisites) require a universal module, correct interfaces, secret sanitization, error handling, and fresh test scenario logs. After those checks, a public app can be [submitted for Make review](https://developers.make.com/custom-apps-documentation/app-review/request-app-review). A [Community App](https://developers.make.com/custom-apps-documentation/community-apps/how-does-it-work) follows a separate submission process. Public publishing creates an install link and cannot simply be reverted to private, so confirm the desired distribution path before publishing. Verify discoverability with the actual install link or listing and a separate organization install.
+Make's [public app review prerequisites](https://developers.make.com/custom-apps-documentation/app-review/prerequisites) require a universal module, correct interfaces, secret sanitization, error handling, and fresh test scenario logs. After those checks, a public app can be [submitted for Make review](https://developers.make.com/custom-apps-documentation/app-review/request-app-review). The documented submission flow requires clicking **Publish** first; Make says the app cannot then be unpublished. Review also requires trademark and external-service terms confirmations, which the authorized owner must complete.
+
+A [Community App](https://developers.make.com/custom-apps-documentation/community-apps/how-does-it-work) follows a separate business-review process. The documented program requires a signed Make partner, a public invite-only app, an invite link, and a developer-hosted landing page. It does not replace technical approval or establish partner eligibility. The FAQ describes policy as of July 2023, so verify current eligibility before relying on it.
+
+Use the [release readiness checklist](review-readiness.md) to prepare both paths. Verify discoverability with the actual listing and a separate organization's successful install.
+
+## Validate the source project
+
+CI validates all referenced JSON files and the local manifest against the official [Make Apps Editor schemas pinned at `6ff5f3d`](https://github.com/integromat/vscode-apps-sdk/tree/6ff5f3dd9960ccbeb24de3beb1cca935de89eaa0/syntaxes). It also checks missing files and unknown connection references. To run the same check locally, install `jsonschema==4.25.1` in a development environment, check out that official revision, and run:
+
+```bash
+python3 scripts/validate_make_app.py --schema-root /path/to/vscode-apps-sdk
+```
+
+Schema validation does not execute IML, validate model access, deploy an origin, or prove scenario output and billing. Those checks must run in Make as described above.
