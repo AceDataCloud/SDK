@@ -20,6 +20,9 @@ Use this application key for API requests. SDK account-management methods requir
 
 ## Languages
 
+**LlamaIndex example:** [web search → extraction → cited retrieval](python/examples/llamaindex/README.md)
+([中文](python/examples/llamaindex/README.zh-CN.md)), with a no-token offline demo and hosted MCP discovery.
+
 | Language | Directory | Package |
 |----------|-----------|---------|
 | Python | [python](python/) | `acedatacloud` |
