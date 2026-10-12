@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "description": "AceDataCloud is an API platform for AI models and services.",
-  "homepage": "https://platform.acedata.cloud",
+  "homepage": "https://acedata.cloud",
   "main": "index.js",
   "scripts": {
     "test": "node --test test/*.test.js",
     "validate": "zapier-platform validate --without-style",
-    "validate:publish": "zapier-platform validate"
+    "validate:publish": "zapier-platform validate",
+    "build": "zapier-platform build"
   },
   "dependencies": {
     "zapier-platform-core": "19.1.0"

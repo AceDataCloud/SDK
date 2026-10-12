@@ -4,7 +4,7 @@ This is a Zapier Platform CLI integration for one text-only **Create Chat Respon
 
 ## What users can do
 
-Connect with an AceDataCloud API token from [Applications](https://platform.acedata.cloud/console/applications). The connection test calls the non-billable `GET /v1/models` endpoint. A separate connection name labels the account in Zapier; it is never sent to AceDataCloud. The model picker reads the public chat catalog and does not make a billable call.
+Connect with an AceDataCloud API token from [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=zapier_readme_api_key). Follow the [user setup guide](HELP.md) for a separately named key, service access, pricing, and connection troubleshooting. The connection test calls the non-billable `GET /v1/models` endpoint. A separate connection name labels the account in Zapier; it is never sent to AceDataCloud. The model picker reads the public chat catalog and does not make a billable call.
 
 The action sends one non-streaming `POST /v1/chat/completions` call. Each action test and each Zap run consumes AceDataCloud balance. It accepts:
 
@@ -28,6 +28,7 @@ npm ci
 npm test
 npm run validate
 npm run validate:publish
+npm run build
 ```
 
 `validate` checks the schema locally. `validate:publish` also runs Zapier's online integration checks. Neither command uploads an integration or executes a paid chat request.
@@ -51,10 +52,12 @@ The action shows safe error text and an AceDataCloud trace ID, when one is retur
 
 ## Directory submission preparation
 
-The suggested listing is **AceDataCloud**, description “AceDataCloud is an API platform for AI models and services,” homepage [platform.acedata.cloud](https://platform.acedata.cloud), and category **Artificial Intelligence → AI Models**. A square transparent [512 px brand icon](assets/acedatacloud-icon.png) is ready for upload in the Developer Platform. Verify its rendering there before review. The [privacy policy](https://docs.acedata.cloud/en/resources/privacy), [terms](https://docs.acedata.cloud/en/resources/terms), and [support page](https://docs.acedata.cloud/en/resources/support) are public; prompts and responses handled by this integration should follow those policies and Zapier's data handling rules.
+The suggested listing is **AceDataCloud**, description “AceDataCloud is an API platform for AI models and services,” marketing homepage [acedata.cloud](https://acedata.cloud), and category **Artificial Intelligence → AI Models**. A square transparent [512 px brand icon](assets/acedatacloud-icon.png) is ready for upload in the Developer Platform. Verify its rendering there before review. The [privacy policy](https://docs.acedata.cloud/en/resources/privacy), [terms](https://docs.acedata.cloud/en/resources/terms), and [support page](https://docs.acedata.cloud/en/resources/support) are public; prompts and responses handled by this integration should follow those policies and Zapier's data handling rules.
 
-Before submission, add an admin using an `@acedata.cloud` email address and provide a non-expiring, feature-enabled AceDataCloud test account for `integration-testing@zapier.com` through Zapier's secure submission form. Publish a user help article with connection and billing instructions. Test every offered action in an enabled Zap and preserve at least one successful Zap History run. Review the online publishing checks, branding, and privacy details, then submit from the Developer Platform's **Publish** form. Review approval leads to a public beta listing; it is separate from uploading a private version.
+Before submission, add an admin using an `@acedata.cloud` email address and provide a non-expiring, feature-enabled AceDataCloud test account for `integration-testing@zapier.com` through Zapier's secure submission form. Publish the [user help article](HELP.md) on the AceDataCloud documentation site before submission. This source draft does not mean that help article is already published. Test every offered action in an enabled Zap and preserve at least one successful Zap History run. Review the online publishing checks, branding, and privacy details, then submit from the Developer Platform's **Publish** form. Review approval leads to a public beta listing; it is separate from uploading a private version.
 
 Keep `0.0.1` private while testing. After real Zap evidence and product review, prepare `1.0.0` for the public submission. Version changes and promotion must be deliberate because promoted versions are immutable and existing Zaps can remain on older versions.
+
+Use the [publication and acceptance worksheet](PUBLISHING.md) to record the integration ID, version, enabled Zap, single usage record, and source attribution. Keep missing evidence marked pending.
 
 Official references: [CLI setup and push](https://docs.zapier.com/integrations/build-cli/overview), [dynamic dropdowns](https://docs.zapier.com/integrations/build-cli/dynamic-dropdowns), [publishing requirements](https://docs.zapier.com/integrations/publish/integration-publishing-requirements), [branding](https://docs.zapier.com/integrations/publish/branding-guidelines), and [public review process](https://docs.zapier.com/integrations/publish/public-integration).

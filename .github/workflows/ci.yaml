@@ -32,6 +32,9 @@ jobs:
       - name: Validate Zapier schema
         run: npm run validate
 
+      - name: Build private integration artifact
+        run: npm run build
+
   provider-generation:
     name: Provider Generation
     runs-on: ubuntu-latest

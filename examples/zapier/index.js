@@ -38,7 +38,7 @@ module.exports = {
         label: 'API token',
         type: 'password',
         required: true,
-        helpText: 'Copy your API token from [AceDataCloud Applications](https://platform.acedata.cloud/console/applications).',
+        helpText: 'Copy your API token from [AceDataCloud Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=zapier_auth_api_key).',
       },
       {
         key: 'connection_name',
