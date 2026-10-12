@@ -23,6 +23,7 @@ const (
 	OpenAIImageModelNanoBanana                 OpenAIImageModel = "nano-banana"
 	OpenAIImageModelNanoBanana2Lite            OpenAIImageModel = "nano-banana-2-lite"
 	OpenAIImageModelNanoBanana2                OpenAIImageModel = "nano-banana-2"
+	OpenAIImageModelNanoBanana21               OpenAIImageModel = "nano-banana-2.1"
 	OpenAIImageModelNanoBananaPro              OpenAIImageModel = "nano-banana-pro"
 )
 

@@ -117,6 +117,99 @@ func TestChatConfigurationPassthrough(t *testing.T) {
 	}
 }
 
+func TestSolFastModelPassthrough(t *testing.T) {
+	for _, operation := range []string{"completions", "responses", "messages"} {
+		for _, streaming := range []bool{false, true} {
+			name := operation
+			if streaming {
+				name += "_stream"
+			}
+			t.Run(name, func(t *testing.T) {
+				model := "gpt-5.6-sol-fast"
+				messages := []map[string]any{{"role": "user", "content": "Hello"}}
+				expected := map[string]any{"model": model}
+				path := "/v1/chat/completions"
+				if operation == "responses" {
+					path = "/openai/responses"
+					expected["input"] = "Hello"
+				} else {
+					expected["messages"] = []any{map[string]any{"role": "user", "content": "Hello"}}
+					if operation == "messages" {
+						path = "/v1/messages"
+						expected["max_tokens"] = float64(64)
+					}
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != path {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Errorf("decode request: %v", err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					if streaming {
+						w.Header().Set("Content-Type", "text/event-stream")
+					} else {
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatalf("NewClient: %v", err)
+				}
+				ctx := context.Background()
+				var chunks <-chan map[string]any
+				var errs <-chan error
+				switch operation {
+				case "completions":
+					req := ChatCompletionRequest{Model: model, Messages: messages}
+					if streaming {
+						chunks, errs = client.OpenAI().Chat().Completions().CreateStream(ctx, req)
+					} else {
+						_, err = client.OpenAI().Chat().Completions().Create(ctx, req)
+					}
+				case "responses":
+					req := ResponsesRequest{Model: model, Input: "Hello"}
+					if streaming {
+						chunks, errs = client.OpenAI().Responses().CreateStream(ctx, req)
+					} else {
+						_, err = client.OpenAI().Responses().Create(ctx, req)
+					}
+				case "messages":
+					req := MessagesRequest{Model: model, Messages: messages, MaxTokens: 64}
+					if streaming {
+						chunks, errs = client.Chat().Messages().CreateStream(ctx, req)
+					} else {
+						_, err = client.Chat().Messages().Create(ctx, req)
+					}
+				}
+				if streaming {
+					for chunk := range chunks {
+						t.Errorf("unexpected chunk: %+v", chunk)
+					}
+					err = <-errs
+				}
+				if err != nil {
+					t.Fatalf("%s: %v", name, err)
+				}
+				if calls != 1 {
+					t.Errorf("got %d calls, want 1", calls)
+				}
+			})
+		}
+	}
+}
+
 func TestOpenAIImageOfficialVariants(t *testing.T) {
 	calls := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -159,6 +252,109 @@ func TestOpenAIImageOfficialVariants(t *testing.T) {
 	}
 }
 
+func TestNanoBanana21Requests(t *testing.T) {
+	for _, action := range []string{"generate", "edit"} {
+		for _, resolution := range []string{"1K", "2K", "4K"} {
+			t.Run(action+"_"+resolution, func(t *testing.T) {
+				expected := map[string]any{
+					"action": action, "model": "nano-banana-2.1", "prompt": "A vase",
+					"resolution": resolution, "aspect_ratio": "1:1", "count": float64(1), "async": true,
+				}
+				req := NanoBananaGenerateRequest{
+					Action: action, Model: "nano-banana-2.1", Prompt: "A vase",
+					Resolution: resolution, AspectRatio: "1:1",
+				}
+				if action == "edit" {
+					req.ImageURLs = []string{"https://example.com/vase.png"}
+					expected["image_urls"] = []any{"https://example.com/vase.png"}
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != "/nano-banana/images" {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Errorf("decode request: %v", err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{}`))
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatalf("NewClient: %v", err)
+				}
+				handle, err := client.NanoBanana().Generate(context.Background(), req)
+				if err != nil || handle == nil {
+					t.Fatalf("Generate: handle=%v err=%v", handle, err)
+				}
+				if calls != 1 {
+					t.Errorf("got %d calls, want 1", calls)
+				}
+			})
+		}
+	}
+}
+
+func TestNanoBananaDefaults(t *testing.T) {
+	body := (NanoBananaGenerateRequest{Action: "generate", Prompt: "A vase"}).toBody()
+	for _, field := range []string{"model", "resolution"} {
+		if _, exists := body[field]; exists {
+			t.Errorf("backend default overridden: %+v", body)
+		}
+	}
+}
+
+func TestOpenAIImagesNanoBanana21(t *testing.T) {
+	for _, operation := range []string{"generations", "edits"} {
+		t.Run(operation, func(t *testing.T) {
+			req := OpenAIImageRequest{Model: OpenAIImageModelNanoBanana21, Prompt: "A vase"}
+			expected := map[string]any{"model": "nano-banana-2.1", "prompt": "A vase"}
+			if operation == "edits" {
+				req.Image = "https://example.com/vase.png"
+				expected["image"] = req.Image
+			}
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/openai/images/"+operation {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("body = %+v, want %+v", body, expected)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatalf("NewClient: %v", err)
+			}
+			if operation == "edits" {
+				_, err = client.OpenAI().Images().Edit(context.Background(), req)
+			} else {
+				_, err = client.OpenAI().Images().Generate(context.Background(), req)
+			}
+			if err != nil {
+				t.Fatalf("%s: %v", operation, err)
+			}
+			if calls != 1 {
+				t.Errorf("got %d calls, want 1", calls)
+			}
+		})
+	}
+}
+
 func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/seedream/images" {
@@ -197,6 +393,56 @@ func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
 	body := SeedreamGenerateRequest{Size: "4K"}.toBody()
 	if body["size"] != "4K" {
 		t.Fatalf("explicit size missing: %+v", body)
+	}
+}
+
+func TestMaestroGenerate(t *testing.T) {
+	for _, langs := range [][]string{nil, {"en"}} {
+		t.Run(strings.Join(langs, ","), func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != "POST" || r.URL.Path != "/maestro/videos" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				_ = json.NewDecoder(r.Body).Decode(&body)
+				wantLang := "zh-cn"
+				if langs != nil {
+					wantLang = langs[0]
+				}
+				if !reflect.DeepEqual(body["langs"], []any{wantLang}) {
+					t.Errorf("unexpected languages: %+v", body["langs"])
+				}
+				if _, ok := body["quality"]; ok {
+					t.Errorf("retired quality sent: %+v", body)
+				}
+				if body["duration"] != float64(300) || body["scenario"] != "drama" || body["async"] != true {
+					t.Errorf("unexpected body: %+v", body)
+				}
+				_, _ = w.Write([]byte(`{"task_id":"task-maestro"}`))
+			}))
+			defer srv.Close()
+			c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+			task, err := c.Maestro().Generate(context.Background(), MaestroGenerateRequest{
+				Prompt: "Launch video", Langs: langs, Duration: 300, Scenario: "drama",
+			})
+			if err != nil {
+				t.Fatalf("Maestro Generate: %v", err)
+			}
+			if task.ID != "task-maestro" {
+				t.Fatalf("unexpected task id: %q", task.ID)
+			}
+		})
+	}
+}
+
+func TestMaestroRejectsInvalidLanguageCount(t *testing.T) {
+	for _, langs := range [][]string{{}, {"en", "de"}} {
+		task, err := (&Maestro{}).Generate(context.Background(), MaestroGenerateRequest{
+			Prompt: "Launch video", Langs: langs,
+		})
+		if task != nil || err == nil || !strings.Contains(err.Error(), "langs must contain exactly one item") {
+			t.Fatalf("expected language validation, got task=%v err=%v", task, err)
+		}
 	}
 }
 

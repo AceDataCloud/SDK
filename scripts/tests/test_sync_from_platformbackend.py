@@ -102,6 +102,20 @@ class SnapshotSyncTests(unittest.TestCase):
         self.run_sync()
         self.assertEqual(json.loads((self.snapshots / f"{A}.json").read_text()), spec)
 
+    def test_maestro_pinned_contract_has_one_language_and_no_quality_tier(self):
+        path = SCRIPT.parent / "specs/ab512c42-324c-42e6-8d79-49a5042f3548.json"
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        operation = spec["paths"]["/maestro/videos"]["post"]
+        properties = operation["requestBody"]["content"]["application/json"]["schema"][
+            "properties"
+        ]
+        self.assertEqual(properties["langs"]["minItems"], 1)
+        self.assertEqual(properties["langs"]["maxItems"], 1)
+        self.assertEqual(properties["langs"]["default"], ["zh-cn"])
+        self.assertNotIn("quality", properties)
+        self.assertIn("0.7 Credits", operation["description"])
+        self.assertNotIn("Fish", properties["voice"]["description"])
+
     def test_retired_embedding_model_is_not_in_pinned_contract(self):
         path = SCRIPT.parent / "specs/a0840c8a-2b9a-4407-8aaf-0057f0e1f65c.json"
         spec = json.loads(path.read_text(encoding="utf-8"))
@@ -111,6 +125,23 @@ class SnapshotSyncTests(unittest.TestCase):
         self.assertEqual(
             model["enum"], ["text-embedding-3-small", "text-embedding-3-large"]
         )
+
+    def test_sol_fast_is_in_pinned_chat_and_responses_contracts(self):
+        for api_id, path in (
+            ("c9969b66-effb-4753-b504-a82c4d16f83f", "/openai/chat/completions"),
+            ("ed972a38-ecef-4fcb-af33-750de42d25dc", "/openai/responses"),
+        ):
+            with self.subTest(path=path):
+                spec = json.loads(
+                    (SCRIPT.parent / "specs" / f"{api_id}.json").read_text(
+                        encoding="utf-8"
+                    )
+                )
+                models = spec["paths"][path]["post"]["requestBody"]["content"][
+                    "application/json"
+                ]["schema"]["properties"]["model"]["enum"]
+                self.assertEqual(models.count("gpt-5.6-sol-fast"), 1)
+                self.assertIn("gpt-5.6-sol", models)
 
     def test_go_representation_hint_survives_snapshot_refresh(self):
         old = {

@@ -70,7 +70,7 @@ func (r NanoBananaGenerateRequest) toBody() map[string]any {
 	return body
 }
 
-// Generate Google Nano Banana image generation and editing API. Supports nano-banana, nano-banana-2, and nano-banana-pro for text-to-image generation and referen
+// Generate Nano Banana image generation and editing. Models: nano-banana, nano-banana-2, nano-banana-2.1, nano-banana-pro.
 func (c *NanoBanana) Generate(ctx context.Context, req NanoBananaGenerateRequest) (*TaskHandle, error) {
 	result, err := c.t.do(ctx, requestOpts{
 		Method: "POST",
