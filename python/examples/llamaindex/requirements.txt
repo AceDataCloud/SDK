@@ -1,0 +1,3 @@
+acedatacloud==2026.10.12.0
+llama-index-core==0.14.25
+respx==0.23.1
