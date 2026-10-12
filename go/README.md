@@ -1,6 +1,6 @@
 # AceDataCloud Go SDK
 
-Official Go client for the [AceDataCloud API](https://platform.acedata.cloud).
+Official Go client for the [AceDataCloud API](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_go_readme_platform).
 
 Mirrors the design of the [Python](../python) and [TypeScript](../typescript) SDKs:
 
@@ -10,6 +10,22 @@ Mirrors the design of the [Python](../python) and [TypeScript](../typescript) SD
 - `TaskHandle` for polling long-running image / audio / video tasks.
 - Pluggable `PaymentHandler` hook for on-chain x402 payments — see the
   companion [X402Client Go package](https://github.com/AceDataCloud/X402Client/tree/main/go).
+
+## Get your Ace Data Cloud API key
+
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_go_readme_api_key). Sign in, or register an account first.
+2. Find **General application**. If it has not been created, choose **Initialize General Application**. A general key can use the services available to your account; a dedicated application's key is limited to its service. Check the required service/model access and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_go_readme_pricing).
+3. Copy the **API Key** from the application card, or open **Keys / Manage Keys → Create** to create a separate key for this integration. Give it a recognizable name so you can revoke or rotate it independently.
+4. When creating a key, review **Expiration Time**, **Set Usage Limitation**, and **Allowed APIs**. Enable only the restrictions you need, allow the operations you will call, then click **Create** and copy the token from the key list. Task lookup does not grant permission to submit a generation. Confirm the application's balance can cover your first request; any trial allowance is whatever your account currently displays.
+5. Copy only the token value, without quotation marks, spaces, or `Bearer `. An API Key / API Token field expects this raw value; only a manually configured HTTP `Authorization` header needs the `Bearer ` prefix. A `platform-...` account-management token cannot replace a generation API key.
+
+![Copy an application API key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+
+![Create a separately named key with optional restrictions](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/create-api-key-en.png)
+
+Save the key in the client's credential store or the environment variable shown below. Never put it in a prompt, shared workflow, screenshot, or Git commit. If authentication fails, check the full copied value, application/service access, expiration, usage limit, and balance before creating another key.
+
+Use this application key for API requests. SDK account-management methods require the separate credential described in their management documentation; do not interchange it with the API key. The optional x402 payment flow below is a separate way to pay for supported requests.
 
 ## Install
 
@@ -104,6 +120,66 @@ handle, _, err := client.Images().Generate(ctx, acedatacloud.ImageGenerateReques
 // Poll until completion (or use handle.Get(ctx) to check once)
 res, err := handle.Wait(ctx, 3*time.Second, 5*time.Minute)
 ```
+
+### Nano Banana 2.1
+
+Select `Model: "nano-banana-2.1"` explicitly for generation or editing at
+1K, 2K, or 4K. Omitting `Model` still uses `nano-banana`; there is no
+`nano-banana-2.1:official` variant.
+
+```go
+handle, err := client.NanoBanana().Generate(ctx, acedatacloud.NanoBananaGenerateRequest{
+    Action: "generate",
+    Model: "nano-banana-2.1",
+    Prompt: "A blue ceramic vase on a cream background",
+    Resolution: "2K",
+    AspectRatio: "1:1",
+})
+if err != nil { panic(err) }
+if _, err = handle.Wait(ctx, 3*time.Second, 5*time.Minute); err != nil { panic(err) }
+
+editHandle, err := client.NanoBanana().Generate(ctx, acedatacloud.NanoBananaGenerateRequest{
+    Action: "edit",
+    Model: "nano-banana-2.1",
+    Prompt: "Change the vase to green; preserve the background",
+    ImageURLs: handle.URLs(),
+    Resolution: "4K",
+})
+if err != nil { panic(err) }
+if _, err = editHandle.Wait(ctx, 3*time.Second, 5*time.Minute); err != nil { panic(err) }
+```
+
+`OpenAIImageModelNanoBanana21` also works with `client.OpenAI().Images().Generate`
+and `.Edit` using `OpenAIImageRequest` (`Image` for editing). Those methods use
+the OpenAI-compatible fields and return response maps, not task handles.
+
+## Maestro video production
+
+Use the provider client to request one finished video in one language:
+
+```go
+handle, err := client.Maestro().Generate(ctx, acedatacloud.MaestroGenerateRequest{
+    Prompt: "Explain vector databases to beginners in 20 seconds",
+    Langs: []string{"en"},
+    Aspect: "9:16",
+    Duration: 20,
+    Scenario: "narrated",
+})
+if err != nil { panic(err) }
+result, err := handle.Wait(ctx, 3*time.Second, 10*time.Minute)
+if err != nil { panic(err) }
+```
+
+Omitting `Langs` defaults to `[]string{"zh-cn"}`; an explicit slice must contain
+exactly one language. Create separate tasks for other languages. The completed
+result contains one video in `response.data.variants`. To revise a video, use
+`Action: "remix"`, `"edit"`, or `"extend"` with `RefTaskID: handle.ID`.
+
+There is no quality tier: all videos use 1080p/30fps and target durations of
+5–300 seconds. Successful tasks cost **0.7 Credits per actual delivered second**,
+with integer billed seconds capped at the requested duration (falling back to
+that duration if it cannot be read). All scenarios, actions, and languages have
+the same rate; failed tasks and `/maestro/tasks` polling are free.
 
 ## More resources
 

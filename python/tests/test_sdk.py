@@ -2,6 +2,7 @@
 
 import base64
 import json
+from typing import get_args
 from unittest.mock import Mock
 
 import httpx
@@ -178,6 +179,93 @@ async def test_async_x402_payment_handler_supports_streaming():
     await client.close()
 
 
+@pytest.mark.parametrize(
+    ("operation", "stream"),
+    [(operation, stream) for operation in ("completions", "responses", "messages") for stream in (False, True)]
+    + [("aichat", False)],
+)
+@respx.mock
+def test_sol_fast_model_passthrough(client, operation, stream):
+    from acedatacloud import AiChatModel
+
+    assert "gpt-5.6-sol-fast" in get_args(AiChatModel)
+    body = {"model": "gpt-5.6-sol-fast"}
+    if operation == "responses":
+        path = "/openai/responses"
+        create = client.openai.responses.create
+        body["input"] = "Hello"
+    elif operation == "aichat":
+        path = "/aichat/conversations"
+        create = client.aichat.create
+        body["question"] = "Hello"
+    else:
+        path = "/openai/chat/completions" if operation == "completions" else "/v1/messages"
+        create = client.openai.chat.completions.create if operation == "completions" else client.chat.messages.create
+        body["messages"] = [{"role": "user", "content": "Hello"}]
+        if operation == "messages":
+            body["max_tokens"] = 64
+    if stream:
+        body["stream"] = True
+    route = respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+
+    result = create(**body)
+    if stream:
+        assert list(result) == []
+
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == body
+
+
+@pytest.mark.parametrize(
+    ("operation", "stream"),
+    [(operation, stream) for operation in ("completions", "responses", "messages") for stream in (False, True)]
+    + [("aichat", False)],
+)
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_sol_fast_model_passthrough(async_client, operation, stream):
+    body = {"model": "gpt-5.6-sol-fast"}
+    if operation == "responses":
+        path = "/openai/responses"
+        create = async_client.openai.responses.create
+        body["input"] = "Hello"
+    elif operation == "aichat":
+        path = "/aichat/conversations"
+        create = async_client.aichat.create
+        body["question"] = "Hello"
+    else:
+        path = "/openai/chat/completions" if operation == "completions" else "/v1/messages"
+        create = (
+            async_client.openai.chat.completions.create
+            if operation == "completions"
+            else async_client.chat.messages.create
+        )
+        body["messages"] = [{"role": "user", "content": "Hello"}]
+        if operation == "messages":
+            body["max_tokens"] = 64
+    if stream:
+        body["stream"] = True
+    route = respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+
+    try:
+        result = await create(**body)
+        if stream:
+            assert [chunk async for chunk in result] == []
+    finally:
+        await async_client.close()
+
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == body
+
+
 # ── OpenAI Chat Completions ──────────────────────────────────────────
 
 
@@ -226,9 +314,11 @@ def test_openai_responses(client):
     assert result["id"] == "resp-123"
 
 
-@pytest.mark.parametrize("model", ["gpt-image-2.5-flare:official", "gpt-image-2.5-sunburst:official"])
+@pytest.mark.parametrize(
+    "model", ["gpt-image-2.5-flare:official", "gpt-image-2.5-sunburst:official", "nano-banana-2.1"]
+)
 @respx.mock
-def test_openai_images_support_official_gpt_image_25_variants(client, model):
+def test_openai_images_support_public_models(client, model):
     generation = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
         return_value=httpx.Response(200, json={"data": []})
     )
@@ -243,6 +333,28 @@ def test_openai_images_support_official_gpt_image_25_variants(client, model):
     assert edit.calls.last.request.content == (
         f'{{"image":"https://example.com/cat.png","prompt":"Add a hat","model":"{model}"}}'.encode()
     )
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_openai_images_support_nano_banana_21(async_client):
+    generation = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
+        return_value=httpx.Response(200, json={})
+    )
+    edit = respx.post("https://api.acedata.cloud/openai/images/edits").mock(return_value=httpx.Response(200, json={}))
+    try:
+        await async_client.openai.images.generate(prompt="A vase", model="nano-banana-2.1")
+        await async_client.openai.images.edit(
+            image="https://example.com/vase.png", prompt="Change the color", model="nano-banana-2.1"
+        )
+        assert json.loads(generation.calls.last.request.content) == {"prompt": "A vase", "model": "nano-banana-2.1"}
+        assert json.loads(edit.calls.last.request.content) == {
+            "image": "https://example.com/vase.png",
+            "prompt": "Change the color",
+            "model": "nano-banana-2.1",
+        }
+    finally:
+        await async_client.close()
 
 
 @pytest.mark.parametrize("model", ["text-embedding-3-small", "text-embedding-3-large"])

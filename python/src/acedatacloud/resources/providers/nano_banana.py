@@ -15,6 +15,7 @@ NanoBananaModel = Literal[
     "nano-banana",
     "nano-banana-2-lite",
     "nano-banana-2",
+    "nano-banana-2.1",
     "nano-banana-pro",
     "nano-banana:official",
     "nano-banana-2-lite:official",
@@ -67,8 +68,8 @@ class NanoBanana:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Google Nano Banana image generation and editing API. Supports nano-banana, nano-banana-2, and
-        nano-banana-pro for text-to-image generation and reference-image editing.
+        """Nano Banana image generation and editing. Models: nano-banana, nano-banana-2, nano-banana-2.1,
+        nano-banana-pro.
         """
         body: dict[str, Any] = {}
         body["action"] = action
@@ -116,8 +117,8 @@ class AsyncNanoBanana:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Google Nano Banana image generation and editing API. Supports nano-banana, nano-banana-2, and
-        nano-banana-pro for text-to-image generation and reference-image editing.
+        """Nano Banana image generation and editing. Models: nano-banana, nano-banana-2, nano-banana-2.1,
+        nano-banana-pro.
         """
         body: dict[str, Any] = {}
         body["action"] = action
