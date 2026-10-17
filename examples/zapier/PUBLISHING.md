@@ -1,6 +1,6 @@
 # Zapier publication and acceptance worksheet
 
-As of 2026-10-12, this integration is source-only. No integration ID, uploaded private version, successful enabled Zap, billing evidence, or App Directory listing has been recorded. This worksheet prepares a reviewable rollout; its unchecked items are not evidence of completion.
+As of 2026-10-17, this integration is source-only. No integration ID, uploaded private version, successful enabled Zap, billing evidence, or App Directory listing has been recorded. This worksheet prepares a reviewable rollout; its unchecked items are not evidence of completion.
 
 ## Listing draft
 
@@ -22,6 +22,7 @@ All Zapier interface fields and error messages remain in English. The Chinese ec
 - [ ] Use an existing AceDataCloud-owned Developer account or safely configured deploy key. An authorized account owner must handle any Platform Agreement acceptance.
 - [ ] List integrations and link the existing app. Register once only if no app exists.
 - [ ] Record integration ID, owning account, linked project, source commit, and private version `0.0.1`.
+- [ ] Use the pinned CLI via `npx --no-install zapier-platform`. The CLI accepts `ZAPIER_DEPLOY_KEY` or `ZAPIER_AUTH_LOCATION` when securely configured; neither is an Ace API token.
 - [ ] Run `npm ci`, `npm test`, `npm run validate`, `npm run validate:publish`, and `npm run build` on Node 22.
 - [ ] Run `zapier-platform push`; read back the actual uploaded version and private status. Build success alone is not upload proof.
 - [ ] Invite only an existing, authorized test user if needed. Do not create duplicate accounts or distribute an irrevocable public invite link.

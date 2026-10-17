@@ -30,7 +30,9 @@ const throwApiError = (z, response) => {
     throw new z.errors.ExpiredAuthError('Your AceDataCloud API token is invalid. Reconnect your account.');
   }
   if (response.status === 429) {
-    throw new z.errors.ThrottledError('AceDataCloud rate limit reached. Zapier will retry.', 60);
+    const retryAfter = Number(response.headers?.get('retry-after'));
+    const delay = Number.isSafeInteger(retryAfter) && retryAfter > 0 ? retryAfter : 60;
+    throw new z.errors.ThrottledError('AceDataCloud rate limit reached. Zapier will retry.', delay);
   }
   const messages = {
     400: 'AceDataCloud rejected the request. Check the model and prompt.',
@@ -72,6 +74,8 @@ const perform = async (z, bundle) => {
     },
     body,
     skipThrowForStatus: true,
+    // Core >=18 otherwise throws on 429 before our safe error mapping runs.
+    throwForThrottlingEarly: false,
   });
   if (response.status >= 400) {
     throwApiError(z, response);

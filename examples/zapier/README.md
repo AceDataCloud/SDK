@@ -19,7 +19,7 @@ The action returns the response ID, response text, model, finish reason, input t
 
 ## Local checks
 
-Use Node.js 22, the [Zapier production runtime](https://docs.zapier.com/integrations/build-cli/overview#requirements). The project pins `zapier-platform-core` and `zapier-platform-cli` to 19.1.0.
+Use Node.js 22, the [Zapier production runtime](https://docs.zapier.com/integrations/build-cli/overview#requirements). The project pins `zapier-platform-core` and `zapier-platform-cli` to 19.2.0.
 The `form-data` override updates a pinned transitive dependency of Zapier core to its patched 4.0.6 release.
 
 ```bash
@@ -31,22 +31,24 @@ npm run validate:publish
 npm run build
 ```
 
+The tests include Zapier core's real HTTP and error middleware with network access disabled and mocked API responses. They do not execute a paid completion.
+
 `validate` checks the schema locally. `validate:publish` also runs Zapier's online integration checks. Neither command uploads an integration or executes a paid chat request.
 
 ## Private installation and real Zap proof
 
-1. Sign in with an AceDataCloud-owned [Zapier Developer account](https://zapier.com/app/developer). Run `zapier-platform login`; SSO users can use a Developer deploy key with `zapier-platform login --sso`. Keep the deploy key outside this repository.
+1. Sign in with an AceDataCloud-owned [Zapier Developer account](https://zapier.com/app/developer). Run `zapier-platform login`; SSO users can use a Developer deploy key with `zapier-platform login --sso`. Keep the deploy key outside this repository. The CLI also supports a securely injected `ZAPIER_DEPLOY_KEY`, or a credential file selected by `ZAPIER_AUTH_LOCATION`; do not pass secrets in command-line arguments or commit them.
 2. Run `zapier-platform integrations` and check for an existing AceDataCloud integration. Link it with `zapier-platform link` if one exists. Otherwise register exactly one app with `zapier-platform register "AceDataCloud"`. Avoid duplicate apps: Zapier permits only one public integration for a brand.
-3. Run `zapier-platform push` from this directory to upload version `0.0.1`. New versions start private. Verify the resulting integration ID, version, and private state in the [Developer Platform](https://zapier.com/app/developer). Do not promote it yet.
+3. Use the pinned local CLI through `npx --no-install zapier-platform`. Run `npx --no-install zapier-platform push` from this directory to upload version `0.0.1`. New versions start private. Verify the resulting integration ID, version, and private state in the [Developer Platform](https://zapier.com/app/developer). Do not promote it yet.
 4. In the Zap editor, build a Zap with a safe test trigger (for example, Schedule by Zapier) and **Create Chat Response**. Connect a dedicated AceDataCloud token, choose a chat model, and map a short, non-sensitive prompt. Testing the action makes a real paid API call.
 5. Turn the Zap on and cause one new trigger event. Keep the successful run in [Zap History](https://zapier.com/app/history). Check the action's response ID, text, model, and token usage. Check the corresponding AceDataCloud usage and balance record before repeating a failed or uncertain call. Do not capture the token or prompt in shared evidence.
-6. Check invalid-token reconnection, a rejected request, rate-limit behavior, and the model picker in the real Zap editor. Use [Zapier Monitoring](https://zapier.com/app/developer) and HTTP logs for failures. Record the private version and Zap History URL as evidence.
+6. Check invalid-token reconnection, a rejected request, rate-limit behavior, and the model picker in the real Zap editor. Use [Zapier Monitoring](https://zapier.com/app/developer) and HTTP logs for failures. Use mocked cases for intentional rate-limit, moderation, and balance failures until a live case is explicitly authorized. Record the private version and Zap History URL as evidence.
 
 `zapier-platform users:add <email> 0.0.1` can invite a limited tester. Avoid a public invite link during private validation; Zapier says access through such links cannot be revoked once shared.
 
 ## Errors, retries, and billing
 
-The connection test and catalog request are read-only. The chat action is billable, including the Zap editor's Test step. Invalid credentials require reconnection; `401 token_mismatched` needs a token with Chat Completions access; `403 used_up` needs more balance. A 429 response raises Zapier's `ThrottledError`, so Zapier retries after a delay. The integration does not retry 5xx responses or timeouts itself. Any replay of a chat POST may generate another completion and charge again because this endpoint has no cross-request idempotency key. Check the usage record and response ID before replaying an uncertain result.
+The connection test and catalog request are read-only. The chat action is billable, including the Zap editor's Test step. Invalid credentials require reconnection; `401 token_mismatched` needs a token with Chat Completions access; `403 used_up` needs more balance. A 429 response raises Zapier's `ThrottledError` with a positive whole-second `Retry-After` value when provided, or a 60-second fallback. Zapier schedules the retry; the action does not submit a second request itself. The integration does not retry 5xx responses or timeouts itself. Any replay of a chat POST may generate another completion and charge again because this endpoint has no cross-request idempotency key. Check the usage record and response ID before replaying an uncertain result.
 
 The action shows safe error text and an AceDataCloud trace ID, when one is returned, without displaying upstream details. Send unresolved cases to [support@acedata.cloud](mailto:support@acedata.cloud) with the response ID or trace ID, model, and approximate run time; never send an API token.
 

@@ -12,10 +12,11 @@
     "build": "zapier-platform build"
   },
   "dependencies": {
-    "zapier-platform-core": "19.1.0"
+    "zapier-platform-core": "19.2.0"
   },
   "devDependencies": {
-    "zapier-platform-cli": "19.1.0"
+    "nock": "14.0.7",
+    "zapier-platform-cli": "19.2.0"
   },
   "overrides": {
     "form-data": "4.0.6"
