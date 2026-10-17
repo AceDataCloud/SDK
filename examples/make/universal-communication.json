@@ -1,5 +1,5 @@
 {
-  "url": "https://api.acedata.cloud/{{parameters.url}}",
+  "url": "https://api.acedata.cloud{{parameters.url}}",
   "method": "{{parameters.method}}",
   "type": "text",
   "qs": {

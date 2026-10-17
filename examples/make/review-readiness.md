@@ -16,6 +16,26 @@ The [public review flow](https://developers.make.com/custom-apps-documentation/a
 
 Use synthetic prompts and non-sensitive outputs. Do not share credentials, full request headers, or customer data. Keep the chat route separate from error tests to avoid accidental reruns.
 
+## Pairing worksheet
+
+Fill this with the intended existing private app before deploying. Do not treat the README's example origin as a real app, or create another app just because this worksheet is incomplete.
+
+| Item | Verified value or action |
+| --- | --- |
+| Make zone and app URL | Unknown; inspect the intended private app in the owner's Make account |
+| Origin base URL | Unknown; use `https://<actual-zone>.make.com/api`, not the AceDataCloud URL or a URL ending in `/api/v2` |
+| App ID and remote version | Unknown; copy from the existing app, not its display label or the example values |
+| Organization and team | Unknown; record the target organization and team ID for scenario access |
+| Deployment credential | Not configured; Make key with `sdk-apps:read` and `sdk-apps:write`, in the ignored `.secrets/apikey` file; never enter its value here |
+| API-based scenario access | If needed, separately confirm existing connection/scenario permissions and team access; the development scopes alone are insufficient |
+| AceDataCloud connection | Raw application API token; validation is `GET https://api.acedata.cloud/v1/models`; no account-management token |
+| Free first scenario | Universal module, `GET /v1/models`, no custom Authorization header; expect `statusCode=200` and `body.data` |
+| Chat model selection | Use the current text-chat [catalog](https://platform.acedata.cloud/api/v1/models/?type=chat&with_pricing=true); the authenticated `/v1/models` list may also contain non-chat models |
+
+The application API key, Make development key, and account-management token have different purposes. A successful direct API model-list request is not proof of a Make Connection or scenario. Keep the first scenario free; chat remains a separate billable acceptance step requiring a current spending authorization.
+
+## Scenario evidence
+
 | Check | Expected result | Evidence to fill |
 | --- | --- | --- |
 | Origin/deploy | Correct Make zone, app ID/version and both modules visible in the intended organization | App URL, deployed source SHA, organization/team reference |

@@ -3,7 +3,8 @@
     "name": "url",
     "label": "URL",
     "type": "text",
-    "help": "Enter a path relative to https://api.acedata.cloud, such as /v1/models. Only AceDataCloud endpoints are supported.",
+    "help": "Enter a path starting with exactly one /, such as /v1/models. Only endpoints under https://api.acedata.cloud are supported; do not enter a full URL.",
+    "validate": {"pattern": "^/(?!/)"},
     "required": true
   },
   {
