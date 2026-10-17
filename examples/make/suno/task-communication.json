@@ -8,7 +8,7 @@
   },
   "response": {
     "valid": {
-      "condition": "{{!body.error && body.id === parameters.task_id && (!body.response || body.response.success === true || body.response.success === false)}}",
+      "condition": "{{!body.error && body.id === parameters.task_id && (!body.response || length(keys(body.response)) === 0 || body.response.success === true || body.response.success === false)}}",
       "message": "Unexpected task response. Preserve the task ID and inspect request history; do not regenerate.",
       "type": "RuntimeError"
     },

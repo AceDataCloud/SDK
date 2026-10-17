@@ -23,6 +23,7 @@ process.stdin.on('end', () => {
     ifempty: (v, fallback) => v === undefined || v === null || v === '' ? fallback : v,
     choose: (condition, yes, no) => condition ? yes : no,
     length: value => value?.length ?? 0,
+    keys: value => Object.keys(value ?? {}),
     contains: (values, value) => values.includes(value),
     map: (values, key, filter, value) => (values ?? [])
       .filter(item => filter === undefined || get(item, filter) === value)
@@ -191,9 +192,11 @@ class MakeSunoTests(unittest.TestCase):
             self.evaluate({"id": "same-task", "response": '{"success":true}'}),
             {"rejected": True},
         )
-        output = self.evaluate({"id": "same-task", "response": None})
-        self.assertEqual(output["status"], "pending")
-        self.assertEqual(output["audio_urls"], [])
+        for response in [None, {}]:
+            with self.subTest(response=response):
+                output = self.evaluate({"id": "same-task", "response": response})
+                self.assertEqual(output["status"], "pending")
+                self.assertEqual(output["audio_urls"], [])
 
 
 if __name__ == "__main__":
