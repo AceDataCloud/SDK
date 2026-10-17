@@ -145,3 +145,16 @@ One daily Kubernetes Job reviews Backend docs and API changes with Claude Code,
 updates existing files, and creates or updates one reviewable PR per repository.
 It never merges PRs or duplicates the Backend guide tree. Normal CI and review
 remain required; publication and sub-repository mirroring run after merge.
+
+## Native Zapier application
+
+The [Ace Data Cloud Zapier application](https://github.com/AceDataCloud/AceDataCloudZapier)
+has its own source, package and release workflow. It provides named Suno music
+generation and original-task recovery actions alongside chat. Follow its
+[English guide](https://github.com/AceDataCloud/AceDataCloudZapier/blob/main/README.md)
+or [Chinese guide](https://github.com/AceDataCloud/AceDataCloudZapier/blob/main/readme/README_zh_Hans.md)
+for actual publication status, account connection and billing boundaries.
+
+The application is source-only until its private upload and public review are
+verified; this link is not a Zapier installation or listing. SDK clients do not
+embed or maintain a second copy of the Zapier application.
