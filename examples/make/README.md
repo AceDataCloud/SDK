@@ -4,6 +4,8 @@ This directory is a source-controlled [Make Apps Editor local app](https://devel
 
 **Current state:** The local components have not been installed in a Make account or run in a Make scenario. `makecomapp.json` has no origin until a Make developer pairs it with a private custom app. This is an Apps Editor project, not a Make scenario blueprint or a public listing.
 
+Looking for music rather than chat? The independently deployable [Suno by Ace Data Cloud app project](suno/README.md) provides **Generate Suno music**, **Get a Suno task**, and a universal module. It is prepared for a service-specific installation and directory review; its public Make install link is still pending. The Suno project is the first service-specific app, while this parent project remains the chat companion.
+
 ## Get your AceDataCloud API token
 
 1. Open [AceDataCloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=make_readme_api_key). Sign in or register, then open **General application** (initialize it if needed), or a dedicated application with access to the chat model you intend to use.

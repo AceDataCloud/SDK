@@ -34,6 +34,7 @@ jobs:
           ruff check scripts/validate_make_app.py
           ruff format --check scripts/validate_make_app.py
           python3 scripts/validate_make_app.py --schema-root .make-apps-sdk
+          python3 scripts/validate_make_app.py --schema-root .make-apps-sdk --app-root examples/make/suno
 
   provider-generation:
     name: Provider Generation
