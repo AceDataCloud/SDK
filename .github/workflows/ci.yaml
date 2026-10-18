@@ -7,6 +7,36 @@ on:
     branches: [main]
 
 jobs:
+  make-app-schema:
+    name: Make App Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check out pinned official Make schemas
+        uses: actions/checkout@v6
+        with:
+          repository: integromat/vscode-apps-sdk
+          ref: 6ff5f3dd9960ccbeb24de3beb1cca935de89eaa0
+          path: .make-apps-sdk
+          sparse-checkout: syntaxes
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install validation tools
+        run: pip install jsonschema==4.25.1 ruff
+
+      - name: Validate Make local app
+        run: |
+          ruff check scripts/validate_make_app.py
+          ruff format --check scripts/validate_make_app.py
+          find examples/make -name makecomapp.json -print0 | while IFS= read -r -d '' manifest; do
+            python3 scripts/validate_make_app.py --schema-root .make-apps-sdk --app-root "$(dirname "$manifest")"
+          done
+
   provider-generation:
     name: Provider Generation
     runs-on: ubuntu-latest

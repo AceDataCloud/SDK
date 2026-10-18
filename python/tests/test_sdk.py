@@ -555,17 +555,62 @@ def test_audio_generate_fish_uses_tts_endpoint(client):
 
 
 @respx.mock
-def test_audio_fish_model_endpoints(client):
-    respx.get("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(200, json={"data": []}))
+@pytest.mark.parametrize("visibility", [None, "private"])
+def test_fish_model_creation_accepts_201(client, visibility):
+    response = {"_id": "d7900c21663f485ab63ebdb7e5905036", "visibility": "public"}
+    route = respx.post("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(201, json=response))
+    params = {"title": "My Custom Voice", "voices": "https://example.com/sample-voice.mp3"}
+    if visibility is not None:
+        params["visibility"] = visibility
+
+    assert client.fish.model(**params) == response
+    assert json.loads(route.calls.last.request.content) == params
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_fish_model_creation_accepts_201(async_client):
+    response = {"_id": "d7900c21663f485ab63ebdb7e5905036", "visibility": "public"}
+    route = respx.post("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(201, json=response))
+    params = {"title": "My Custom Voice", "voices": "https://example.com/sample-voice.mp3"}
+
+    async with async_client:
+        assert await async_client.fish.model(**params) == response
+    assert json.loads(route.calls.last.request.content) == params
+
+
+@respx.mock
+@pytest.mark.parametrize(("self_only", "has_more"), [(True, False), (True, True), (False, None)])
+def test_audio_fish_model_endpoints(client, self_only, has_more):
+    response = {"total": 0, "items": [], "has_more": has_more}
+    route = respx.get("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(200, json=response))
     respx.get("https://api.acedata.cloud/fish/model/model-1").mock(
         return_value=httpx.Response(200, json={"id": "model-1"})
     )
 
-    model_list = client.audio.list_fish_models(page_size=10, page_number=2, self_only=True)
+    model_list = client.audio.list_fish_models(page_size=10, page_number=2, self_only=self_only, sort_by="created_at")
     model_detail = client.audio.get_fish_model("model-1")
 
-    assert model_list["data"] == []
+    assert model_list == response
+    assert dict(route.calls.last.request.url.params) == {
+        "page_size": "10",
+        "page_number": "2",
+        "self": str(self_only).lower(),
+        "sort_by": "created_at",
+    }
     assert model_detail["id"] == "model-1"
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize(("self_only", "has_more"), [(True, False), (False, None)])
+async def test_async_audio_fish_model_pagination(async_client, self_only, has_more):
+    response = {"total": 0, "items": [], "has_more": has_more}
+    route = respx.get("https://api.acedata.cloud/fish/model").mock(return_value=httpx.Response(200, json=response))
+
+    async with async_client:
+        assert await async_client.audio.list_fish_models(self_only=self_only, sort_by="task_count") == response
+    assert dict(route.calls.last.request.url.params) == {"self": str(self_only).lower(), "sort_by": "task_count"}
 
 
 # ── Video Generation ──────────────────────────────────────────────────
