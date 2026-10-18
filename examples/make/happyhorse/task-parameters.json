@@ -1,0 +1,12 @@
+[
+  {
+    "name": "task_id",
+    "label": "Task ID",
+    "type": "text",
+    "required": true,
+    "help": "Map task_id from the generation module or enter your own existing HappyHorse task ID. Querying this ID does not generate again.",
+    "validate": {
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    }
+  }
+]

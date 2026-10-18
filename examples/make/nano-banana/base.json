@@ -1,0 +1,25 @@
+{
+  "baseUrl": "https://api.acedata.cloud",
+  "headers": {
+    "Authorization": "Bearer {{connection.apiKey}}"
+  },
+  "response": {
+    "error": {
+      "message": "[{{statusCode}}] Ace Data Cloud request failed. Inspect the task or trace ID before resubmitting.",
+      "type": "RuntimeError",
+      "401": {
+        "message": "[401] Invalid Ace Data Cloud API token. Reconnect with an application token.",
+        "type": "InvalidAccessTokenError"
+      },
+      "429": {
+        "message": "[429] Rate limited. Inspect the original generation before retrying.",
+        "type": "RuntimeError"
+      }
+    }
+  },
+  "log": {
+    "sanitize": [
+      "request.headers.authorization"
+    ]
+  }
+}

@@ -6,6 +6,16 @@ This directory is a source-controlled [Make Apps Editor local app](https://devel
 
 Looking for music rather than chat? The independently deployable [Suno by Ace Data Cloud app project](suno/README.md) provides **Generate Suno music**, **Get a Suno task**, and a universal module. It is prepared for a service-specific installation and directory review; its public Make install link is still pending. The Suno project is the first service-specific app, while this parent project remains the chat companion.
 
+| Independent service app | First generation module | Same-ID query | Publication |
+| --- | --- | --- | --- |
+| [Suno](suno/README.md) | Description-based music | Get a Suno task | Pending |
+| [Seedance](seedance/README.md) | Text-to-video with content array, duration and audio | Get a Seedance task | Pending |
+| [HappyHorse](happyhorse/README.md) | Text-to-video with t2v models and uppercase resolution | Get a HappyHorse task | Pending |
+| [GPT Image](gpt-image/README.md) | One URL-format image with explicit model, size and quality | Get a GPT Image task | Pending |
+| [Nano Banana](nano-banana/README.md) | One generated image with aspect ratio and resolution | Get a Nano Banana task | Pending |
+
+Each child directory has its own manifest, complete deployment files, service-specific inputs, EN/ZH onboarding, and publication packet. These are independently deployable source projects, not publicly installed Make apps. Configure separate cloud app identities and never deploy one service's manifest into another service's origin.
+
 ## Get your AceDataCloud API token
 
 1. Open [AceDataCloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=make_readme_api_key). Sign in or register, then open **General application** (initialize it if needed), or a dedicated application with access to the chat model you intend to use.

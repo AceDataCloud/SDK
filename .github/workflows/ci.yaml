@@ -33,8 +33,9 @@ jobs:
         run: |
           ruff check scripts/validate_make_app.py
           ruff format --check scripts/validate_make_app.py
-          python3 scripts/validate_make_app.py --schema-root .make-apps-sdk
-          python3 scripts/validate_make_app.py --schema-root .make-apps-sdk --app-root examples/make/suno
+          find examples/make -name makecomapp.json -print0 | while IFS= read -r -d '' manifest; do
+            python3 scripts/validate_make_app.py --schema-root .make-apps-sdk --app-root "$(dirname "$manifest")"
+          done
 
   provider-generation:
     name: Provider Generation

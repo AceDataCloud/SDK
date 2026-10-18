@@ -1,0 +1,37 @@
+{
+  "url": "/openai/tasks",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "action": "retrieve",
+    "id": "{{parameters.task_id}}"
+  },
+  "response": {
+    "valid": {
+      "condition": "{{!body.error && body.id === parameters.task_id && (!body.response || length(keys(body.response)) === 0 || body.response.success === true || body.response.success === false)}}",
+      "message": "Unexpected task response. Preserve the task ID and inspect request history; do not regenerate.",
+      "type": "RuntimeError"
+    },
+    "temp": {
+      "succeeded": "{{body.finished_at && get(body, \"response.success\") === true && !get(body, \"response.error\") && length(ifempty(get(body, \"response.data\"), emptyarray)) === 1 && length(ifempty(get(body, \"response.data.1.url\"), \"\")) > 0}}"
+    },
+    "output": {
+      "task_id": "{{body.id}}",
+      "status": "{{if(temp.succeeded, \"succeeded\", if(body.finished_at && (get(body, \"response.success\") === false || get(body, \"response.error\")), \"failed\", \"pending\"))}}",
+      "success": "{{!!temp.succeeded}}",
+      "trace_id": "{{body.trace_id}}",
+      "image_url": "{{if(temp.succeeded, get(body, \"response.data.1.url\"), \"\")}}"
+    }
+  },
+  "log": {
+    "sanitize": [
+      "request.headers.authorization",
+      "response.body.request",
+      "response.body.user_id",
+      "response.body.actor_user_id",
+      "response.body.credential_id",
+      "response.body.authorization_id",
+      "response.body.application_id"
+    ]
+  }
+}
