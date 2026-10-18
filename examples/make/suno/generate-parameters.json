@@ -1,0 +1,49 @@
+[
+  {
+    "name": "prompt",
+    "label": "Music description",
+    "type": "text",
+    "required": true,
+    "validate": {
+      "min": 1,
+      "max": 500
+    },
+    "help": "Describe the music. Submitting creates a billable task; save task_id and query it instead of regenerating."
+  },
+  {
+    "name": "model",
+    "label": "Suno model",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "Suno v6",
+        "value": "chirp-v6"
+      },
+      {
+        "label": "Suno v6 Mini",
+        "value": "chirp-v6-mini"
+      },
+      {
+        "label": "Suno v6 Wild",
+        "value": "chirp-v6-wild"
+      },
+      {
+        "label": "Suno v5.5",
+        "value": "chirp-v5-5"
+      },
+      {
+        "label": "Suno v5",
+        "value": "chirp-v5"
+      }
+    ],
+    "help": "Choose explicitly after checking current service access and price; no automatic model fallback."
+  },
+  {
+    "name": "instrumental",
+    "label": "Instrumental only",
+    "type": "boolean",
+    "required": true,
+    "default": true
+  }
+]

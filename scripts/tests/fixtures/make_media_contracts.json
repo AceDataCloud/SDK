@@ -1,0 +1,764 @@
+{
+  "seedance": {
+    "path": "/seedance/videos",
+    "task_path": "/seedance/tasks",
+    "schema": {
+      "type": "object",
+      "required": [
+        "model",
+        "content"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": [
+            "doubao-seedance-1-0-pro-250528",
+            "doubao-seedance-1-0-pro-fast-251015",
+            "doubao-seedance-1-5-pro-251215",
+            "doubao-seedance-1-0-lite-t2v-250428",
+            "doubao-seedance-1-0-lite-i2v-250428",
+            "doubao-seedance-2-0-260128",
+            "doubao-seedance-2-0-fast-260128",
+            "doubao-seedance-2-0-mini-260615",
+            "doubao-seedance-2-5-260628"
+          ],
+          "example": "doubao-seedance-1-0-pro-250528",
+          "description": "$t(seedance_videos_model)"
+        },
+        "content": {
+          "type": "array",
+          "description": "$t(seedance_videos)",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "text"
+                    ],
+                    "description": "$t(seedance_videos_type)"
+                  },
+                  "text": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "example": "A kitten yawning at the camera. --rs 720p --rt 16:9 --dur 5 --fps 24 --wm true --seed 11 --cf false",
+                    "description": "$t(seedance_videos_text)"
+                  }
+                },
+                "additionalProperties": false,
+                "example": {
+                  "type": "text",
+                  "text": "A kitten yawning at the camera. --rs 720p --rt 16:9 --dur 5 --fps 24 --wm true --seed 11 --cf false"
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "image_url"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "image_url"
+                    ],
+                    "description": "$t(seedance_videos_type_2)"
+                  },
+                  "image_url": {
+                    "type": "object",
+                    "required": [
+                      "url"
+                    ],
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "example": "https://cdn.acedata.cloud/v8073y.png",
+                        "description": "$t(seedance_videos_image_url_url)"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "$t(seedance_videos_image_url)"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "first_frame",
+                      "last_frame",
+                      "reference_image"
+                    ],
+                    "description": "$t(seedance_videos_role)"
+                  }
+                },
+                "additionalProperties": false,
+                "example": {
+                  "type": "image_url",
+                  "role": "first_frame",
+                  "image_url": {
+                    "url": "https://cdn.acedata.cloud/v8073y.png"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "audio_url",
+                  "role"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "audio_url"
+                    ],
+                    "description": "$t(seedance_videos_type_3)"
+                  },
+                  "audio_url": {
+                    "type": "object",
+                    "required": [
+                      "url"
+                    ],
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "example": "https://cdn.acedata.cloud/suno_demo.mp3",
+                        "description": "$t(seedance_videos_audio_url_url)"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "$t(seedance_videos_audio_url)"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "reference_audio"
+                    ],
+                    "description": "$t(seedance_videos_audio_role)"
+                  }
+                },
+                "additionalProperties": false,
+                "example": {
+                  "type": "audio_url",
+                  "role": "reference_audio",
+                  "audio_url": {
+                    "url": "https://cdn.acedata.cloud/suno_demo.mp3"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "video_url",
+                  "role"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "video_url"
+                    ],
+                    "description": "$t(seedance_videos_type_4)"
+                  },
+                  "video_url": {
+                    "type": "object",
+                    "required": [
+                      "url"
+                    ],
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "example": "https://cdn.acedata.cloud/43a57990c0.mp4",
+                        "description": "$t(seedance_videos_video_url_url)"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "$t(seedance_videos_video_url)"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "reference_video"
+                    ],
+                    "description": "$t(seedance_videos_video_role)"
+                  }
+                },
+                "additionalProperties": false,
+                "example": {
+                  "type": "video_url",
+                  "role": "reference_video",
+                  "video_url": {
+                    "url": "https://cdn.acedata.cloud/43a57990c0.mp4"
+                  }
+                }
+              }
+            ],
+            "discriminator": {
+              "propertyName": "type"
+            }
+          }
+        },
+        "resolution": {
+          "type": "string",
+          "enum": [
+            "480p",
+            "720p",
+            "1080p",
+            "4k"
+          ],
+          "description": "$t(seedance_videos_resolution)"
+        },
+        "ratio": {
+          "type": "string",
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9",
+            "adaptive"
+          ],
+          "default": "16:9",
+          "description": "$t(seedance_videos_ratio)"
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 30,
+          "description": "$t(seedance_videos_duration)"
+        },
+        "frames": {
+          "type": "integer",
+          "minimum": 29,
+          "maximum": 289,
+          "description": "$t(seedance_videos_frames)"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 4294967295,
+          "description": "$t(seedance_videos_seed)"
+        },
+        "camerafixed": {
+          "type": "boolean",
+          "description": "$t(seedance_videos_camerafixed)"
+        },
+        "watermark": {
+          "type": "boolean",
+          "description": "$t(seedance_videos_watermark)"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": false,
+          "description": "$t(seedance_videos_generate_audio)"
+        },
+        "callback_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "$t(seedance_videos_callback_url)"
+        },
+        "async": {
+          "rank": 101,
+          "type": "boolean",
+          "description": "$t(seedance_videos_async)"
+        },
+        "return_last_frame": {
+          "type": "boolean",
+          "default": false,
+          "description": "$t(seedance_videos_return_last_frame)"
+        },
+        "execution_expires_after": {
+          "type": "integer",
+          "minimum": 3600,
+          "maximum": 259200,
+          "default": 172800,
+          "description": "$t(seedance_videos_execution_expires_after)"
+        },
+        "omni_reference_task_type": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "reference",
+            "edit",
+            "extend"
+          ],
+          "description": "$t(seedance_videos_omni_reference_task_type)"
+        },
+        "output_format": {
+          "type": "string",
+          "enum": [
+            "mp4",
+            "mov"
+          ],
+          "description": "$t(seedance_videos_output_format)"
+        },
+        "tools": {
+          "type": "array",
+          "maxItems": 1,
+          "description": "$t(seedance_videos_tools)",
+          "items": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "web_search"
+                ],
+                "description": "$t(seedance_videos_tools_type)"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 50,
+                "default": 10,
+                "description": "$t(seedance_videos_tools_limit)"
+              },
+              "max_keyword": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 50,
+                "description": "$t(seedance_videos_tools_max_keyword)"
+              },
+              "sources": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "toutiao",
+                    "douyin",
+                    "moji",
+                    "search_engine"
+                  ]
+                },
+                "description": "$t(seedance_videos_tools_sources)"
+              }
+            }
+          }
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9,
+          "default": 0,
+          "description": "$t(seedance_videos_priority)"
+        },
+        "safety_identifier": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "$t(seedance_videos_safety_identifier)"
+        }
+      }
+    },
+    "source_sha": "f288eb461f15d057e9f5cedd634ce1e5c4959552",
+    "source_url": "https://github.com/AceDataCloud/PlatformBackend/blob/f288eb461f15d057e9f5cedd634ce1e5c4959552/openapi/0083b874-4da6-40df-87e3-835b1300c1e8.json"
+  },
+  "happyhorse": {
+    "path": "/happyhorse/videos",
+    "task_path": "/happyhorse/tasks",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "enum": [
+            "generate",
+            "image_to_video",
+            "reference_to_video",
+            "video_edit"
+          ],
+          "rank": 10,
+          "type": "string",
+          "default": "generate",
+          "example": "generate",
+          "description": "$t(happyhorse_videos_action)"
+        },
+        "model": {
+          "enum": [
+            "happyhorse-1.0-t2v",
+            "happyhorse-1.1-t2v",
+            "happyhorse-1.0-i2v",
+            "happyhorse-1.1-i2v",
+            "happyhorse-1.0-r2v",
+            "happyhorse-1.1-r2v",
+            "happyhorse-1.0-video-edit"
+          ],
+          "rank": 20,
+          "type": "string",
+          "default": "happyhorse-1.1-t2v",
+          "example": "happyhorse-1.1-t2v",
+          "description": "$t(happyhorse_videos_model)"
+        },
+        "prompt": {
+          "rank": 30,
+          "type": "string",
+          "example": "A cinematic white horse lifts its head, the mane moves gently in the sunrise wind, slow camera push in, warm film lighting",
+          "description": "$t(happyhorse_videos_prompt)"
+        },
+        "image_url": {
+          "rank": 40,
+          "type": "string",
+          "example": "https://cdn.acedata.cloud/b1c82e4937.png",
+          "description": "$t(happyhorse_videos_image_url)"
+        },
+        "image_urls": {
+          "rank": 50,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "$t(happyhorse_videos_image_urls)"
+        },
+        "video_url": {
+          "rank": 60,
+          "type": "string",
+          "example": "https://cdn.acedata.cloud/assets/examples/happyhorse/27837f92-d1c1-4db4-ad9a-4e6e81d9f6c1-2c108ce23554.mp4",
+          "description": "$t(happyhorse_videos_video_url)"
+        },
+        "resolution": {
+          "enum": [
+            "720P",
+            "1080P"
+          ],
+          "rank": 70,
+          "type": "string",
+          "default": "1080P",
+          "example": "720P",
+          "description": "$t(happyhorse_videos_resolution)"
+        },
+        "ratio": {
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "4:3",
+            "3:4"
+          ],
+          "rank": 80,
+          "type": "string",
+          "default": "16:9",
+          "example": "16:9",
+          "description": "$t(happyhorse_videos_ratio)"
+        },
+        "duration": {
+          "rank": 90,
+          "type": "integer",
+          "default": 5,
+          "minimum": 3,
+          "maximum": 15,
+          "example": 5,
+          "description": "$t(happyhorse_videos_duration)"
+        },
+        "watermark": {
+          "rank": 100,
+          "type": "boolean",
+          "default": false,
+          "description": "$t(happyhorse_videos_watermark)"
+        },
+        "audio_setting": {
+          "enum": [
+            "auto",
+            "origin"
+          ],
+          "rank": 110,
+          "type": "string",
+          "default": "auto",
+          "description": "$t(happyhorse_videos_audio_setting)"
+        },
+        "seed": {
+          "rank": 120,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647,
+          "description": "$t(happyhorse_videos_seed)"
+        },
+        "callback_url": {
+          "rank": 130,
+          "type": "string",
+          "description": "$t(happyhorse_videos_callback_url)"
+        },
+        "async": {
+          "rank": 131,
+          "type": "boolean",
+          "description": "$t(happyhorse_videos_async)"
+        }
+      }
+    },
+    "source_sha": "f288eb461f15d057e9f5cedd634ce1e5c4959552",
+    "source_url": "https://github.com/AceDataCloud/PlatformBackend/blob/f288eb461f15d057e9f5cedd634ce1e5c4959552/openapi/d656e357-50cb-4390-b8c9-67464bc2a2f2.json"
+  },
+  "gpt-image": {
+    "path": "/openai/images/generations",
+    "task_path": "/openai/tasks",
+    "schema": {
+      "type": "object",
+      "required": [
+        "prompt",
+        "model"
+      ],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "rank": 10,
+          "example": "A cute baby sea otter",
+          "enum": [
+            "A cute baby sea otter",
+            "A wooden bookshelf consisting of three shelves: on the top shelf one book, the second shelf three books, and the bottom shelf seven books.",
+            "Cinematic minimal portrait of a solitary man standing in an intense orange-to-red gradient environment, strong silhouette lighting, deep shadow contrast, reflective glossy floor, symmetrical composition.",
+            "Symmetrical design featuring two elegant blue peacocks with detailed feather patterns, surrounded by blue floral elements, intricate vintage botanical ornament, soft beige background, decorative art illustration.",
+            "Avant-garde sports fashion advertisement, oversized basketball posed like a monumental sculpture, female athlete reclining across the ball's curved surface, giant word 'ELEVATE' in bold typography behind, burnt orange studio backdrop, glossy reflective floor.",
+            "High-fashion surrealist poster for Rolex. Deep emerald green minimalist studio with polished reflective floor. A massive Rolex watch standing upright like a monument; a male model in tailored dark green suit leans casually against the watch face, wearing a matching Rolex.",
+            "Ultra-realistic product photography of a rich strawberry soft-serve ice cream in a crispy waffle cone, clean modern premium aesthetic, soft serve vibrant natural pink, sculpted swirl with curled peak, lightly topped with strawberry dust.",
+            "Hyper-realistic UI/UX mockup on a slim modern laptop on a minimal wooden desk with soft natural daylight; clean SaaS dashboard with elegant typography, glassmorphism cards, smooth gradients, subtle drop shadows, charts, sidebar navigation, macOS-style window frame.",
+            "9:16 vertical Korean idol portrait photoshoot, 3x3 grid (nine frames), same person in all images, consistent facial features and styling, soft black mist filter effect, lowered contrast, blooming highlights, subtle glow around light sources.",
+            "Mobile phone photo, old CCD camera aesthetic, harsh flash, grainy, dim messy indoor lighting, candid snapshot feeling, slight motion blur.",
+            "Create a science fiction movie poster.",
+            "以中国连环画（小人书）的风格帮我绘制大闹天宫",
+            "新中式水墨山水海报，竖版9:16构图，东方极简美学风格，大面积留白，主题是春岚一叶红"
+          ],
+          "description": "$t(openai_images_generations_prompt)"
+        },
+        "background": {
+          "enum": [
+            "transparent",
+            "opaque",
+            "auto"
+          ],
+          "type": "string",
+          "default": "auto",
+          "description": "$t(openai_images_generations_background)"
+        },
+        "model": {
+          "enum": [
+            "dall-e-2",
+            "dall-e-3",
+            "gpt-image-1",
+            "gpt-image-1.5",
+            "gpt-image-2",
+            "gpt-image-2.5-flare",
+            "gpt-image-2.5-flare:official",
+            "gpt-image-2.5-sunburst",
+            "gpt-image-2.5-sunburst:official",
+            "gpt-image-2:reverse",
+            "gpt-image-2:official",
+            "nano-banana",
+            "nano-banana-2-lite",
+            "nano-banana-2",
+            "nano-banana-2.1",
+            "nano-banana-pro"
+          ],
+          "type": "string",
+          "rank": 1,
+          "description": "$t(openai_images_generations_model)"
+        },
+        "moderation": {
+          "enum": [
+            "low",
+            "auto"
+          ],
+          "type": "string",
+          "default": "auto",
+          "description": "$t(openai_images_generations_moderation)"
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 1,
+          "rank": 20,
+          "maximum": 10,
+          "default": 1,
+          "example": 1,
+          "description": "$t(openai_images_generations_n)"
+        },
+        "output_compression": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 100,
+          "description": "$t(openai_images_generations_output_compression)"
+        },
+        "output_format": {
+          "enum": [
+            "png",
+            "jpeg",
+            "webp"
+          ],
+          "type": "string",
+          "default": "png",
+          "description": "$t(openai_images_generations_output_format)"
+        },
+        "partial_images": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 0,
+          "description": "$t(openai_images_generations_partial_images)"
+        },
+        "size": {
+          "type": "string",
+          "default": "auto",
+          "rank": 30,
+          "example": "1024x1024",
+          "nullable": true,
+          "pattern": "^(auto|\\d+x\\d+)$",
+          "description": "$t(openai_images_generations_size)"
+        },
+        "quality": {
+          "enum": [
+            "auto",
+            "high",
+            "medium",
+            "low",
+            "hd",
+            "standard"
+          ],
+          "type": "string",
+          "default": "auto",
+          "rank": 40,
+          "example": "auto",
+          "description": "$t(openai_images_generations_quality)"
+        },
+        "response_format": {
+          "enum": [
+            "url",
+            "b64_json"
+          ],
+          "type": "string",
+          "default": "url",
+          "example": "url",
+          "nullable": true,
+          "description": "$t(openai_images_generations_response_format)"
+        },
+        "style": {
+          "enum": [
+            "vivid",
+            "natural"
+          ],
+          "type": "string",
+          "default": "vivid",
+          "example": "vivid",
+          "description": "$t(openai_images_generations_style)"
+        },
+        "callback_url": {
+          "rank": 100,
+          "type": "string",
+          "description": "$t(openai_images_generations_callback_url)"
+        },
+        "async": {
+          "rank": 101,
+          "type": "boolean",
+          "description": "$t(openai_images_generations_async)"
+        }
+      }
+    },
+    "source_sha": "f288eb461f15d057e9f5cedd634ce1e5c4959552",
+    "source_url": "https://github.com/AceDataCloud/PlatformBackend/blob/f288eb461f15d057e9f5cedd634ce1e5c4959552/openapi/8f01fe72-8a3e-4872-8d8d-330cde179b3a.json"
+  },
+  "nano-banana": {
+    "path": "/nano-banana/images",
+    "task_path": "/nano-banana/tasks",
+    "schema": {
+      "type": "object",
+      "required": [
+        "action",
+        "prompt"
+      ],
+      "properties": {
+        "action": {
+          "enum": [
+            "generate",
+            "edit"
+          ],
+          "rank": 0,
+          "type": "string",
+          "example": "generate",
+          "description": "$t(nano_banana_images_action)"
+        },
+        "model": {
+          "rank": 10,
+          "type": "string",
+          "enum": [
+            "nano-banana",
+            "nano-banana-2-lite",
+            "nano-banana-2",
+            "nano-banana-2.1",
+            "nano-banana-pro",
+            "nano-banana:official",
+            "nano-banana-2-lite:official",
+            "nano-banana-2:official",
+            "nano-banana-pro:official"
+          ],
+          "description": "$t(nano_banana_images_model)"
+        },
+        "prompt": {
+          "rank": 20,
+          "type": "string",
+          "example": "a white siamese cat",
+          "description": "$t(nano_banana_images_prompt)"
+        },
+        "image_urls": {
+          "rank": 30,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "$t(nano_banana_images_image_urls)"
+        },
+        "count": {
+          "rank": 35,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "default": 1,
+          "description": "$t(nano_banana_images_count)"
+        },
+        "aspect_ratio": {
+          "rank": 40,
+          "type": "string",
+          "enum": [
+            "1:1",
+            "3:2",
+            "2:3",
+            "16:9",
+            "9:16",
+            "4:3",
+            "3:4"
+          ],
+          "example": "1:1",
+          "description": "$t(nano_banana_images_aspect_ratio)"
+        },
+        "resolution": {
+          "rank": 50,
+          "type": "string",
+          "enum": [
+            "1K",
+            "2K",
+            "4K"
+          ],
+          "description": "$t(nano_banana_images_resolution)"
+        },
+        "callback_url": {
+          "rank": 100,
+          "type": "string",
+          "description": "$t(nano_banana_images_callback_url)"
+        },
+        "async": {
+          "rank": 101,
+          "type": "boolean",
+          "description": "$t(nano_banana_images_async)"
+        }
+      }
+    },
+    "source_sha": "f288eb461f15d057e9f5cedd634ce1e5c4959552",
+    "source_url": "https://github.com/AceDataCloud/PlatformBackend/blob/f288eb461f15d057e9f5cedd634ce1e5c4959552/openapi/9d8a117e-31ca-4322-a0fd-1771296ec610.json"
+  }
+}
