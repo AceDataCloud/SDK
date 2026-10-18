@@ -28,6 +28,7 @@ class Audio:
         title_language: str | None = None,
         sort_by: str | None = None,
     ) -> dict[str, Any]:
+        """self_only filters this account's platform-created voices; it does not make them private."""
         params: dict[str, Any] = {}
         if page_size is not None:
             params["page_size"] = page_size
@@ -119,6 +120,7 @@ class AsyncAudio:
         title_language: str | None = None,
         sort_by: str | None = None,
     ) -> dict[str, Any]:
+        """self_only filters this account's platform-created voices; it does not make them private."""
         params: dict[str, Any] = {}
         if page_size is not None:
             params["page_size"] = page_size

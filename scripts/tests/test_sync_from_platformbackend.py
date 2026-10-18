@@ -183,6 +183,18 @@ class SnapshotSyncTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "endpoint moved"):
             self.run_sync()
 
+    def test_fish_creation_snapshot_uses_created_status_and_public_visibility(self):
+        path = SCRIPT.parent / "specs" / "82dcabe9-b1a3-541f-80f1-decb183b920c.json"
+        operation = json.loads(path.read_text())["paths"]["/fish/model"]["post"]
+        self.assertNotIn("200", operation["responses"])
+        schema = operation["responses"]["201"]["content"]["application/json"]["schema"]
+        self.assertEqual(schema["example"]["visibility"], "public")
+        visibility = operation["requestBody"]["content"]["application/json"]["schema"][
+            "properties"
+        ]["visibility"]
+        self.assertIn("does not restrict access", visibility["description"])
+        self.assertNotIn("default", visibility)
+
     def test_unmapped_service_does_not_expand_curated_manifest(self):
         self.change(A)
         self.assertEqual(self.run_sync(["new-provider"]), [])
