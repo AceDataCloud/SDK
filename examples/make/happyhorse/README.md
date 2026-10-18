@@ -4,6 +4,8 @@ Use HappyHorse in Make with your **Ace Data Cloud application API token**. This 
 
 [简体中文](README.zh-CN.md) · [Current pricing](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=happyhorse_make_readme_pricing)
 
+**Community directory name:** `HappyHorse` under the current form's service-only naming rule; **provided by Ace Data Cloud** is the integration identity in the description/publisher page. This README title is not an approved directory label. [Submission rules checked 2026-10-19](../COMMUNITY_SUBMISSION.md).
+
 ## 1. Install the correct integration
 
 **Official Make installation URL: pending.** This is an independently deployable source project, not a published Make app. After publication, use the real approved install link and verify the integration provider is **Ace Data Cloud**. A similarly named app by someone else is not this integration.

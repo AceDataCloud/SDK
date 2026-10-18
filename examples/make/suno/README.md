@@ -4,6 +4,8 @@ Create Suno music tasks in Make with your own **Ace Data Cloud** API token, then
 
 [简体中文](README.zh-CN.md) · [Current API access and pricing](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_readme_pricing) · [API documentation](https://platform.acedata.cloud/documents/suno-audios?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_readme_docs)
 
+**Community directory name:** `Suno` under the current form's service-only naming rule; **provided by Ace Data Cloud** is the integration identity in the description/publisher page. This README title is not an approved directory label. [Submission rules checked 2026-10-19](../COMMUNITY_SUBMISSION.md).
+
 ## 1. Install the correct app
 
 **Official Make installation link: pending.** This source project has not been deployed to a Make account, reviewed, or published. Do not install an unrelated search result because its name contains Suno. Once the approved link exists, check that the listing identifies **Ace Data Cloud** as the integration provider, install it into your intended organization, and add its module to a scenario.
@@ -56,7 +58,7 @@ Before any paid action, run **Make an API call** with `GET /v1/models`. For an e
 
 ## Development and publication
 
-The app directory is independently deployable; its cloud label proposal is **Suno by Ace Data Cloud**, subject to Make's naming and trademark review. It is a single service app, not a renamed copy of the chat app. The repository owns one canonical copy of this project; no duplicate service repository is required to get a separate Make app identity.
+The app directory is independently deployable; the Community directory-name draft is **Suno**, with Ace Data Cloud identified separately as the integration provider. Its cloud app label and service/brand classification remain subject to Make's review. It is a single service app, not a renamed copy of the chat app. The repository owns one canonical copy of this project; no duplicate service repository is required to get a separate Make app identity.
 
 From the SDK repository root:
 

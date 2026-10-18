@@ -5,15 +5,15 @@ Prepared 2026-10-18. Source and reviewer materials only; no Make app, invite lin
 ## Identity and discoverability proposal
 
 - **Internal name:** `suno-acedatacloud` (proposal; check actual availability and existing app first).
-- **Label:** `Suno by Ace Data Cloud` (proposal, subject to Make's brand/naming and trademark review).
+- **Community directory service name:** `Suno`. The live submission form requires the exact service name and excludes the developer company; identify Ace Data Cloud in the description and publisher/landing page instead. The eventual cloud app label must follow Make's decision for the selected publication route.
 - **Description:** Generate Suno music through Ace Data Cloud, save the asynchronous task ID, and retrieve the finished audio using your own Ace Data Cloud API token. Independent integration provided by Ace Data Cloud; not an official Suno app.
 - **Proposed categories:** AI, music/audio, automation; use only categories offered by the current review form.
 - **Relevant search terms:** Suno, Suno music, AI music, Ace Data Cloud. Put terms in accurate label/description/module text and landing-page content; no unrelated keyword stuffing or ranking claims.
 - **Modules:** Generate Suno music; Get a Suno task; Make an API call.
-- **Icon:** use an approved Ace-owned logo; no Suno logo or approval badge without rights confirmation.
+- **Community logo:** use only a service-identifying asset with the necessary rights confirmed by its owner. The form says to omit a new logo when an existing service listing already supplies it. Do not submit the Ace company logo as the service logo or assume Suno logo rights.
 - **Install URL:** pending actual Make app, publisher eligibility, and review. Never substitute a source URL for an official installation link.
 
-Make's [app naming rules](https://developers.make.com/custom-apps-documentation/best-practices/naming-conventions/apps) prohibit adding advertising descriptions to the app name. The proposed `by Ace Data Cloud` identifies the integration provider rather than claiming Suno affiliation; the exact public label still needs Make's decision. [Module labels](https://developers.make.com/custom-apps-documentation/best-practices/naming-conventions/modules/module-labels) use action/entity sentence case.
+Make's [app naming rules](https://developers.make.com/custom-apps-documentation/best-practices/naming-conventions/apps) prohibit advertising descriptions in the app name. The [live Community submission form](https://f.make.com/submit-your-app), checked 2026-10-19, is more specific: use the exact service name, do not include the developer company unless it is part of the official product name, and stay within 60 characters. Therefore **Suno** is the directory-name draft; **provided by Ace Data Cloud** belongs in the description, provider identity and landing page. A README title describing ownership is not the value to paste into the form's app-name field. See the [current form worksheet](../COMMUNITY_SUBMISSION.md) for all required fields and legal gates. [Module labels](https://developers.make.com/custom-apps-documentation/best-practices/naming-conventions/modules/module-labels) use action/entity sentence case.
 
 ## Choose the permitted public path
 

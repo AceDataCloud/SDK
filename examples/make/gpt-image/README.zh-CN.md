@@ -2,6 +2,8 @@
 
 独立服务App源项目：**Generate a GPT Image image**、**Get a GPT Image task**、**Make an API call**。使用自己的Ace应用Token，不冒充第三方官方。[English](README.md)。
 
+**Community目录名称按当前表单填写 `GPT Image`，不把开发者公司名加进App名称；Ace Data Cloud身份放在描述、提供者和landing页。** README标题只是说明集成提供者，不是已批准目录名。[2026-10-19核验的投稿规则](../COMMUNITY_SUBMISSION.md)。
+
 ## 1. 正确安装入口
 
 **官方Make安装链接待发布，尚未部署、审核或上架。** 发布后核对提供者为Ace Data Cloud，再装到目标组织。开发者用本目录manifest配对自己的独立测试App，先查已有应用，不能指向Suno/聊天/其他服务origin。[配对说明](../README.md#set-up-a-private-testing-app)。

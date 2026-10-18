@@ -2,18 +2,20 @@
 
 Prepared 2026-10-18. No cloud app/official listing/invite link is provisioned.
 
-- Proposed label: **Nano Banana by Ace Data Cloud**, identifying the integration provider; subject to Make's naming/trademark decision.
+- Community directory service name: **Nano Banana**. The current form requires the exact service name without the developer company. Put **provided by Ace Data Cloud** in the description, publisher identity and landing page; cloud labels remain subject to Make's decision.
 - Proposed internal app name: `nano-banana-acedatacloud`; inspect availability and existing apps before assigning.
 - Relevant discovery terms: **Nano Banana**, **Nano Banana image**, **Ace Data Cloud**. Accurate service descriptions only; no official-affiliation badge, unrelated keyword stuffing or ranking claim.
 - Description: Generate one Nano Banana image through Ace Data Cloud, preserve its async task ID, and retrieve completed media using your own API token.
 - Scope: One generated image only: `action=generate`, `count=1`, Nano Banana 2 / 2.1 / Pro, aspect ratio and 1K/2K/4K resolution. The Lite model is excluded from this module because it supports only 1K. Image editing/reference inputs are not exposed. Its result uses image_url, not the GPT Image url field.
 - Native modules: Generate a Nano Banana image; Get a Nano Banana task; Make an API call.
 - Categories: relevant AI/image/automation choices offered by the review form.
-- Icon: approved Ace-owned logo only; no third-party logo rights are assumed.
+- Community logo: service-identifying asset only, with owner-confirmed rights. The form allows omitting a new logo when the service already has one in the directory. Do not use the Ace company logo as a substitute or assume third-party logo rights.
 - API paths: `/nano-banana/images` and `/nano-banana/tasks`; Connection GET `/v1/models`.
 - Official install link / landing URL / cloud version: **pending**. GitHub source is not a public install URL.
 
 [Common Make policy, duplicate-service rules, and irreversible publication gate](../suno/PUBLICATION.md#choose-the-permitted-public-path): technical review requires correct service classification, no conflicting integration, secret handling, universal module, fresh scenarios; Community allows multiple partner apps but requires current signed-partner eligibility and no default/roadmap conflict. Historical July2023 FAQ is not current approval. Name/brand/terms/indemnification are owner decisions, not accepted here.
+
+The [live Community form](https://f.make.com/submit-your-app), checked 2026-10-19, requires a service-only app name (maximum 60 characters), a description of at most 200 characters, an existing signed partner agreement, real landing/invite/app IDs and consent to listing terms. Use the [current field worksheet](../COMMUNITY_SUBMISSION.md). The README ownership title is not a form app-name value.
 
 ## Private acceptance before submission
 

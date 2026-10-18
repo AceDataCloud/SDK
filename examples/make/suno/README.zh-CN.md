@@ -4,6 +4,8 @@
 
 [English](README.md) · [当前服务与价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_zh_pricing)
 
+**Community目录名称按当前表单填写 `Suno`，不把开发者公司名加进App名称；Ace Data Cloud身份放在描述、提供者和landing页。** README标题只是说明集成提供者，不是已批准目录名。[2026-10-19核验的投稿规则](../COMMUNITY_SUBMISSION.md)。
+
 ## 1. 从正确入口安装
 
 **Make 官方安装链接尚未生成；未部署、未审核、未公开上架。** 获批后从正式链接进入，核对集成提供者为 **Ace Data Cloud**，安装到目标组织，再在场景添加模块。不能仅因其他应用名称含 Suno 就当作本集成。

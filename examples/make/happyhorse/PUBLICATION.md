@@ -2,18 +2,20 @@
 
 Prepared 2026-10-18. No cloud app/official listing/invite link is provisioned.
 
-- Proposed label: **HappyHorse by Ace Data Cloud**, identifying the integration provider; subject to Make's naming/trademark decision.
+- Community directory service name: **HappyHorse**. The current form requires the exact service name without the developer company. Put **provided by Ace Data Cloud** in the description, publisher identity and landing page; cloud labels remain subject to Make's decision.
 - Proposed internal app name: `happyhorse-acedatacloud`; inspect availability and existing apps before assigning.
 - Relevant discovery terms: **HappyHorse**, **HappyHorse video**, **Ace Data Cloud**. Accurate service descriptions only; no official-affiliation badge, unrelated keyword stuffing or ranking claim.
 - Description: Generate one HappyHorse video through Ace Data Cloud, preserve its async task ID, and retrieve completed media using your own API token.
 - Scope: Text-to-video `action=generate` only, using the 1.0/1.1 t2v models. Resolution is **720P/1080P** (uppercase), with 3/5/10/15-second targets. Image-to-video, reference-to-video and video editing are not exposed. A finished result must have exactly one video item with state=succeeded.
 - Native modules: Generate a HappyHorse video; Get a HappyHorse task; Make an API call.
 - Categories: relevant AI/video/automation choices offered by the review form.
-- Icon: approved Ace-owned logo only; no third-party logo rights are assumed.
+- Community logo: service-identifying asset only, with owner-confirmed rights. The form allows omitting a new logo when the service already has one in the directory. Do not use the Ace company logo as a substitute or assume third-party logo rights.
 - API paths: `/happyhorse/videos` and `/happyhorse/tasks`; Connection GET `/v1/models`.
 - Official install link / landing URL / cloud version: **pending**. GitHub source is not a public install URL.
 
 [Common Make policy, duplicate-service rules, and irreversible publication gate](../suno/PUBLICATION.md#choose-the-permitted-public-path): technical review requires correct service classification, no conflicting integration, secret handling, universal module, fresh scenarios; Community allows multiple partner apps but requires current signed-partner eligibility and no default/roadmap conflict. Historical July2023 FAQ is not current approval. Name/brand/terms/indemnification are owner decisions, not accepted here.
+
+The [live Community form](https://f.make.com/submit-your-app), checked 2026-10-19, requires a service-only app name (maximum 60 characters), a description of at most 200 characters, an existing signed partner agreement, real landing/invite/app IDs and consent to listing terms. Use the [current field worksheet](../COMMUNITY_SUBMISSION.md). The README ownership title is not a form app-name value.
 
 ## Private acceptance before submission
 
