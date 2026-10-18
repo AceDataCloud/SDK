@@ -18,6 +18,12 @@ Save the key in the client's credential store or the environment variable shown 
 
 Use this application key for API requests. SDK account-management methods require the separate credential described in their management documentation; do not interchange it with the API key. The optional x402 payment flow below is a separate way to pay for supported requests.
 
+## For single-service integration maintainers
+
+The public SDK is shared infrastructure for independently named service integrations. Keep the service identity visible (for example **Suno by Ace Data Cloud**) and point users to that platform's verified install entry, not only to a generic API URL. The SDK itself is not a default provider listing in another application.
+
+Use the [English/Chinese first-use templates and real API-key screenshot sources](docs/integration-onboarding/README.md) to build the service's installation → application key → host credential → first request → same-task retrieval guide. The templates preserve the current four UTM fields and require platform-specific instructions; they do not generate fake screenshots or claim a marketplace release.
+
 ## Languages
 
 | Language | Directory | Package |

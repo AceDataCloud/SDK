@@ -5,13 +5,23 @@ build-backend = "hatchling.build"
 [project]
 name = "acedatacloud"
 version = "0.1.0"
-description = "Official Python SDK for AceDataCloud — AI-powered data services"
+description = "Ace Data Cloud Python SDK for Suno, Seedance, HappyHorse, GPT Image and Nano Banana"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.9"
+authors = [{ name = "Ace Data Cloud", email = "support@acedata.cloud" }]
+maintainers = [{ name = "Ace Data Cloud", email = "support@acedata.cloud" }]
+keywords = ["acedatacloud", "ai", "suno", "seedance", "happyhorse", "gpt-image", "nano-banana", "sdk"]
+
 dependencies = [
     "httpx>=0.25.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/AceDataCloud/SDK"
+Repository = "https://github.com/AceDataCloud/SDK"
+Issues = "https://github.com/AceDataCloud/SDK/issues"
+Documentation = "https://github.com/AceDataCloud/SDK/blob/main/python/README.md"
 
 [project.optional-dependencies]
 dev = [

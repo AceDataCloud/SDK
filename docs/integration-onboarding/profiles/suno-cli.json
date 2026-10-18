@@ -1,0 +1,20 @@
+{
+  "service": "Suno",
+  "host": "CLI",
+  "entry": "suno_cli",
+  "utm_source": "opensource",
+  "install_url": "https://pypi.org/project/suno-cli/",
+  "install_steps": "```bash\npython -m pip install suno-cli\nsuno --help\nsuno models\n```",
+  "credential_location": "Set the raw token in ACEDATACLOUD_API_TOKEN in the environment launching the terminal command. Do not paste it into a prompt.",
+  "credential_location_zh": "在启动终端命令的环境变量 ACEDATACLOUD_API_TOKEN 中设置原始 Token，不粘贴到提示词。",
+  "first_use": "The commands above only show local help and model references. Check current model/service access, price and balance before using the generation example in the package README. This template does not run a paid request.",
+  "first_use_zh": "上面的命令只展示本地帮助和模型参考。确认当前服务/模型权限、价格和余额后，才按包README运行生成示例；此模板不发收费请求。",
+  "same_task_query": "suno task <task-id>\nsuno wait <task-id> --interval 5",
+  "api_operations": [
+    "/suno/audios",
+    "/suno/tasks"
+  ],
+  "host_image_url": null,
+  "host_image_caption": "No CLI terminal screenshot is supplied by this shared template. Add an actual dated install/command/result capture before claiming this host flow is visually verified.",
+  "host_image_caption_zh": "共享模板不提供CLI终端截图。需补实际带日期的安装/命令/结果截图，才能声称宿主流程有图验证。"
+}

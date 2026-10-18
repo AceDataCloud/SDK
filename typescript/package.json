@@ -1,7 +1,7 @@
 {
   "name": "@acedatacloud/sdk",
   "version": "0.1.0",
-  "description": "Official TypeScript SDK for AceDataCloud — AI-powered data services",
+  "description": "Ace Data Cloud SDK for Suno, Seedance, HappyHorse, GPT Image and Nano Banana",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -38,5 +38,25 @@
   ],
   "engines": {
     "node": ">=18"
+  },
+  "keywords": [
+    "acedatacloud",
+    "ai",
+    "suno",
+    "seedance",
+    "happyhorse",
+    "gpt-image",
+    "nano-banana",
+    "sdk"
+  ],
+  "author": "Ace Data Cloud <support@acedata.cloud>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AceDataCloud/SDK.git",
+    "directory": "typescript"
+  },
+  "homepage": "https://github.com/AceDataCloud/SDK/tree/main/typescript",
+  "bugs": {
+    "url": "https://github.com/AceDataCloud/SDK/issues"
   }
 }
