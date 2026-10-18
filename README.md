@@ -26,6 +26,11 @@ Use this application key for API requests. SDK account-management methods requir
 | TypeScript | [typescript](typescript/) | `@acedatacloud/sdk` |
 | Go | [go](go/) | `github.com/AceDataCloud/SDK/go` |
 
+## Framework examples
+
+- [LangChain chat](examples/langchain/): use `langchain-openai` with the
+  OpenAI-compatible Chat Completions endpoint for text, streaming, and tools.
+
 ## Architecture
 
 All three SDKs share the same design, organised along **two axes**:
