@@ -7,6 +7,23 @@ Use the published Ace Data Cloud Python SDK with LlamaIndex `FunctionTool`,
 their source URLs. It does not generate an answer or require an LLM/embedding key.
 It is an Ace-maintained example, not an official LlamaIndex listing or built-in provider.
 
+This is an auxiliary SDK search/extraction compatibility example, separate from
+the six native LlamaIndex integrations released as GitHub **v0.1.0**:
+
+| Native integration | Versioned release |
+|---|---|
+| Ace Data Cloud LLM | [v0.1.0](https://github.com/AceDataCloud/AceDataCloudModelProviderLlamaIndex/releases/tag/v0.1.0) |
+| Suno | [v0.1.0](https://github.com/AceDataCloud/SunoLlamaIndex/releases/tag/v0.1.0) |
+| Seedance | [v0.1.0](https://github.com/AceDataCloud/SeedanceLlamaIndex/releases/tag/v0.1.0) |
+| HappyHorse | [v0.1.0](https://github.com/AceDataCloud/HappyHorseLlamaIndex/releases/tag/v0.1.0) |
+| GPT Image | [v0.1.0](https://github.com/AceDataCloud/GPTImageLlamaIndex/releases/tag/v0.1.0) |
+| Nano Banana | [v0.1.0](https://github.com/AceDataCloud/NanoBananaLlamaIndex/releases/tag/v0.1.0) |
+
+Those are independently installable native packages with their own versioned wheel
+and onboarding. This example does not replace them or imply official listing.
+PyPI publication of those six new packages is still pending the shared project
+creation quota; use their GitHub release instructions, not an assumed PyPI version.
+
 ## Install and run without a token
 
 Python 3.10+ is required by LlamaIndex; Python 3.12 is used in CI.
@@ -29,11 +46,34 @@ The output contains retrieved `text`, `url`, `title`, `task_id`, and `trace_id`.
 
 ## Use your Ace account
 
-1. [Register or sign in](https://platform.acedata.cloud/?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction).
-2. Open [Applications](https://platform.acedata.cloud/console/applications?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction), create an application if necessary, then create and copy its API credential.
-3. Check your current service access, quota and pricing for
-   [Google Search](https://platform.acedata.cloud/service/serp?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction)
-   and [WebExtrator](https://platform.acedata.cloud/service/webextrator?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction).
+1. [Register or sign in](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_register) and open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_api_key).
+2. Find **General application**. If absent, choose **Initialize General Application**.
+   Its key can use services your account is entitled to; a dedicated application's
+   key is service-limited. This workflow requires both Google Search and WebExtrator access.
+3. Copy the application's **API Key**, or select **Manage Keys → Create** for a
+   dedicated `LlamaIndex search/extraction` key.
+
+![Real Ace console: copy the redacted API Key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
+
+4. When creating a key, review **Expiration Time**, **Set Usage Limitation**, and
+   **Allowed APIs**. If restricting APIs, allow `/serp/google`, `/webextrator/extract`
+   and `/webextrator/tasks` for same-ID recovery. Create it, return to the key list,
+   and copy the raw token. Do not add `Bearer `, quotes, whitespace or the screenshot's
+   redacted characters; a `platform-...` management token cannot replace this key.
+
+![Real Ace console: create a separately named key with optional restrictions](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png)
+
+These are real, redacted Ace console screenshots from the linked fixed SunoDify
+commit, reused and visually checked on **2026-10-19**; capture date/console version
+is unknown. The historical `Dify tutorial` example name should be replaced by
+`LlamaIndex search/extraction`. These show account setup, not this example running.
+Never put a real token in a prompt, notebook output, screenshot or Git.
+
+5. Check your current permissions, quota, balance and prices before live calls:
+   [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_serp_example_docs) ·
+   [WebExtrator extraction API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_docs) ·
+   [current model/service prices](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_pricing).
+   No fixed price or free allowance is assumed here.
 
 Set `ACEDATACLOUD_API_TOKEN` in your shell, then opt in:
 
@@ -51,7 +91,7 @@ credits. This example installs no payment handler and initiates no on-chain paym
 The workflow fails on authentication, rate limits, failed extraction, empty content,
 or an unexpectedly pending task. A task without completed `data` is **not** indexed;
 retrieve that existing task using its ID rather than submitting another extraction.
-See [task retrieval](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction).
+See [task retrieval](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_task_guide).
 
 ## Attach the tools to your agent
 
@@ -82,6 +122,11 @@ generic MCP client. No Ace-specific integration package is needed:
 python -m pip install -r requirements-mcp.txt
 python mcp_discovery.py
 ```
+
+The workflow and tests above use mocked API responses; they are distinct from this
+networked, authenticated discovery command. On 2026-10-12 the actual LlamaIndex MCP
+client read 11 tools and called a free static information tool; that historical
+evidence is not a paid search/extraction or six-package publication check.
 
 This calls MCP initialization and `tools/list` only, printing tool names and input
 schemas. Set `ACEDATACLOUD_API_TOKEN` first: the hosted endpoint requires Bearer

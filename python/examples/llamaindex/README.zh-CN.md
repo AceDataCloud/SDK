@@ -7,6 +7,20 @@
 示例不生成回答，不需要 LLM 或 embedding 密钥。这是 Ace 维护的示例；
 尚无 LlamaIndex 官方收录、默认内置或精选证明。
 
+这是辅助性的 SDK 搜索/提取兼容示例，与已通过 GitHub 发布 **v0.1.0** 的六个原生 LlamaIndex 包分开：
+
+| 原生集成 | 版本化发行入口 |
+|---|---|
+| Ace Data Cloud LLM | [v0.1.0](https://github.com/AceDataCloud/AceDataCloudModelProviderLlamaIndex/releases/tag/v0.1.0) |
+| Suno | [v0.1.0](https://github.com/AceDataCloud/SunoLlamaIndex/releases/tag/v0.1.0) |
+| Seedance | [v0.1.0](https://github.com/AceDataCloud/SeedanceLlamaIndex/releases/tag/v0.1.0) |
+| HappyHorse | [v0.1.0](https://github.com/AceDataCloud/HappyHorseLlamaIndex/releases/tag/v0.1.0) |
+| GPT Image | [v0.1.0](https://github.com/AceDataCloud/GPTImageLlamaIndex/releases/tag/v0.1.0) |
+| Nano Banana | [v0.1.0](https://github.com/AceDataCloud/NanoBananaLlamaIndex/releases/tag/v0.1.0) |
+
+六包各自有独立 wheel 和原生类/工具，本示例不代替它们，也不等于官方收录。
+六个新包的 PyPI 发布仍待共享创建项目配额，按 GitHub 正式发行说明安装，不猜造 PyPI 版本。
+
 ## 无 Token 安装与体验
 
 需要 Python 3.10+，CI 使用 3.12。在本目录运行：
@@ -24,10 +38,29 @@ API 请求被拦截，未匹配请求会失败。输出标为 `synthetic-offline
 
 ## 连接自己的账户
 
-1. [注册或登录](https://platform.acedata.cloud/?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction)。
-2. 打开[应用控制台](https://platform.acedata.cloud/console/applications?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction)，按需创建应用，再创建并复制 API 凭据。
-3. 确认自己的 [Google Search](https://platform.acedata.cloud/service/serp?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction)
-   与 [WebExtrator](https://platform.acedata.cloud/service/webextrator?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction) 服务权限、额度和当前价格。
+1. [注册或登录](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_register_zh)，打开[应用控制台 Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_api_key_zh)。
+2. 找到 **General application**；没有时点 **Initialize General Application**。
+   通用应用 Key 仍受当前账户服务权限约束，专用应用仅限其服务；本流程同时需要 Google Search 与 WebExtrator。
+3. 复制应用的 **API Key**；或 **Manage Keys → Create** 新建 `LlamaIndex search/extraction` 专用 Key。
+
+![真实 Ace 控制台：复制已遮挡 Key 或打开 Manage Keys](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
+
+4. 按需设置 **Expiration Time**、**Set Usage Limitation** 和 **Allowed APIs**。
+   若限制接口，需允许 `/serp/google`、`/webextrator/extract` 以及同 ID 恢复用的 `/webextrator/tasks`。
+   创建后回 Key 列表复制 Token 本体，不加 `Bearer `、引号、空格或截图遮挡字符。
+   `platform-...` 管理令牌不能代替本流程的服务 Key；不要把真实 Key 放入 prompt、输出、截图或 Git。
+
+![真实 Ace 控制台：创建独立 Key 和可选权限限制](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png)
+
+图片复用固定 SunoDify 提交的真实脱敏控制台截图，**2026-10-19 复用并目视核验**；
+原拍摄日期与控制台版本未知。旧示例名 `Dify tutorial` 应改填 `LlamaIndex search/extraction`。
+这些图只展示账户步骤，不是本示例真实运行证据。
+
+5. 开启真实调用前核当前权限、用量、余额与价格：
+   [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_serp_example_docs_zh) ·
+   [WebExtrator 提取 API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_docs_zh) ·
+   [当前模型/服务价格](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_pricing_zh)。
+   本教程不假定固定单价或免费额度。
 
 在 shell 中设置 `ACEDATACLOUD_API_TOKEN`，然后显式开启：
 
@@ -42,7 +75,7 @@ python workflow.py --live --query "LlamaIndex search tools" --max-pages 1
 
 鉴权、限流、提取失败、空正文或意外 pending 均会报错。
 只有完成的 `data` 会进入索引；若已得到 task ID 却没有正文，
-按[任务查询指南](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=llamaindex&utm_medium=example&utm_campaign=search-extraction)
+按[任务查询指南](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_task_guide_zh)
 查询同一 ID，避免重新提交提取。结果保留 `text`、`url`、`title`、`task_id` 和 `trace_id`。
 
 ## 放入自己的 Agent
@@ -61,6 +94,10 @@ python workflow.py --live --query "LlamaIndex search tools" --max-pages 1
 python -m pip install -r requirements-mcp.txt
 python mcp_discovery.py
 ```
+
+上面的工作流与测试使用模拟 API，与这里的联网工具发现分开。2026-10-12 曾通过真实
+LlamaIndex MCP 客户端读回 11 个工具并调用免费静态信息工具；这是历史只读证据，
+不等于收费搜索/提取或六个原生包发布验收。
 
 先设置 `ACEDATACLOUD_API_TOKEN`：托管端点在工具发现阶段也需要 Bearer 鉴权。
 只初始化并执行 `tools/list`，打印工具名与输入 schema。
