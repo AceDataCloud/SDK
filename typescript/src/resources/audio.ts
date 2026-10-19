@@ -8,6 +8,7 @@ export type AudioProvider = 'suno' | 'producer' | 'fish' | (string & {});
 export class Audio {
   constructor(private transport: Transport) {}
 
+  /** selfOnly filters this account's platform-created voices; it does not make them private. */
   async listFishModels(opts: {
     pageSize?: number;
     pageNumber?: number;

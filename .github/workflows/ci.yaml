@@ -7,6 +7,36 @@ on:
     branches: [main]
 
 jobs:
+  make-app-schema:
+    name: Make App Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check out pinned official Make schemas
+        uses: actions/checkout@v6
+        with:
+          repository: integromat/vscode-apps-sdk
+          ref: 6ff5f3dd9960ccbeb24de3beb1cca935de89eaa0
+          path: .make-apps-sdk
+          sparse-checkout: syntaxes
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install validation tools
+        run: pip install jsonschema==4.25.1 ruff
+
+      - name: Validate Make local app
+        run: |
+          ruff check scripts/validate_make_app.py
+          ruff format --check scripts/validate_make_app.py
+          find examples/make -name makecomapp.json -print0 | while IFS= read -r -d '' manifest; do
+            python3 scripts/validate_make_app.py --schema-root .make-apps-sdk --app-root "$(dirname "$manifest")"
+          done
+
   provider-generation:
     name: Provider Generation
     runs-on: ubuntu-latest
@@ -57,10 +87,34 @@ jobs:
           pip install ".[dev]"
 
       - name: Run Ruff linter
-        run: ruff check .
+        run: ruff check . ../examples/langchain
 
       - name: Run Ruff formatter check
-        run: ruff format --check .
+        run: ruff format --check . ../examples/langchain
+
+  langchain-example:
+    name: LangChain Example (${{ matrix.adapter-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter-version: ["1.6.6", "1.7.0"]
+    defaults:
+      run:
+        working-directory: examples/langchain
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install example dependencies
+        run: python -m pip install 'langchain-openai==${{ matrix.adapter-version }}' pytest
+
+      - name: Test ChatOpenAI protocol
+        run: python -m pytest -q
 
   python-test:
     name: Python Test (${{ matrix.python-version }})

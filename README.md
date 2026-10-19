@@ -26,11 +26,19 @@ Use the [English/Chinese first-use templates and real API-key screenshot sources
 
 ## Languages
 
+**LlamaIndex example:** [web search → extraction → cited retrieval](python/examples/llamaindex/README.md)
+([中文](python/examples/llamaindex/README.zh-CN.md)), with a no-token offline demo and hosted MCP discovery.
+
 | Language | Directory | Package |
 |----------|-----------|---------|
 | Python | [python](python/) | `acedatacloud` |
 | TypeScript | [typescript](typescript/) | `@acedatacloud/sdk` |
 | Go | [go](go/) | `github.com/AceDataCloud/SDK/go` |
+
+## Framework examples
+
+- [LangChain chat](examples/langchain/): use `langchain-openai` with the
+  OpenAI-compatible Chat Completions endpoint for text, streaming, and tools.
 
 ## Architecture
 
@@ -151,3 +159,16 @@ One daily Kubernetes Job reviews Backend docs and API changes with Claude Code,
 updates existing files, and creates or updates one reviewable PR per repository.
 It never merges PRs or duplicates the Backend guide tree. Normal CI and review
 remain required; publication and sub-repository mirroring run after merge.
+
+## Native Zapier application
+
+The [Ace Data Cloud Zapier application](https://github.com/AceDataCloud/AceDataCloudZapier)
+has its own source, package and release workflow. It provides named Suno music
+generation and original-task recovery actions alongside chat. Follow its
+[English guide](https://github.com/AceDataCloud/AceDataCloudZapier/blob/main/README.md)
+or [Chinese guide](https://github.com/AceDataCloud/AceDataCloudZapier/blob/main/readme/README_zh_Hans.md)
+for actual publication status, account connection and billing boundaries.
+
+The application is source-only until its private upload and public review are
+verified; this link is not a Zapier installation or listing. SDK clients do not
+embed or maintain a second copy of the Zapier application.

@@ -49,6 +49,10 @@ for chunk in client.openai.chat.completions.create(
 
 ## Async Usage
 
+For a runnable LlamaIndex workflow, see [search, extraction and cited retrieval](examples/llamaindex/README.md)
+([中文](examples/llamaindex/README.zh-CN.md)). It uses the published SDK, runs offline by default,
+and includes a read-only hosted MCP discovery command.
+
 ```python
 import asyncio
 from acedatacloud import AsyncAceDataCloud
@@ -188,6 +192,39 @@ There is no quality tier: all videos use 1080p/30fps and target durations of
 with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
+
+## Fish voice models
+
+`client.fish.model(title=..., voices=...)` creates a reusable voice from a single
+publicly downloadable audio URL string, not an array or a multipart upload.
+Prefer a direct URL ending in `.mp3` or `.wav`. Successful creation returns the
+model object directly (HTTP 201); its `_id` can be used as `reference_id` in
+`client.fish.generate`.
+
+Created voices are stored publicly long-term and may be searched and used by
+other users. Omit `visibility`: passing `private` or `unlist` does not make the
+voice private. For temporary reference audio without creating a saved model,
+use `client.fish.generate(text=..., references=[{"audio": audio_url, "text": transcript}])`.
+
+`client.audio.list_fish_models(self_only=True, page_size=20, page_number=1)`
+lists voices created and saved through this platform by the calling account,
+including voices created with its other API tokens. This only filters the list;
+it does not restrict public use. Results are paginated in reverse creation order;
+`sort_by` supports `created_at` and `task_count`, and `author_id` can further
+filter them. Do not combine `self_only=True` with `title_language`; that filter
+is for the public library. Responses contain `total`, `items`, and `has_more`;
+`has_more` is boolean for self queries and may be `None` for public-library
+queries. `AsyncAceDataCloud` exposes the same methods with `await`.
+
+## File uploads
+
+`client.files.upload(file_bytes, filename="photo.jpg")` uses the management-plane
+account token, not a generation API key. Use a separate client configured with
+that token. Uploads return `file_url` and `mime`; use the returned URL rather than
+constructing one. The platform assigns an `uploads/<uuid>` path and preserves a
+safe filename extension. Supply a filename matching the actual content: MIME
+inference from the filename does not convert the file. The default single-file
+limit is 100 MB. The async client supports the same upload procedure.
 
 ## Multi-Provider Support
 

@@ -70,7 +70,7 @@ export interface FishModelOptions {
   tags?: string[];
   /** Reference text corresponding to the audio sample (optional). */
   texts?: string[];
-  /** The visibility of the model is set to `private` by default. */
+  /** Voices are always public. Omit visibility; `private` or `unlist` does not restrict access. */
   visibility?: "public" | "private";
   /** HTTP(S) URL of the voice model cover image (optional). */
   coverImage?: string;

@@ -1,0 +1,9 @@
+[
+  {
+    "name": "apiKey",
+    "label": "AceDataCloud API token",
+    "type": "password",
+    "required": true,
+    "editable": true
+  }
+]

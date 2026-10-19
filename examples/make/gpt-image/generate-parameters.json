@@ -1,0 +1,80 @@
+[
+  {
+    "name": "prompt",
+    "label": "Image description",
+    "type": "text",
+    "required": true,
+    "help": "Describe one image. This first action creates one URL result; edits and base64 output are not exposed."
+  },
+  {
+    "name": "model",
+    "label": "GPT Image model",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "GPT Image 2",
+        "value": "gpt-image-2"
+      },
+      {
+        "label": "GPT Image 2.5 Flare",
+        "value": "gpt-image-2.5-flare"
+      },
+      {
+        "label": "GPT Image 2.5 Sunburst",
+        "value": "gpt-image-2.5-sunburst"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "size",
+    "label": "Image size",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "Auto",
+        "value": "auto"
+      },
+      {
+        "label": "1024 \u00d7 1024",
+        "value": "1024x1024"
+      },
+      {
+        "label": "1024 \u00d7 1536",
+        "value": "1024x1536"
+      },
+      {
+        "label": "1536 \u00d7 1024",
+        "value": "1536x1024"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "quality",
+    "label": "Quality",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "Auto",
+        "value": "auto"
+      },
+      {
+        "label": "Low",
+        "value": "low"
+      },
+      {
+        "label": "Medium",
+        "value": "medium"
+      },
+      {
+        "label": "High",
+        "value": "high"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  }
+]
