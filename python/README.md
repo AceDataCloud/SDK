@@ -49,6 +49,10 @@ for chunk in client.openai.chat.completions.create(
 
 ## Async Usage
 
+For a runnable LlamaIndex workflow, see [search, extraction and cited retrieval](examples/llamaindex/README.md)
+([中文](examples/llamaindex/README.zh-CN.md)). It uses the published SDK, runs offline by default,
+and includes a read-only hosted MCP discovery command.
+
 ```python
 import asyncio
 from acedatacloud import AsyncAceDataCloud
