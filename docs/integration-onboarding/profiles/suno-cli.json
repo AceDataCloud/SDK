@@ -1,0 +1,20 @@
+{
+  "service": "Suno",
+  "host": "CLI",
+  "entry": "suno_cli",
+  "utm_source": "opensource",
+  "install_url": "https://pypi.org/project/suno-cli/",
+  "install_steps": "```bash\npython -m pip install suno-cli\nsuno --help\nsuno models\n```",
+  "credential_location": "Set the raw token in ACEDATACLOUD_API_TOKEN in the environment launching the terminal command. Do not paste it into a prompt.",
+  "credential_location_zh": "在启动终端命令的环境变量 ACEDATACLOUD_API_TOKEN 中设置原始 Token，不粘贴到提示词。",
+  "first_use": "The help/models commands above are local and free. After approving the current price, account access and balance, this is an explicit first-request example (not executed by the template):\n\n```bash\nsuno generate \"A short gentle instrumental piano melody for a sunrise, no vocals.\" --model chirp-v5-5 --instrumental --async --json\n```\n\nThis submits one potentially billable music task. Save the returned task_id, and use the query commands below for that same ID. Do not rerun the generate command while pending.",
+  "first_use_zh": "前面的help/models是本地免费命令。确认并接受当前价格、账号权限和余额后，以下是明确的首次请求例子（模板不会执行）：\n\n```bash\nsuno generate \"A short gentle instrumental piano melody for a sunrise, no vocals.\" --model chirp-v5-5 --instrumental --async --json\n```\n\n它会提交一次可能收费的音乐任务。保存返回的task_id，再用下方命令查询同一个ID；pending时不要重复运行generate。",
+  "same_task_query": "suno task <task-id>\nsuno wait <task-id> --interval 5",
+  "api_operations": [
+    "/suno/audios",
+    "/suno/tasks"
+  ],
+  "host_image_url": null,
+  "host_image_caption": "No CLI terminal screenshot is supplied by this shared template. Add an actual dated install/command/result capture before claiming this host flow is visually verified.",
+  "host_image_caption_zh": "共享模板不提供CLI终端截图。需补实际带日期的安装/命令/结果截图，才能声称宿主流程有图验证。"
+}
