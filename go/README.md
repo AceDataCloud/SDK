@@ -181,6 +181,19 @@ with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
 
+## Fish voice models
+
+`client.Fish().Model(ctx, acedatacloud.FishModelRequest{Title: title, Voices: audioURL})`
+creates a reusable voice from a single publicly downloadable audio URL string,
+not an array or a multipart upload. Prefer a direct URL ending in `.mp3` or
+`.wav`. Successful creation returns the model map directly (HTTP 201); its `_id`
+can be used as `ReferenceID` in `client.Fish().Generate`.
+
+Created voices are stored publicly long-term and may be searched and used by
+other users. Omit `Visibility`: passing `private` or `unlist` does not make the
+voice private. For temporary reference audio without creating a saved model,
+use `FishGenerateRequest.References` instead of creating a model.
+
 ## More resources
 
 ```go

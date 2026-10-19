@@ -24,6 +24,51 @@ func TestNewClient_RequiresTokenOrHandler(t *testing.T) {
 	}
 }
 
+func TestFishModelCreated(t *testing.T) {
+	for _, visibility := range []string{"", "private"} {
+		t.Run("visibility="+visibility, func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/fish/model" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if body["voices"] != "https://example.com/sample-voice.mp3" || body["title"] != "My Custom Voice" {
+					t.Errorf("unexpected body: %+v", body)
+				}
+				if visibility == "" {
+					if _, ok := body["visibility"]; ok {
+						t.Error("visibility must be omitted by default")
+					}
+				} else if body["visibility"] != visibility {
+					t.Errorf("explicit visibility was not preserved: %+v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				_, _ = w.Write([]byte(`{"_id":"d7900c21663f485ab63ebdb7e5905036","visibility":"public"}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			result, err := client.Fish().Model(context.Background(), FishModelRequest{
+				Title: "My Custom Voice", Voices: "https://example.com/sample-voice.mp3", Visibility: visibility,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if result["_id"] != "d7900c21663f485ab63ebdb7e5905036" || result["visibility"] != "public" || calls != 1 {
+				t.Fatalf("unexpected creation result: %+v (%d calls)", result, calls)
+			}
+		})
+	}
+}
+
 func TestNewClient_WithToken(t *testing.T) {
 	c, err := NewClient(WithAPIToken("test-token"))
 	if err != nil {

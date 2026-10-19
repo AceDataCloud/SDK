@@ -181,6 +181,38 @@ with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
 
+## Fish voice models
+
+`client.fish.model({ title, voices: audioUrl })` creates a reusable voice from a
+single publicly downloadable audio URL string, not an array or a multipart
+upload. Prefer a direct URL ending in `.mp3` or `.wav`. Successful creation
+returns the model object directly (HTTP 201); its `_id` can be used as
+`referenceId` in `client.fish.generate`.
+
+Created voices are stored publicly long-term and may be searched and used by
+other users. Omit `visibility`: passing `private` or `unlist` does not make the
+voice private. For temporary reference audio without creating a saved model,
+use `client.fish.generate({ text, references: [{ audio: audioUrl, text: transcript }] })`.
+
+`client.audio.listFishModels({ selfOnly: true, pageSize: 20, pageNumber: 1 })`
+lists voices created and saved through this platform by the calling account,
+including voices created with its other API tokens. This only filters the list;
+it does not restrict public use. Results are paginated in reverse creation order;
+`sortBy` supports `created_at` and `task_count`, and `authorId` can further filter
+them. Do not combine `selfOnly: true` with `titleLanguage`; that filter is for
+the public library. Responses contain `total`, `items`, and `has_more`;
+`has_more` is boolean for self queries and may be `null` for public-library queries.
+
+## File uploads
+
+`client.files.upload(fileBytes, { filename: 'photo.jpg' })` uses the
+management-plane account token, not a generation API key. Use a separate client
+configured with that token. Uploads return `file_url` and `mime`; use the returned
+URL rather than constructing one. The platform assigns an `uploads/<uuid>` path
+and preserves a safe filename extension. Supply a filename matching the actual
+content: MIME inference from the filename does not convert the file. The default
+single-file limit is 100 MB.
+
 ## Multi-Provider Support
 
 Image, video, and audio resources support a `provider` parameter to switch between services:

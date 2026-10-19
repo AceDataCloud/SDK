@@ -145,7 +145,7 @@ type FishModelRequest struct {
 	Tags []string
 	// Reference text corresponding to the audio sample (optional).
 	Texts []string
-	// The visibility of the model is set to `private` by default.
+	// Voices are always public. Omit visibility; `private` or `unlist` does not restrict access.
 	Visibility string
 	// HTTP(S) URL of the voice model cover image (optional).
 	CoverImage string
