@@ -32,7 +32,13 @@ suno models
 
 ## 4. 首用与同一个任务查询
 
-上面的命令只展示本地帮助和模型参考。确认当前服务/模型权限、价格和余额后，才按包README运行生成示例；此模板不发收费请求。
+前面的help/models是本地免费命令。确认并接受当前价格、账号权限和余额后，以下是明确的首次请求例子（模板不会执行）：
+
+```bash
+suno generate "A short gentle instrumental piano melody for a sunrise, no vocals." --model chirp-v5-5 --instrumental --async --json
+```
+
+它会提交一次可能收费的音乐任务。保存返回的task_id，再用下方命令查询同一个ID；pending时不要重复运行generate。
 
 ```text
 suno task <task-id>

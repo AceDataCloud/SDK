@@ -32,7 +32,13 @@ No CLI terminal screenshot is supplied by this shared template. Add an actual da
 
 ## 4. First use and retrieve the same task
 
-The commands above only show local help and model references. Check current model/service access, price and balance before using the generation example in the package README. This template does not run a paid request.
+The help/models commands above are local and free. After approving the current price, account access and balance, this is an explicit first-request example (not executed by the template):
+
+```bash
+suno generate "A short gentle instrumental piano melody for a sunrise, no vocals." --model chirp-v5-5 --instrumental --async --json
+```
+
+This submits one potentially billable music task. Save the returned task_id, and use the query commands below for that same ID. Do not rerun the generate command while pending.
 
 ```text
 suno task <task-id>
