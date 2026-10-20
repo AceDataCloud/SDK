@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from acedatacloud import APIError
 from acedatacloud._runtime.transport import _map_error
 
@@ -38,6 +40,30 @@ def test_error_as_non_mapping_non_string_falls_back():
     exc = _map_error(502, {"error": ["a", "b"]})
     assert isinstance(exc, APIError)
     assert exc.code == ""
+
+
+@pytest.mark.parametrize(
+    ("code", "message"),
+    [
+        ("suno_processing_unavailable", "Music processing is unavailable. Contact support with the trace ID."),
+        (
+            "suno_model_unavailable",
+            "The selected model is unavailable for this operation. Contact support with the trace ID.",
+        ),
+        ("suno_processing_failed", "Music processing returned no audio. Contact support with the trace ID."),
+    ],
+)
+def test_suno_processing_error_preserves_support_details(code, message):
+    body = {"error": {"code": code, "message": message}, "trace_id": "test-trace"}
+
+    exc = _map_error(500, body)
+
+    assert isinstance(exc, APIError)
+    assert exc.status_code == 500
+    assert exc.code == code
+    assert exc.message == message
+    assert exc.trace_id == body["trace_id"]
+    assert exc.body == body
 
 
 def test_error_as_none_falls_back():
