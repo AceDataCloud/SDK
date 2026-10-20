@@ -69,6 +69,42 @@ func TestFishModelCreated(t *testing.T) {
 	}
 }
 
+func TestSunoNegativeTagsAreNotTruncated(t *testing.T) {
+	for _, tags := range []string{"", strings.Repeat("no distorted guitars; ", 100)} {
+		body := (SunoGenerateRequest{Custom: true, NegativeTags: tags}).toBody()
+		if tags == "" {
+			if _, exists := body["negative_tags"]; exists {
+				t.Fatal("empty negative_tags must remain omitted")
+			}
+		} else if body["negative_tags"] != tags {
+			t.Fatal("negative_tags was changed or truncated")
+		}
+	}
+}
+
+func TestSunoProcessingErrorsPreserveSupportDetails(t *testing.T) {
+	for code, message := range map[string]string{
+		"suno_processing_unavailable": "Music processing is unavailable. Contact support with the trace ID.",
+		"suno_model_unavailable":      "The selected model is unavailable for this operation. Contact support with the trace ID.",
+		"suno_processing_failed":      "Music processing returned no audio. Contact support with the trace ID.",
+	} {
+		t.Run(code, func(t *testing.T) {
+			body := map[string]any{"error": map[string]any{"code": code, "message": message}, "trace_id": "test-trace"}
+			err := mapError(http.StatusInternalServerError, body)
+			apiErr, ok := err.(*APIError)
+			if !ok {
+				t.Fatalf("expected APIError, got %T", err)
+			}
+			if apiErr.Code() != code || apiErr.Message != message || apiErr.StatusCode() != 500 || apiErr.TraceID() != "test-trace" {
+				t.Fatalf("lost support details: %+v", apiErr)
+			}
+			if !reflect.DeepEqual(apiErr.Body(), body) {
+				t.Fatalf("lost response body: %+v", apiErr.Body())
+			}
+		})
+	}
+}
+
 func TestNewClient_WithToken(t *testing.T) {
 	c, err := NewClient(WithAPIToken("test-token"))
 	if err != nil {

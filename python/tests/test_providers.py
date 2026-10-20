@@ -139,6 +139,37 @@ def test_nano_banana_model_defaults_and_public_variants(client):
     assert "resolution" not in transport.request.call_args.kwargs["json"]
 
 
+@pytest.mark.parametrize("negative_tags", [None, "", "no distorted guitars; " * 100])
+def test_suno_negative_tags_are_not_truncated(client, negative_tags):
+    transport = Mock()
+    transport.request.return_value = {}
+    client.suno._transport = transport
+
+    client.suno.generate(custom=True, negative_tags=negative_tags)
+
+    expected = {"custom": True, "async": True}
+    if negative_tags is not None:
+        expected["negative_tags"] = negative_tags
+    transport.request.assert_called_once_with("POST", "/suno/audios", json=expected)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("negative_tags", [None, "", "no distorted guitars; " * 100])
+async def test_async_suno_negative_tags_are_not_truncated(negative_tags):
+    from unittest.mock import AsyncMock
+
+    async with AsyncAceDataCloud(api_token="test-token") as client:
+        transport = Mock(request=AsyncMock(return_value={}))
+        client.suno._transport = transport
+
+        await client.suno.generate(custom=True, negative_tags=negative_tags)
+
+        expected = {"custom": True, "async": True}
+        if negative_tags is not None:
+            expected["negative_tags"] = negative_tags
+        transport.request.assert_awaited_once_with("POST", "/suno/audios", json=expected)
+
+
 def test_required_flux_size_is_sent(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}

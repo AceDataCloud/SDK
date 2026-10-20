@@ -193,6 +193,24 @@ with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
 
+## Suno music processing
+
+Use `client.suno.generate(custom=True, lyric=..., style=..., negative_tags=...)`
+for custom-mode music. `negative_tags` describes styles or genres to exclude;
+there is currently no fixed character limit, but overly long input may still
+fail, so keep it concise. The SDK passes the string through without truncation.
+`AsyncAceDataCloud` accepts the same fields with `await`.
+
+A downloadable audio file does not guarantee that its `audio_id` remains usable
+for covers, extensions or stem separation. If processing returns
+`suno_processing_unavailable`, keep the original `task_id` (the task handle's
+`id`, when available) and the error's `trace_id` for support. The related codes
+`suno_model_unavailable` and `suno_processing_failed` mean the selected model is
+unavailable for that operation or processing returned no audio, respectively.
+These HTTP 500 errors retain their `code`, `trace_id` and `body` on `APIError`.
+Retrieve an existing task rather than submitting a replacement generation just
+to check its result.
+
 ## Fish voice models
 
 `client.fish.model(title=..., voices=...)` creates a reusable voice from a single
@@ -319,7 +337,14 @@ client = AceDataCloud(
 ```
 
 See [`AceDataCloud/X402Client`](https://github.com/AceDataCloud/X402Client) for
-Base, Solana, and SKALE setup details.
+network setup details. Its TypeScript/Python signers also support Arbitrum One
+(`network="arbitrum"` or `"eip155:42161"`) for `exact` payments with native USDC
+(6 decimals), not bridged USDC. Availability is rolled out per network: only
+select Arbitrum when the server's current `accepts` offers it. A configured
+signer does not enable the network on the server. Use the returned payment
+requirements and price rather than hard-coding an amount; the SDK forwards
+`accepts` unchanged to the handler. The wallet must support and hold funds on
+the target chain.
 
 ## License
 

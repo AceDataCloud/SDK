@@ -50,7 +50,7 @@ type SunoGenerateRequest struct {
 	VocalGender string
 	// Add a default start time for the uploaded audio sample, with a default value of 0.
 	SamplesStart float64
-	// Styles of description that are not desired in music generation.
+	// No fixed character limit is currently enforced; keep it concise. Styles or genres to exclude in custom mode (`
 	NegativeTags string
 	// The "Style Influence" advanced parameter in the Suno official custom mode has a value range of 0 to 1, with hi
 	StyleInfluence float64

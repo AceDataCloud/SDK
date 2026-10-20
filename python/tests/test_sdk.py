@@ -77,10 +77,11 @@ def test_x402_payment_retry_does_not_use_retry_budget():
 
 
 @respx.mock
-def test_x402_payment_retry_parses_payment_required_header():
+@pytest.mark.parametrize("network", ["eip155:8453", "eip155:42161"])
+def test_x402_payment_retry_parses_payment_required_header(network):
     required = {
         "x402Version": 2,
-        "accepts": [{"network": "eip155:8453", "scheme": "exact", "amount": "1"}],
+        "accepts": [{"network": network, "scheme": "exact", "amount": "1"}],
     }
     encoded = base64.b64encode(json.dumps(required).encode()).decode()
     payment_handler = Mock(return_value={"headers": {"PAYMENT-SIGNATURE": "signed-payment"}})

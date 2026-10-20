@@ -143,6 +143,18 @@ class SnapshotSyncTests(unittest.TestCase):
                 self.assertEqual(models.count("gpt-5.6-sol-fast"), 1)
                 self.assertIn("gpt-5.6-sol", models)
 
+    def test_suno_negative_tags_has_no_fixed_character_limit(self):
+        path = SCRIPT.parent / "specs/09a26295-5972-4392-9318-dcd9b218f90d.json"
+        operation = json.loads(path.read_text())["paths"]["/suno/audios"]["post"]
+        field = operation["requestBody"]["content"]["application/json"]["schema"][
+            "properties"
+        ]["negative_tags"]
+        self.assertEqual(field["type"], "string")
+        self.assertNotIn("maxLength", field)
+        self.assertIn("custom", field["description"])
+        self.assertIn("No fixed character limit", field["description"])
+        self.assertIn("keep it concise", field["description"])
+
     def test_go_representation_hint_survives_snapshot_refresh(self):
         old = {
             "properties": {

@@ -181,6 +181,24 @@ with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
 
+## Suno music processing
+
+Use `client.Suno().Generate` with `SunoGenerateRequest{Custom: true, Lyric: lyric,
+Style: style, NegativeTags: negativeTags}` for custom-mode music. `NegativeTags`
+describes styles or genres to exclude; there is currently no fixed character
+limit, but overly long input may still fail, so keep it concise. The SDK sends
+it as `negative_tags` without truncation.
+
+A downloadable audio file does not guarantee that its `audio_id` remains usable
+for covers, extensions or stem separation. If processing returns
+`suno_processing_unavailable`, keep the original `task_id` (the task handle's
+`ID`, when available) and the error's `TraceID()` for support. The related codes
+`suno_model_unavailable` and `suno_processing_failed` mean the selected model is
+unavailable for that operation or processing returned no audio, respectively.
+These HTTP 500 errors retain their `Code()`, `TraceID()` and `Body()` through
+the `Error` interface. Retrieve an existing task rather than submitting a
+replacement generation just to check its result.
+
 ## Fish voice models
 
 `client.Fish().Model(ctx, acedatacloud.FishModelRequest{Title: title, Voices: audioURL})`

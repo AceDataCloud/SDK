@@ -1,8 +1,26 @@
 import { Audio } from '../src/resources/audio';
 import { Fish } from '../src/resources/providers/fish';
+import { Suno } from '../src/resources/providers/suno';
 import { Transport } from '../src/runtime/transport';
 
 describe('Audio resource', () => {
+  it.each([undefined, '', 'no distorted guitars; '.repeat(100)])(
+    'preserves Suno negativeTags without truncation (%p)', async (negativeTags) => {
+      const request = jest.fn().mockResolvedValue({});
+      const suno = new Suno({ request } as any);
+
+      await suno.generate({ custom: true, negativeTags });
+
+      expect(request).toHaveBeenCalledWith('POST', '/suno/audios', {
+        json: {
+          custom: true,
+          async: true,
+          ...(negativeTags === undefined ? {} : { negative_tags: negativeTags }),
+        },
+      });
+    }
+  );
+
   it('uses fish tts endpoint with text body and model header', async () => {
     const request = jest.fn().mockResolvedValue({ task_id: 'task-fish' });
     const audio = new Audio({ request } as any);
