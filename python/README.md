@@ -207,6 +207,9 @@ for covers, extensions or stem separation. If processing returns
 `id`, when available) and the error's `trace_id` for support. The related codes
 `suno_model_unavailable` and `suno_processing_failed` mean the selected model is
 unavailable for that operation or processing returned no audio, respectively.
+Suno can also return `api_error` with the message
+`the account may have been offline`; this is a server error, not an SDK
+authentication error.
 These HTTP 500 errors retain their `code`, `trace_id` and `body` on `APIError`.
 Retrieve an existing task rather than submitting a replacement generation just
 to check its result.

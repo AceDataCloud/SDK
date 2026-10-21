@@ -84,6 +84,7 @@ func TestSunoNegativeTagsAreNotTruncated(t *testing.T) {
 
 func TestSunoProcessingErrorsPreserveSupportDetails(t *testing.T) {
 	for code, message := range map[string]string{
+		"api_error":                   "the account may have been offline",
 		"suno_processing_unavailable": "Music processing is unavailable. Contact support with the trace ID.",
 		"suno_model_unavailable":      "The selected model is unavailable for this operation. Contact support with the trace ID.",
 		"suno_processing_failed":      "Music processing returned no audio. Contact support with the trace ID.",
