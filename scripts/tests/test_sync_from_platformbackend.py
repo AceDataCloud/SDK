@@ -116,6 +116,20 @@ class SnapshotSyncTests(unittest.TestCase):
         self.assertIn("0.7 Credits", operation["description"])
         self.assertNotIn("Fish", properties["voice"]["description"])
 
+    def test_kling_reference_video_billing_is_documented_not_a_request_field(self):
+        path = SCRIPT.parent / "specs/29187cb2-1acb-43b8-baf5-3f3f709292eb.json"
+        operation = json.loads(path.read_text())["paths"]["/kling/videos"]["post"]
+        properties = operation["requestBody"]["content"]["application/json"]["schema"][
+            "properties"
+        ]
+        description = properties["video_list"]["description"]
+        self.assertIn("separate billing tier", description)
+        self.assertIn("actual output duration rounded", description)
+        self.assertIn("feature references use the requested duration", description)
+        self.assertIn("usage.reference_video_seconds", description)
+        self.assertIn("Image references alone do not trigger", description)
+        self.assertNotIn("reference_video_seconds", properties)
+
     def test_retired_embedding_model_is_not_in_pinned_contract(self):
         path = SCRIPT.parent / "specs/a0840c8a-2b9a-4407-8aaf-0057f0e1f65c.json"
         spec = json.loads(path.read_text(encoding="utf-8"))

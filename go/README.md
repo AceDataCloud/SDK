@@ -181,6 +181,25 @@ with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
 
+## Kling reference-video billing
+
+Use `client.Kling().Generate` with `KlingGenerateRequest.VideoList` containing
+`map[string]any{"video_url": referenceURL, "refer_type": "feature"}` and
+`Model: "kling-o1"` or `"kling-v3-omni"`.
+Reference videos use a separate billing tier: **1.202 Credits/second** in `std`
+mode and **1.602 Credits/second** in `pro` mode. For a 5-second O1 result,
+`std` / `pro` cost **4.005 / 5.340 Credits** without a reference video, or
+**6.010 / 8.010 Credits** with one.
+
+`refer_type: "base"` (the default) edits may follow the reference video's length;
+billing uses the actual output duration rounded to the nearest integer second.
+`refer_type: "feature"` uses the requested `Duration`. After `handle.Wait`, read
+`usage.reference_video_seconds` in the completed task's `response` map for the final billed seconds;
+the request-time estimate can differ from the final charge. This is response
+usage, not a request parameter. Image references and first/last frames alone do
+not trigger reference-video billing. Do not combine `VideoList` with
+`GenerateAudio: true`.
+
 ## Suno music processing
 
 Use `client.Suno().Generate` with `SunoGenerateRequest{Custom: true, Lyric: lyric,
