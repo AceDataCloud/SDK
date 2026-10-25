@@ -23,8 +23,7 @@ def completion(message, *, model="gpt-4o-mini", finish_reason="stop", usage=None
         "created": 1,
         "model": model,
         "choices": [{"index": 0, "message": message, "finish_reason": finish_reason}],
-        "usage": usage
-        or {"prompt_tokens": 5, "completion_tokens": 3, "total_tokens": 8},
+        "usage": usage or {"prompt_tokens": 5, "completion_tokens": 3, "total_tokens": 8},
     }
 
 
@@ -46,8 +45,18 @@ def credentials(monkeypatch):
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
 
 
-@pytest.mark.parametrize("model_name", ["gpt-4o-mini", "gpt-5.5"])
-def test_sync_request_and_usage(capsys, monkeypatch, model_name):
+@pytest.mark.parametrize(
+    "model_name,reasoning_effort",
+    [
+        ("gpt-4o-mini", None),
+        ("gpt-5.5", None),
+        ("kimi-k3.1-pro", "low"),
+        ("kimi-k3.1-pro", "high"),
+        ("kimi-k3.1-pro", "max"),
+        ("kimi-k3", "max"),
+    ],
+)
+def test_sync_request_and_usage(capsys, monkeypatch, model_name, reasoning_effort):
     monkeypatch.setenv("ACEDATACLOUD_MODEL", model_name)
     requests = []
 
@@ -55,19 +64,19 @@ def test_sync_request_and_usage(capsys, monkeypatch, model_name):
         requests.append(assert_request(request, model=model_name))
         return httpx.Response(
             200,
-            json=completion(
-                {"role": "assistant", "content": "Hello"}, model=model_name
-            ),
+            json=completion({"role": "assistant", "content": "Hello"}, model=model_name),
         )
 
     client = httpx.Client(transport=httpx.MockTransport(handle))
-    run_chat(build_model(http_client=client), "Say hello")
+    options = {"reasoning_effort": reasoning_effort} if reasoning_effort else {}
+    run_chat(build_model(http_client=client, **options), "Say hello")
     out = capsys.readouterr()
     assert out.out.strip() == "Hello"
     assert '"total_tokens": 8' in out.err
     assert len(requests) == 1
     assert requests[0]["messages"] == [{"content": "Say hello", "role": "user"}]
     assert not requests[0].get("stream")
+    assert requests[0].get("reasoning_effort") == reasoning_effort
 
 
 def test_stream_request_and_final_usage(capsys):
@@ -95,9 +104,7 @@ def test_stream_request_and_final_usage(capsys):
             "object": "chat.completion.chunk",
             "created": 1,
             "model": "gpt-4o-mini",
-            "choices": [
-                {"index": 0, "delta": {"content": "!"}, "finish_reason": "stop"}
-            ],
+            "choices": [{"index": 0, "delta": {"content": "!"}, "finish_reason": "stop"}],
         },
         {
             "id": "chatcmpl-test",
@@ -112,9 +119,7 @@ def test_stream_request_and_final_usage(capsys):
     def handle(request):
         requests.append(assert_request(request))
         stream = "".join(event(chunk) for chunk in chunks) + "data: [DONE]\n\n"
-        return httpx.Response(
-            200, text=stream, headers={"content-type": "text/event-stream"}
-        )
+        return httpx.Response(200, text=stream, headers={"content-type": "text/event-stream"})
 
     client = httpx.Client(transport=httpx.MockTransport(handle))
     run_stream(build_model(stream_usage=True, http_client=client), "Say hi")
@@ -147,12 +152,8 @@ def test_tool_call_round_trip(capsys):
                     }
                 ],
             }
-            return httpx.Response(
-                200, json=completion(message, finish_reason="tool_calls")
-            )
-        return httpx.Response(
-            200, json=completion({"role": "assistant", "content": "5"})
-        )
+            return httpx.Response(200, json=completion(message, finish_reason="tool_calls"))
+        return httpx.Response(200, json=completion({"role": "assistant", "content": "5"}))
 
     client = httpx.Client(transport=httpx.MockTransport(handle))
     run_tools(build_model(http_client=client))
@@ -186,9 +187,7 @@ def test_http_error_does_not_retry(status, error_type):
         nonlocal attempts
         assert_request(request)
         attempts += 1
-        return httpx.Response(
-            status, json={"error": {"message": "test error", "type": "test_error"}}
-        )
+        return httpx.Response(status, json={"error": {"message": "test error", "type": "test_error"}})
 
     client = httpx.Client(transport=httpx.MockTransport(handle))
     with pytest.raises(error_type):
@@ -201,9 +200,7 @@ def test_async_chat_completions():
 
     def handle(request):
         requests.append(assert_request(request))
-        return httpx.Response(
-            200, json=completion({"role": "assistant", "content": "Async OK"})
-        )
+        return httpx.Response(200, json=completion({"role": "assistant", "content": "Async OK"}))
 
     client = httpx.AsyncClient(transport=httpx.MockTransport(handle))
     model = build_model(http_async_client=client)

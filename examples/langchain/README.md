@@ -78,6 +78,29 @@ Text appears on stdout; response IDs and available token counts appear on stderr
 | `404` | Base URL must include `/v1`; confirm the model ID. |
 | `5xx` or timeout | Check service status and Usage History before retrying an uncertain request. |
 
+## Kimi K3.1 Pro
+
+The same `/v1/chat/completions` entry accepts the public `kimi-k3.1-pro`
+model ID. For a single-turn text request, set `ACEDATACLOUD_MODEL=kimi-k3.1-pro`
+and use the existing helper from the example directory:
+
+```python
+from chat import build_model, run_chat
+
+run_chat(build_model(reasoning_effort="low"), "Review this function for correctness.")
+```
+
+K3.1 Pro always reasons and accepts `low`, `high`, or `max`; do not send settings
+that disable reasoning. The existing `kimi-k3` ID remains available; use `max`
+for that model. Check current model access and input/output/cache-hit pricing
+before submitting a request. The advertised model context size is not a guarantee
+of the platform's per-request limit.
+
+For multi-turn reasoning or tool calls, use the provider's Chat Completions API
+and preserve the full assistant message, including `reasoning_content` and
+`tool_calls`, when sending history. This standard `ChatOpenAI` example does not
+guarantee preservation of those provider-specific fields.
+
 ## Verify without a billable call
 
 With `pytest` installed, run:

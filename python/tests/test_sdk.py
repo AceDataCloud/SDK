@@ -720,12 +720,28 @@ def test_platform_models_list(client):
     assert result["data"][0]["id"] == "claude-sonnet-4-20250514"
 
 
+@pytest.mark.parametrize("region", ["us", "cn", None])
 @respx.mock
-def test_platform_config_get(client):
-    mock = {"features": {"DISCOUNT_FOR_X402": 0.9}}
-    respx.get("https://platform.acedata.cloud/api/v1/config/").mock(return_value=httpx.Response(200, json=mock))
-    result = client.platform.config.get()
-    assert result["features"]["DISCOUNT_FOR_X402"] == 0.9
+def test_platform_config_get(client, region):
+    mock = {"features": {"DISCOUNT_FOR_X402": 0.9}, "region": region}
+    route = respx.get("https://platform.acedata.cloud/api/v1/config/").mock(return_value=httpx.Response(200, json=mock))
+    assert client.platform.config.get() == mock
+    assert route.call_count == 1
+    assert not route.calls.last.request.url.query
+
+
+@pytest.mark.parametrize("region", ["us", "cn", None])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_platform_config_get(async_client, region):
+    mock = {"features": {}, "region": region}
+    route = respx.get("https://platform.acedata.cloud/api/v1/config/").mock(return_value=httpx.Response(200, json=mock))
+    try:
+        assert await async_client.platform.config.get() == mock
+        assert route.call_count == 1
+        assert not route.calls.last.request.url.query
+    finally:
+        await async_client.close()
 
 
 # ── Error Mapping ─────────────────────────────────────────────────────

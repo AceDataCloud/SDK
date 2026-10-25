@@ -303,6 +303,13 @@ const client = new AceDataCloud({
 
 The token can also be set via the `ACEDATACLOUD_API_TOKEN` environment variable.
 
+`await client.platform.config.get()` returns `features` and `region`. `region`
+is the lowercase country/region code detected from the request IP, or `null`
+when unknown. The endpoint accepts no country/region override. Keep any
+user-selected display region in your own application; it does not change
+server-side availability or security policies. Feature keys may change; use
+safe defaults for missing keys and do not share cached config across users.
+
 ## Paying with X402 Instead of a Bearer Token
 
 The SDK supports a pluggable `paymentHandler` that is invoked when the

@@ -78,6 +78,22 @@ describe('Transport API base URL', () => {
     }
   );
 
+  it.each(['us', 'cn', null])('preserves the IP-detected config region %s', async (region) => {
+    const config = { features: {}, region };
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(config), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    );
+    const client = new AceDataCloud({ apiToken: 'test-token', maxRetries: 0 });
+
+    expect(await client.platform.config.get()).toEqual(config);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe('https://platform.acedata.cloud/api/v1/config/');
+    expect(fetchMock.mock.calls[0][1]!.method).toBe('GET');
+  });
+
   it('preserves an explicit API base URL override', async () => {
     const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ ok: true }), {
