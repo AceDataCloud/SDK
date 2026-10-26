@@ -228,6 +228,14 @@ export interface SunoMp3Options {
   [key: string]: unknown;
 }
 
+export interface SunoAvailabilityOptions {
+  /** Suno audio ID from a completed task, not the task ID. */
+  audioId: string;
+  callbackUrl?: string;
+  /** Any parameter added upstream before the SDK is regenerated. */
+  [key: string]: unknown;
+}
+
 /** suno client. */
 export class Suno {
   constructor(private transport: Transport) {}
@@ -468,6 +476,19 @@ export class Suno {
       await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });
     }
     return handle;
+  }
+
+  /** Check Suno audio availability. */
+  async availability(options: SunoAvailabilityOptions): Promise<Record<string, unknown>> {
+    const body: Record<string, unknown> = {};
+    body["audio_id"] = options.audioId;
+    for (const [key, value] of Object.entries(options)) {
+      if (!["async", "audioId", "callbackUrl", "maxWait", "pollInterval", "wait"].includes(key) && value !== undefined) {
+        body[key] = value;
+      }
+    }
+    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
+    return (await this.transport.request('POST', "/suno/availability", { json: body })) as Record<string, unknown>;
   }
 
 }

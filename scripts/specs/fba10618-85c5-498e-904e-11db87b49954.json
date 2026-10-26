@@ -1,0 +1,118 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Suno Audio Availability Check API",
+    "version": "1.0.0",
+    "description": "Check for positive evidence that a Suno audio ID is usable on the current channel. Uncertain availability returns an error, not false."
+  },
+  "servers": [{"url": "https://api.acedata.cloud"}],
+  "paths": {
+    "/suno/availability": {
+      "post": {
+        "operationId": "checkSunoAudioAvailability",
+        "summary": "Check Suno audio availability.",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["audio_id"],
+                "additionalProperties": false,
+                "properties": {
+                  "audio_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Suno audio ID from a completed task, not the task ID."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Positive evidence found; data.available is always true and does not guarantee a subsequent operation will succeed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["success", "task_id", "trace_id", "data"],
+                  "properties": {
+                    "success": {"type": "boolean", "enum": [true]},
+                    "task_id": {"type": "string", "format": "uuid"},
+                    "trace_id": {"type": "string", "format": "uuid"},
+                    "data": {
+                      "type": "object",
+                      "required": ["id", "available"],
+                      "properties": {
+                        "id": {"type": "string", "format": "uuid"},
+                        "available": {
+                          "type": "boolean",
+                          "description": "Positive evidence on the current channel; does not guarantee that extension, cover or other operations will succeed.",
+                          "enum": [true]
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "task_id": "11111111-1111-4111-8111-111111111111",
+                  "trace_id": "22222222-2222-4222-8222-222222222222",
+                  "data": {
+                    "id": "33333333-3333-4333-8333-333333333333",
+                    "available": true
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "audio_id is missing or malformed.",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}
+          },
+          "401": {
+            "description": "API token is missing or invalid.",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}
+          },
+          "429": {
+            "description": "Too many requests.",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}
+          },
+          "500": {
+            "description": "Audio availability could not be confirmed; do not interpret the error as false.",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}
+          },
+          "503": {
+            "description": "The current channel could not confirm audio availability, including inconclusive offline status; do not interpret the error as false.",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {"bearerAuth": {"type": "http", "scheme": "bearer"}},
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "success": {"type": "boolean", "enum": [false]},
+          "trace_id": {"type": "string"},
+          "task_id": {"type": "string"},
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": {"type": "string"},
+              "message": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

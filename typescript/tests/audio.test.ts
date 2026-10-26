@@ -4,6 +4,50 @@ import { Suno } from '../src/resources/providers/suno';
 import { Transport } from '../src/runtime/transport';
 
 describe('Audio resource', () => {
+  const availability = {
+    success: true,
+    task_id: '11111111-1111-4111-8111-111111111111',
+    trace_id: '22222222-2222-4222-8222-222222222222',
+    data: { id: '33333333-3333-4333-8333-333333333333', available: true },
+  };
+
+  it('returns Suno availability directly without polling', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(availability), { status: 200 })
+    );
+    try {
+      const suno = new Suno(new Transport({ apiToken: 'test-token', maxRetries: 0 }));
+
+      expect(await suno.availability({ audioId: availability.data.id })).toEqual(availability);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock.mock.calls[0][0]).toBe('https://x402.acedata.cloud/suno/availability');
+      expect(JSON.parse(fetchMock.mock.calls[0][1]!.body as string)).toEqual({ audio_id: availability.data.id });
+      expect(new Headers(fetchMock.mock.calls[0][1]!.headers).get('Authorization')).toBe('Bearer test-token');
+    } finally {
+      fetchMock.mockRestore();
+    }
+  });
+
+  it.each([500, 503])('throws on inconclusive Suno availability (HTTP %s), not false', async (status) => {
+    const body = {
+      error: { code: 'availability_unknown', message: 'Availability could not be confirmed.' },
+      trace_id: 'test-trace',
+    };
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(body), { status })
+    );
+    try {
+      const suno = new Suno(new Transport({ apiToken: 'test-token', maxRetries: 0 }));
+
+      await expect(suno.availability({ audioId: availability.data.id })).rejects.toMatchObject({
+        statusCode: status, code: 'availability_unknown', traceId: 'test-trace', body,
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    } finally {
+      fetchMock.mockRestore();
+    }
+  });
+
   it.each([undefined, '', 'no distorted guitars; '.repeat(100)])(
     'preserves Suno negativeTags without truncation (%p)', async (negativeTags) => {
       const request = jest.fn().mockResolvedValue({});

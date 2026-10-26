@@ -213,6 +213,16 @@ not trigger reference-video billing. Do not combine `video_list` with
 
 ## Suno music processing
 
+Before a cover or extension, optionally call
+`client.suno.availability(audio_id=audio_id)` (or `await` with `AsyncAceDataCloud`).
+Use the song's `audio_id` from a completed task, not its `task_id`. This is a
+synchronous API-token-authenticated check, currently without a Credits charge;
+it returns the response dictionary directly, not a task handle to poll.
+`result["data"]["available"]` is only `True` on success: it is positive evidence
+on the current channel, not a guarantee that a subsequent operation will work.
+An inconclusive check returns an error, including `503 availability_unknown`;
+never convert an error into `False`. Preserve the error code and trace ID.
+
 Use `client.suno.generate(custom=True, lyric=..., style=..., negative_tags=...)`
 for custom-mode music. `negative_tags` describes styles or genres to exclude;
 there is currently no fixed character limit, but overly long input may still

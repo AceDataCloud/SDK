@@ -69,6 +69,66 @@ func TestFishModelCreated(t *testing.T) {
 	}
 }
 
+func TestSunoAvailability(t *testing.T) {
+	const audioID = "33333333-3333-4333-8333-333333333333"
+	for _, status := range []int{200, 500, 503} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/suno/availability" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				if r.Header.Get("Authorization") != "Bearer test-token" {
+					t.Error("missing API token")
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, map[string]any{"audio_id": audioID}) {
+					t.Errorf("unexpected body: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(status)
+				if status == 200 {
+					_, _ = w.Write([]byte(`{"success":true,"task_id":"11111111-1111-4111-8111-111111111111","trace_id":"22222222-2222-4222-8222-222222222222","data":{"id":"33333333-3333-4333-8333-333333333333","available":true}}`))
+				} else {
+					_, _ = w.Write([]byte(`{"error":{"code":"availability_unknown","message":"Availability could not be confirmed."},"trace_id":"test-trace"}`))
+				}
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			result, err := client.Suno().Availability(context.Background(), SunoAvailabilityRequest{AudioID: audioID})
+			if calls != 1 {
+				t.Fatalf("expected one request without polling, got %d", calls)
+			}
+			if status == 200 {
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !reflect.DeepEqual(result["data"], map[string]any{"id": audioID, "available": true}) {
+					t.Fatalf("unexpected availability: %#v", result)
+				}
+				if result["task_id"] != "11111111-1111-4111-8111-111111111111" || result["trace_id"] != "22222222-2222-4222-8222-222222222222" {
+					t.Fatalf("lost response identifiers: %#v", result)
+				}
+			} else {
+				apiErr, ok := err.(Error)
+				if !ok || apiErr.Code() != "availability_unknown" || apiErr.StatusCode() != status || apiErr.TraceID() != "test-trace" {
+					t.Fatalf("expected availability error, got %v (result=%#v)", err, result)
+				}
+				if result != nil {
+					t.Fatalf("an error must not become an availability result: %#v", result)
+				}
+			}
+		})
+	}
+}
+
 func TestSunoNegativeTagsAreNotTruncated(t *testing.T) {
 	for _, tags := range []string{"", strings.Repeat("no distorted guitars; ", 100)} {
 		body := (SunoGenerateRequest{Custom: true, NegativeTags: tags}).toBody()

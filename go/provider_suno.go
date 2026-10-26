@@ -675,3 +675,36 @@ func (c *Suno) Mp3(ctx context.Context, req SunoMp3Request) (*TaskHandle, error)
 	}
 	return newTaskHandle(taskIDFrom(result), "/suno/tasks", c.t, result), nil
 }
+
+// SunoAvailabilityRequest is the input to suno.Availability.
+type SunoAvailabilityRequest struct {
+	// Suno audio ID from a completed task, not the task ID.
+	AudioID string
+	// CallbackURL optionally receives the completion webhook.
+	CallbackURL string
+	// Extra fields merged into the request body.
+	Extra map[string]any
+}
+
+func (r SunoAvailabilityRequest) toBody() map[string]any {
+	body := map[string]any{}
+	body["audio_id"] = r.AudioID
+	if r.CallbackURL != "" {
+		body["callback_url"] = r.CallbackURL
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Availability Check Suno audio availability.
+func (c *Suno) Availability(ctx context.Context, req SunoAvailabilityRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/suno/availability",
+		Body:   req.toBody(),
+	})
+}

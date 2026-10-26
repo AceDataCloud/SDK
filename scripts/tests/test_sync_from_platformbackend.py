@@ -157,6 +157,31 @@ class SnapshotSyncTests(unittest.TestCase):
                 self.assertEqual(models.count("gpt-5.6-sol-fast"), 1)
                 self.assertIn("gpt-5.6-sol", models)
 
+    def test_suno_availability_is_synchronous_and_only_confirms_true(self):
+        path = SCRIPT.parent / "specs/fba10618-85c5-498e-904e-11db87b49954.json"
+        spec = json.loads(path.read_text())
+        operation = spec["paths"]["/suno/availability"]["post"]
+        request = operation["requestBody"]["content"]["application/json"]["schema"]
+        self.assertEqual(request["required"], ["audio_id"])
+        self.assertEqual(set(request["properties"]), {"audio_id"})
+        self.assertFalse(request["additionalProperties"])
+        self.assertEqual(request["properties"]["audio_id"]["format"], "uuid")
+        response = operation["responses"]["200"]["content"]["application/json"][
+            "schema"
+        ]
+        available = response["properties"]["data"]["properties"]["available"]
+        self.assertEqual(available["enum"], [True])
+        self.assertIn("not guarantee", available["description"])
+        self.assertIn("not interpret", operation["responses"]["503"]["description"])
+        self.assertEqual(operation["security"], [{"bearerAuth": []}])
+        manifest = json.loads((SCRIPT.parent / "services.json").read_text())
+        endpoint = next(
+            ep
+            for ep in manifest["suno"]["endpoints"]
+            if ep["path"] == "/suno/availability"
+        )
+        self.assertFalse(endpoint.get("pollable", False))
+
     def test_suno_negative_tags_has_no_fixed_character_limit(self):
         path = SCRIPT.parent / "specs/09a26295-5972-4392-9318-dcd9b218f90d.json"
         operation = json.loads(path.read_text())["paths"]["/suno/audios"]["post"]

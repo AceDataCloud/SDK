@@ -202,6 +202,17 @@ not trigger reference-video billing. Do not combine `VideoList` with
 
 ## Suno music processing
 
+Before a cover or extension, optionally call
+`client.Suno().Availability(ctx, acedatacloud.SunoAvailabilityRequest{AudioID: audioID})`.
+Use the song's `audio_id` from a completed task, not its `task_id`. This is a
+synchronous API-token-authenticated check, currently without a Credits charge;
+it returns the response map and an error, not a task handle to poll.
+`result["data"].(map[string]any)["available"]` is only `true` on success: it is
+positive evidence on the current channel, not a guarantee that a subsequent
+operation will work. An inconclusive check returns an error, including
+`503 availability_unknown`; never convert an error into `false`. Preserve the
+error code and trace ID.
+
 Use `client.Suno().Generate` with `SunoGenerateRequest{Custom: true, Lyric: lyric,
 Style: style, NegativeTags: negativeTags}` for custom-mode music. `NegativeTags`
 describes styles or genres to exclude; there is currently no fixed character

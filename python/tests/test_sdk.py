@@ -31,6 +31,80 @@ def async_client():
     return AsyncAceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
 
 
+SUNO_AVAILABILITY = {
+    "success": True,
+    "task_id": "11111111-1111-4111-8111-111111111111",
+    "trace_id": "22222222-2222-4222-8222-222222222222",
+    "data": {"id": "33333333-3333-4333-8333-333333333333", "available": True},
+}
+
+
+@respx.mock
+def test_suno_availability_returns_response_without_polling(client):
+    route = respx.post("https://api.acedata.cloud/suno/availability").respond(200, json=SUNO_AVAILABILITY)
+
+    result = client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert result == SUNO_AVAILABILITY
+    assert len(respx.calls) == 1
+    assert json.loads(route.calls[0].request.content) == {"audio_id": SUNO_AVAILABILITY["data"]["id"]}
+    assert route.calls[0].request.headers["Authorization"] == "Bearer test-token"
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_suno_availability_returns_response_without_polling(async_client):
+    route = respx.post("https://api.acedata.cloud/suno/availability").respond(200, json=SUNO_AVAILABILITY)
+
+    async with async_client:
+        result = await async_client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert result == SUNO_AVAILABILITY
+    assert len(respx.calls) == 1
+    assert json.loads(route.calls[0].request.content) == {"audio_id": SUNO_AVAILABILITY["data"]["id"]}
+    assert route.calls[0].request.headers["Authorization"] == "Bearer test-token"
+
+
+@respx.mock
+@pytest.mark.parametrize("status", [500, 503])
+def test_suno_availability_unknown_is_an_error_not_false(client, status):
+    body = {
+        "error": {"code": "availability_unknown", "message": "Availability could not be confirmed."},
+        "trace_id": "test-trace",
+    }
+    respx.post("https://api.acedata.cloud/suno/availability").respond(status, json=body)
+
+    with pytest.raises(APIError) as exc:
+        client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert exc.value.status_code == status
+    assert exc.value.code == "availability_unknown"
+    assert exc.value.trace_id == "test-trace"
+    assert exc.value.body == body
+    assert len(respx.calls) == 1
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [500, 503])
+async def test_async_suno_availability_unknown_is_an_error_not_false(async_client, status):
+    body = {
+        "error": {"code": "availability_unknown", "message": "Availability could not be confirmed."},
+        "trace_id": "test-trace",
+    }
+    respx.post("https://api.acedata.cloud/suno/availability").respond(status, json=body)
+
+    async with async_client:
+        with pytest.raises(APIError) as exc:
+            await async_client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert exc.value.status_code == status
+    assert exc.value.code == "availability_unknown"
+    assert exc.value.trace_id == "test-trace"
+    assert exc.value.body == body
+    assert len(respx.calls) == 1
+
+
 @respx.mock
 def test_default_api_base_uses_x402_host():
     route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(

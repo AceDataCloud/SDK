@@ -420,6 +420,21 @@ class Suno:
             handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
 
+    def availability(
+        self,
+        *,
+        audio_id: str,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> dict[str, Any]:
+        """Check Suno audio availability."""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return self._transport.request("POST", "/suno/availability", json=body)
+
 
 class AsyncSuno:
     """Asynchronous suno client."""
@@ -787,3 +802,18 @@ class AsyncSuno:
         if wait:
             await handle.wait(poll_interval=poll_interval, max_wait=max_wait)
         return handle
+
+    async def availability(
+        self,
+        *,
+        audio_id: str,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> dict[str, Any]:
+        """Check Suno audio availability."""
+        body: dict[str, Any] = {}
+        body["audio_id"] = audio_id
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return await self._transport.request("POST", "/suno/availability", json=body)
