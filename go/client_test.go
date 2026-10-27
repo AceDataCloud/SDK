@@ -176,6 +176,62 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 }
 
+func TestChatUsagePassthrough(t *testing.T) {
+	for _, operation := range []string{"completions", "responses", "messages"} {
+		t.Run(operation, func(t *testing.T) {
+			usage := map[string]any{
+				"cost": map[string]any{"amount": 0.0123, "currency": "Credits", "list_amount": 0.0246},
+			}
+			path := "/v1/chat/completions"
+			switch operation {
+			case "completions":
+				usage["prompt_tokens"] = float64(100)
+				usage["completion_tokens"] = float64(5)
+				usage["prompt_tokens_details"] = map[string]any{"cached_tokens": float64(40)}
+			case "responses":
+				path = "/openai/responses"
+				usage["input_tokens"] = float64(100)
+				usage["output_tokens"] = float64(5)
+				usage["input_tokens_details"] = map[string]any{"cached_tokens": float64(40)}
+			case "messages":
+				path = "/v1/messages"
+				usage["input_tokens"] = float64(60)
+				usage["output_tokens"] = float64(5)
+				usage["cache_read_input_tokens"] = float64(40)
+				usage["cache_creation_input_tokens"] = float64(10)
+			}
+			payload := map[string]any{"usage": usage}
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != http.MethodPost || r.URL.Path != path {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(w).Encode(payload)
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var result map[string]any
+			switch operation {
+			case "completions":
+				result, err = client.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{Model: "gpt-5.6-sol-fast", Messages: []map[string]any{}})
+			case "responses":
+				result, err = client.OpenAI().Responses().Create(context.Background(), ResponsesRequest{Model: "gpt-5.6-sol-fast", Input: "Hello"})
+			case "messages":
+				result, err = client.Chat().Messages().Create(context.Background(), MessagesRequest{Model: "gpt-5.6-sol-fast", Messages: []map[string]any{}})
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(result, payload) {
+				t.Fatalf("reported usage was changed: %#v, want %#v", result, payload)
+			}
+		})
+	}
+}
+
 func TestChatConfigurationPassthrough(t *testing.T) {
 	for _, operation := range []string{"create", "stream", "count_tokens"} {
 		t.Run(operation, func(t *testing.T) {

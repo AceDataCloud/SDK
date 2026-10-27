@@ -341,6 +341,79 @@ async def test_async_sol_fast_model_passthrough(async_client, operation, stream)
     assert json.loads(route.calls.last.request.content) == body
 
 
+@pytest.fixture(params=["completions", "responses", "messages"])
+def chat_usage_case(request):
+    operation = request.param
+    if operation == "completions":
+        usage = {"prompt_tokens": 100, "completion_tokens": 5, "prompt_tokens_details": {"cached_tokens": 40}}
+        path = "/openai/chat/completions"
+    elif operation == "responses":
+        usage = {"input_tokens": 100, "output_tokens": 5, "input_tokens_details": {"cached_tokens": 40}}
+        path = "/openai/responses"
+    else:
+        usage = {
+            "input_tokens": 60,
+            "output_tokens": 5,
+            "cache_read_input_tokens": 40,
+            "cache_creation_input_tokens": 10,
+        }
+        path = "/v1/messages"
+    usage["cost"] = {"amount": 0.0123, "currency": "Credits", "list_amount": 0.0246}
+    return operation, path, usage
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+def test_chat_usage_is_not_recalculated(client, chat_usage_case, stream):
+    operation, path, usage = chat_usage_case
+    payload = {"usage": usage}
+    if stream and operation == "responses":
+        payload = {"type": "response.completed", "response": payload}
+    elif stream and operation == "messages":
+        payload = {"type": "message_delta", "usage": usage}
+    respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, text=f"data: {json.dumps(payload)}\n\n")
+        if stream
+        else httpx.Response(200, json=payload)
+    )
+    if operation == "responses":
+        result = client.openai.responses.create(model="gpt-5.6-sol-fast", input="Hello", stream=stream)
+    else:
+        create = client.openai.chat.completions.create if operation == "completions" else client.chat.messages.create
+        result = create(model="gpt-5.6-sol-fast", messages=[], stream=stream)
+    assert (list(result) if stream else result) == ([payload] if stream else payload)
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_chat_usage_is_not_recalculated(async_client, chat_usage_case, stream):
+    operation, path, usage = chat_usage_case
+    payload = {"usage": usage}
+    if stream and operation == "responses":
+        payload = {"type": "response.completed", "response": payload}
+    elif stream and operation == "messages":
+        payload = {"type": "message_delta", "usage": usage}
+    respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, text=f"data: {json.dumps(payload)}\n\n")
+        if stream
+        else httpx.Response(200, json=payload)
+    )
+    try:
+        if operation == "responses":
+            result = await async_client.openai.responses.create(model="gpt-5.6-sol-fast", input="Hello", stream=stream)
+        else:
+            create = (
+                async_client.openai.chat.completions.create
+                if operation == "completions"
+                else async_client.chat.messages.create
+            )
+            result = await create(model="gpt-5.6-sol-fast", messages=[], stream=stream)
+        assert ([chunk async for chunk in result] if stream else result) == ([payload] if stream else payload)
+    finally:
+        await async_client.close()
+
+
 # ── OpenAI Chat Completions ──────────────────────────────────────────
 
 

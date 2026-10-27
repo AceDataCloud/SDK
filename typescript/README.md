@@ -71,6 +71,22 @@ for await (const chunk of stream) {
 | `client.files` | File uploads |
 | `client.platform` | Applications, credentials, models management |
 
+## Chat usage and billing
+
+Accepted model requests through Chat Completions, Responses, and Messages are
+billed by the selected model's input, output, and cache usage, not a fixed fee
+per request. Switching protocol formats does not change this to per-call billing
+or guarantee that a model accepts that format. Consult current model prices and
+`usage.cost` for the charge; the SDK preserves reported usage without recalculating it.
+
+- Chat Completions `prompt_tokens` includes reported cached tokens.
+- Responses `input_tokens` includes reported cached tokens.
+- Messages `input_tokens` excludes separately reported `cache_read_input_tokens`
+  and `cache_creation_input_tokens`; those dimensions are charged separately.
+
+Do not add cached tokens to the input total again for Chat Completions or
+Responses, or treat Messages input alone as the full input/cache usage.
+
 ## Native Claude Messages
 
 Thinking and output configuration are passed through without SDK model-specific
