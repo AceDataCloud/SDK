@@ -69,6 +69,35 @@ describe('GPT-5.6 Sol Fast', () => {
   );
 });
 
+describe('Public Chat Completions models', () => {
+  it.each([
+    { model: 'claude-opus-5-5', n: 1, tool_choice: 'auto' },
+    { model: 'gemini-4-argon', max_tokens: 32768 },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'low' },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'high' },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'max' },
+    { model: 'kimi-k3', reasoning_effort: 'max' },
+  ])('passes through $model and its options without injecting defaults', async (options) => {
+    const request = jest.fn().mockResolvedValue({});
+    const requestStream = jest.fn().mockImplementation(async function* () {});
+    const openai = new OpenAI({ request, requestStream } as any);
+    const body = { ...options, messages: [{ role: 'user', content: 'Hello' }] };
+
+    await openai.chat.completions.create(body);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith('POST', '/openai/chat/completions', { json: body });
+
+    const stream = await openai.chat.completions.create({ ...body, stream: true });
+    for await (const chunk of stream) {
+      throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+    }
+    expect(requestStream).toHaveBeenCalledTimes(1);
+    expect(requestStream).toHaveBeenCalledWith('POST', '/openai/chat/completions', {
+      json: { ...body, stream: true },
+    });
+  });
+});
+
 describe('Nano Banana 2.1', () => {
   it.each(['generate', 'edit'] as const)(
     'serializes %s at every supported resolution',

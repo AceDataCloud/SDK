@@ -341,6 +341,61 @@ async def test_async_sol_fast_model_passthrough(async_client, operation, stream)
     assert json.loads(route.calls.last.request.content) == body
 
 
+@pytest.fixture(
+    params=[
+        ("claude-opus-5-5", {"n": 1, "tool_choice": "auto"}),
+        ("gemini-4-argon", {"max_tokens": 32768}),
+        ("kimi-k3.1-pro", {"reasoning_effort": "low"}),
+        ("kimi-k3.1-pro", {"reasoning_effort": "high"}),
+        ("kimi-k3.1-pro", {"reasoning_effort": "max"}),
+        ("kimi-k3", {"reasoning_effort": "max"}),
+    ]
+)
+def public_chat_body(request):
+    model, options = request.param
+    return {"model": model, "messages": [{"role": "user", "content": "Hello"}], **options}
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+def test_public_chat_models_passthrough(client, public_chat_body, stream):
+    route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+    result = client.openai.chat.completions.create(**public_chat_body, stream=stream)
+    if stream:
+        assert list(result) == []
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == {
+        **public_chat_body,
+        **({"stream": True} if stream else {}),
+    }
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_public_chat_models_passthrough(async_client, public_chat_body, stream):
+    route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+    try:
+        result = await async_client.openai.chat.completions.create(**public_chat_body, stream=stream)
+        if stream:
+            assert [chunk async for chunk in result] == []
+    finally:
+        await async_client.close()
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == {
+        **public_chat_body,
+        **({"stream": True} if stream else {}),
+    }
+
+
 @pytest.fixture(params=["completions", "responses", "messages"])
 def chat_usage_case(request):
     operation = request.param

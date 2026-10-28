@@ -50,6 +50,8 @@ def credentials(monkeypatch):
     [
         ("gpt-4o-mini", None),
         ("gpt-5.5", None),
+        ("claude-opus-5-5", None),
+        ("gemini-4-argon", None),
         ("kimi-k3.1-pro", "low"),
         ("kimi-k3.1-pro", "high"),
         ("kimi-k3.1-pro", "max"),
@@ -131,11 +133,13 @@ def test_stream_request_and_final_usage(capsys):
     assert requests[0]["stream_options"] == {"include_usage": True}
 
 
-def test_tool_call_round_trip(capsys):
+@pytest.mark.parametrize("model_name", ["gpt-4o-mini", "claude-opus-5-5"])
+def test_tool_call_round_trip(capsys, monkeypatch, model_name):
+    monkeypatch.setenv("ACEDATACLOUD_MODEL", model_name)
     requests = []
 
     def handle(request):
-        body = assert_request(request)
+        body = assert_request(request, model=model_name)
         requests.append(body)
         if len(requests) == 1:
             message = {
@@ -161,13 +165,31 @@ def test_tool_call_round_trip(capsys):
     assert out.out.strip() == "5"
     assert out.err.count("tokens:") == 2
     assert len(requests) == 2
-    assert requests[0]["tool_choice"] == "required"
+    assert requests[0]["tool_choice"] == "auto"
     assert requests[0]["tools"][0]["function"]["name"] == "add_numbers"
     assert requests[1]["messages"][-1] == {
         "content": "5",
         "role": "tool",
         "tool_call_id": "call_add",
     }
+
+
+def test_tool_auto_direct_answer_does_not_submit_a_second_request(capsys, monkeypatch):
+    monkeypatch.setenv("ACEDATACLOUD_MODEL", "claude-opus-5-5")
+    requests = []
+
+    def handle(request):
+        body = assert_request(request, model="claude-opus-5-5")
+        requests.append(body)
+        assert body["tool_choice"] == "auto"
+        return httpx.Response(200, json=completion({"role": "assistant", "content": "5"}, model="claude-opus-5-5"))
+
+    client = httpx.Client(transport=httpx.MockTransport(handle))
+    run_tools(build_model(http_client=client))
+    out = capsys.readouterr()
+    assert out.out.strip() == "5"
+    assert out.err.count("tokens:") == 1
+    assert len(requests) == 1
 
 
 @pytest.mark.parametrize(

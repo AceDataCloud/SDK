@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -402,6 +403,83 @@ func TestSolFastModelPassthrough(t *testing.T) {
 				}
 				if calls != 1 {
 					t.Errorf("got %d calls, want 1", calls)
+				}
+			})
+		}
+	}
+}
+
+func TestPublicChatModelsPassthrough(t *testing.T) {
+	for _, tc := range []struct {
+		model     string
+		maxTokens int
+		extra     map[string]any
+	}{
+		{"claude-opus-5-5", 0, map[string]any{"n": 1, "tool_choice": "auto"}},
+		{"gemini-4-argon", 32768, nil},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "low"}},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "high"}},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "max"}},
+		{"kimi-k3", 0, map[string]any{"reasoning_effort": "max"}},
+	} {
+		for _, streaming := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/%v/stream=%t", tc.model, tc.extra["reasoning_effort"], streaming), func(t *testing.T) {
+				req := ChatCompletionRequest{
+					Model: tc.model, Messages: []map[string]any{{"role": "user", "content": "Hello"}},
+					MaxTokens: tc.maxTokens, Extra: tc.extra,
+				}
+				expected := map[string]any{
+					"model": tc.model, "messages": []any{map[string]any{"role": "user", "content": "Hello"}},
+				}
+				for key, value := range tc.extra {
+					if key == "n" {
+						value = float64(1)
+					}
+					expected[key] = value
+				}
+				if tc.maxTokens > 0 {
+					expected["max_tokens"] = float64(tc.maxTokens)
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != "/v1/chat/completions" {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Error(err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					if streaming {
+						w.Header().Set("Content-Type", "text/event-stream")
+					} else {
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatal(err)
+				}
+				completions := client.OpenAI().Chat().Completions()
+				if streaming {
+					chunks, errs := completions.CreateStream(context.Background(), req)
+					for chunk := range chunks {
+						t.Errorf("unexpected chunk: %+v", chunk)
+					}
+					err = <-errs
+				} else {
+					_, err = completions.Create(context.Background(), req)
+				}
+				if err != nil || calls != 1 {
+					t.Fatalf("err=%v, calls=%d; want one successful request", err, calls)
 				}
 			})
 		}

@@ -100,6 +100,27 @@ or guarantee that a model accepts that format. Consult current model prices and
 Do not add cached tokens to the input total again for Chat Completions or
 Responses, or treat Messages input alone as the full input/cache usage.
 
+## Public Chat Completions models
+
+Pass these public IDs to `client.openai.chat.completions.create(model=..., messages=...)`
+(or `await` with `AsyncAceDataCloud`); use `stream=True` for streaming. The SDK
+passes model-specific fields through without rewriting model IDs or enforcing a catalog.
+
+- `claude-opus-5-5`: supports text and streaming Chat Completions with `n=1`.
+  Omit `temperature` and `top_p` to use model defaults; do not set temperature below
+  1 or a non-default top-p. Use `tool_choice="auto"`, not forced tools. For native
+  thinking blocks, signatures, and native tool semantics, use `client.chat.messages`.
+- `gemini-4-argon`: supports text and streaming Chat Completions. Thinking can
+  consume output budget; Google recommends at least `max_tokens=32768` for ordinary
+  tasks. This does not expose Interactions background long-output functionality.
+- `kimi-k3.1-pro`: always reasons; pass `reasoning_effort="low"`, `"high"`, or `"max"`.
+  Do not disable reasoning. Keep the full assistant message, including
+  `reasoning_content` and `tool_calls`, in multi-turn and tool-call history.
+  The existing `kimi-k3` alias remains available; use `reasoning_effort="max"` for it.
+
+Check current account access and prices before calling. A model's advertised
+context size does not guarantee the platform's per-request limit.
+
 ## Native Claude Messages
 
 Thinking and output configuration are passed through without SDK model-specific
