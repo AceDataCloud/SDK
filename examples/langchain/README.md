@@ -54,8 +54,10 @@ Do not include `/chat/completions` in the base URL.
 The example fixes `use_responses_api=False`, since some model names cause
 LangChain to choose the Responses API. It sets `max_retries=0`, so an error is
 not automatically submitted again. The `chat` and `stream` modes each make one
-billable request; `tools` makes two (tool selection and the final answer). The
-local `add_numbers` function has no external side effects. Any automatic retry
+billable request; `tools` makes one request if the model answers directly, or
+two if it calls the tool (tool selection and the final answer). Tools use
+`tool_choice="auto"`; a model may decline to call one. The local `add_numbers`
+function has no external side effects. Any automatic retry
 or agent loop you add can create more billable requests.
 
 The example prints the API response ID and `usage_metadata` token counts when
@@ -77,6 +79,49 @@ Text appears on stdout; response IDs and available token counts appear on stderr
 | `429` | Rate limit. Wait before an intentional retry. |
 | `404` | Base URL must include `/v1`; confirm the model ID. |
 | `5xx` or timeout | Check service status and Usage History before retrying an uncertain request. |
+
+## Claude Opus 5.5 and Gemini 4 Argon
+
+Set `ACEDATACLOUD_MODEL=claude-opus-5-5` for text or streaming Chat Completions.
+This model accepts only `n=1`; leave `temperature` and `top_p` unset, and do not
+force tools. The tool example uses `auto` and prints a direct answer if no tool
+is selected. Chat Completions does not return native thinking blocks; use
+Messages when you need thinking blocks, signatures, or native tool semantics.
+
+For `ACEDATACLOUD_MODEL=gemini-4-argon`, allow enough output budget for thinking:
+
+```python
+from chat import build_model, run_chat
+
+run_chat(build_model(max_tokens=32768), "Review this design for correctness.")
+```
+
+Google recommends at least 32768 output tokens for ordinary tasks. This text
+and streaming Chat Completions example does not expose Interactions background
+long-output functionality. Check model access and current pricing before calling.
+
+## Kimi K3.1 Pro
+
+The same `/v1/chat/completions` entry accepts the public `kimi-k3.1-pro`
+model ID. For a single-turn text request, set `ACEDATACLOUD_MODEL=kimi-k3.1-pro`
+and use the existing helper from the example directory:
+
+```python
+from chat import build_model, run_chat
+
+run_chat(build_model(reasoning_effort="low"), "Review this function for correctness.")
+```
+
+K3.1 Pro always reasons and accepts `low`, `high`, or `max`; do not send settings
+that disable reasoning. The existing `kimi-k3` ID remains available; use `max`
+for that model. Check current model access and input/output/cache-hit pricing
+before submitting a request. The advertised model context size is not a guarantee
+of the platform's per-request limit.
+
+For multi-turn reasoning or tool calls, use the provider's Chat Completions API
+and preserve the full assistant message, including `reasoning_content` and
+`tool_calls`, when sending history. This standard `ChatOpenAI` example does not
+guarantee preservation of those provider-specific fields.
 
 ## Verify without a billable call
 

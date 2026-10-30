@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -69,6 +70,104 @@ func TestFishModelCreated(t *testing.T) {
 	}
 }
 
+func TestSunoUploadPersona(t *testing.T) {
+	for _, personaID := range []string{"", "voice-persona"} {
+		t.Run("persona="+personaID, func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/suno/upload" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				expected := map[string]any{"audio_url": "https://example.com/song.mp3"}
+				if personaID != "" {
+					expected["persona_id"] = personaID
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("unexpected upload body: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = client.Suno().Upload(context.Background(), SunoUploadRequest{
+				AudioURL: "https://example.com/song.mp3", PersonaID: personaID,
+			})
+			if err != nil || calls != 1 {
+				t.Fatalf("expected one upload request: calls=%d err=%v", calls, err)
+			}
+		})
+	}
+}
+
+func TestSunoAvailability(t *testing.T) {
+	const audioID = "33333333-3333-4333-8333-333333333333"
+	for _, status := range []int{200, 500, 503} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/suno/availability" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				if r.Header.Get("Authorization") != "Bearer test-token" {
+					t.Error("missing API token")
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, map[string]any{"audio_id": audioID}) {
+					t.Errorf("unexpected body: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(status)
+				if status == 200 {
+					_, _ = w.Write([]byte(`{"success":true,"task_id":"11111111-1111-4111-8111-111111111111","trace_id":"22222222-2222-4222-8222-222222222222","data":{"id":"33333333-3333-4333-8333-333333333333","available":true}}`))
+				} else {
+					_, _ = w.Write([]byte(`{"error":{"code":"availability_unknown","message":"Availability could not be confirmed."},"trace_id":"test-trace"}`))
+				}
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			result, err := client.Suno().Availability(context.Background(), SunoAvailabilityRequest{AudioID: audioID})
+			if calls != 1 {
+				t.Fatalf("expected one request without polling, got %d", calls)
+			}
+			if status == 200 {
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !reflect.DeepEqual(result["data"], map[string]any{"id": audioID, "available": true}) {
+					t.Fatalf("unexpected availability: %#v", result)
+				}
+				if result["task_id"] != "11111111-1111-4111-8111-111111111111" || result["trace_id"] != "22222222-2222-4222-8222-222222222222" {
+					t.Fatalf("lost response identifiers: %#v", result)
+				}
+			} else {
+				apiErr, ok := err.(Error)
+				if !ok || apiErr.Code() != "availability_unknown" || apiErr.StatusCode() != status || apiErr.TraceID() != "test-trace" {
+					t.Fatalf("expected availability error, got %v (result=%#v)", err, result)
+				}
+				if result != nil {
+					t.Fatalf("an error must not become an availability result: %#v", result)
+				}
+			}
+		})
+	}
+}
+
 func TestSunoNegativeTagsAreNotTruncated(t *testing.T) {
 	for _, tags := range []string{"", strings.Repeat("no distorted guitars; ", 100)} {
 		body := (SunoGenerateRequest{Custom: true, NegativeTags: tags}).toBody()
@@ -84,6 +183,7 @@ func TestSunoNegativeTagsAreNotTruncated(t *testing.T) {
 
 func TestSunoProcessingErrorsPreserveSupportDetails(t *testing.T) {
 	for code, message := range map[string]string{
+		"api_error":                   "the account may have been offline",
 		"suno_processing_unavailable": "Music processing is unavailable. Contact support with the trace ID.",
 		"suno_model_unavailable":      "The selected model is unavailable for this operation. Contact support with the trace ID.",
 		"suno_processing_failed":      "Music processing returned no audio. Contact support with the trace ID.",
@@ -112,6 +212,62 @@ func TestNewClient_WithToken(t *testing.T) {
 	}
 	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
 		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestChatUsagePassthrough(t *testing.T) {
+	for _, operation := range []string{"completions", "responses", "messages"} {
+		t.Run(operation, func(t *testing.T) {
+			usage := map[string]any{
+				"cost": map[string]any{"amount": 0.0123, "currency": "Credits", "list_amount": 0.0246},
+			}
+			path := "/v1/chat/completions"
+			switch operation {
+			case "completions":
+				usage["prompt_tokens"] = float64(100)
+				usage["completion_tokens"] = float64(5)
+				usage["prompt_tokens_details"] = map[string]any{"cached_tokens": float64(40)}
+			case "responses":
+				path = "/openai/responses"
+				usage["input_tokens"] = float64(100)
+				usage["output_tokens"] = float64(5)
+				usage["input_tokens_details"] = map[string]any{"cached_tokens": float64(40)}
+			case "messages":
+				path = "/v1/messages"
+				usage["input_tokens"] = float64(60)
+				usage["output_tokens"] = float64(5)
+				usage["cache_read_input_tokens"] = float64(40)
+				usage["cache_creation_input_tokens"] = float64(10)
+			}
+			payload := map[string]any{"usage": usage}
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != http.MethodPost || r.URL.Path != path {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(w).Encode(payload)
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var result map[string]any
+			switch operation {
+			case "completions":
+				result, err = client.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{Model: "gpt-5.6-sol-fast", Messages: []map[string]any{}})
+			case "responses":
+				result, err = client.OpenAI().Responses().Create(context.Background(), ResponsesRequest{Model: "gpt-5.6-sol-fast", Input: "Hello"})
+			case "messages":
+				result, err = client.Chat().Messages().Create(context.Background(), MessagesRequest{Model: "gpt-5.6-sol-fast", Messages: []map[string]any{}})
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(result, payload) {
+				t.Fatalf("reported usage was changed: %#v, want %#v", result, payload)
+			}
+		})
 	}
 }
 
@@ -287,6 +443,129 @@ func TestSolFastModelPassthrough(t *testing.T) {
 					t.Errorf("got %d calls, want 1", calls)
 				}
 			})
+		}
+	}
+}
+
+func TestPublicChatModelsPassthrough(t *testing.T) {
+	for _, tc := range []struct {
+		model     string
+		maxTokens int
+		extra     map[string]any
+	}{
+		{"claude-opus-5-5", 0, map[string]any{"n": 1, "tool_choice": "auto"}},
+		{"gemini-4-argon", 32768, nil},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "low"}},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "high"}},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "max"}},
+		{"kimi-k3", 0, map[string]any{"reasoning_effort": "max"}},
+	} {
+		for _, streaming := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/%v/stream=%t", tc.model, tc.extra["reasoning_effort"], streaming), func(t *testing.T) {
+				req := ChatCompletionRequest{
+					Model: tc.model, Messages: []map[string]any{{"role": "user", "content": "Hello"}},
+					MaxTokens: tc.maxTokens, Extra: tc.extra,
+				}
+				expected := map[string]any{
+					"model": tc.model, "messages": []any{map[string]any{"role": "user", "content": "Hello"}},
+				}
+				for key, value := range tc.extra {
+					if key == "n" {
+						value = float64(1)
+					}
+					expected[key] = value
+				}
+				if tc.maxTokens > 0 {
+					expected["max_tokens"] = float64(tc.maxTokens)
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != "/v1/chat/completions" {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Error(err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					if streaming {
+						w.Header().Set("Content-Type", "text/event-stream")
+					} else {
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatal(err)
+				}
+				completions := client.OpenAI().Chat().Completions()
+				if streaming {
+					chunks, errs := completions.CreateStream(context.Background(), req)
+					for chunk := range chunks {
+						t.Errorf("unexpected chunk: %+v", chunk)
+					}
+					err = <-errs
+				} else {
+					_, err = completions.Create(context.Background(), req)
+				}
+				if err != nil || calls != 1 {
+					t.Fatalf("err=%v, calls=%d; want one successful request", err, calls)
+				}
+			})
+		}
+	}
+}
+
+func TestOpenAIImageQualityPassthrough(t *testing.T) {
+	for _, model := range []OpenAIImageModel{
+		OpenAIImageModelGPTImage25Flare, OpenAIImageModelGPTImage25Sunburst,
+		OpenAIImageModelGPTImage25FlareOfficial, OpenAIImageModelGPTImage25SunburstOfficial,
+	} {
+		for _, quality := range []string{"xhigh", "max"} {
+			for _, operation := range []string{"generations", "edits"} {
+				t.Run(model+"/"+quality+"/"+operation, func(t *testing.T) {
+					req := OpenAIImageRequest{Model: model, Prompt: "A vase", Extra: map[string]any{"quality": quality}}
+					expected := map[string]any{"model": model, "prompt": "A vase", "quality": quality}
+					if operation == "edits" {
+						req.Image = "https://example.com/vase.png"
+						expected["image"] = req.Image
+					}
+					calls := 0
+					srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						calls++
+						var body map[string]any
+						if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+							t.Errorf("decode request: %v", err)
+						}
+						if r.URL.Path != "/openai/images/"+operation || !reflect.DeepEqual(body, expected) {
+							t.Errorf("unexpected image request: path=%s body=%#v", r.URL.Path, body)
+						}
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}))
+					defer srv.Close()
+					client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+					if err != nil {
+						t.Fatal(err)
+					}
+					if operation == "edits" {
+						_, err = client.OpenAI().Images().Edit(context.Background(), req)
+					} else {
+						_, err = client.OpenAI().Images().Generate(context.Background(), req)
+					}
+					if err != nil || calls != 1 {
+						t.Fatalf("expected one image request: calls=%d err=%v", calls, err)
+					}
+				})
+			}
 		}
 	}
 }

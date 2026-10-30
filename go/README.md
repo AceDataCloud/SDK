@@ -79,6 +79,43 @@ for chunk := range chunks {
 if err := <-errs; err != nil { panic(err) }
 ```
 
+## Chat usage and billing
+
+Accepted model requests through Chat Completions, Responses, and Messages are
+billed by the selected model's input, output, and cache usage, not a fixed fee
+per request. Switching protocol formats does not change this to per-call billing
+or guarantee that a model accepts that format. Consult current model prices and
+`usage.cost` for the charge; the SDK preserves reported usage without recalculating it.
+
+- Chat Completions `prompt_tokens` includes reported cached tokens.
+- Responses `input_tokens` includes reported cached tokens.
+- Messages `input_tokens` excludes separately reported `cache_read_input_tokens`
+  and `cache_creation_input_tokens`; those dimensions are charged separately.
+
+Do not add cached tokens to the input total again for Chat Completions or
+Responses, or treat Messages input alone as the full input/cache usage.
+
+## Public Chat Completions models
+
+Pass these public IDs in `ChatCompletionRequest.Model` to
+`client.OpenAI().Chat().Completions().Create` or `CreateStream`. Put model-specific
+fields in `ChatCompletionRequest.Extra`; the SDK does not rewrite IDs or enforce a catalog.
+
+- `claude-opus-5-5`: supports text and streaming Chat Completions with `"n": 1`.
+  Leave `Temperature` and `TopP` nil to use model defaults; do not set temperature
+  below 1 or a non-default top-p. Use `"tool_choice": "auto"`, not forced tools.
+  For native thinking blocks, signatures, and native tool semantics, use `client.Chat().Messages()`.
+- `gemini-4-argon`: supports text and streaming Chat Completions. Thinking can
+  consume output budget; Google recommends at least `MaxTokens: 32768` for ordinary
+  tasks. This does not expose Interactions background long-output functionality.
+- `kimi-k3.1-pro`: always reasons; pass `"reasoning_effort": "low"`, `"high"`, or `"max"`.
+  Do not disable reasoning. Keep the full assistant message, including
+  `reasoning_content` and `tool_calls`, in multi-turn and tool-call history.
+  The existing `kimi-k3` alias remains available; use `"reasoning_effort": "max"` for it.
+
+Check current account access and prices before calling. A model's advertised
+context size does not guarantee the platform's per-request limit.
+
 ## Native Claude Messages
 
 Use `MessagesRequest.Extra` for thinking and output configuration. These fields
@@ -153,6 +190,15 @@ if _, err = editHandle.Wait(ctx, 3*time.Second, 5*time.Minute); err != nil { pan
 and `.Edit` using `OpenAIImageRequest` (`Image` for editing). Those methods use
 the OpenAI-compatible fields and return response maps, not task handles.
 
+### GPT Image 2.5 quality
+
+`client.OpenAI().Images().Generate` and `.Edit` pass
+`OpenAIImageRequest.Extra["quality"]` through unchanged. GPT Image models accept
+`auto`, `low`, `medium`, and `high`; only `gpt-image-2.5-flare` and
+`gpt-image-2.5-sunburst` (including `:official` variants) additionally accept
+`xhigh` and `max`. Official-channel requests are billed by actual token usage,
+not a fixed fee per image.
+
 ## Maestro video production
 
 Use the provider client to request one finished video in one language:
@@ -181,7 +227,47 @@ with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
 
+## Kling reference-video billing
+
+Use `client.Kling().Generate` with `KlingGenerateRequest.VideoList` containing
+`map[string]any{"video_url": referenceURL, "refer_type": "feature"}` and
+`Model: "kling-o1"` or `"kling-v3-omni"`.
+Reference videos use a separate billing tier: **1.202 Credits/second** in `std`
+mode and **1.602 Credits/second** in `pro` mode. For a 5-second O1 result,
+`std` / `pro` cost **4.005 / 5.340 Credits** without a reference video, or
+**6.010 / 8.010 Credits** with one.
+
+`refer_type: "base"` (the default) edits may follow the reference video's length;
+billing uses the actual output duration rounded to the nearest integer second.
+`refer_type: "feature"` uses the requested `Duration`. After `handle.Wait`, read
+`usage.reference_video_seconds` in the completed task's `response` map for the final billed seconds;
+the request-time estimate can differ from the final charge. This is response
+usage, not a request parameter. Image references and first/last frames alone do
+not trigger reference-video billing. Do not combine `VideoList` with
+`GenerateAudio: true`.
+
 ## Suno music processing
+
+For a private voice created by `client.Suno().Voices`, upload the original
+song with `client.Suno().Upload(ctx, acedatacloud.SunoUploadRequest{
+AudioURL: sourceURL, PersonaID: personaID})`. This field is supported only for
+standard uploads (the default), not `Extra: map[string]any{"mode": "enhanced"}`.
+After upload succeeds, use its `data.audio_id` as `SunoGenerateRequest.AudioID`,
+with `Action: "upload_cover"` and the same `PersonaID`. Do not reuse a song ID
+uploaded without that voice association. Voice creation, upload, and cover
+must use the same service channel. `VocalGender` is not required and cannot
+replace `PersonaID`.
+
+Before a cover or extension, optionally call
+`client.Suno().Availability(ctx, acedatacloud.SunoAvailabilityRequest{AudioID: audioID})`.
+Use the song's `audio_id` from a completed task, not its `task_id`. This is a
+synchronous API-token-authenticated check, currently without a Credits charge;
+it returns the response map and an error, not a task handle to poll.
+`result["data"].(map[string]any)["available"]` is only `true` on success: it is
+positive evidence on the current channel, not a guarantee that a subsequent
+operation will work. An inconclusive check returns an error, including
+`503 availability_unknown`; never convert an error into `false`. Preserve the
+error code and trace ID.
 
 Use `client.Suno().Generate` with `SunoGenerateRequest{Custom: true, Lyric: lyric,
 Style: style, NegativeTags: negativeTags}` for custom-mode music. `NegativeTags`
@@ -195,6 +281,9 @@ for covers, extensions or stem separation. If processing returns
 `ID`, when available) and the error's `TraceID()` for support. The related codes
 `suno_model_unavailable` and `suno_processing_failed` mean the selected model is
 unavailable for that operation or processing returned no audio, respectively.
+Suno can also return `api_error` with the message
+`the account may have been offline`; this is a server error, not an SDK
+authentication error.
 These HTTP 500 errors retain their `Code()`, `TraceID()` and `Body()` through
 the `Error` interface. Retrieve an existing task rather than submitting a
 replacement generation just to check its result.
