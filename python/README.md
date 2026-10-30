@@ -203,6 +203,14 @@ The public model ID also works with `client.openai.images.generate(...)` and
 `client.openai.images.edit(...)`; those use the OpenAI-compatible fields
 (`image` for editing) and return response dictionaries, not task handles.
 
+### GPT Image 2.5 quality
+
+`client.openai.images.generate(...)` and `.edit(...)` pass `quality` through
+unchanged. GPT Image models accept `auto`, `low`, `medium`, and `high`;
+only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst` (including `:official`
+variants) additionally accept `xhigh` and `max`. Official-channel requests
+are billed by actual token usage, not a fixed fee per image.
+
 ## Maestro Video Production
 
 Use the provider client to request one finished video in one language:
@@ -249,6 +257,15 @@ not trigger reference-video billing. Do not combine `video_list` with
 `generate_audio=True`. `AsyncAceDataCloud` uses the same fields with `await`.
 
 ## Suno music processing
+
+For a private voice created by `client.suno.voices(...)`, upload the original
+song with `client.suno.upload(audio_url=source_url, persona_id=persona_id)`.
+This field is supported only for standard uploads (the default), not
+`mode="enhanced"`. After upload succeeds, use `upload["data"]["audio_id"]` and
+the same `persona_id` in `client.suno.generate(action="upload_cover", ...)`.
+Do not reuse a song ID uploaded without that voice association. Voice creation,
+upload, and cover must use the same service channel. `vocal_gender` is not
+required and cannot replace `persona_id`. Async clients use the same fields.
 
 Before a cover or extension, optionally call
 `client.suno.availability(audio_id=audio_id)` (or `await` with `AsyncAceDataCloud`).

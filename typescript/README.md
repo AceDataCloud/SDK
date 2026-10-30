@@ -192,6 +192,14 @@ The public model ID also works with `client.openai.images.generate(...)` and
 `client.openai.images.edit(...)`; those use the OpenAI-compatible fields
 (`image` for editing) and return response objects, not task handles.
 
+### GPT Image 2.5 quality
+
+`client.openai.images.generate(...)` and `.edit(...)` pass `quality` through
+unchanged. GPT Image models accept `auto`, `low`, `medium`, and `high`;
+only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst` (including `:official`
+variants) additionally accept `xhigh` and `max`. Official-channel requests
+are billed by actual token usage, not a fixed fee per image.
+
 ## Maestro Video Production
 
 Use the provider client to request one finished video in one language:
@@ -237,6 +245,16 @@ not trigger reference-video billing. Do not combine `videoList` with
 `generateAudio: true`.
 
 ## Suno music processing
+
+For a private voice created by `client.suno.voices(...)`, upload the original
+song with `await client.suno.upload({ audioUrl: sourceUrl, personaId })`.
+This field is supported only for standard uploads (the default), not
+`mode: 'enhanced'`. After upload succeeds, use the returned `data.audio_id` as
+`audioId` and the same `personaId` in
+`await client.suno.generate({ action: 'upload_cover', audioId, personaId })`.
+Do not reuse a song ID uploaded without that voice association. Voice creation,
+upload, and cover must use the same service channel. `vocalGender` is not
+required and cannot replace `personaId`.
 
 Before a cover or extension, optionally call
 `await client.suno.availability({ audioId })`. Use the song's `audio_id` from a

@@ -182,6 +182,32 @@ class SnapshotSyncTests(unittest.TestCase):
         )
         self.assertFalse(endpoint.get("pollable", False))
 
+    def test_suno_upload_persona_is_optional_and_standard_only(self):
+        path = SCRIPT.parent / "specs/8823cd83-54f6-4ea8-979a-7fa448577186.json"
+        operation = json.loads(path.read_text())["paths"]["/suno/upload"]["post"]
+        request = operation["requestBody"]["content"]["application/json"]["schema"]
+        self.assertEqual(request["required"], ["audio_url"])
+        persona = request["properties"]["persona_id"]
+        self.assertEqual(persona["type"], "string")
+        self.assertEqual(persona["minLength"], 1)
+        self.assertIn("standard uploads only", persona["description"])
+        self.assertIn("same channel", persona["description"])
+
+    def test_image_quality_enums_include_model_specific_extended_values(self):
+        for api_id, route in (
+            ("8f01fe72-8a3e-4872-8d8d-330cde179b3a", "/openai/images/generations"),
+            ("fb74083e-bb68-48d5-8ba6-b5a224400cd3", "/openai/images/edits"),
+        ):
+            spec = json.loads((SCRIPT.parent / "specs" / f"{api_id}.json").read_text())
+            content = spec["paths"][route]["post"]["requestBody"]["content"]
+            for media in content.values():
+                with self.subTest(route=route, media=media):
+                    quality = media["schema"]["properties"]["quality"]
+                    self.assertIn("xhigh", quality["enum"])
+                    self.assertIn("max", quality["enum"])
+                    self.assertIn("Only `gpt-image-2.5-flare`", quality["description"])
+                    self.assertIn("actual token usage", quality["description"])
+
     def test_suno_negative_tags_has_no_fixed_character_limit(self):
         path = SCRIPT.parent / "specs/09a26295-5972-4392-9318-dcd9b218f90d.json"
         operation = json.loads(path.read_text())["paths"]["/suno/audios"]["post"]

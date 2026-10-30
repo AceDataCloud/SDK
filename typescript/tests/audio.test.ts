@@ -48,6 +48,21 @@ describe('Audio resource', () => {
     }
   });
 
+  it.each([undefined, 'voice-persona'])('serializes an optional Suno upload persona (%s)', async (personaId) => {
+    const request = jest.fn().mockResolvedValue({});
+    const suno = new Suno({ request } as any);
+
+    await suno.upload({ audioUrl: 'https://example.com/song.mp3', personaId });
+
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith('POST', '/suno/upload', {
+      json: {
+        audio_url: 'https://example.com/song.mp3',
+        ...(personaId === undefined ? {} : { persona_id: personaId }),
+      },
+    });
+  });
+
   it.each([undefined, '', 'no distorted guitars; '.repeat(100)])(
     'preserves Suno negativeTags without truncation (%p)', async (negativeTags) => {
       const request = jest.fn().mockResolvedValue({});

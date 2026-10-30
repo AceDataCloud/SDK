@@ -190,6 +190,15 @@ if _, err = editHandle.Wait(ctx, 3*time.Second, 5*time.Minute); err != nil { pan
 and `.Edit` using `OpenAIImageRequest` (`Image` for editing). Those methods use
 the OpenAI-compatible fields and return response maps, not task handles.
 
+### GPT Image 2.5 quality
+
+`client.OpenAI().Images().Generate` and `.Edit` pass
+`OpenAIImageRequest.Extra["quality"]` through unchanged. GPT Image models accept
+`auto`, `low`, `medium`, and `high`; only `gpt-image-2.5-flare` and
+`gpt-image-2.5-sunburst` (including `:official` variants) additionally accept
+`xhigh` and `max`. Official-channel requests are billed by actual token usage,
+not a fixed fee per image.
+
 ## Maestro video production
 
 Use the provider client to request one finished video in one language:
@@ -238,6 +247,16 @@ not trigger reference-video billing. Do not combine `VideoList` with
 `GenerateAudio: true`.
 
 ## Suno music processing
+
+For a private voice created by `client.Suno().Voices`, upload the original
+song with `client.Suno().Upload(ctx, acedatacloud.SunoUploadRequest{
+AudioURL: sourceURL, PersonaID: personaID})`. This field is supported only for
+standard uploads (the default), not `Extra: map[string]any{"mode": "enhanced"}`.
+After upload succeeds, use its `data.audio_id` as `SunoGenerateRequest.AudioID`,
+with `Action: "upload_cover"` and the same `PersonaID`. Do not reuse a song ID
+uploaded without that voice association. Voice creation, upload, and cover
+must use the same service channel. `VocalGender` is not required and cannot
+replace `PersonaID`.
 
 Before a cover or extension, optionally call
 `client.Suno().Availability(ctx, acedatacloud.SunoAvailabilityRequest{AudioID: audioID})`.

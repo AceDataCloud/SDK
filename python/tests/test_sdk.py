@@ -31,6 +31,36 @@ def async_client():
     return AsyncAceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
 
 
+@respx.mock
+@pytest.mark.parametrize("persona_id", [None, "voice-persona"])
+def test_suno_upload_persona(client, persona_id):
+    route = respx.post("https://api.acedata.cloud/suno/upload").respond(200, json={})
+
+    client.suno.upload(audio_url="https://example.com/song.mp3", persona_id=persona_id)
+
+    expected = {"audio_url": "https://example.com/song.mp3"}
+    if persona_id is not None:
+        expected["persona_id"] = persona_id
+    assert json.loads(route.calls.last.request.content) == expected
+    assert len(respx.calls) == 1
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("persona_id", [None, "voice-persona"])
+async def test_async_suno_upload_persona(async_client, persona_id):
+    route = respx.post("https://api.acedata.cloud/suno/upload").respond(200, json={})
+
+    async with async_client:
+        await async_client.suno.upload(audio_url="https://example.com/song.mp3", persona_id=persona_id)
+
+    expected = {"audio_url": "https://example.com/song.mp3"}
+    if persona_id is not None:
+        expected["persona_id"] = persona_id
+    assert json.loads(route.calls.last.request.content) == expected
+    assert len(respx.calls) == 1
+
+
 SUNO_AVAILABILITY = {
     "success": True,
     "task_id": "11111111-1111-4111-8111-111111111111",
@@ -536,6 +566,43 @@ def test_openai_images_support_public_models(client, model):
     assert edit.calls.last.request.content == (
         f'{{"image":"https://example.com/cat.png","prompt":"Add a hat","model":"{model}"}}'.encode()
     )
+
+
+@respx.mock
+@pytest.mark.parametrize("quality", ["xhigh", "max"])
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gpt-image-2.5-flare",
+        "gpt-image-2.5-sunburst",
+        "gpt-image-2.5-flare:official",
+        "gpt-image-2.5-sunburst:official",
+    ],
+)
+def test_openai_image_quality_pass_through(client, model, quality):
+    for operation, path in [("generate", "generations"), ("edit", "edits")]:
+        route = respx.post(f"https://api.acedata.cloud/openai/images/{path}").respond(200, json={})
+        options = {"model": model, "prompt": "A vase", "quality": quality}
+        if operation == "edit":
+            options["image"] = "https://example.com/vase.png"
+        getattr(client.openai.images, operation)(**options)
+        assert json.loads(route.calls.last.request.content) == options
+    assert len(respx.calls) == 2
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("quality", ["xhigh", "max"])
+async def test_async_openai_image_quality_pass_through(async_client, quality):
+    async with async_client:
+        for operation, path in [("generate", "generations"), ("edit", "edits")]:
+            route = respx.post(f"https://api.acedata.cloud/openai/images/{path}").respond(200, json={})
+            options = {"model": "gpt-image-2.5-flare:official", "prompt": "A vase", "quality": quality}
+            if operation == "edit":
+                options["image"] = "https://example.com/vase.png"
+            await getattr(async_client.openai.images, operation)(**options)
+            assert json.loads(route.calls.last.request.content) == options
+    assert len(respx.calls) == 2
 
 
 @respx.mock

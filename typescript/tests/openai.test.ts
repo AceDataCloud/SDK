@@ -192,6 +192,25 @@ describe('OpenAI resource', () => {
     }
   );
 
+  it.each(['xhigh', 'max'])('passes through extended image quality %s', async (quality) => {
+    for (const model of [
+      'gpt-image-2.5-flare', 'gpt-image-2.5-sunburst',
+      'gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official',
+    ] as const) {
+      const request = jest.fn().mockResolvedValue({});
+      const openai = new OpenAI({ request } as any);
+      const options = { model, prompt: 'A vase', quality };
+      const editOptions = { ...options, image: 'https://example.com/vase.png' };
+
+      await openai.images.generate(options);
+      await openai.images.edit(editOptions);
+
+      expect(request).toHaveBeenCalledTimes(2);
+      expect(request).toHaveBeenNthCalledWith(1, 'POST', '/openai/images/generations', { json: options });
+      expect(request).toHaveBeenNthCalledWith(2, 'POST', '/openai/images/edits', { json: editOptions });
+    }
+  });
+
   it('keeps dynamically discovered image model IDs compatible', async () => {
     const request = jest.fn().mockResolvedValue({ data: [] });
     const openai = new OpenAI({ request } as any);

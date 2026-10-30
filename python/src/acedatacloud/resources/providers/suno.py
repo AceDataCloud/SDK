@@ -385,12 +385,15 @@ class Suno:
         self,
         *,
         audio_url: str,
+        persona_id: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
         """Suno reference audio upload API, upload audio to get an audio_id for extended generation."""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
+        if persona_id is not None:
+            body["persona_id"] = persona_id
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -768,12 +771,15 @@ class AsyncSuno:
         self,
         *,
         audio_url: str,
+        persona_id: str | None = None,
         callback_url: str | None = None,
         **extra: Any,
     ) -> dict[str, Any]:
         """Suno reference audio upload API, upload audio to get an audio_id for extended generation."""
         body: dict[str, Any] = {}
         body["audio_url"] = audio_url
+        if persona_id is not None:
+            body["persona_id"] = persona_id
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

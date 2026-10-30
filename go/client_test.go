@@ -70,6 +70,44 @@ func TestFishModelCreated(t *testing.T) {
 	}
 }
 
+func TestSunoUploadPersona(t *testing.T) {
+	for _, personaID := range []string{"", "voice-persona"} {
+		t.Run("persona="+personaID, func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/suno/upload" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				expected := map[string]any{"audio_url": "https://example.com/song.mp3"}
+				if personaID != "" {
+					expected["persona_id"] = personaID
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("unexpected upload body: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = client.Suno().Upload(context.Background(), SunoUploadRequest{
+				AudioURL: "https://example.com/song.mp3", PersonaID: personaID,
+			})
+			if err != nil || calls != 1 {
+				t.Fatalf("expected one upload request: calls=%d err=%v", calls, err)
+			}
+		})
+	}
+}
+
 func TestSunoAvailability(t *testing.T) {
 	const audioID = "33333333-3333-4333-8333-333333333333"
 	for _, status := range []int{200, 500, 503} {
@@ -482,6 +520,52 @@ func TestPublicChatModelsPassthrough(t *testing.T) {
 					t.Fatalf("err=%v, calls=%d; want one successful request", err, calls)
 				}
 			})
+		}
+	}
+}
+
+func TestOpenAIImageQualityPassthrough(t *testing.T) {
+	for _, model := range []OpenAIImageModel{
+		OpenAIImageModelGPTImage25Flare, OpenAIImageModelGPTImage25Sunburst,
+		OpenAIImageModelGPTImage25FlareOfficial, OpenAIImageModelGPTImage25SunburstOfficial,
+	} {
+		for _, quality := range []string{"xhigh", "max"} {
+			for _, operation := range []string{"generations", "edits"} {
+				t.Run(model+"/"+quality+"/"+operation, func(t *testing.T) {
+					req := OpenAIImageRequest{Model: model, Prompt: "A vase", Extra: map[string]any{"quality": quality}}
+					expected := map[string]any{"model": model, "prompt": "A vase", "quality": quality}
+					if operation == "edits" {
+						req.Image = "https://example.com/vase.png"
+						expected["image"] = req.Image
+					}
+					calls := 0
+					srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						calls++
+						var body map[string]any
+						if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+							t.Errorf("decode request: %v", err)
+						}
+						if r.URL.Path != "/openai/images/"+operation || !reflect.DeepEqual(body, expected) {
+							t.Errorf("unexpected image request: path=%s body=%#v", r.URL.Path, body)
+						}
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}))
+					defer srv.Close()
+					client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+					if err != nil {
+						t.Fatal(err)
+					}
+					if operation == "edits" {
+						_, err = client.OpenAI().Images().Edit(context.Background(), req)
+					} else {
+						_, err = client.OpenAI().Images().Generate(context.Background(), req)
+					}
+					if err != nil || calls != 1 {
+						t.Fatalf("expected one image request: calls=%d err=%v", calls, err)
+					}
+				})
+			}
 		}
 	}
 }
