@@ -3,6 +3,8 @@
 import { Transport } from '../runtime/transport';
 
 export type AiChatModel =
+  | 'mimo-v2.6-pro'
+  | 'mimo-v2.6-flash'
   | 'gpt-5.6-sol-fast'
   | 'gpt-5.5'
   | 'gpt-5.5-pro'
