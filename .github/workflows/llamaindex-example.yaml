@@ -18,6 +18,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt pytest
+      - name: Install NLTK corpus required by the keyword index
+        run: python -m nltk.downloader -q stopwords
       - name: Verify published SDK and LlamaIndex workflow offline
         run: |
           python workflow.py
