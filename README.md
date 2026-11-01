@@ -172,3 +172,7 @@ for actual publication status, account connection and billing boundaries.
 The application is source-only until its private upload and public review are
 verified; this link is not a Zapier installation or listing. SDK clients do not
 embed or maintain a second copy of the Zapier application.
+
+## MiMo
+
+`mimo-v2.6-pro` and `mimo-v2.6-flash` are model identifiers for the existing OpenAI-compatible `client.openai.chat.completions.create` interface in Python/TypeScript (and the corresponding Go client), including streaming. Check the live console catalog, service status and account access before using it. Use `max_completion_tokens`, preserve captured assistant `reasoning_content` during tool continuations, and use only function tools with `tool_choice=auto`. This does not enable MiMo on Responses or Messages.
