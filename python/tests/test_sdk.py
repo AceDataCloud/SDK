@@ -31,6 +31,148 @@ def async_client():
     return AsyncAceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
 
 
+@pytest.mark.parametrize("operation", ["extract", "render"])
+@pytest.mark.parametrize("options", [{}, {"cookies": [], "bypass_cache": False, "cache_ttl_seconds": 0}])
+def test_webextrator_cache_options(client, operation, options):
+    transport = Mock()
+    transport.request.return_value = {}
+    client.webextrator._transport = transport
+    getattr(client.webextrator, operation)(url="https://example.com", **options)
+    transport.request.assert_called_once_with(
+        "POST", f"/webextrator/{operation}", json={"url": "https://example.com", **options}
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("operation", ["extract", "render"])
+async def test_async_webextrator_cookies_and_cache(async_client, operation):
+    from unittest.mock import AsyncMock
+
+    cookies = [{"name": "session", "value": "test", "domain": "example.com", "httpOnly": True, "sameSite": "Lax"}]
+    transport = Mock(request=AsyncMock(return_value={}))
+    async_client.webextrator._transport = transport
+    async with async_client:
+        await getattr(async_client.webextrator, operation)(
+            url="https://example.com", cookies=cookies, bypass_cache=True, cache_ttl_seconds=0, timeout=1, delay=0
+        )
+    transport.request.assert_awaited_once_with(
+        "POST",
+        f"/webextrator/{operation}",
+        json={
+            "url": "https://example.com",
+            "cookies": cookies,
+            "bypass_cache": True,
+            "cache_ttl_seconds": 0,
+            "timeout": 1,
+            "delay": 0,
+        },
+    )
+
+
+@respx.mock
+@pytest.mark.parametrize("persona_id", [None, "voice-persona"])
+def test_suno_upload_persona(client, persona_id):
+    route = respx.post("https://api.acedata.cloud/suno/upload").respond(200, json={})
+
+    client.suno.upload(audio_url="https://example.com/song.mp3", persona_id=persona_id)
+
+    expected = {"audio_url": "https://example.com/song.mp3"}
+    if persona_id is not None:
+        expected["persona_id"] = persona_id
+    assert json.loads(route.calls.last.request.content) == expected
+    assert len(respx.calls) == 1
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("persona_id", [None, "voice-persona"])
+async def test_async_suno_upload_persona(async_client, persona_id):
+    route = respx.post("https://api.acedata.cloud/suno/upload").respond(200, json={})
+
+    async with async_client:
+        await async_client.suno.upload(audio_url="https://example.com/song.mp3", persona_id=persona_id)
+
+    expected = {"audio_url": "https://example.com/song.mp3"}
+    if persona_id is not None:
+        expected["persona_id"] = persona_id
+    assert json.loads(route.calls.last.request.content) == expected
+    assert len(respx.calls) == 1
+
+
+SUNO_AVAILABILITY = {
+    "success": True,
+    "task_id": "11111111-1111-4111-8111-111111111111",
+    "trace_id": "22222222-2222-4222-8222-222222222222",
+    "data": {"id": "33333333-3333-4333-8333-333333333333", "available": True},
+}
+
+
+@respx.mock
+def test_suno_availability_returns_response_without_polling(client):
+    route = respx.post("https://api.acedata.cloud/suno/availability").respond(200, json=SUNO_AVAILABILITY)
+
+    result = client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert result == SUNO_AVAILABILITY
+    assert len(respx.calls) == 1
+    assert json.loads(route.calls[0].request.content) == {"audio_id": SUNO_AVAILABILITY["data"]["id"]}
+    assert route.calls[0].request.headers["Authorization"] == "Bearer test-token"
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_suno_availability_returns_response_without_polling(async_client):
+    route = respx.post("https://api.acedata.cloud/suno/availability").respond(200, json=SUNO_AVAILABILITY)
+
+    async with async_client:
+        result = await async_client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert result == SUNO_AVAILABILITY
+    assert len(respx.calls) == 1
+    assert json.loads(route.calls[0].request.content) == {"audio_id": SUNO_AVAILABILITY["data"]["id"]}
+    assert route.calls[0].request.headers["Authorization"] == "Bearer test-token"
+
+
+@respx.mock
+@pytest.mark.parametrize("status", [500, 503])
+def test_suno_availability_unknown_is_an_error_not_false(client, status):
+    body = {
+        "error": {"code": "availability_unknown", "message": "Availability could not be confirmed."},
+        "trace_id": "test-trace",
+    }
+    respx.post("https://api.acedata.cloud/suno/availability").respond(status, json=body)
+
+    with pytest.raises(APIError) as exc:
+        client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert exc.value.status_code == status
+    assert exc.value.code == "availability_unknown"
+    assert exc.value.trace_id == "test-trace"
+    assert exc.value.body == body
+    assert len(respx.calls) == 1
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [500, 503])
+async def test_async_suno_availability_unknown_is_an_error_not_false(async_client, status):
+    body = {
+        "error": {"code": "availability_unknown", "message": "Availability could not be confirmed."},
+        "trace_id": "test-trace",
+    }
+    respx.post("https://api.acedata.cloud/suno/availability").respond(status, json=body)
+
+    async with async_client:
+        with pytest.raises(APIError) as exc:
+            await async_client.suno.availability(audio_id=SUNO_AVAILABILITY["data"]["id"])
+
+    assert exc.value.status_code == status
+    assert exc.value.code == "availability_unknown"
+    assert exc.value.trace_id == "test-trace"
+    assert exc.value.body == body
+    assert len(respx.calls) == 1
+
+
 @respx.mock
 def test_default_api_base_uses_x402_host():
     route = respx.post("https://x402.acedata.cloud/openai/chat/completions").mock(
@@ -186,11 +328,12 @@ async def test_async_x402_payment_handler_supports_streaming():
     + [("aichat", False)],
 )
 @respx.mock
-def test_sol_fast_model_passthrough(client, operation, stream):
+@pytest.mark.parametrize("model", ["gpt-5.6-sol-fast", "gpt-6.1-terra"])
+def test_compatible_model_passthrough(client, operation, stream, model):
     from acedatacloud import AiChatModel
 
-    assert "gpt-5.6-sol-fast" in get_args(AiChatModel)
-    body = {"model": "gpt-5.6-sol-fast"}
+    assert model in get_args(AiChatModel)
+    body = {"model": model}
     if operation == "responses":
         path = "/openai/responses"
         create = client.openai.responses.create
@@ -267,6 +410,134 @@ async def test_async_sol_fast_model_passthrough(async_client, operation, stream)
     assert json.loads(route.calls.last.request.content) == body
 
 
+@pytest.fixture(
+    params=[
+        ("claude-opus-5-5", {"n": 1, "tool_choice": "auto"}),
+        ("gemini-4-argon", {"max_tokens": 32768}),
+        ("kimi-k3.1-pro", {"reasoning_effort": "low"}),
+        ("kimi-k3.1-pro", {"reasoning_effort": "high"}),
+        ("kimi-k3.1-pro", {"reasoning_effort": "max"}),
+        ("kimi-k3", {"reasoning_effort": "max"}),
+    ]
+)
+def public_chat_body(request):
+    model, options = request.param
+    return {"model": model, "messages": [{"role": "user", "content": "Hello"}], **options}
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+def test_public_chat_models_passthrough(client, public_chat_body, stream):
+    route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+    result = client.openai.chat.completions.create(**public_chat_body, stream=stream)
+    if stream:
+        assert list(result) == []
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == {
+        **public_chat_body,
+        **({"stream": True} if stream else {}),
+    }
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_public_chat_models_passthrough(async_client, public_chat_body, stream):
+    route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+    try:
+        result = await async_client.openai.chat.completions.create(**public_chat_body, stream=stream)
+        if stream:
+            assert [chunk async for chunk in result] == []
+    finally:
+        await async_client.close()
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == {
+        **public_chat_body,
+        **({"stream": True} if stream else {}),
+    }
+
+
+@pytest.fixture(params=["completions", "responses", "messages"])
+def chat_usage_case(request):
+    operation = request.param
+    if operation == "completions":
+        usage = {"prompt_tokens": 100, "completion_tokens": 5, "prompt_tokens_details": {"cached_tokens": 40}}
+        path = "/openai/chat/completions"
+    elif operation == "responses":
+        usage = {"input_tokens": 100, "output_tokens": 5, "input_tokens_details": {"cached_tokens": 40}}
+        path = "/openai/responses"
+    else:
+        usage = {
+            "input_tokens": 60,
+            "output_tokens": 5,
+            "cache_read_input_tokens": 40,
+            "cache_creation_input_tokens": 10,
+        }
+        path = "/v1/messages"
+    usage["cost"] = {"amount": 0.0123, "currency": "Credits", "list_amount": 0.0246}
+    return operation, path, usage
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+def test_chat_usage_is_not_recalculated(client, chat_usage_case, stream):
+    operation, path, usage = chat_usage_case
+    payload = {"usage": usage}
+    if stream and operation == "responses":
+        payload = {"type": "response.completed", "response": payload}
+    elif stream and operation == "messages":
+        payload = {"type": "message_delta", "usage": usage}
+    respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, text=f"data: {json.dumps(payload)}\n\n")
+        if stream
+        else httpx.Response(200, json=payload)
+    )
+    if operation == "responses":
+        result = client.openai.responses.create(model="gpt-5.6-sol-fast", input="Hello", stream=stream)
+    else:
+        create = client.openai.chat.completions.create if operation == "completions" else client.chat.messages.create
+        result = create(model="gpt-5.6-sol-fast", messages=[], stream=stream)
+    assert (list(result) if stream else result) == ([payload] if stream else payload)
+
+
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_chat_usage_is_not_recalculated(async_client, chat_usage_case, stream):
+    operation, path, usage = chat_usage_case
+    payload = {"usage": usage}
+    if stream and operation == "responses":
+        payload = {"type": "response.completed", "response": payload}
+    elif stream and operation == "messages":
+        payload = {"type": "message_delta", "usage": usage}
+    respx.post(f"https://api.acedata.cloud{path}").mock(
+        return_value=httpx.Response(200, text=f"data: {json.dumps(payload)}\n\n")
+        if stream
+        else httpx.Response(200, json=payload)
+    )
+    try:
+        if operation == "responses":
+            result = await async_client.openai.responses.create(model="gpt-5.6-sol-fast", input="Hello", stream=stream)
+        else:
+            create = (
+                async_client.openai.chat.completions.create
+                if operation == "completions"
+                else async_client.chat.messages.create
+            )
+            result = await create(model="gpt-5.6-sol-fast", messages=[], stream=stream)
+        assert ([chunk async for chunk in result] if stream else result) == ([payload] if stream else payload)
+    finally:
+        await async_client.close()
+
+
 # ── OpenAI Chat Completions ──────────────────────────────────────────
 
 
@@ -334,6 +605,43 @@ def test_openai_images_support_public_models(client, model):
     assert edit.calls.last.request.content == (
         f'{{"image":"https://example.com/cat.png","prompt":"Add a hat","model":"{model}"}}'.encode()
     )
+
+
+@respx.mock
+@pytest.mark.parametrize("quality", ["xhigh", "max"])
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gpt-image-2.5-flare",
+        "gpt-image-2.5-sunburst",
+        "gpt-image-2.5-flare:official",
+        "gpt-image-2.5-sunburst:official",
+    ],
+)
+def test_openai_image_quality_pass_through(client, model, quality):
+    for operation, path in [("generate", "generations"), ("edit", "edits")]:
+        route = respx.post(f"https://api.acedata.cloud/openai/images/{path}").respond(200, json={})
+        options = {"model": model, "prompt": "A vase", "quality": quality}
+        if operation == "edit":
+            options["image"] = "https://example.com/vase.png"
+        getattr(client.openai.images, operation)(**options)
+        assert json.loads(route.calls.last.request.content) == options
+    assert len(respx.calls) == 2
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("quality", ["xhigh", "max"])
+async def test_async_openai_image_quality_pass_through(async_client, quality):
+    async with async_client:
+        for operation, path in [("generate", "generations"), ("edit", "edits")]:
+            route = respx.post(f"https://api.acedata.cloud/openai/images/{path}").respond(200, json={})
+            options = {"model": "gpt-image-2.5-flare:official", "prompt": "A vase", "quality": quality}
+            if operation == "edit":
+                options["image"] = "https://example.com/vase.png"
+            await getattr(async_client.openai.images, operation)(**options)
+            assert json.loads(route.calls.last.request.content) == options
+    assert len(respx.calls) == 2
 
 
 @respx.mock
@@ -440,7 +748,11 @@ def test_chat_configuration_passthrough(operation, thinking):
     if operation != "count_tokens":
         body.update(
             metadata={"user_id": "example-user-001"},
-            output_config={"effort": "future-effort", "extension": True},
+            output_config={
+                "effort": "future-effort",
+                "extension": True,
+                "format": {"type": "json_schema", "schema": {"type": "object"}},
+            },
             temperature=0.7,
         )
     with AceDataCloud(
@@ -482,7 +794,11 @@ async def test_async_chat_configuration_passthrough(operation):
     }
     if operation != "count_tokens":
         body["metadata"] = {"user_id": "example-user-001"}
-        body["output_config"] = {"effort": "future-effort", "extension": True}
+        body["output_config"] = {
+            "effort": "future-effort",
+            "extension": True,
+            "format": {"type": "json_schema", "schema": {"type": "object"}},
+        }
     async with AsyncAceDataCloud(
         api_token="test-token",
         base_url="https://api.acedata.cloud",
@@ -720,12 +1036,28 @@ def test_platform_models_list(client):
     assert result["data"][0]["id"] == "claude-sonnet-4-20250514"
 
 
+@pytest.mark.parametrize("region", ["us", "cn", None])
 @respx.mock
-def test_platform_config_get(client):
-    mock = {"features": {"DISCOUNT_FOR_X402": 0.9}}
-    respx.get("https://platform.acedata.cloud/api/v1/config/").mock(return_value=httpx.Response(200, json=mock))
-    result = client.platform.config.get()
-    assert result["features"]["DISCOUNT_FOR_X402"] == 0.9
+def test_platform_config_get(client, region):
+    mock = {"features": {"DISCOUNT_FOR_X402": 0.9}, "region": region}
+    route = respx.get("https://platform.acedata.cloud/api/v1/config/").mock(return_value=httpx.Response(200, json=mock))
+    assert client.platform.config.get() == mock
+    assert route.call_count == 1
+    assert not route.calls.last.request.url.query
+
+
+@pytest.mark.parametrize("region", ["us", "cn", None])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_platform_config_get(async_client, region):
+    mock = {"features": {}, "region": region}
+    route = respx.get("https://platform.acedata.cloud/api/v1/config/").mock(return_value=httpx.Response(200, json=mock))
+    try:
+        assert await async_client.platform.config.get() == mock
+        assert route.call_count == 1
+        assert not route.calls.last.request.url.query
+    finally:
+        await async_client.close()
 
 
 # ── Error Mapping ─────────────────────────────────────────────────────

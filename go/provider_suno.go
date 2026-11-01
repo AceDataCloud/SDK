@@ -34,7 +34,7 @@ type SunoGenerateRequest struct {
 	Weirdness float64
 	// A list of reference audio URLs for inspiration, requiring 1 to 4 publicly accessible audio addresses. This fie
 	AudioURLs []string
-	// Generate the singer Persona ID used when creating songs based on the unique style characteristics of the speci
+	// Singer style or cloned voice Persona ID for generation and cover / upload_cover. For a private voice, first up
 	PersonaID string
 	// Continue generating from the specified time point (seconds) of the existing audio. For example, 213.5 means to
 	ContinueAt float64
@@ -604,6 +604,8 @@ func (c *Suno) MashupLyrics(ctx context.Context, req SunoMashupLyricsRequest) (m
 type SunoUploadRequest struct {
 	// The CDN address (URL) for the custom audio file to be uploaded.
 	AudioURL string
+	// Optional voice Persona ID for standard uploads only. Associate the source audio with this voice before upload_
+	PersonaID string
 	// CallbackURL optionally receives the completion webhook.
 	CallbackURL string
 	// Extra fields merged into the request body.
@@ -613,6 +615,9 @@ type SunoUploadRequest struct {
 func (r SunoUploadRequest) toBody() map[string]any {
 	body := map[string]any{}
 	body["audio_url"] = r.AudioURL
+	if r.PersonaID != "" {
+		body["persona_id"] = r.PersonaID
+	}
 	if r.CallbackURL != "" {
 		body["callback_url"] = r.CallbackURL
 	}
@@ -674,4 +679,37 @@ func (c *Suno) Mp3(ctx context.Context, req SunoMp3Request) (*TaskHandle, error)
 		return nil, err
 	}
 	return newTaskHandle(taskIDFrom(result), "/suno/tasks", c.t, result), nil
+}
+
+// SunoAvailabilityRequest is the input to suno.Availability.
+type SunoAvailabilityRequest struct {
+	// Suno audio ID from a completed task, not the task ID.
+	AudioID string
+	// CallbackURL optionally receives the completion webhook.
+	CallbackURL string
+	// Extra fields merged into the request body.
+	Extra map[string]any
+}
+
+func (r SunoAvailabilityRequest) toBody() map[string]any {
+	body := map[string]any{}
+	body["audio_id"] = r.AudioID
+	if r.CallbackURL != "" {
+		body["callback_url"] = r.CallbackURL
+	}
+	for k, v := range r.Extra {
+		if _, exists := body[k]; !exists {
+			body[k] = v
+		}
+	}
+	return body
+}
+
+// Availability Check Suno audio availability.
+func (c *Suno) Availability(ctx context.Context, req SunoAvailabilityRequest) (map[string]any, error) {
+	return c.t.do(ctx, requestOpts{
+		Method: "POST",
+		Path:   "/suno/availability",
+		Body:   req.toBody(),
+	})
 }

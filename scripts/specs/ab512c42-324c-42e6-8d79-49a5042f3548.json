@@ -101,43 +101,36 @@
                   },
                   "style": {
                     "type": "string",
-                    "enum": [
-                      "auto",
-                      "cinematic",
-                      "glass",
-                      "luxury",
-                      "swiss",
-                      "modern",
-                      "editorial",
-                      "warm",
-                      "vibrant",
-                      "neon",
-                      "mono",
-                      "pastel",
-                      "bold",
-                      "industrial",
-                      "futuristic",
-                      "retro"
-                    ],
+                    "x-python-type-alias": "MaestroStyle",
                     "default": "auto",
                     "description": "Optional visual-style preset — expressed through typography, palette, motion, image treatment and pacing. Orthogonal to `scenario` (it does NOT change routing). `auto` (default) lets the director pick; every other value adopts a real named look: `cinematic` = dark film-noir (black + blood-red, Oswald); `glass` = Apple / iOS-26 frosted liquid glass; `luxury` = timeless near-black + indigo, huge whitespace; `swiss` = precise grid + electric blue + oversized numerals; `modern` = clean light SaaS; `editorial` = cream magazine + serif; `warm` = intimate cream + amber; `vibrant` = festive folk colour; `neon` = electric neon glow; `mono` = grayscale, type-led; `pastel` = soft candy pastels; `bold` = huge poster type; `industrial` = raw glitch + rust; `futuristic` = particle glow. A freeform string is also accepted as a soft hint."
                   },
                   "voice": {
                     "type": "string",
-                    "enum": [
-                      "auto",
-                      "warm-female",
-                      "bright-female",
-                      "anchor-female",
-                      "clean-female",
-                      "calm-male",
-                      "deep-male",
-                      "documentary-male",
-                      "energetic-male",
-                      "storyteller-male"
-                    ],
+                    "x-python-type-alias": "MaestroVoice",
                     "default": "auto",
-                    "description": "Optional narration voice — the **timbre** of the voiceover, independent of language. `auto` (default) lets the director pick a fitting voice. Every preset can speak the language selected in `langs`, so choose purely by character — `warm-female`, `bright-female`, `anchor-female`, `clean-female`, `calm-male`, `deep-male`, `documentary-male`, `energetic-male`, `storyteller-male`. For `drama` / `avatar` this sets the primary / narrator timbre; distinct characters may still get their own."
+                    "description": "Optional narration voice — the **timbre** of the voiceover, independent of language. `auto` (default) lets the director pick a fitting voice. Every preset can speak the language selected in `langs`, so choose purely by character — `warm-female`, `bright-female`, `anchor-female`, `clean-female`, `calm-male`, `deep-male`, `documentary-male`, `energetic-male`, `storyteller-male`. For `drama` / `avatar` this sets the primary / narrator timbre; distinct characters may still get their own. A 32-character hexadecimal voice reference_id is also accepted.",
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "auto",
+                          "warm-female",
+                          "bright-female",
+                          "anchor-female",
+                          "clean-female",
+                          "calm-male",
+                          "deep-male",
+                          "documentary-male",
+                          "energetic-male",
+                          "storyteller-male"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9a-fA-F]{32}$"
+                      }
+                    ]
                   },
                   "callback_url": {
                     "type": "string",

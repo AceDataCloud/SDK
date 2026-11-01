@@ -1,9 +1,114 @@
 import { Audio } from '../src/resources/audio';
 import { Fish } from '../src/resources/providers/fish';
 import { Suno } from '../src/resources/providers/suno';
+import { Producer, ProducerGenerateOptions } from '../src/resources/providers/producer';
+import { Maestro } from '../src/resources/providers/maestro';
+import { WebExtrator } from '../src/resources/webextrator';
 import { Transport } from '../src/runtime/transport';
 
+describe('Recent provider contracts', () => {
+  it.each<ProducerGenerateOptions>([
+    { action: 'generate', prompt: 'A jazz song' },
+    { action: 'generate', custom: true, instrumental: true },
+    { action: 'extend', audioId: 'source-audio', continueAt: 12.5, lyric: 'New verse' },
+    { action: 'cover', audioId: 'source-audio' },
+  ])('does not require lyrics and a prompt for every Producer action (%p)', async (options) => {
+    const request = jest.fn().mockResolvedValue({});
+    await new Producer({ request } as any).generate(options);
+    expect(request).toHaveBeenCalledTimes(1);
+    const body = request.mock.calls[0][2].json;
+    expect(request.mock.calls[0].slice(0, 2)).toEqual(['POST', '/producer/audios']);
+    expect(body.action).toBe(options.action);
+    if (options.prompt === undefined) expect(body).not.toHaveProperty('prompt');
+    else expect(body.prompt).toBe(options.prompt);
+    if (options.lyric === undefined) expect(body).not.toHaveProperty('lyric');
+    else expect(body.lyric).toBe(options.lyric);
+  });
+
+  it('accepts a freeform Maestro style and a reference voice', async () => {
+    const request = jest.fn().mockResolvedValue({});
+    await new Maestro({ request } as any).generate({
+      prompt: 'Launch video', style: 'watercolor storyboard', voice: '0123456789abcdef0123456789abcdef',
+    });
+    expect(request.mock.calls[0][2].json).toMatchObject({
+      style: 'watercolor storyboard', voice: '0123456789abcdef0123456789abcdef',
+    });
+  });
+
+  it.each(['extract', 'render'] as const)('maps WebExtrator %s cookie and cache options', async (operation) => {
+    const request = jest.fn().mockResolvedValue({});
+    const client = new WebExtrator({ request } as any);
+    const cookies = [{ name: 'session', value: 'test', domain: 'example.com', httpOnly: true, sameSite: 'Lax' as const }];
+    await client[operation]({ url: 'https://example.com', cookies, bypassCache: false, cacheTtlSeconds: 0, delay: 0 });
+    expect(request).toHaveBeenCalledWith('POST', `/webextrator/${operation}`, {
+      json: { url: 'https://example.com', cookies, bypass_cache: false, cache_ttl_seconds: 0, delay: 0 },
+    });
+    request.mockClear();
+    await client[operation]({ url: 'https://example.com' });
+    expect(request).toHaveBeenCalledWith('POST', `/webextrator/${operation}`, { json: { url: 'https://example.com' } });
+  });
+});
+
 describe('Audio resource', () => {
+  const availability = {
+    success: true,
+    task_id: '11111111-1111-4111-8111-111111111111',
+    trace_id: '22222222-2222-4222-8222-222222222222',
+    data: { id: '33333333-3333-4333-8333-333333333333', available: true },
+  };
+
+  it('returns Suno availability directly without polling', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(availability), { status: 200 })
+    );
+    try {
+      const suno = new Suno(new Transport({ apiToken: 'test-token', maxRetries: 0 }));
+
+      expect(await suno.availability({ audioId: availability.data.id })).toEqual(availability);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(fetchMock.mock.calls[0][0]).toBe('https://x402.acedata.cloud/suno/availability');
+      expect(JSON.parse(fetchMock.mock.calls[0][1]!.body as string)).toEqual({ audio_id: availability.data.id });
+      expect(new Headers(fetchMock.mock.calls[0][1]!.headers).get('Authorization')).toBe('Bearer test-token');
+    } finally {
+      fetchMock.mockRestore();
+    }
+  });
+
+  it.each([500, 503])('throws on inconclusive Suno availability (HTTP %s), not false', async (status) => {
+    const body = {
+      error: { code: 'availability_unknown', message: 'Availability could not be confirmed.' },
+      trace_id: 'test-trace',
+    };
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(body), { status })
+    );
+    try {
+      const suno = new Suno(new Transport({ apiToken: 'test-token', maxRetries: 0 }));
+
+      await expect(suno.availability({ audioId: availability.data.id })).rejects.toMatchObject({
+        statusCode: status, code: 'availability_unknown', traceId: 'test-trace', body,
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    } finally {
+      fetchMock.mockRestore();
+    }
+  });
+
+  it.each([undefined, 'voice-persona'])('serializes an optional Suno upload persona (%s)', async (personaId) => {
+    const request = jest.fn().mockResolvedValue({});
+    const suno = new Suno({ request } as any);
+
+    await suno.upload({ audioUrl: 'https://example.com/song.mp3', personaId });
+
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith('POST', '/suno/upload', {
+      json: {
+        audio_url: 'https://example.com/song.mp3',
+        ...(personaId === undefined ? {} : { persona_id: personaId }),
+      },
+    });
+  });
+
   it.each([undefined, '', 'no distorted guitars; '.repeat(100)])(
     'preserves Suno negativeTags without truncation (%p)', async (negativeTags) => {
       const request = jest.fn().mockResolvedValue({});

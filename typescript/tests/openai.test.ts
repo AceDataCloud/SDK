@@ -4,9 +4,9 @@ import { OpenAI } from '../src/resources/openai';
 import { NanoBanana, NanoBananaGenerateOptions } from '../src/resources/providers/nano-banana';
 import { TaskHandle } from '../src/runtime/tasks';
 
-const solFastModel: AiChatModel = 'gpt-5.6-sol-fast';
+const compatibleModels: AiChatModel[] = ['gpt-5.6-sol-fast', 'gpt-6.1-terra'];
 
-describe('GPT-5.6 Sol Fast', () => {
+describe.each(compatibleModels)('Public compatible model %s', (model) => {
   it.each(['completions', 'responses', 'messages', 'aichat'])(
     'preserves the public model ID in %s requests',
     async (operation) => {
@@ -19,23 +19,23 @@ describe('GPT-5.6 Sol Fast', () => {
       switch (operation) {
         case 'completions':
           path = '/openai/chat/completions';
-          body = { model: solFastModel, messages };
-          await openai.chat.completions.create({ model: solFastModel, messages });
+          body = { model, messages };
+          await openai.chat.completions.create({ model, messages });
           break;
         case 'responses':
           path = '/openai/responses';
-          body = { model: solFastModel, input: 'Hello' };
-          await openai.responses.create({ model: solFastModel, input: 'Hello' });
+          body = { model, input: 'Hello' };
+          await openai.responses.create({ model, input: 'Hello' });
           break;
         case 'messages':
           path = '/v1/messages';
-          body = { model: solFastModel, messages, max_tokens: 64 };
-          await new Chat(transport).messages.create({ model: solFastModel, messages, maxTokens: 64 });
+          body = { model, messages, max_tokens: 64 };
+          await new Chat(transport).messages.create({ model, messages, maxTokens: 64 });
           break;
         default:
           path = '/aichat/conversations';
-          body = { model: solFastModel, question: 'Hello' };
-          await new AiChat(transport).create({ model: solFastModel, question: 'Hello' });
+          body = { model, question: 'Hello' };
+          await new AiChat(transport).create({ model, question: 'Hello' });
       }
       expect(request).toHaveBeenCalledTimes(1);
       expect(request).toHaveBeenCalledWith('POST', path, { json: body });
@@ -50,10 +50,10 @@ describe('GPT-5.6 Sol Fast', () => {
       const openai = new OpenAI(transport);
       const messages = [{ role: 'user', content: 'Hello' }];
       const stream = operation === 'completions'
-        ? await openai.chat.completions.create({ model: solFastModel, messages, stream: true })
+        ? await openai.chat.completions.create({ model, messages, stream: true })
         : operation === 'responses'
-          ? await openai.responses.create({ model: solFastModel, input: 'Hello', stream: true })
-          : await new Chat(transport).messages.create({ model: solFastModel, messages, maxTokens: 64, stream: true });
+          ? await openai.responses.create({ model, input: 'Hello', stream: true })
+          : await new Chat(transport).messages.create({ model, messages, maxTokens: 64, stream: true });
       for await (const chunk of stream) {
         throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
       }
@@ -63,10 +63,68 @@ describe('GPT-5.6 Sol Fast', () => {
         : operation === 'messages' ? { messages, max_tokens: 64 } : { messages };
       expect(requestStream).toHaveBeenCalledTimes(1);
       expect(requestStream).toHaveBeenCalledWith('POST', path, {
-        json: { model: solFastModel, ...body, stream: true },
+        json: { model, ...body, stream: true },
       });
     }
   );
+});
+
+describe('Messages structured output', () => {
+  it.each([false, true])('preserves output_config.format with stream=%s', async (streaming) => {
+    const request = jest.fn().mockResolvedValue({});
+    const requestStream = jest.fn().mockImplementation(async function* () {});
+    const chat = new Chat({ request, requestStream } as any);
+    const body = {
+      model: 'claude-sonnet-5-5',
+      messages: [{ role: 'user', content: 'Return a JSON object.' }],
+      output_config: { format: { type: 'json_schema', schema: { type: 'object' } } },
+    };
+    if (streaming) {
+      const stream = await chat.messages.create({ ...body, stream: true });
+      for await (const chunk of stream) {
+        throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+      }
+      expect(requestStream).toHaveBeenCalledWith('POST', '/v1/messages', {
+        json: { ...body, max_tokens: 4096, stream: true },
+      });
+      expect(request).not.toHaveBeenCalled();
+    } else {
+      await chat.messages.create(body);
+      expect(request).toHaveBeenCalledWith('POST', '/v1/messages', {
+        json: { ...body, max_tokens: 4096 },
+      });
+      expect(requestStream).not.toHaveBeenCalled();
+    }
+  });
+});
+
+describe('Public Chat Completions models', () => {
+  it.each([
+    { model: 'claude-opus-5-5', n: 1, tool_choice: 'auto' },
+    { model: 'gemini-4-argon', max_tokens: 32768 },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'low' },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'high' },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'max' },
+    { model: 'kimi-k3', reasoning_effort: 'max' },
+  ])('passes through $model and its options without injecting defaults', async (options) => {
+    const request = jest.fn().mockResolvedValue({});
+    const requestStream = jest.fn().mockImplementation(async function* () {});
+    const openai = new OpenAI({ request, requestStream } as any);
+    const body = { ...options, messages: [{ role: 'user', content: 'Hello' }] };
+
+    await openai.chat.completions.create(body);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith('POST', '/openai/chat/completions', { json: body });
+
+    const stream = await openai.chat.completions.create({ ...body, stream: true });
+    for await (const chunk of stream) {
+      throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+    }
+    expect(requestStream).toHaveBeenCalledTimes(1);
+    expect(requestStream).toHaveBeenCalledWith('POST', '/openai/chat/completions', {
+      json: { ...body, stream: true },
+    });
+  });
 });
 
 describe('Nano Banana 2.1', () => {
@@ -162,6 +220,25 @@ describe('OpenAI resource', () => {
       });
     }
   );
+
+  it.each(['xhigh', 'max'])('passes through extended image quality %s', async (quality) => {
+    for (const model of [
+      'gpt-image-2.5-flare', 'gpt-image-2.5-sunburst',
+      'gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official',
+    ] as const) {
+      const request = jest.fn().mockResolvedValue({});
+      const openai = new OpenAI({ request } as any);
+      const options = { model, prompt: 'A vase', quality };
+      const editOptions = { ...options, image: 'https://example.com/vase.png' };
+
+      await openai.images.generate(options);
+      await openai.images.edit(editOptions);
+
+      expect(request).toHaveBeenCalledTimes(2);
+      expect(request).toHaveBeenNthCalledWith(1, 'POST', '/openai/images/generations', { json: options });
+      expect(request).toHaveBeenNthCalledWith(2, 'POST', '/openai/images/edits', { json: editOptions });
+    }
+  });
 
   it('keeps dynamically discovered image model IDs compatible', async () => {
     const request = jest.fn().mockResolvedValue({ data: [] });

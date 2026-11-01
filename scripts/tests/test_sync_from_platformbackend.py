@@ -116,6 +116,20 @@ class SnapshotSyncTests(unittest.TestCase):
         self.assertIn("0.7 Credits", operation["description"])
         self.assertNotIn("Fish", properties["voice"]["description"])
 
+    def test_kling_reference_video_billing_is_documented_not_a_request_field(self):
+        path = SCRIPT.parent / "specs/29187cb2-1acb-43b8-baf5-3f3f709292eb.json"
+        operation = json.loads(path.read_text())["paths"]["/kling/videos"]["post"]
+        properties = operation["requestBody"]["content"]["application/json"]["schema"][
+            "properties"
+        ]
+        description = properties["video_list"]["description"]
+        self.assertIn("separate billing tier", description)
+        self.assertIn("actual output duration rounded", description)
+        self.assertIn("feature references use the requested duration", description)
+        self.assertIn("usage.reference_video_seconds", description)
+        self.assertIn("Image references alone do not trigger", description)
+        self.assertNotIn("reference_video_seconds", properties)
+
     def test_retired_embedding_model_is_not_in_pinned_contract(self):
         path = SCRIPT.parent / "specs/a0840c8a-2b9a-4407-8aaf-0057f0e1f65c.json"
         spec = json.loads(path.read_text(encoding="utf-8"))
@@ -142,6 +156,57 @@ class SnapshotSyncTests(unittest.TestCase):
                 ]["schema"]["properties"]["model"]["enum"]
                 self.assertEqual(models.count("gpt-5.6-sol-fast"), 1)
                 self.assertIn("gpt-5.6-sol", models)
+
+    def test_suno_availability_is_synchronous_and_only_confirms_true(self):
+        path = SCRIPT.parent / "specs/fba10618-85c5-498e-904e-11db87b49954.json"
+        spec = json.loads(path.read_text())
+        operation = spec["paths"]["/suno/availability"]["post"]
+        request = operation["requestBody"]["content"]["application/json"]["schema"]
+        self.assertEqual(request["required"], ["audio_id"])
+        self.assertEqual(set(request["properties"]), {"audio_id"})
+        self.assertFalse(request["additionalProperties"])
+        self.assertEqual(request["properties"]["audio_id"]["format"], "uuid")
+        response = operation["responses"]["200"]["content"]["application/json"][
+            "schema"
+        ]
+        available = response["properties"]["data"]["properties"]["available"]
+        self.assertEqual(available["enum"], [True])
+        self.assertIn("not guarantee", available["description"])
+        self.assertIn("not interpret", operation["responses"]["503"]["description"])
+        self.assertEqual(operation["security"], [{"bearerAuth": []}])
+        manifest = json.loads((SCRIPT.parent / "services.json").read_text())
+        endpoint = next(
+            ep
+            for ep in manifest["suno"]["endpoints"]
+            if ep["path"] == "/suno/availability"
+        )
+        self.assertFalse(endpoint.get("pollable", False))
+
+    def test_suno_upload_persona_is_optional_and_standard_only(self):
+        path = SCRIPT.parent / "specs/8823cd83-54f6-4ea8-979a-7fa448577186.json"
+        operation = json.loads(path.read_text())["paths"]["/suno/upload"]["post"]
+        request = operation["requestBody"]["content"]["application/json"]["schema"]
+        self.assertEqual(request["required"], ["audio_url"])
+        persona = request["properties"]["persona_id"]
+        self.assertEqual(persona["type"], "string")
+        self.assertEqual(persona["minLength"], 1)
+        self.assertIn("standard uploads only", persona["description"])
+        self.assertIn("same channel", persona["description"])
+
+    def test_image_quality_enums_include_model_specific_extended_values(self):
+        for api_id, route in (
+            ("8f01fe72-8a3e-4872-8d8d-330cde179b3a", "/openai/images/generations"),
+            ("fb74083e-bb68-48d5-8ba6-b5a224400cd3", "/openai/images/edits"),
+        ):
+            spec = json.loads((SCRIPT.parent / "specs" / f"{api_id}.json").read_text())
+            content = spec["paths"][route]["post"]["requestBody"]["content"]
+            for media in content.values():
+                with self.subTest(route=route, media=media):
+                    quality = media["schema"]["properties"]["quality"]
+                    self.assertIn("xhigh", quality["enum"])
+                    self.assertIn("max", quality["enum"])
+                    self.assertIn("Only `gpt-image-2.5-flare`", quality["description"])
+                    self.assertIn("actual token usage", quality["description"])
 
     def test_suno_negative_tags_has_no_fixed_character_limit(self):
         path = SCRIPT.parent / "specs/09a26295-5972-4392-9318-dcd9b218f90d.json"
@@ -171,6 +236,59 @@ class SnapshotSyncTests(unittest.TestCase):
             new["properties"]["flag"],
             {"type": "boolean", "x-go-optional-pointer": True},
         )
+
+    def test_python_alias_hint_survives_snapshot_refresh(self):
+        old = {
+            "properties": {
+                "style": {"type": "string", "x-python-type-alias": "MaestroStyle"}
+            }
+        }
+        new = {"properties": {"style": {"type": "string"}}}
+        sync.preserve_client_hints(old, new)
+        self.assertEqual(
+            new["properties"]["style"]["x-python-type-alias"], "MaestroStyle"
+        )
+
+    def test_webextrator_navigation_and_cache_contract(self):
+        for api_id, route in (
+            ("4ab24fda-2140-476c-a190-91bde5f0baf4", "/webextrator/render"),
+            ("c32c05d0-5f47-4b89-8458-9776aad4a8c4", "/webextrator/extract"),
+        ):
+            with self.subTest(route=route):
+                spec = json.loads(
+                    (SCRIPT.parent / "specs" / f"{api_id}.json").read_text()
+                )
+                properties = spec["paths"][route]["post"]["requestBody"]["content"][
+                    "application/json"
+                ]["schema"]["properties"]
+                self.assertEqual(properties["wait_until"]["default"], "load")
+                for name, minimum in (
+                    ("timeout", 1),
+                    ("delay", 0),
+                    ("cache_ttl_seconds", 0),
+                ):
+                    self.assertEqual(properties[name]["type"], "integer")
+                    self.assertEqual(properties[name]["minimum"], minimum)
+                self.assertEqual(
+                    properties["cookies"]["items"]["required"],
+                    ["name", "value", "domain"],
+                )
+                self.assertEqual(properties["cache_ttl_seconds"]["default"], 3600)
+                self.assertFalse(properties["bypass_cache"]["default"])
+
+    def test_producer_top_level_only_requires_action(self):
+        spec = json.loads(
+            (
+                SCRIPT.parent / "specs/01d96900-9f8c-41d7-814c-95c7a885ba61.json"
+            ).read_text()
+        )
+        schema = spec["paths"]["/producer/audios"]["post"]["requestBody"]["content"][
+            "application/json"
+        ]["schema"]
+        self.assertEqual(schema["required"], ["action"])
+        self.assertFalse(schema["properties"]["custom"]["default"])
+        self.assertEqual(schema["oneOf"][1]["required"], ["audio_id", "continue_at"])
+        self.assertEqual(schema["oneOf"][2]["required"], ["audio_id"])
 
     def test_missing_source_does_not_partially_write_or_delete(self):
         before = (self.snapshots / f"{A}.json").read_bytes()

@@ -99,13 +99,13 @@ class Producer:
     def generate(
         self,
         *,
-        lyric: str,
         action: ProducerAction,
-        prompt: str,
         seed: str | None = None,
+        lyric: str | None = None,
         model: ProducerModel | None = None,
         title: str | None = None,
         custom: bool | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         weirdness: float | None = None,
         continue_at: float | None = None,
@@ -123,17 +123,18 @@ class Producer:
     ) -> TaskHandle:
         """Producer AI music generation API, generates 1 song per request."""
         body: dict[str, Any] = {}
-        body["lyric"] = lyric
         body["action"] = action
-        body["prompt"] = prompt
         if seed is not None:
             body["seed"] = seed
+        if lyric is not None:
+            body["lyric"] = lyric
         if model is not None:
             body["model"] = model
         if title is not None:
             body["title"] = title
-        if custom is not None:
-            body["custom"] = custom
+        body["custom"] = custom if custom is not None else False
+        if prompt is not None:
+            body["prompt"] = prompt
         if audio_id is not None:
             body["audio_id"] = audio_id
         body["weirdness"] = weirdness if weirdness is not None else False
@@ -223,13 +224,13 @@ class AsyncProducer:
     async def generate(
         self,
         *,
-        lyric: str,
         action: ProducerAction,
-        prompt: str,
         seed: str | None = None,
+        lyric: str | None = None,
         model: ProducerModel | None = None,
         title: str | None = None,
         custom: bool | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         weirdness: float | None = None,
         continue_at: float | None = None,
@@ -247,17 +248,18 @@ class AsyncProducer:
     ) -> AsyncTaskHandle:
         """Producer AI music generation API, generates 1 song per request."""
         body: dict[str, Any] = {}
-        body["lyric"] = lyric
         body["action"] = action
-        body["prompt"] = prompt
         if seed is not None:
             body["seed"] = seed
+        if lyric is not None:
+            body["lyric"] = lyric
         if model is not None:
             body["model"] = model
         if title is not None:
             body["title"] = title
-        if custom is not None:
-            body["custom"] = custom
+        body["custom"] = custom if custom is not None else False
+        if prompt is not None:
+            body["prompt"] = prompt
         if audio_id is not None:
             body["audio_id"] = audio_id
         body["weirdness"] = weirdness if weirdness is not None else False

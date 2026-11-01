@@ -41,20 +41,20 @@ export interface ProducerWavOptions {
 }
 
 export interface ProducerGenerateOptions {
-  /** Lyrics content for generating audio. */
-  lyric: string;
   /** Types of audio generation operations. Supported values include `generate` (generate based on prompts), `cover` (cover song), `extend` (continue writing), `variation` (variant), `swap_vocals` (replace vocals), `swap_instrumentals` (replace instrumentals), `replace_section` (replace section), `stems` (separate tracks). */
   action: "generate" | "cover" | "extend" | "variation" | "swap_vocals" | "swap_instrumentals" | "replace_section" | "stems";
-  /** Prompts for generating audio should not exceed 200 characters in length. */
-  prompt: string;
   /** Random seed used for audio generation. */
   seed?: string;
+  /** Lyrics content for generating audio. */
+  lyric?: string;
   /** The model used for generating music is `FUZZ-2.0` by default. */
   model?: "FUZZ-2.0 Pro" | "FUZZ-2.0" | "FUZZ-2.0 Raw" | "FUZZ-1.1 Pro" | "FUZZ-1.0 Pro" | "FUZZ-1.0" | "FUZZ-1.1" | "FUZZ-0.8";
   /** Title used for generating songs. */
   title?: string;
   /** Is it a custom mode? If `true`, the audio will be generated based on the `lyric`; otherwise, it will be generated based on the `prompt`. */
   custom?: boolean;
+  /** Prompts for generating audio should not exceed 200 characters in length. */
+  prompt?: string;
   /** The unique ID of the reference song. */
   audioId?: string;
   /** The degree of uniqueness of style can be selected between 0 and 1, with a default value of 0.5. */
@@ -136,13 +136,13 @@ export class Producer {
   /** Producer AI music generation API, generates 1 song per request. */
   async generate(options: ProducerGenerateOptions): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
-    body["lyric"] = options.lyric;
     body["action"] = options.action;
-    body["prompt"] = options.prompt;
     if (options.seed !== undefined) body["seed"] = options.seed;
+    if (options.lyric !== undefined) body["lyric"] = options.lyric;
     if (options.model !== undefined) body["model"] = options.model;
     if (options.title !== undefined) body["title"] = options.title;
-    if (options.custom !== undefined) body["custom"] = options.custom;
+    body["custom"] = options.custom ?? false;
+    if (options.prompt !== undefined) body["prompt"] = options.prompt;
     if (options.audioId !== undefined) body["audio_id"] = options.audioId;
     body["weirdness"] = options.weirdness ?? false;
     body["continue_at"] = options.continueAt ?? false;

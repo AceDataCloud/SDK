@@ -191,6 +191,11 @@
     "path": "/suno/mp3",
     "name": "Suno MP3 URL API",
     "pollable": true
+   },
+   {
+    "id": "fba10618-85c5-498e-904e-11db87b49954",
+    "path": "/suno/availability",
+    "name": "Suno Audio Availability Check API"
    }
   ],
   "tasks": "/suno/tasks"

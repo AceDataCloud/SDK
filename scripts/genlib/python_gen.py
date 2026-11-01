@@ -127,7 +127,14 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
     lines: list[str] = []
     for ep in svc.endpoints:
         for p in ep.params:
-            if p.is_control or not p.enum or p.name in mapping:
+            if p.is_control or p.name in mapping:
+                continue
+            explicit_alias = p.schema.get("x-python-type-alias")
+            if explicit_alias:
+                mapping[p.name] = explicit_alias
+                lines.append(f"{explicit_alias} = {p.py_type()}")
+                continue
+            if not p.enum:
                 continue
             inline = p.py_type()
             if len(inline) <= 40:

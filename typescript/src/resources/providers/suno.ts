@@ -39,7 +39,7 @@ export interface SunoGenerateOptions {
   weirdness?: number;
   /** A list of reference audio URLs for inspiration, requiring 1 to 4 publicly accessible audio addresses. This field is mandatory when `action` is `inspo`. */
   audioUrls?: string[];
-  /** Generate the singer Persona ID used when creating songs based on the unique style characteristics of the specified singer. */
+  /** Singer style or cloned voice Persona ID for generation and cover / upload_cover. For a private voice, first upload the source to /suno/upload with the same persona_id, then use the returned audio_id on the same channel. No vocal_gender is required. */
   personaId?: string;
   /** Continue generating from the specified time point (seconds) of the existing audio. For example, 213.5 means to continue from 3 minutes and 33.5 seconds. */
   continueAt?: number;
@@ -209,6 +209,8 @@ export interface SunoMashupLyricsOptions {
 export interface SunoUploadOptions {
   /** The CDN address (URL) for the custom audio file to be uploaded. */
   audioUrl: string;
+  /** Optional voice Persona ID for standard uploads only. Associate the source audio with this voice before upload_cover; use the returned audio_id and the same persona_id on the same channel. */
+  personaId?: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;
@@ -223,6 +225,14 @@ export interface SunoMp3Options {
   wait?: boolean;
   pollInterval?: number;
   maxWait?: number;
+  callbackUrl?: string;
+  /** Any parameter added upstream before the SDK is regenerated. */
+  [key: string]: unknown;
+}
+
+export interface SunoAvailabilityOptions {
+  /** Suno audio ID from a completed task, not the task ID. */
+  audioId: string;
   callbackUrl?: string;
   /** Any parameter added upstream before the SDK is regenerated. */
   [key: string]: unknown;
@@ -442,8 +452,9 @@ export class Suno {
   async upload(options: SunoUploadOptions): Promise<Record<string, unknown>> {
     const body: Record<string, unknown> = {};
     body["audio_url"] = options.audioUrl;
+    if (options.personaId !== undefined) body["persona_id"] = options.personaId;
     for (const [key, value] of Object.entries(options)) {
-      if (!["async", "audioUrl", "callbackUrl", "maxWait", "pollInterval", "wait"].includes(key) && value !== undefined) {
+      if (!["async", "audioUrl", "callbackUrl", "maxWait", "personaId", "pollInterval", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }
@@ -468,6 +479,19 @@ export class Suno {
       await handle.wait({ pollInterval: options.pollInterval, maxWait: options.maxWait });
     }
     return handle;
+  }
+
+  /** Check Suno audio availability. */
+  async availability(options: SunoAvailabilityOptions): Promise<Record<string, unknown>> {
+    const body: Record<string, unknown> = {};
+    body["audio_id"] = options.audioId;
+    for (const [key, value] of Object.entries(options)) {
+      if (!["async", "audioId", "callbackUrl", "maxWait", "pollInterval", "wait"].includes(key) && value !== undefined) {
+        body[key] = value;
+      }
+    }
+    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
+    return (await this.transport.request('POST', "/suno/availability", { json: body })) as Record<string, unknown>;
   }
 
 }

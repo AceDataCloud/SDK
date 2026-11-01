@@ -77,10 +77,11 @@ def run_stream(model: ChatOpenAI, prompt: str) -> None:
 
 def run_tools(model: ChatOpenAI) -> None:
     messages = [HumanMessage(content="Use add_numbers to add 2 and 3, then report the sum.")]
-    tool_reply = model.bind_tools([ADD_TOOL], tool_choice="required").invoke(messages)
-    if not tool_reply.tool_calls:
-        raise RuntimeError("The model returned no tool call.")
+    tool_reply = model.bind_tools([ADD_TOOL], tool_choice="auto").invoke(messages)
     show_usage(tool_reply)
+    if not tool_reply.tool_calls:
+        print(tool_reply.content)
+        return
     messages.append(tool_reply)
     for call in tool_reply.tool_calls:
         if call["name"] != "add_numbers":

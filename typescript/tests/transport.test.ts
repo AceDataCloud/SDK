@@ -78,6 +78,68 @@ describe('Transport API base URL', () => {
     }
   );
 
+  it.each(['completions', 'responses', 'messages'] as const)(
+    'preserves reported cache usage and cost for %s without recalculation',
+    async (operation) => {
+      const usage = {
+        ...(operation === 'completions'
+          ? { prompt_tokens: 100, completion_tokens: 5, prompt_tokens_details: { cached_tokens: 40 } }
+          : operation === 'responses'
+            ? { input_tokens: 100, output_tokens: 5, input_tokens_details: { cached_tokens: 40 } }
+            : { input_tokens: 60, output_tokens: 5, cache_read_input_tokens: 40, cache_creation_input_tokens: 10 }),
+        cost: { amount: 0.0123, currency: 'Credits', list_amount: 0.0246 },
+      };
+      const client = new AceDataCloud({ apiToken: 'test-token', maxRetries: 0 });
+      const fetchMock = jest.spyOn(global, 'fetch');
+      for (const stream of [false, true] as const) {
+        const payload = stream && operation === 'responses'
+          ? { type: 'response.completed', response: { usage } }
+          : stream && operation === 'messages'
+            ? { type: 'message_delta', usage }
+            : { usage };
+        fetchMock.mockResolvedValueOnce(new Response(
+          stream ? `data: ${JSON.stringify(payload)}\n\n` : JSON.stringify(payload),
+          { status: 200, headers: { 'content-type': stream ? 'text/event-stream' : 'application/json' } },
+        ));
+        let result;
+        if (operation === 'responses') {
+          result = stream
+            ? await client.openai.responses.create({ model: 'gpt-5.6-sol-fast', input: 'Hello', stream: true })
+            : await client.openai.responses.create({ model: 'gpt-5.6-sol-fast', input: 'Hello' });
+        } else {
+          const resource = operation === 'completions' ? client.openai.chat.completions : client.chat.messages;
+          result = stream
+            ? await resource.create({ model: 'gpt-5.6-sol-fast', messages: [], stream: true })
+            : await resource.create({ model: 'gpt-5.6-sol-fast', messages: [] });
+        }
+        if (stream) {
+          const chunks = [];
+          for await (const chunk of result as AsyncGenerator<Record<string, unknown>>) chunks.push(chunk);
+          expect(chunks).toEqual([payload]);
+        } else {
+          expect(result).toEqual(payload);
+        }
+      }
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    },
+  );
+
+  it.each(['us', 'cn', null])('preserves the IP-detected config region %s', async (region) => {
+    const config = { features: {}, region };
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(config), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    );
+    const client = new AceDataCloud({ apiToken: 'test-token', maxRetries: 0 });
+
+    expect(await client.platform.config.get()).toEqual(config);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe('https://platform.acedata.cloud/api/v1/config/');
+    expect(fetchMock.mock.calls[0][1]!.method).toBe('GET');
+  });
+
   it('preserves an explicit API base URL override', async () => {
     const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ ok: true }), {

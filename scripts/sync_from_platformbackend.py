@@ -41,6 +41,8 @@ def operations(spec: dict) -> set[tuple[str, str]]:
 def preserve_client_hints(current: object, incoming: object) -> None:
     """Keep representation hints owned by the SDK, never stale API constraints."""
     if isinstance(current, dict) and isinstance(incoming, dict):
+        if "x-python-type-alias" in current:
+            incoming["x-python-type-alias"] = current["x-python-type-alias"]
         if (
             current.get("x-go-optional-pointer") is True
             and incoming.get("type") == "boolean"
