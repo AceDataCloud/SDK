@@ -237,6 +237,59 @@ class SnapshotSyncTests(unittest.TestCase):
             {"type": "boolean", "x-go-optional-pointer": True},
         )
 
+    def test_python_alias_hint_survives_snapshot_refresh(self):
+        old = {
+            "properties": {
+                "style": {"type": "string", "x-python-type-alias": "MaestroStyle"}
+            }
+        }
+        new = {"properties": {"style": {"type": "string"}}}
+        sync.preserve_client_hints(old, new)
+        self.assertEqual(
+            new["properties"]["style"]["x-python-type-alias"], "MaestroStyle"
+        )
+
+    def test_webextrator_navigation_and_cache_contract(self):
+        for api_id, route in (
+            ("4ab24fda-2140-476c-a190-91bde5f0baf4", "/webextrator/render"),
+            ("c32c05d0-5f47-4b89-8458-9776aad4a8c4", "/webextrator/extract"),
+        ):
+            with self.subTest(route=route):
+                spec = json.loads(
+                    (SCRIPT.parent / "specs" / f"{api_id}.json").read_text()
+                )
+                properties = spec["paths"][route]["post"]["requestBody"]["content"][
+                    "application/json"
+                ]["schema"]["properties"]
+                self.assertEqual(properties["wait_until"]["default"], "load")
+                for name, minimum in (
+                    ("timeout", 1),
+                    ("delay", 0),
+                    ("cache_ttl_seconds", 0),
+                ):
+                    self.assertEqual(properties[name]["type"], "integer")
+                    self.assertEqual(properties[name]["minimum"], minimum)
+                self.assertEqual(
+                    properties["cookies"]["items"]["required"],
+                    ["name", "value", "domain"],
+                )
+                self.assertEqual(properties["cache_ttl_seconds"]["default"], 3600)
+                self.assertFalse(properties["bypass_cache"]["default"])
+
+    def test_producer_top_level_only_requires_action(self):
+        spec = json.loads(
+            (
+                SCRIPT.parent / "specs/01d96900-9f8c-41d7-814c-95c7a885ba61.json"
+            ).read_text()
+        )
+        schema = spec["paths"]["/producer/audios"]["post"]["requestBody"]["content"][
+            "application/json"
+        ]["schema"]
+        self.assertEqual(schema["required"], ["action"])
+        self.assertFalse(schema["properties"]["custom"]["default"])
+        self.assertEqual(schema["oneOf"][1]["required"], ["audio_id", "continue_at"])
+        self.assertEqual(schema["oneOf"][2]["required"], ["audio_id"])
+
     def test_missing_source_does_not_partially_write_or_delete(self):
         before = (self.snapshots / f"{A}.json").read_bytes()
         self.change(A)

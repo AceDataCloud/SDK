@@ -31,6 +31,44 @@ def async_client():
     return AsyncAceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud", max_retries=0)
 
 
+@pytest.mark.parametrize("operation", ["extract", "render"])
+@pytest.mark.parametrize("options", [{}, {"cookies": [], "bypass_cache": False, "cache_ttl_seconds": 0}])
+def test_webextrator_cache_options(client, operation, options):
+    transport = Mock()
+    transport.request.return_value = {}
+    client.webextrator._transport = transport
+    getattr(client.webextrator, operation)(url="https://example.com", **options)
+    transport.request.assert_called_once_with(
+        "POST", f"/webextrator/{operation}", json={"url": "https://example.com", **options}
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("operation", ["extract", "render"])
+async def test_async_webextrator_cookies_and_cache(async_client, operation):
+    from unittest.mock import AsyncMock
+
+    cookies = [{"name": "session", "value": "test", "domain": "example.com", "httpOnly": True, "sameSite": "Lax"}]
+    transport = Mock(request=AsyncMock(return_value={}))
+    async_client.webextrator._transport = transport
+    async with async_client:
+        await getattr(async_client.webextrator, operation)(
+            url="https://example.com", cookies=cookies, bypass_cache=True, cache_ttl_seconds=0, timeout=1, delay=0
+        )
+    transport.request.assert_awaited_once_with(
+        "POST",
+        f"/webextrator/{operation}",
+        json={
+            "url": "https://example.com",
+            "cookies": cookies,
+            "bypass_cache": True,
+            "cache_ttl_seconds": 0,
+            "timeout": 1,
+            "delay": 0,
+        },
+    )
+
+
 @respx.mock
 @pytest.mark.parametrize("persona_id", [None, "voice-persona"])
 def test_suno_upload_persona(client, persona_id):
@@ -290,11 +328,12 @@ async def test_async_x402_payment_handler_supports_streaming():
     + [("aichat", False)],
 )
 @respx.mock
-def test_sol_fast_model_passthrough(client, operation, stream):
+@pytest.mark.parametrize("model", ["gpt-5.6-sol-fast", "gpt-6.1-terra"])
+def test_compatible_model_passthrough(client, operation, stream, model):
     from acedatacloud import AiChatModel
 
-    assert "gpt-5.6-sol-fast" in get_args(AiChatModel)
-    body = {"model": "gpt-5.6-sol-fast"}
+    assert model in get_args(AiChatModel)
+    body = {"model": model}
     if operation == "responses":
         path = "/openai/responses"
         create = client.openai.responses.create
@@ -709,7 +748,11 @@ def test_chat_configuration_passthrough(operation, thinking):
     if operation != "count_tokens":
         body.update(
             metadata={"user_id": "example-user-001"},
-            output_config={"effort": "future-effort", "extension": True},
+            output_config={
+                "effort": "future-effort",
+                "extension": True,
+                "format": {"type": "json_schema", "schema": {"type": "object"}},
+            },
             temperature=0.7,
         )
     with AceDataCloud(
@@ -751,7 +794,11 @@ async def test_async_chat_configuration_passthrough(operation):
     }
     if operation != "count_tokens":
         body["metadata"] = {"user_id": "example-user-001"}
-        body["output_config"] = {"effort": "future-effort", "extension": True}
+        body["output_config"] = {
+            "effort": "future-effort",
+            "extension": True,
+            "format": {"type": "json_schema", "schema": {"type": "object"}},
+        }
     async with AsyncAceDataCloud(
         api_token="test-token",
         base_url="https://api.acedata.cloud",

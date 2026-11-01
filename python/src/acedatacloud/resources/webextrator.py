@@ -18,14 +18,17 @@ class WebExtrator:
         expected_type: Literal["product", "article", "general"] | None = None,
         enable_llm: bool | None = None,
         wait_until: Literal["load", "domcontentloaded", "networkidle", "commit"] | None = None,
-        timeout: float | None = None,
-        delay: float | None = None,
+        timeout: int | None = None,
+        delay: int | None = None,
         wait_for_selector: str | None = None,
         block_resources: list[str] | None = None,
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        cookies: list[dict[str, Any]] | None = None,
+        bypass_cache: bool | None = None,
+        cache_ttl_seconds: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -51,6 +54,12 @@ class WebExtrator:
             body["callback_url"] = callback_url
         if async_ is not None:
             body["async"] = async_
+        if cookies is not None:
+            body["cookies"] = cookies
+        if bypass_cache is not None:
+            body["bypass_cache"] = bypass_cache
+        if cache_ttl_seconds is not None:
+            body["cache_ttl_seconds"] = cache_ttl_seconds
         return self._transport.request("POST", "/webextrator/extract", json=body)
 
     def render(
@@ -58,14 +67,17 @@ class WebExtrator:
         *,
         url: str,
         wait_until: Literal["load", "domcontentloaded", "networkidle", "commit"] | None = None,
-        timeout: float | None = None,
-        delay: float | None = None,
+        timeout: int | None = None,
+        delay: int | None = None,
         wait_for_selector: str | None = None,
         block_resources: list[str] | None = None,
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        cookies: list[dict[str, Any]] | None = None,
+        bypass_cache: bool | None = None,
+        cache_ttl_seconds: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -87,6 +99,12 @@ class WebExtrator:
             body["callback_url"] = callback_url
         if async_ is not None:
             body["async"] = async_
+        if cookies is not None:
+            body["cookies"] = cookies
+        if bypass_cache is not None:
+            body["bypass_cache"] = bypass_cache
+        if cache_ttl_seconds is not None:
+            body["cache_ttl_seconds"] = cache_ttl_seconds
         return self._transport.request("POST", "/webextrator/render", json=body)
 
 
@@ -103,14 +121,17 @@ class AsyncWebExtrator:
         expected_type: Literal["product", "article", "general"] | None = None,
         enable_llm: bool | None = None,
         wait_until: Literal["load", "domcontentloaded", "networkidle", "commit"] | None = None,
-        timeout: float | None = None,
-        delay: float | None = None,
+        timeout: int | None = None,
+        delay: int | None = None,
         wait_for_selector: str | None = None,
         block_resources: list[str] | None = None,
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        cookies: list[dict[str, Any]] | None = None,
+        bypass_cache: bool | None = None,
+        cache_ttl_seconds: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -136,6 +157,12 @@ class AsyncWebExtrator:
             body["callback_url"] = callback_url
         if async_ is not None:
             body["async"] = async_
+        if cookies is not None:
+            body["cookies"] = cookies
+        if bypass_cache is not None:
+            body["bypass_cache"] = bypass_cache
+        if cache_ttl_seconds is not None:
+            body["cache_ttl_seconds"] = cache_ttl_seconds
         return await self._transport.request("POST", "/webextrator/extract", json=body)
 
     async def render(
@@ -143,14 +170,17 @@ class AsyncWebExtrator:
         *,
         url: str,
         wait_until: Literal["load", "domcontentloaded", "networkidle", "commit"] | None = None,
-        timeout: float | None = None,
-        delay: float | None = None,
+        timeout: int | None = None,
+        delay: int | None = None,
         wait_for_selector: str | None = None,
         block_resources: list[str] | None = None,
         headers: dict[str, str] | None = None,
         user_agent: str | None = None,
         callback_url: str | None = None,
         async_: bool | None = None,
+        cookies: list[dict[str, Any]] | None = None,
+        bypass_cache: bool | None = None,
+        cache_ttl_seconds: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {"url": url, **kwargs}
@@ -172,4 +202,10 @@ class AsyncWebExtrator:
             body["callback_url"] = callback_url
         if async_ is not None:
             body["async"] = async_
+        if cookies is not None:
+            body["cookies"] = cookies
+        if bypass_cache is not None:
+            body["bypass_cache"] = bypass_cache
+        if cache_ttl_seconds is not None:
+            body["cache_ttl_seconds"] = cache_ttl_seconds
         return await self._transport.request("POST", "/webextrator/render", json=body)

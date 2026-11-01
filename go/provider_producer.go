@@ -111,20 +111,20 @@ func (c *Producer) Wav(ctx context.Context, req ProducerWavRequest) (map[string]
 
 // ProducerGenerateRequest is the input to producer.Generate.
 type ProducerGenerateRequest struct {
-	// Lyrics content for generating audio.
-	Lyric string
 	// Types of audio generation operations. Supported values include `generate` (generate based on prompts), `cover`
 	Action string
-	// Prompts for generating audio should not exceed 200 characters in length.
-	Prompt string
 	// Random seed used for audio generation.
 	Seed string
+	// Lyrics content for generating audio.
+	Lyric string
 	// The model used for generating music is `FUZZ-2.0` by default.
 	Model string
 	// Title used for generating songs.
 	Title string
 	// Is it a custom mode? If `true`, the audio will be generated based on the `lyric`; otherwise, it will be genera
 	Custom bool
+	// Prompts for generating audio should not exceed 200 characters in length.
+	Prompt string
 	// The unique ID of the reference song.
 	AudioID string
 	// The degree of uniqueness of style can be selected between 0 and 1, with a default value of 0.5.
@@ -151,11 +151,12 @@ type ProducerGenerateRequest struct {
 
 func (r ProducerGenerateRequest) toBody() map[string]any {
 	body := map[string]any{}
-	body["lyric"] = r.Lyric
 	body["action"] = r.Action
-	body["prompt"] = r.Prompt
 	if r.Seed != "" {
 		body["seed"] = r.Seed
+	}
+	if r.Lyric != "" {
+		body["lyric"] = r.Lyric
 	}
 	if r.Model != "" {
 		body["model"] = r.Model
@@ -164,6 +165,9 @@ func (r ProducerGenerateRequest) toBody() map[string]any {
 		body["title"] = r.Title
 	}
 	body["custom"] = r.Custom
+	if r.Prompt != "" {
+		body["prompt"] = r.Prompt
+	}
 	if r.AudioID != "" {
 		body["audio_id"] = r.AudioID
 	}

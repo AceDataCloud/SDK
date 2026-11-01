@@ -54,6 +54,26 @@ def test_generate_serializes_single_language_contract() -> None:
     assert "quality" not in inspect.signature(client.generate).parameters
 
 
+@pytest.mark.parametrize("voice", ["warm-female", "0123456789abcdef0123456789ABCDEF"])
+def test_generate_accepts_freeform_style_and_reference_voice(voice: str) -> None:
+    transport = Transport()
+    Maestro(transport).generate(prompt="Launch video", style="watercolor storyboard", voice=voice)
+    body = transport.calls[0][2]
+    assert body["style"] == "watercolor storyboard"
+    assert body["voice"] == voice
+
+
+async def test_async_generate_preserves_style_and_reference_voice() -> None:
+    transport = AsyncMock()
+    transport.request.return_value = {}
+    await AsyncMaestro(transport).generate(
+        prompt="Launch video", style="watercolor storyboard", voice="0123456789abcdef0123456789abcdef"
+    )
+    body = transport.request.call_args.kwargs["json"]
+    assert body["style"] == "watercolor storyboard"
+    assert body["voice"] == "0123456789abcdef0123456789abcdef"
+
+
 def test_generate_defaults_to_chinese_without_quality() -> None:
     transport = Transport()
     Maestro(transport).generate(prompt="Launch video")

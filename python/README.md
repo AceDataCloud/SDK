@@ -106,6 +106,11 @@ Pass these public IDs to `client.openai.chat.completions.create(model=..., messa
 (or `await` with `AsyncAceDataCloud`); use `stream=True` for streaming. The SDK
 passes model-specific fields through without rewriting model IDs or enforcing a catalog.
 
+- `gpt-6.1-terra`: supports text/image input, streaming, function tools, and
+  structured output. Use `reasoning_effort="low"` initially; supported levels are
+  `low`, `medium`, `high`, `xhigh`, and `max`, not `none` or `minimal`. Responses uses
+  `reasoning={"effort": "low"}` instead. Inputs over 272,000 tokens use long-context
+  pricing; consult current prices and reported usage.
 - `claude-opus-5-5`: supports text and streaming Chat Completions with `n=1`.
   Omit `temperature` and `top_p` to use model defaults; do not set temperature below
   1 or a non-default top-p. Use `tool_choice="auto"`, not forced tools. For native
@@ -122,6 +127,11 @@ Check current account access and prices before calling. A model's advertised
 context size does not guarantee the platform's per-request limit.
 
 ## Native Claude Messages
+
+For structured output, pass
+`output_config={"format": {"type": "json_schema", "schema": your_schema}}` to
+`client.chat.messages.create(...)`. Read the generated JSON from Messages `content`
+text blocks; this does not change the response envelope or increase `max_tokens`.
 
 Thinking and output configuration are passed through without SDK model-specific
 enum or combination checks. The selected model determines which values it accepts.
@@ -237,6 +247,34 @@ There is no quality tier: all videos use 1080p/30fps and target durations of
 with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
+
+`style` accepts a freeform visual hint as well as named presets. `voice` accepts
+named voice presets or a 32-character hexadecimal voice `reference_id`; pass it
+unchanged. Existing `MaestroStyle` and `MaestroVoice` type aliases remain available.
+
+## Producer action-specific inputs
+
+`client.producer.generate(action="generate", prompt="A jazz song")` uses inspiration
+mode (`custom=False` by default). For custom vocals, set `custom=True` and provide
+`lyric`; for custom instrumental music, set `custom=True, instrumental=True` without
+inventing lyrics or a prompt. Extensions require `audio_id`, positive `continue_at`
+(seconds, including fractions), and `lyric` unless instrumental. Covers, variations,
+section replacement, vocal/instrument swaps, and stems require the source `audio_id`.
+`lyric` and `prompt` are no longer required for every action. Async clients accept
+the same fields; generation still returns a task handle.
+
+## WebExtrator navigation and cache
+
+`client.webextrator.extract(...)` and `.render(...)` accept `cookies`,
+`bypass_cache`, and `cache_ttl_seconds`. Each cookie requires `name`, `value`, and
+`domain`; optional fields are `path`, `expires` (Unix seconds), `httpOnly`, `secure`,
+and `sameSite` (`Strict`, `Lax`, or `None`). Keep cookie values out of logs and Git.
+
+The server defaults `wait_until` to `load`, navigation `timeout` to 30 seconds,
+and cache TTL to 3600 seconds. `timeout` must be a positive integer; `delay` and
+`cache_ttl_seconds` must be nonnegative integers. `bypass_cache=True` skips cache
+reads but can still cache the fresh result; `cache_ttl_seconds=0` disables caching
+that result. Omitted options remain omitted; async clients use the same fields.
 
 ## Kling reference-video billing
 

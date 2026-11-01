@@ -70,6 +70,39 @@ func TestFishModelCreated(t *testing.T) {
 	}
 }
 
+func TestProducerActionSpecificInputs(t *testing.T) {
+	for _, req := range []ProducerGenerateRequest{
+		{Action: "generate", Prompt: "A jazz song"},
+		{Action: "generate", Custom: true, Instrumental: true},
+		{Action: "extend", AudioID: "source-audio", ContinueAt: 12.5, Lyric: "New verse"},
+		{Action: "cover", AudioID: "source-audio"},
+	} {
+		body := req.toBody()
+		if req.Prompt == "" {
+			if _, ok := body["prompt"]; ok {
+				t.Error("omitted prompt must not be sent")
+			}
+		}
+		if req.Lyric == "" {
+			if _, ok := body["lyric"]; ok {
+				t.Error("omitted lyric must not be sent")
+			}
+		}
+		if body["action"] != req.Action {
+			t.Errorf("unexpected action: %#v", body)
+		}
+	}
+}
+
+func TestMaestroFreeformStyleAndReferenceVoice(t *testing.T) {
+	body := (MaestroGenerateRequest{
+		Prompt: "Launch video", Style: "watercolor storyboard", Voice: "0123456789abcdef0123456789abcdef",
+	}).toBody()
+	if body["style"] != "watercolor storyboard" || body["voice"] != "0123456789abcdef0123456789abcdef" {
+		t.Fatalf("style and voice must be preserved: %#v", body)
+	}
+}
+
 func TestSunoUploadPersona(t *testing.T) {
 	for _, personaID := range []string{"", "voice-persona"} {
 		t.Run("persona="+personaID, func(t *testing.T) {
@@ -281,7 +314,10 @@ func TestChatConfigurationPassthrough(t *testing.T) {
 			}
 			if operation != "count_tokens" {
 				extra["metadata"] = map[string]any{"user_id": "example-user-001"}
-				extra["output_config"] = map[string]any{"effort": "future-effort", "extension": true}
+				extra["output_config"] = map[string]any{
+					"effort": "future-effort", "extension": true,
+					"format": map[string]any{"type": "json_schema", "schema": map[string]any{"type": "object"}},
+				}
 				extra["temperature"] = 0.7
 			}
 			expected := map[string]any{

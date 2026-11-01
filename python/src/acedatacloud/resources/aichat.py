@@ -7,6 +7,7 @@ from typing import Any, Literal
 AiChatModel = Literal[
     "mimo-v2.6-pro",
     "mimo-v2.6-flash",
+    "gpt-6.1-terra",
     "gpt-5.6-sol-fast",
     "gpt-5.5",
     "gpt-5.5-pro",

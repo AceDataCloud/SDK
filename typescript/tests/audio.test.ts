@@ -1,7 +1,53 @@
 import { Audio } from '../src/resources/audio';
 import { Fish } from '../src/resources/providers/fish';
 import { Suno } from '../src/resources/providers/suno';
+import { Producer, ProducerGenerateOptions } from '../src/resources/providers/producer';
+import { Maestro } from '../src/resources/providers/maestro';
+import { WebExtrator } from '../src/resources/webextrator';
 import { Transport } from '../src/runtime/transport';
+
+describe('Recent provider contracts', () => {
+  it.each<ProducerGenerateOptions>([
+    { action: 'generate', prompt: 'A jazz song' },
+    { action: 'generate', custom: true, instrumental: true },
+    { action: 'extend', audioId: 'source-audio', continueAt: 12.5, lyric: 'New verse' },
+    { action: 'cover', audioId: 'source-audio' },
+  ])('does not require lyrics and a prompt for every Producer action (%p)', async (options) => {
+    const request = jest.fn().mockResolvedValue({});
+    await new Producer({ request } as any).generate(options);
+    expect(request).toHaveBeenCalledTimes(1);
+    const body = request.mock.calls[0][2].json;
+    expect(request.mock.calls[0].slice(0, 2)).toEqual(['POST', '/producer/audios']);
+    expect(body.action).toBe(options.action);
+    if (options.prompt === undefined) expect(body).not.toHaveProperty('prompt');
+    else expect(body.prompt).toBe(options.prompt);
+    if (options.lyric === undefined) expect(body).not.toHaveProperty('lyric');
+    else expect(body.lyric).toBe(options.lyric);
+  });
+
+  it('accepts a freeform Maestro style and a reference voice', async () => {
+    const request = jest.fn().mockResolvedValue({});
+    await new Maestro({ request } as any).generate({
+      prompt: 'Launch video', style: 'watercolor storyboard', voice: '0123456789abcdef0123456789abcdef',
+    });
+    expect(request.mock.calls[0][2].json).toMatchObject({
+      style: 'watercolor storyboard', voice: '0123456789abcdef0123456789abcdef',
+    });
+  });
+
+  it.each(['extract', 'render'] as const)('maps WebExtrator %s cookie and cache options', async (operation) => {
+    const request = jest.fn().mockResolvedValue({});
+    const client = new WebExtrator({ request } as any);
+    const cookies = [{ name: 'session', value: 'test', domain: 'example.com', httpOnly: true, sameSite: 'Lax' as const }];
+    await client[operation]({ url: 'https://example.com', cookies, bypassCache: false, cacheTtlSeconds: 0, delay: 0 });
+    expect(request).toHaveBeenCalledWith('POST', `/webextrator/${operation}`, {
+      json: { url: 'https://example.com', cookies, bypass_cache: false, cache_ttl_seconds: 0, delay: 0 },
+    });
+    request.mockClear();
+    await client[operation]({ url: 'https://example.com' });
+    expect(request).toHaveBeenCalledWith('POST', `/webextrator/${operation}`, { json: { url: 'https://example.com' } });
+  });
+});
 
 describe('Audio resource', () => {
   const availability = {

@@ -5,7 +5,23 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 
-from genlib.model import Endpoint, Param
+from genlib.model import Endpoint, Param, Service
+from genlib.python_gen import render
+
+
+def test_maestro_preserves_exported_type_aliases():
+    from acedatacloud.resources.providers.maestro import MaestroStyle, MaestroVoice
+
+    service = Service(
+        "maestro",
+        {"endpoints": [{"id": "ab512c42-324c-42e6-8d79-49a5042f3548", "path": "/maestro/videos"}]},
+        Path(__file__).resolve().parents[2] / "scripts/specs",
+    )
+    source = render(service)
+    assert "MaestroStyle = str" in source
+    assert "MaestroVoice = " in source
+    assert MaestroStyle is str
+    assert "str" in str(MaestroVoice)
 
 
 def test_default_only_reads_schema_default():

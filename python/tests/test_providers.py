@@ -170,6 +170,44 @@ async def test_async_suno_negative_tags_are_not_truncated(negative_tags):
         transport.request.assert_awaited_once_with("POST", "/suno/audios", json=expected)
 
 
+@pytest.mark.parametrize(
+    "options",
+    [
+        {"action": "generate", "prompt": "A jazz song"},
+        {"action": "generate", "custom": True, "instrumental": True},
+        {"action": "extend", "audio_id": "source-audio", "continue_at": 12.5, "lyric": "New verse"},
+        {"action": "cover", "audio_id": "source-audio"},
+    ],
+)
+def test_producer_does_not_require_lyric_and_prompt_for_every_action(client, options):
+    transport = Mock()
+    transport.request.return_value = {}
+    client.producer._transport = transport
+    client.producer.generate(**options)
+    body = transport.request.call_args.kwargs["json"]
+    for key, value in options.items():
+        assert body[key] == value
+    for key in ("lyric", "prompt"):
+        if key not in options:
+            assert key not in body
+    assert transport.request.call_args.args == ("POST", "/producer/audios")
+
+
+@pytest.mark.asyncio
+async def test_async_producer_custom_instrumental_needs_no_lyric_or_prompt():
+    from unittest.mock import AsyncMock
+
+    async with AsyncAceDataCloud(api_token="test-token") as client:
+        transport = Mock(request=AsyncMock(return_value={}))
+        client.producer._transport = transport
+        await client.producer.generate(action="generate", custom=True, instrumental=True)
+        body = transport.request.call_args.kwargs["json"]
+        assert body["custom"] is True
+        assert body["instrumental"] is True
+        assert "lyric" not in body
+        assert "prompt" not in body
+
+
 def test_required_flux_size_is_sent(client):
     transport = Mock()
     transport.request.return_value = {"task_id": "t-1"}

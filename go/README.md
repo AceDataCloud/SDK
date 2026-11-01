@@ -101,6 +101,11 @@ Pass these public IDs in `ChatCompletionRequest.Model` to
 `client.OpenAI().Chat().Completions().Create` or `CreateStream`. Put model-specific
 fields in `ChatCompletionRequest.Extra`; the SDK does not rewrite IDs or enforce a catalog.
 
+- `gpt-6.1-terra`: supports text/image input, streaming, function tools, and
+  structured output. Start with `Extra: map[string]any{"reasoning_effort": "low"}`;
+  supported levels are `low`, `medium`, `high`, `xhigh`, and `max`, not `none` or
+  `minimal`. Responses uses `Extra["reasoning"] = map[string]any{"effort": "low"}`.
+  Inputs over 272,000 tokens use long-context pricing; consult current prices and usage.
 - `claude-opus-5-5`: supports text and streaming Chat Completions with `"n": 1`.
   Leave `Temperature` and `TopP` nil to use model defaults; do not set temperature
   below 1 or a non-default top-p. Use `"tool_choice": "auto"`, not forced tools.
@@ -117,6 +122,11 @@ Check current account access and prices before calling. A model's advertised
 context size does not guarantee the platform's per-request limit.
 
 ## Native Claude Messages
+
+For structured output, set `MessagesRequest.Extra["output_config"]` to
+`map[string]any{"format": map[string]any{"type": "json_schema", "schema": yourSchema}}`.
+Read the generated JSON from Messages `content` text blocks; this does not change
+the response envelope or increase `MaxTokens`.
 
 Use `MessagesRequest.Extra` for thinking and output configuration. These fields
 are passed through without SDK model-specific enum or combination checks; the
@@ -226,6 +236,21 @@ There is no quality tier: all videos use 1080p/30fps and target durations of
 with integer billed seconds capped at the requested duration (falling back to
 that duration if it cannot be read). All scenarios, actions, and languages have
 the same rate; failed tasks and `/maestro/tasks` polling are free.
+
+`Style` accepts a freeform visual hint as well as named presets. `Voice` accepts
+named voice presets or a 32-character hexadecimal voice `reference_id`; pass it unchanged.
+
+## Producer action-specific inputs
+
+Use `client.Producer().Generate` with `ProducerGenerateRequest{Action: "generate",
+Prompt: "A jazz song"}` for inspiration mode (`Custom: false` by default). For custom
+vocals, set `Custom: true` and provide `Lyric`; for custom instrumental music, set
+`Custom: true, Instrumental: true` without inventing lyrics or a prompt.
+Extensions require `AudioID`, positive `ContinueAt` (seconds, including fractions),
+and `Lyric` unless instrumental. Covers, variations, section replacement,
+vocal/instrument swaps, and stems require the source `AudioID`. Omitted `Lyric`
+and `Prompt` fields are no longer sent for every action; generation still returns
+a task handle.
 
 ## Kling reference-video billing
 
