@@ -83,6 +83,28 @@ want "generate an image" and are happy with common parameters plus a
 - **Dual base URLs**: calling plane (`x402.acedata.cloud`) and management plane (`platform.acedata.cloud`)
 - **Pluggable payment handler**: on `402 Payment Required`, the SDK invokes an optional handler to produce the retry headers — the integration point for on-chain (x402) payments
 
+## Platform balances and usage retention
+
+Python and TypeScript expose application details through `client.platform.applications.get`.
+Use an Account Token, not a generation API key. For Proxy-type services, a paused
+balance sync or sync timeout returns the last saved `remaining_amount`; a positive
+balance does not establish current service availability. Check service status,
+`disabled`, and `expired_at`, and interpret the amount using `service.unit`, not
+as dollars. The balance endpoint, authentication, and field names are unchanged.
+See the [application details guide](https://platform.acedata.cloud/documents/platform-application-detail).
+
+Platform account usage records and billing summaries are queryable for the latest
+60 days; request and response bodies are retained separately for 30 days. Records
+30–60 days old still retain trace, status, timing, model, usage, and actual-charge
+summaries, but their details no longer return `metadata.request`
+or `metadata.response`. Body expiry does not change actual charges, usage, or
+aggregate statistics. Save bodies at call time if you need longer retention.
+The SDK has no usage-list, aggregate, or CSV-export helper; consult the existing
+[usage list](https://platform.acedata.cloud/documents/platform-usage-list),
+[aggregate](https://platform.acedata.cloud/documents/platform-usage-aggregate), and
+[export](https://platform.acedata.cloud/documents/platform-usage-export) guides for
+those account-management operations.
+
 ## Paying Per Request with X402
 
 Both SDKs expose a `paymentHandler` / `payment_handler` hook that is
