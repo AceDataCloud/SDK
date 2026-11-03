@@ -208,6 +208,25 @@ class SnapshotSyncTests(unittest.TestCase):
                     self.assertIn("Only `gpt-image-2.5-flare`", quality["description"])
                     self.assertIn("actual token usage", quality["description"])
 
+    def test_image_reverse_aliases_preserve_existing_models_and_edit_default(self):
+        for api_id, route in (
+            ("8f01fe72-8a3e-4872-8d8d-330cde179b3a", "/openai/images/generations"),
+            ("fb74083e-bb68-48d5-8ba6-b5a224400cd3", "/openai/images/edits"),
+        ):
+            spec = json.loads((SCRIPT.parent / "specs" / f"{api_id}.json").read_text())
+            content = spec["paths"][route]["post"]["requestBody"]["content"]
+            for media_type, media in content.items():
+                with self.subTest(route=route, media=media_type):
+                    model = media["schema"]["properties"]["model"]
+                    for family in ("gpt-image-2.5-flare", "gpt-image-2.5-sunburst"):
+                        for suffix in ("", ":reverse", ":official"):
+                            self.assertEqual(model["enum"].count(family + suffix), 1)
+                    self.assertIn("gpt-image-2:reverse", model["enum"])
+                    if route.endswith("edits"):
+                        self.assertEqual(model["default"], "dall-e-3")
+                    else:
+                        self.assertIn("model", media["schema"]["required"])
+
     def test_suno_negative_tags_has_no_fixed_character_limit(self):
         path = SCRIPT.parent / "specs/09a26295-5972-4392-9318-dcd9b218f90d.json"
         operation = json.loads(path.read_text())["paths"]["/suno/audios"]["post"]

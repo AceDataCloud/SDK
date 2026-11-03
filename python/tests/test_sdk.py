@@ -587,10 +587,20 @@ def test_openai_responses(client):
 
 
 @pytest.mark.parametrize(
-    "model", ["gpt-image-2.5-flare:official", "gpt-image-2.5-sunburst:official", "nano-banana-2.1"]
+    "model",
+    [
+        "gpt-image-2.5-flare:reverse",
+        "gpt-image-2.5-sunburst:reverse",
+        "gpt-image-2.5-flare:official",
+        "gpt-image-2.5-sunburst:official",
+        "nano-banana-2.1",
+    ],
 )
 @respx.mock
 def test_openai_images_support_public_models(client, model):
+    from acedatacloud.resources.openai_compat import OpenAIImageModel
+
+    assert model in get_args(OpenAIImageModel)
     generation = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
         return_value=httpx.Response(200, json={"data": []})
     )
@@ -614,6 +624,8 @@ def test_openai_images_support_public_models(client, model):
     [
         "gpt-image-2.5-flare",
         "gpt-image-2.5-sunburst",
+        "gpt-image-2.5-flare:reverse",
+        "gpt-image-2.5-sunburst:reverse",
         "gpt-image-2.5-flare:official",
         "gpt-image-2.5-sunburst:official",
     ],
@@ -632,11 +644,14 @@ def test_openai_image_quality_pass_through(client, model, quality):
 @respx.mock
 @pytest.mark.asyncio
 @pytest.mark.parametrize("quality", ["xhigh", "max"])
-async def test_async_openai_image_quality_pass_through(async_client, quality):
+@pytest.mark.parametrize(
+    "model", ["gpt-image-2.5-flare:official", "gpt-image-2.5-flare:reverse", "gpt-image-2.5-sunburst:reverse"]
+)
+async def test_async_openai_image_quality_pass_through(async_client, quality, model):
     async with async_client:
         for operation, path in [("generate", "generations"), ("edit", "edits")]:
             route = respx.post(f"https://api.acedata.cloud/openai/images/{path}").respond(200, json={})
-            options = {"model": "gpt-image-2.5-flare:official", "prompt": "A vase", "quality": quality}
+            options = {"model": model, "prompt": "A vase", "quality": quality}
             if operation == "edit":
                 options["image"] = "https://example.com/vase.png"
             await getattr(async_client.openai.images, operation)(**options)
@@ -1008,6 +1023,36 @@ def test_platform_applications_list(client):
     respx.get("https://platform.acedata.cloud/api/v1/applications/").mock(return_value=httpx.Response(200, json=mock))
     result = client.platform.applications.list()
     assert result["count"] == 1
+
+
+@respx.mock
+@pytest.mark.parametrize("allow_overdraft", [False, True])
+def test_platform_applications_preserve_overdraft_state(client, allow_overdraft):
+    application = {"allow_overdraft": allow_overdraft, "remaining_amount": -1, "used_amount": 2, "type": "Usage"}
+    respx.get("https://platform.acedata.cloud/api/v1/applications/app-1/").respond(200, json=application)
+    respx.get("https://platform.acedata.cloud/api/v1/applications/").respond(200, json={"results": [application]})
+    creation = respx.post("https://platform.acedata.cloud/api/v1/applications/").respond(201, json=application)
+
+    assert client.platform.applications.get("app-1") == application
+    assert client.platform.applications.list()["results"] == [application]
+    assert client.platform.applications.create(service_id="svc-1") == application
+    assert json.loads(creation.calls.last.request.content) == {"service_id": "svc-1"}
+
+
+@respx.mock
+@pytest.mark.asyncio
+@pytest.mark.parametrize("allow_overdraft", [False, True])
+async def test_async_platform_applications_preserve_overdraft_state(async_client, allow_overdraft):
+    application = {"allow_overdraft": allow_overdraft, "remaining_amount": -1, "used_amount": 2, "type": "Usage"}
+    respx.get("https://platform.acedata.cloud/api/v1/applications/app-1/").respond(200, json=application)
+    respx.get("https://platform.acedata.cloud/api/v1/applications/").respond(200, json={"results": [application]})
+    creation = respx.post("https://platform.acedata.cloud/api/v1/applications/").respond(201, json=application)
+
+    async with async_client:
+        assert await async_client.platform.applications.get("app-1") == application
+        assert (await async_client.platform.applications.list())["results"] == [application]
+        assert await async_client.platform.applications.create(service_id="svc-1") == application
+    assert json.loads(creation.calls.last.request.content) == {"service_id": "svc-1"}
 
 
 @respx.mock

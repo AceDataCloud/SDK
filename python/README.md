@@ -217,9 +217,18 @@ The public model ID also works with `client.openai.images.generate(...)` and
 
 `client.openai.images.generate(...)` and `.edit(...)` pass `quality` through
 unchanged. GPT Image models accept `auto`, `low`, `medium`, and `high`;
-only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst` (including `:official`
-variants) additionally accept `xhigh` and `max`. Official-channel requests
-are billed by actual token usage, not a fixed fee per image.
+only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst` (including `:reverse`
+and `:official` variants) additionally accept `xhigh` and `max`.
+
+For both methods, `gpt-image-2.5-flare:reverse` and
+`gpt-image-2.5-sunburst:reverse` are explicit aliases of their unsuffixed names.
+Pass the complete model ID unchanged; the SDK does not select a fallback.
+The server may use GPT Image 2.5 Flare during automatic recovery for reverse
+models, while preserving the requested model and per-successful-image billing.
+`gpt-image-2`, both 2.5 models, and their `:reverse` aliases have a base price
+of **0.19 Credits per successful image**; check current account pricing and
+usage records for final charges. Official-channel requests are billed by actual
+token usage, not a fixed fee per image.
 
 ## Maestro Video Production
 
