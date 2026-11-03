@@ -93,6 +93,18 @@ balance does not establish current service availability. Check service status,
 as dollars. The balance endpoint, authentication, and field names are unchanged.
 See the [application details guide](https://platform.acedata.cloud/documents/platform-application-detail).
 
+Application list, detail, and create responses expose `allow_overdraft`, a
+read-only boolean that defaults to `false` and can only be enabled by an
+administrator, not through application creation parameters. An authorized
+`Usage` application may continue calling with an insufficient or negative
+`remaining_amount`; a negative balance is unsettled usage. Recharges offset
+that balance without resetting `used_amount`. Disabled/expired applications and
+credential limits still apply. An overdraft-enabled application continues to
+charge its own balance instead of switching to the global application for
+insufficient funds. Otherwise `allow_consume_global` applies; after switching,
+the charged global application's overdraft setting determines eligibility.
+The SDK returns these fields unchanged and does not authorize overdraft locally.
+
 Platform account usage records and billing summaries are queryable for the latest
 60 days; request and response bodies are retained separately for 30 days. Records
 30–60 days old still retain trace, status, timing, model, usage, and actual-charge

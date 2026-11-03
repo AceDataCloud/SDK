@@ -124,6 +124,28 @@ describe('Transport API base URL', () => {
     },
   );
 
+  it.each([false, true])('preserves application overdraft state %s and negative balances', async (allowOverdraft) => {
+    const application = { allow_overdraft: allowOverdraft, remaining_amount: -1, used_amount: 2, type: 'Usage' };
+    const fetchMock = jest.spyOn(global, 'fetch');
+    for (const payload of [application, { results: [application] }, application]) {
+      fetchMock.mockResolvedValueOnce(new Response(JSON.stringify(payload), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }));
+    }
+    const client = new AceDataCloud({ apiToken: 'test-token', maxRetries: 0 });
+
+    expect(await client.platform.applications.get('app-1')).toEqual(application);
+    expect(await client.platform.applications.list()).toEqual({ results: [application] });
+    expect(await client.platform.applications.create({ serviceId: 'svc-1' })).toEqual(application);
+    expect(fetchMock.mock.calls.map(([url, opts]) => [url, opts!.method])).toEqual([
+      ['https://platform.acedata.cloud/api/v1/applications/app-1/', 'GET'],
+      ['https://platform.acedata.cloud/api/v1/applications/', 'GET'],
+      ['https://platform.acedata.cloud/api/v1/applications/', 'POST'],
+    ]);
+    expect(JSON.parse(fetchMock.mock.calls[2][1]!.body as string)).toEqual({ service_id: 'svc-1' });
+  });
+
   it.each(['us', 'cn', null])('preserves the IP-detected config region %s', async (region) => {
     const config = { features: {}, region };
     const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(

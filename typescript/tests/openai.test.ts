@@ -203,7 +203,10 @@ describe('OpenAI resource', () => {
     }
   );
 
-  it.each(['gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official', 'nano-banana-2.1'] as const)(
+  it.each([
+    'gpt-image-2.5-flare:reverse', 'gpt-image-2.5-sunburst:reverse',
+    'gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official', 'nano-banana-2.1',
+  ] as const)(
     'sends %s to both image endpoints',
     async (model) => {
       const request = jest.fn().mockResolvedValue({ data: [] });
@@ -224,6 +227,7 @@ describe('OpenAI resource', () => {
   it.each(['xhigh', 'max'])('passes through extended image quality %s', async (quality) => {
     for (const model of [
       'gpt-image-2.5-flare', 'gpt-image-2.5-sunburst',
+      'gpt-image-2.5-flare:reverse', 'gpt-image-2.5-sunburst:reverse',
       'gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official',
     ] as const) {
       const request = jest.fn().mockResolvedValue({});
