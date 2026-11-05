@@ -590,9 +590,13 @@ def test_openai_responses(client):
     "model",
     [
         "gpt-image-2.5-flare:reverse",
+        "gpt-image-2.6-flare:reverse",
         "gpt-image-2.5-sunburst:reverse",
+        "gpt-image-2.6-sunburst:reverse",
         "gpt-image-2.5-flare:official",
+        "gpt-image-2.6-flare:official",
         "gpt-image-2.5-sunburst:official",
+        "gpt-image-2.6-sunburst:official",
         "nano-banana-2.1",
     ],
 )
@@ -623,11 +627,17 @@ def test_openai_images_support_public_models(client, model):
     "model",
     [
         "gpt-image-2.5-flare",
+        "gpt-image-2.6-flare",
         "gpt-image-2.5-sunburst",
+        "gpt-image-2.6-sunburst",
         "gpt-image-2.5-flare:reverse",
+        "gpt-image-2.6-flare:reverse",
         "gpt-image-2.5-sunburst:reverse",
+        "gpt-image-2.6-sunburst:reverse",
         "gpt-image-2.5-flare:official",
+        "gpt-image-2.6-flare:official",
         "gpt-image-2.5-sunburst:official",
+        "gpt-image-2.6-sunburst:official",
     ],
 )
 def test_openai_image_quality_pass_through(client, model, quality):
@@ -645,7 +655,15 @@ def test_openai_image_quality_pass_through(client, model, quality):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("quality", ["xhigh", "max"])
 @pytest.mark.parametrize(
-    "model", ["gpt-image-2.5-flare:official", "gpt-image-2.5-flare:reverse", "gpt-image-2.5-sunburst:reverse"]
+    "model",
+    [
+        "gpt-image-2.5-flare:official",
+        "gpt-image-2.5-flare:reverse",
+        "gpt-image-2.5-sunburst:reverse",
+        "gpt-image-2.6-flare:official",
+        "gpt-image-2.6-flare:reverse",
+        "gpt-image-2.6-sunburst:reverse",
+    ],
 )
 async def test_async_openai_image_quality_pass_through(async_client, quality, model):
     async with async_client:
