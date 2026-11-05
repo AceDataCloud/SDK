@@ -563,8 +563,11 @@ func TestPublicChatModelsPassthrough(t *testing.T) {
 func TestOpenAIImageQualityPassthrough(t *testing.T) {
 	for _, model := range []OpenAIImageModel{
 		OpenAIImageModelGPTImage25Flare, OpenAIImageModelGPTImage25Sunburst,
+		OpenAIImageModelGPTImage26Flare, OpenAIImageModelGPTImage26Sunburst,
 		OpenAIImageModelGPTImage25FlareReverse, OpenAIImageModelGPTImage25SunburstReverse,
+		OpenAIImageModelGPTImage26FlareReverse, OpenAIImageModelGPTImage26SunburstReverse,
 		OpenAIImageModelGPTImage25FlareOfficial, OpenAIImageModelGPTImage25SunburstOfficial,
+		OpenAIImageModelGPTImage26FlareOfficial, OpenAIImageModelGPTImage26SunburstOfficial,
 	} {
 		for _, quality := range []string{"xhigh", "max"} {
 			for _, operation := range []string{"generations", "edits"} {
