@@ -489,3 +489,5 @@ the target chain.
 ## License
 
 MIT
+
+Image generation and edits also accept `gpt-image-2.6-flare` and `gpt-image-2.6-sunburst`, including `:reverse` and `:official` variants. Use the same raster parameters and quality options as GPT Image 2.5. Plain/reverse models bill 0.19 Credits per image; official models use actual token usage at the 2.5 rates.
