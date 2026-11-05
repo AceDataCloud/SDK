@@ -205,7 +205,9 @@ class SnapshotSyncTests(unittest.TestCase):
                     quality = media["schema"]["properties"]["quality"]
                     self.assertIn("xhigh", quality["enum"])
                     self.assertIn("max", quality["enum"])
-                    self.assertIn("GPT Image 2.5 and 2.6 Flare/Sunburst", quality["description"])
+                    self.assertIn(
+                        "GPT Image 2.5 and 2.6 Flare/Sunburst", quality["description"]
+                    )
                     self.assertIn("actual token usage", quality["description"])
 
     def test_image_reverse_aliases_preserve_existing_models_and_edit_default(self):
@@ -218,7 +220,12 @@ class SnapshotSyncTests(unittest.TestCase):
             for media_type, media in content.items():
                 with self.subTest(route=route, media=media_type):
                     model = media["schema"]["properties"]["model"]
-                    for family in ("gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-2.6-flare", "gpt-image-2.6-sunburst"):
+                    for family in (
+                        "gpt-image-2.5-flare",
+                        "gpt-image-2.5-sunburst",
+                        "gpt-image-2.6-flare",
+                        "gpt-image-2.6-sunburst",
+                    ):
                         for suffix in ("", ":reverse", ":official"):
                             self.assertEqual(model["enum"].count(family + suffix), 1)
                     self.assertIn("gpt-image-2:reverse", model["enum"])
