@@ -202,22 +202,33 @@ The public model ID also works with `client.openai.images.generate(...)` and
 `client.openai.images.edit(...)`; those use the OpenAI-compatible fields
 (`image` for editing) and return response objects, not task handles.
 
-### GPT Image 2.5 quality
+### GPT Image 2.5 / 2.6 quality
 
 `client.openai.images.generate(...)` and `.edit(...)` pass `quality` through
 unchanged. GPT Image models accept `auto`, `low`, `medium`, and `high`;
-only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst` (including `:reverse`
-and `:official` variants) additionally accept `xhigh` and `max`.
+2.5 and 2.6 Flare/Sunburst models (including `:reverse` and `:official`
+variants) additionally accept `xhigh` and `max`.
 
-For both methods, `gpt-image-2.5-flare:reverse` and
-`gpt-image-2.5-sunburst:reverse` are explicit aliases of their unsuffixed names.
-Pass the complete model ID unchanged; the SDK does not select a fallback.
-The server may use GPT Image 2.5 Flare during automatic recovery for reverse
-models, while preserving the requested model and per-successful-image billing.
+For both methods, `:reverse` is an explicit alias of the corresponding
+unsuffixed Flare/Sunburst model. Pass the complete model ID unchanged, such as
+`gpt-image-2.6-flare` or `gpt-image-2.6-sunburst:reverse`; do not use the
+incomplete `gpt-image-2.6`. The SDK does not select a fallback.
+The server may use GPT Image 2.5 Flare during automatic recovery for 2.0 / 2.5
+reverse models, while preserving the requested model and per-successful-image
+billing; 2.6 does not configure cross-model substitution.
 `gpt-image-2`, both 2.5 models, and their `:reverse` aliases have a base price
-of **0.19 Credits per successful image**; check current account pricing and
-usage records for final charges. Official-channel requests are billed by actual
-token usage, not a fixed fee per image.
+of **0.19 Credits per successful image**. The 2.6 Flare/Sunburst models and their
+`:reverse` aliases have a base price of **0.22 Credits per successful image**.
+Official-channel requests are billed by actual token usage, not a fixed fee per
+image; 2.6 uses the same official rates as 2.5. Check current account pricing and
+usage records for final charges.
+
+Both 2.6 models use the existing raster parameters: `outputFormat` is `png`,
+`jpeg`, or `webp` (not SVG/GIF), and `size` is `auto` or `WIDTHxHEIGHT`.
+Explicit dimensions must be multiples of 16, with a longest side of at most
+3840, 655,360–8,294,400 total pixels, and an aspect ratio of at most 3:1.
+Editing uses image URLs through the SDK's JSON interface; Backend multipart
+file upload support is not exposed by these helpers.
 
 ## Maestro Video Production
 
@@ -477,5 +488,3 @@ the target chain.
 ## License
 
 MIT
-
-Image generation and edits also accept `gpt-image-2.6-flare` and `gpt-image-2.6-sunburst`, including `:reverse` and `:official` variants. Use the same raster parameters and quality options as GPT Image 2.5. Plain/reverse models bill 0.22 Credits per image; official models use actual token usage at the 2.5 rates.
