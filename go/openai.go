@@ -114,6 +114,8 @@ func (o *OpenAIResource) Images() *OpenAIImages { return &OpenAIImages{t: o.t} }
 
 // OpenAIImageRequest is the JSON input for OpenAI-compatible image endpoints.
 type OpenAIImageRequest struct {
+	Complexity      string           `json:"complexity,omitempty"`
+	Markup          any              `json:"markup,omitempty"`
 	OutputFormat    string           `json:"output_format,omitempty"`
 	FrameCount      int              `json:"frame_count,omitempty"`
 	FrameDurationMS int              `json:"frame_duration_ms,omitempty"`
@@ -125,6 +127,12 @@ type OpenAIImageRequest struct {
 
 func (r OpenAIImageRequest) toBody() map[string]any {
 	body := map[string]any{"model": r.Model, "prompt": r.Prompt}
+	if r.Complexity != "" {
+		body["complexity"] = r.Complexity
+	}
+	if r.Markup != nil {
+		body["markup"] = r.Markup
+	}
 	if r.OutputFormat != "" {
 		body["output_format"] = r.OutputFormat
 	}
