@@ -128,6 +128,7 @@ class Images {
     partialImages?: number;
     size?: string;
     quality?: string;
+    complexity?: 'low' | 'medium' | 'high';
     responseFormat?: string;
     style?: string;
     callbackUrl?: string;
@@ -154,12 +155,14 @@ class Images {
     background?: string;
     inputFidelity?: string;
     mask?: string;
+    markup?: string | { image_url: string };
     outputFormat?: string;
     frameCount?: number;
     frameDurationMs?: number;
     outputCompression?: number;
     partialImages?: number;
     quality?: string;
+    complexity?: 'low' | 'medium' | 'high';
     size?: string;
     responseFormat?: string;
     callbackUrl?: string;

@@ -157,6 +157,7 @@ class _Images:
         partial_images: int | None = None,
         size: str | None = None,
         quality: str | None = None,
+        complexity: str | None = None,
         response_format: str | None = None,
         style: str | None = None,
         callback_url: str | None = None,
@@ -182,6 +183,8 @@ class _Images:
             body["partial_images"] = partial_images
         if size is not None:
             body["size"] = size
+        if complexity is not None:
+            body["complexity"] = complexity
         if quality is not None:
             body["quality"] = quality
         if response_format is not None:
@@ -204,12 +207,14 @@ class _Images:
         background: str | None = None,
         input_fidelity: str | None = None,
         mask: str | None = None,
+        markup: str | dict[str, str] | None = None,
         output_format: str | None = None,
         frame_count: int | None = None,
         frame_duration_ms: int | None = None,
         output_compression: int | None = None,
         partial_images: int | None = None,
         quality: str | None = None,
+        complexity: str | None = None,
         size: str | None = None,
         response_format: str | None = None,
         callback_url: str | None = None,
@@ -225,6 +230,8 @@ class _Images:
             body["background"] = background
         if input_fidelity is not None:
             body["input_fidelity"] = input_fidelity
+        if markup is not None:
+            body["markup"] = markup
         if mask is not None:
             body["mask"] = mask
         if output_format is not None:
@@ -237,6 +244,8 @@ class _Images:
             body["output_compression"] = output_compression
         if partial_images is not None:
             body["partial_images"] = partial_images
+        if complexity is not None:
+            body["complexity"] = complexity
         if quality is not None:
             body["quality"] = quality
         if size is not None:
@@ -269,6 +278,7 @@ class _AsyncImages:
         partial_images: int | None = None,
         size: str | None = None,
         quality: str | None = None,
+        complexity: str | None = None,
         response_format: str | None = None,
         style: str | None = None,
         callback_url: str | None = None,
@@ -294,6 +304,8 @@ class _AsyncImages:
             body["partial_images"] = partial_images
         if size is not None:
             body["size"] = size
+        if complexity is not None:
+            body["complexity"] = complexity
         if quality is not None:
             body["quality"] = quality
         if response_format is not None:
@@ -316,12 +328,14 @@ class _AsyncImages:
         background: str | None = None,
         input_fidelity: str | None = None,
         mask: str | None = None,
+        markup: str | dict[str, str] | None = None,
         output_format: str | None = None,
         frame_count: int | None = None,
         frame_duration_ms: int | None = None,
         output_compression: int | None = None,
         partial_images: int | None = None,
         quality: str | None = None,
+        complexity: str | None = None,
         size: str | None = None,
         response_format: str | None = None,
         callback_url: str | None = None,
@@ -337,6 +351,8 @@ class _AsyncImages:
             body["background"] = background
         if input_fidelity is not None:
             body["input_fidelity"] = input_fidelity
+        if markup is not None:
+            body["markup"] = markup
         if mask is not None:
             body["mask"] = mask
         if output_format is not None:
@@ -349,6 +365,8 @@ class _AsyncImages:
             body["output_compression"] = output_compression
         if partial_images is not None:
             body["partial_images"] = partial_images
+        if complexity is not None:
+            body["complexity"] = complexity
         if quality is not None:
             body["quality"] = quality
         if size is not None:

@@ -275,3 +275,12 @@ describe('OpenAI native GIF options', () => {
     expect(request.mock.calls[0][2].json).not.toHaveProperty('frameDurationMs');
   });
 });
+
+
+it('preserves image complexity and annotation references in typed requests', async () => {
+  const request = jest.fn().mockResolvedValue({ task_id: 'same-id' });
+  const openai = new OpenAI({ request } as any);
+  const options = { model: 'gpt-image-2.6-flare', prompt: 'edit', image: 'https://example.test/base.png', complexity: 'low' as const, markup: { image_url: 'https://example.test/markup.png' } };
+  await openai.images.edit(options);
+  expect(request).toHaveBeenCalledWith('POST', '/openai/images/edits', { json: options });
+});

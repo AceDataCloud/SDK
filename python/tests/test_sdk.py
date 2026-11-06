@@ -1274,3 +1274,25 @@ async def test_async_openai_gif_parameters(async_client, operation):
     finally:
         await async_client.close()
     assert json.loads(route.calls.last.request.content) == args
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+@respx.mock
+@pytest.mark.asyncio
+async def test_openai_markup_and_complexity_payload(client, async_client, async_mode):
+    route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+        return_value=httpx.Response(200, json={"task_id": "same-id"})
+    )
+    args = {
+        "image": "https://example.test/base.png",
+        "prompt": "edit",
+        "model": "gpt-image-2.6-flare",
+        "complexity": "low",
+        "markup": {"image_url": "https://example.test/markup.png"},
+    }
+    if async_mode:
+        await async_client.openai.images.edit(**args)
+        await async_client.close()
+    else:
+        client.openai.images.edit(**args)
+    assert json.loads(route.calls.last.request.content) == args

@@ -213,6 +213,8 @@ embed or maintain a second copy of the Zapier application.
 
 ### GPT Image 2.6 native GIF
 
-GIF generation and editing are available for `gpt-image-2.6-flare`, its `:reverse`/`:official` variants, and `gpt-image-2.6-sunburst:official`. Ordinary/reverse Sunburst GIF is not available. Use `output_format="gif"` in Python, `outputFormat: "gif"` in TypeScript, or `OutputFormat: "gif"` in Go. Frame controls are `frame_count`/`frame_duration_ms` (Python), `frameCount`/`frameDurationMs` (TypeScript), and `FrameCount`/`FrameDurationMS` (Go).
+GIF generation and editing are available for `gpt-image-2.6-flare`, its `:reverse`/`:official` variants, and all `gpt-image-2.6-sunburst` variants.  Use `output_format="gif"` in Python, `outputFormat: "gif"` in TypeScript, or `OutputFormat: "gif"` in Go. Frame controls are `frame_count`/`frame_duration_ms` (Python), `frameCount`/`frameDurationMs` (TypeScript), and `FrameCount`/`FrameDurationMS` (Go).
 
 GIF defaults to a 512x512 preview, 9 frames and 200 ms per frame; actual dimensions may be adjusted by the model. The static 4K presets (`3840x2160`, `2160x3840`) remain supported for PNG/JPEG/WebP generation and editing on all 2.6 variants. GIF has separate size/frame constraints.
+
+GPT Image 2.6 supports `complexity="low"|"medium"|"high"` (omitted: model default high). Static edits accept `markup`: a PNG with transparent pixels, matching the first reference after orientation, up to 16,777,216 pixels per image and 40MB for the annotation. JSON accepts an HTTPS URL, PNG data URL or an object containing only `image_url`; multipart accepts an annotation file. Do not combine markup with mask, GIF or prompt_rewriter. GIF frame count is 2–16; frame duration is 20–655350ms, rounded to 10ms. GIF rejects masks, custom compression and partial streaming. Pricing is unchanged.

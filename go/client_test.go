@@ -1329,3 +1329,27 @@ func TestOpenAIGifParameters(t *testing.T) {
 		})
 	}
 }
+
+func TestOpenAIImageMarkupAndComplexity(t *testing.T) {
+	req := OpenAIImageRequest{Model: OpenAIImageModelGPTImage26Flare, Prompt: "edit", Image: "https://example.test/base.png", Complexity: "low", Markup: map[string]string{"image_url": "https://example.test/markup.png"}}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Error(err)
+		}
+		markup, ok := body["markup"].(map[string]any)
+		if body["complexity"] != "low" || !ok || markup["image_url"] != "https://example.test/markup.png" {
+			t.Errorf("missing advanced image options: %#v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"task_id":"same-id"}`))
+	}))
+	defer srv.Close()
+	client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := client.OpenAI().Images().Edit(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+}
