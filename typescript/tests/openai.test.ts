@@ -261,3 +261,17 @@ describe('OpenAI resource', () => {
     });
   });
 });
+
+
+describe('OpenAI native GIF options', () => {
+  it.each(['generate', 'edit'] as const)('maps frame controls to API field names for %s', async operation => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'gif-task' });
+    const openai = new OpenAI({ request } as any);
+    const options = { model: 'gpt-image-2.6-flare', prompt: 'animate', outputFormat: 'gif', frameCount: 9, frameDurationMs: 200 };
+    if (operation === 'edit') await openai.images.edit({ ...options, image: 'https://example.com/reference.png' });
+    else await openai.images.generate(options);
+    expect(request).toHaveBeenCalledWith('POST', '/openai/images/' + (operation === 'edit' ? 'edits' : 'generations'), { json: { model: options.model, prompt: 'animate', output_format: 'gif', frame_count: 9, frame_duration_ms: 200, ...(operation === 'edit' ? { image: 'https://example.com/reference.png' } : {}) } });
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('frameCount');
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('frameDurationMs');
+  });
+});

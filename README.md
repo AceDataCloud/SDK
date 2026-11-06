@@ -210,3 +210,9 @@ embed or maintain a second copy of the Zapier application.
 ## MiMo
 
 `mimo-v2.6-pro` and `mimo-v2.6-flash` are model identifiers for the existing OpenAI-compatible `client.openai.chat.completions.create` interface in Python/TypeScript (and the corresponding Go client), including streaming. Check the live console catalog, service status and account access before using it. Use `max_completion_tokens`, preserve captured assistant `reasoning_content` during tool continuations, and use only function tools with `tool_choice=auto`. This does not enable MiMo on Responses or Messages.
+
+### GPT Image 2.6 native GIF
+
+GIF generation and editing are available for `gpt-image-2.6-flare`, its `:reverse`/`:official` variants, and `gpt-image-2.6-sunburst:official`. Ordinary/reverse Sunburst GIF is not available. Use `output_format="gif"` in Python, `outputFormat: "gif"` in TypeScript, or `OutputFormat: "gif"` in Go. Frame controls are `frame_count`/`frame_duration_ms` (Python), `frameCount`/`frameDurationMs` (TypeScript), and `FrameCount`/`FrameDurationMS` (Go).
+
+GIF defaults to a 512x512 preview, 9 frames and 200 ms per frame; actual dimensions may be adjusted by the model. The static 4K presets (`3840x2160`, `2160x3840`) remain supported for PNG/JPEG/WebP generation and editing on all 2.6 variants. GIF has separate size/frame constraints.

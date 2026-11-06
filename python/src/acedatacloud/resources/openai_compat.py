@@ -152,6 +152,8 @@ class _Images:
         n: int | None = None,
         output_compression: int | None = None,
         output_format: str | None = None,
+        frame_count: int | None = None,
+        frame_duration_ms: int | None = None,
         partial_images: int | None = None,
         size: str | None = None,
         quality: str | None = None,
@@ -172,6 +174,10 @@ class _Images:
             body["output_compression"] = output_compression
         if output_format is not None:
             body["output_format"] = output_format
+        if frame_count is not None:
+            body["frame_count"] = frame_count
+        if frame_duration_ms is not None:
+            body["frame_duration_ms"] = frame_duration_ms
         if partial_images is not None:
             body["partial_images"] = partial_images
         if size is not None:
@@ -199,6 +205,8 @@ class _Images:
         input_fidelity: str | None = None,
         mask: str | None = None,
         output_format: str | None = None,
+        frame_count: int | None = None,
+        frame_duration_ms: int | None = None,
         output_compression: int | None = None,
         partial_images: int | None = None,
         quality: str | None = None,
@@ -221,6 +229,10 @@ class _Images:
             body["mask"] = mask
         if output_format is not None:
             body["output_format"] = output_format
+        if frame_count is not None:
+            body["frame_count"] = frame_count
+        if frame_duration_ms is not None:
+            body["frame_duration_ms"] = frame_duration_ms
         if output_compression is not None:
             body["output_compression"] = output_compression
         if partial_images is not None:
@@ -252,6 +264,8 @@ class _AsyncImages:
         n: int | None = None,
         output_compression: int | None = None,
         output_format: str | None = None,
+        frame_count: int | None = None,
+        frame_duration_ms: int | None = None,
         partial_images: int | None = None,
         size: str | None = None,
         quality: str | None = None,
@@ -272,6 +286,10 @@ class _AsyncImages:
             body["output_compression"] = output_compression
         if output_format is not None:
             body["output_format"] = output_format
+        if frame_count is not None:
+            body["frame_count"] = frame_count
+        if frame_duration_ms is not None:
+            body["frame_duration_ms"] = frame_duration_ms
         if partial_images is not None:
             body["partial_images"] = partial_images
         if size is not None:
@@ -299,6 +317,8 @@ class _AsyncImages:
         input_fidelity: str | None = None,
         mask: str | None = None,
         output_format: str | None = None,
+        frame_count: int | None = None,
+        frame_duration_ms: int | None = None,
         output_compression: int | None = None,
         partial_images: int | None = None,
         quality: str | None = None,
@@ -321,6 +341,10 @@ class _AsyncImages:
             body["mask"] = mask
         if output_format is not None:
             body["output_format"] = output_format
+        if frame_count is not None:
+            body["frame_count"] = frame_count
+        if frame_duration_ms is not None:
+            body["frame_duration_ms"] = frame_duration_ms
         if output_compression is not None:
             body["output_compression"] = output_compression
         if partial_images is not None:
