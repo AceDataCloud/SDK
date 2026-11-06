@@ -1289,3 +1289,43 @@ func TestTransientErrorKeepsWaiting(t *testing.T) {
 		t.Errorf("taskStatus = %q, want empty (still running)", got)
 	}
 }
+
+func TestOpenAIGifParameters(t *testing.T) {
+	for _, operation := range []string{"generations", "edits"} {
+		t.Run(operation, func(t *testing.T) {
+			req := OpenAIImageRequest{Model: OpenAIImageModelGPTImage26Flare, Prompt: "animate", OutputFormat: "gif", FrameCount: 9, FrameDurationMS: 200}
+			if operation == "edits" {
+				req.Image = "https://example.com/reference.png"
+			}
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Error(err)
+				}
+				if r.URL.Path != "/openai/images/"+operation || body["output_format"] != "gif" || body["frame_count"] != float64(9) || body["frame_duration_ms"] != float64(200) {
+					t.Errorf("unexpected GIF request: %#v", body)
+				}
+				if operation == "edits" && body["image"] != req.Image {
+					t.Errorf("missing reference image: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"task_id":"gif-task"}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if operation == "edits" {
+				_, err = client.OpenAI().Images().Edit(context.Background(), req)
+			} else {
+				_, err = client.OpenAI().Images().Generate(context.Background(), req)
+			}
+			if err != nil || calls != 1 {
+				t.Fatalf("calls=%d err=%v", calls, err)
+			}
+		})
+	}
+}

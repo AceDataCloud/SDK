@@ -1230,3 +1230,47 @@ def test_no_token_error(monkeypatch):
     monkeypatch.delenv("ACEDATACLOUD_API_TOKEN", raising=False)
     with pytest.raises(AuthenticationError, match="api_token is required"):
         AceDataCloud()
+
+
+@pytest.mark.parametrize("operation", ["generate", "edit"])
+@respx.mock
+def test_openai_gif_parameters(client, operation):
+    path = "generations" if operation == "generate" else "edits"
+    route = respx.post(f"https://api.acedata.cloud/openai/images/{path}").mock(
+        return_value=httpx.Response(200, json={"task_id": "gif-task"})
+    )
+    args = {
+        "model": "gpt-image-2.6-flare",
+        "prompt": "animate",
+        "output_format": "gif",
+        "frame_count": 9,
+        "frame_duration_ms": 200,
+    }
+    if operation == "edit":
+        args["image"] = "https://example.com/reference.png"
+    getattr(client.openai.images, operation)(**args)
+    assert json.loads(route.calls.last.request.content) == args
+
+
+@pytest.mark.parametrize("operation", ["generate", "edit"])
+@respx.mock
+@pytest.mark.asyncio
+async def test_async_openai_gif_parameters(async_client, operation):
+    path = "generations" if operation == "generate" else "edits"
+    route = respx.post(f"https://api.acedata.cloud/openai/images/{path}").mock(
+        return_value=httpx.Response(200, json={"task_id": "gif-task"})
+    )
+    args = {
+        "model": "gpt-image-2.6-sunburst:official",
+        "prompt": "animate",
+        "output_format": "gif",
+        "frame_count": 9,
+        "frame_duration_ms": 200,
+    }
+    if operation == "edit":
+        args["image"] = "https://example.com/reference.png"
+    try:
+        await getattr(async_client.openai.images, operation)(**args)
+    finally:
+        await async_client.close()
+    assert json.loads(route.calls.last.request.content) == args
