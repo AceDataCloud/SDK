@@ -304,6 +304,13 @@ not trigger reference-video billing. Do not combine `videoList` with
 
 ## Suno music processing
 
+`await client.suno.persona({ name, audioId })` creates a singer style with
+`POST /suno/persona`; creation still follows the endpoint's pricing rules.
+Listing with `GET /suno/persona` and deleting with `DELETE /suno/persona` are
+free and require no extra billing-bypass header. Normal API authentication
+still applies. The SDK currently provides only the creation helper; listing
+and deletion require direct HTTP requests, not calls to `.persona(...)`.
+
 For a private voice created by `client.suno.voices(...)`, upload the original
 song with `await client.suno.upload({ audioUrl: sourceUrl, personaId })`.
 This field is supported only for standard uploads (the default), not
