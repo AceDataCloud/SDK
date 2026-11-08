@@ -294,6 +294,14 @@ not trigger reference-video billing. Do not combine `VideoList` with
 
 ## Suno music processing
 
+`client.Suno().Persona(ctx, acedatacloud.SunoPersonaRequest{Name: name, AudioID: audioID})`
+creates a singer style with `POST /suno/persona`; creation still follows the
+endpoint's pricing rules. Listing with `GET /suno/persona` and deleting with
+`DELETE /suno/persona` are free and require no extra billing-bypass header.
+Normal API authentication still applies. The SDK currently provides only the
+creation helper; listing and deletion require direct HTTP requests, not calls
+to `.Persona(...)`.
+
 For a private voice created by `client.Suno().Voices`, upload the original
 song with `client.Suno().Upload(ctx, acedatacloud.SunoUploadRequest{
 AudioURL: sourceURL, PersonaID: personaID})`. This field is supported only for
