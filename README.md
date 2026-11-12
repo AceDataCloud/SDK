@@ -117,6 +117,28 @@ The SDK has no usage-list, aggregate, or CSV-export helper; consult the existing
 [export](https://platform.acedata.cloud/documents/platform-usage-export) guides for
 those account-management operations.
 
+## Trial-account concurrency
+
+Accounts that have neither completed a paid recharge nor received an administrator's
+manual credit addition may run only one billable request at a time across all API
+keys and services. Rewards, redemption cards, and transferred credits do not count
+as paid recharges. Once either qualifying action succeeds, this trial concurrency
+limit no longer applies; balance and credential limits still do. Eligibility is
+managed by the server, not by SDK configuration.
+
+An overlapping request returns `429 too_many_requests`, which the SDKs already map
+to `RateLimitError`. Serialize billable calls across integrations using the same
+account rather than switching keys or services. Free task queries remain available;
+Realtime connection authentication does not occupy this ordinary-request slot and
+keeps its existing per-turn billing flow.
+
+For asynchronous generation, acceptance is not completion: wait for the original
+task's final result before submitting another generation. A disconnected client or
+proxy timeout does not mean the task stopped. Continue retrieving the original task
+when its ID is available; if it remains without a final state for an extended period,
+provide its `trace_id` to support. This limit does not change trial API availability
+or billing rules: charges are still settled after the request using actual usage.
+
 ## Paying Per Request with X402
 
 Both SDKs expose a `paymentHandler` / `payment_handler` hook that is
