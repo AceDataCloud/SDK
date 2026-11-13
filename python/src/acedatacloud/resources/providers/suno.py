@@ -68,7 +68,7 @@ class Suno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -91,6 +91,7 @@ class Suno:
         replace_section_end: float | None = None,
         underpainting_start: float | None = None,
         replace_section_start: float | None = None,
+        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -158,6 +159,8 @@ class Suno:
             body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
             body["replace_section_start"] = replace_section_start
+        if replace_section_result_mode is not None:
+            body["replace_section_result_mode"] = replace_section_result_mode
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -454,7 +457,7 @@ class AsyncSuno:
         title: str | None = None,
         action: SunoAction | None = None,
         custom: bool | None = None,
-        prompt: dict[str, Any] | None = None,
+        prompt: str | None = None,
         audio_id: str | None = None,
         duration: int | None = None,
         weirdness: float | None = None,
@@ -477,6 +480,7 @@ class AsyncSuno:
         replace_section_end: float | None = None,
         underpainting_start: float | None = None,
         replace_section_start: float | None = None,
+        replace_section_result_mode: Literal["candidates", "full_song"] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -544,6 +548,8 @@ class AsyncSuno:
             body["underpainting_start"] = underpainting_start
         if replace_section_start is not None:
             body["replace_section_start"] = replace_section_start
+        if replace_section_result_mode is not None:
+            body["replace_section_result_mode"] = replace_section_result_mode
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

@@ -234,6 +234,38 @@ class SnapshotSyncTests(unittest.TestCase):
                     else:
                         self.assertIn("model", media["schema"]["required"])
 
+    def test_suno_replacement_uses_local_lyrics_and_server_default(self):
+        path = SCRIPT.parent / "specs/09a26295-5972-4392-9318-dcd9b218f90d.json"
+        operation = json.loads(path.read_text())["paths"]["/suno/audios"]["post"]
+        properties = operation["requestBody"]["content"]["application/json"]["schema"][
+            "properties"
+        ]
+        self.assertEqual(properties["prompt"]["type"], "string")
+        self.assertIn("local new lyrics", properties["prompt"]["description"])
+        self.assertIn("not the whole song", properties["lyric"]["description"])
+        mode = properties["replace_section_result_mode"]
+        self.assertEqual(mode["enum"], ["candidates", "full_song"])
+        self.assertNotIn("default", mode)
+        self.assertIn("full_song (default)", mode["description"])
+        lyric = operation["responses"]["200"]["content"]["application/json"]["schema"][
+            "properties"
+        ]["data"]["items"]["properties"]["lyric"]
+        self.assertIn("not an audio transcription", lyric["description"])
+
+    def test_suno_processing_billing_is_per_successful_request(self):
+        for api_id, route, price in (
+            ("09a26295-5972-4392-9318-dcd9b218f90d", "/suno/audios", "0.56"),
+            ("1aece23f-07b3-4c21-8b2b-d93ce9bf0e84", "/suno/voices", "0.15"),
+            ("c98fe4e5-73c0-462d-ad24-5080ee1fa01a", "/suno/lyrics", "0.08"),
+        ):
+            with self.subTest(route=route):
+                spec = json.loads(
+                    (SCRIPT.parent / "specs" / f"{api_id}.json").read_text()
+                )
+                description = spec["paths"][route]["post"]["description"]
+                self.assertIn(f"{price} Credits per request", description)
+                self.assertIn("failed requests are not charged", description)
+
     def test_suno_negative_tags_has_no_fixed_character_limit(self):
         path = SCRIPT.parent / "specs/09a26295-5972-4392-9318-dcd9b218f90d.json"
         operation = json.loads(path.read_text())["paths"]["/suno/audios"]["post"]

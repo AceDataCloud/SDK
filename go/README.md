@@ -162,6 +162,9 @@ the SDK's normal error handling.
 Use the exact model ID `claude-fable-5-2`. Native Messages preserves thinking and
 tool content blocks. Omit `temperature`, `top_p` and `top_k`; adaptive thinking is
 always enabled, and the output budget covers thinking plus the final answer.
+For tools, set `Extra["tool_choice"]` to `map[string]any{"type": "auto"}`, not
+`any` or a forced tool. Fable 5.1 and Fable 5 remain separate model IDs; upgrade
+by changing `Model` explicitly.
 Count Tokens and Responses are not published for this model. Consult the
 [current model page](https://platform.acedata.cloud/models/claude-fable-5-2?m=chat)
 for account availability and package-dependent prices; model discovery alone does
@@ -285,6 +288,55 @@ the same rate; failed tasks and `/maestro/tasks` polling are free.
 
 `Style` accepts a freeform visual hint as well as named presets. `Voice` accepts
 named voice presets or a 32-character hexadecimal voice `reference_id`; pass it unchanged.
+
+## Suno section replacement and charges
+
+Use the completed song's `data[].id`, not the task ID. Listen to the source and
+use `client.Suno().Timing` to choose a complete phrase; replace the example ID
+and 30–50 second interval with your own. Supply only local new lyrics, preferably
+the same text in `Lyric` and `Prompt`, not the whole song.
+
+```go
+localLyrics := "Evening winds along the quiet lane\nCarry our story home again"
+task, err := client.Suno().Generate(ctx, acedatacloud.SunoGenerateRequest{
+    Action: "replace_section",
+    AudioID: "YOUR_COMPLETED_AUDIO_ID",
+    Model: "chirp-v5-5",
+    Lyric: localLyrics,
+    Prompt: localLyrics,
+    ReplaceSectionStart: 30.0,
+    ReplaceSectionEnd: 50.0,
+    ReplaceSectionResultMode: "full_song",
+})
+if err != nil { panic(err) }
+result, err := task.Wait(ctx, 3*time.Second, 10*time.Minute)
+if err != nil { panic(err) }
+songs := result["response"].(map[string]any)["data"]
+_ = songs
+```
+
+Omitting `ReplaceSectionResultMode` uses the server's `full_song` default:
+two complete songs, with no further `concat`. Listen to both results and check
+`audio_url`, `duration`, new words and transitions. Success does not guarantee
+word-for-word lyrics or the original duration; the `Duration` request field
+cannot lock a replacement's length. Returned `lyric` is metadata, not a
+transcription, and may be empty if source lyric timing is unavailable.
+
+For another edit, use the selected complete song's `id` and recheck its timing;
+do not reuse old coordinates or send its whole returned lyric as local input.
+For manual selection, set `ReplaceSectionResultMode: "candidates"`, then call
+`client.Suno().Generate` with `Action: "concat", AudioID: selectedCandidateID`
+and wait for the complete song. Candidates are unstitched clips, possibly with
+context. If results still sing old words or grow too long, check the source,
+interval and local lyrics, then the other result; more polling cannot change
+completed audio. Keep the task ID, source ID, request and result audio for support.
+
+Standard successful-request charges are **0.56 Credits** for `Action: "stems"`
+(vocals and accompaniment together count once), **0.08 Credits** for
+`client.Suno().Lyrics` (multiple candidates still count once), and **0.15 Credits**
+for `client.Suno().Voices`. Failed requests are not charged; applicable discounts
+follow the actual bill. `all_stems`, `extract_stem` and other actions have their own
+prices, not the `stems` rate.
 
 ## Producer action-specific inputs
 

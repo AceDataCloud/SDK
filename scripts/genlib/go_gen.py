@@ -89,6 +89,10 @@ def _to_body(struct: str, svc: Service, ep) -> str:
             else:
                 # bool and composite types have no distinguishable zero value.
                 lines.append(f"\tbody[{key}] = r.{field}")
+        elif svc.alias == "suno" and p.name == "replace_section_start":
+            lines.append(f'\tif r.{field} != 0 || r.Action == "replace_section" {{')
+            lines.append(f"\t\tbody[{key}] = r.{field}")
+            lines.append("\t}")
         elif zero:
             lines.append(f"\tif r.{field} != {zero} {{")
             lines.append(f"\t\tbody[{key}] = r.{field}")

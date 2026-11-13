@@ -201,6 +201,102 @@ func TestSunoAvailability(t *testing.T) {
 	}
 }
 
+func TestSunoReplacementSerializesLocalLyrics(t *testing.T) {
+	for _, mode := range []string{"", "full_song", "candidates"} {
+		t.Run("mode="+mode, func(t *testing.T) {
+			body := (SunoGenerateRequest{
+				Action: "replace_section", AudioID: "source-audio",
+				Lyric: "Local new lyrics", Prompt: "Local new lyrics",
+				ReplaceSectionStart: 0, ReplaceSectionEnd: 12.5,
+				ReplaceSectionResultMode: mode,
+			}).toBody()
+			if body["lyric"] != "Local new lyrics" || body["prompt"] != body["lyric"] {
+				t.Fatalf("local lyric strings must be preserved: %#v", body)
+			}
+			if body["audio_id"] != "source-audio" || body["replace_section_end"] != 12.5 || body["replace_section_start"] != float64(0) {
+				t.Fatalf("source, zero start and fractional end must be preserved: %#v", body)
+			}
+			if mode == "" {
+				if _, exists := body["replace_section_result_mode"]; exists {
+					t.Fatal("omitted mode must use the server default")
+				}
+			} else if body["replace_section_result_mode"] != mode {
+				t.Fatalf("explicit mode must be preserved: %#v", body)
+			}
+			if body["async"] != true {
+				t.Fatal("replacement must retain asynchronous task submission")
+			}
+		})
+	}
+	body := (SunoGenerateRequest{Action: "generate", Prompt: "A jazz song"}).toBody()
+	if _, exists := body["replace_section_result_mode"]; exists {
+		t.Fatal("ordinary generation must not receive a replacement-only default")
+	}
+	if _, exists := body["replace_section_start"]; exists {
+		t.Fatal("ordinary generation must not receive replacement coordinates")
+	}
+}
+
+func TestFable52MessagesOptions(t *testing.T) {
+	for _, streaming := range []bool{false, true} {
+		t.Run(fmt.Sprintf("stream=%t", streaming), func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/v1/messages" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Fatal(err)
+				}
+				expected := map[string]any{
+					"model": "claude-fable-5-2", "messages": []any{}, "max_tokens": float64(4096),
+					"output_config": map[string]any{"effort": "high"},
+					"tool_choice":   map[string]any{"type": "auto"},
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("options changed: got %#v, want %#v", body, expected)
+				}
+				if streaming {
+					w.Header().Set("Content-Type", "text/event-stream")
+				} else {
+					w.Write([]byte(`{}`))
+				}
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			req := MessagesRequest{
+				Model: "claude-fable-5-2", Messages: []map[string]any{}, MaxTokens: 4096,
+				Extra: map[string]any{
+					"output_config": map[string]any{"effort": "high"},
+					"tool_choice":   map[string]any{"type": "auto"},
+				},
+			}
+			if streaming {
+				chunks, errs := client.Chat().Messages().CreateStream(context.Background(), req)
+				for chunk := range chunks {
+					t.Errorf("unexpected chunk: %#v", chunk)
+				}
+				for err := range errs {
+					t.Error(err)
+				}
+			} else if _, err := client.Chat().Messages().Create(context.Background(), req); err != nil {
+				t.Fatal(err)
+			}
+			if calls != 1 {
+				t.Fatalf("expected one request, got %d", calls)
+			}
+		})
+	}
+}
+
 func TestSunoNegativeTagsAreNotTruncated(t *testing.T) {
 	for _, tags := range []string{"", strings.Repeat("no distorted guitars; ", 100)} {
 		body := (SunoGenerateRequest{Custom: true, NegativeTags: tags}).toBody()

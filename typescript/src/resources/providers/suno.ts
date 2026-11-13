@@ -17,7 +17,7 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface SunoGenerateOptions {
-  /** Lyrics for generating music under custom mode (`custom` is `true`). `chirp-v3-5` and `chirp-v4` have a maximum of 3000 characters; `chirp-v4-5` and above (including `chirp-v5`, `chirp-v5-5`) have a maximum of 5000 characters. */
+  /** For replace_section, use local new lyrics for the selected interval, not the whole song; matching local lyrics in prompt are recommended. Full-song output does not require full-song input lyrics. For custom generation (`custom` is `true`), `chirp-v3-5` and `chirp-v4` allow up to 3000 characters; `chirp-v4-5` and above allow up to 5000 characters. */
   lyric?: string;
   /** The model used for generating music has a default value of `chirp-v4`. */
   model?: "chirp-v5-5" | "chirp-v5" | "chirp-v4-5-plus" | "chirp-v4-5" | "chirp-v4" | "chirp-v3-5" | "chirp-v3-0";
@@ -29,8 +29,8 @@ export interface SunoGenerateOptions {
   action?: "generate" | "extend" | "upload_extend" | "upload_cover" | "concat" | "cover" | "artist_consistency" | "artist_consistency_vox" | "stems" | "all_stems" | "replace_section" | "underpainting" | "overpainting" | "remaster" | "mashup" | "samples" | "inspo";
   /** Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise, it will be generated based on the prompts. */
   custom?: boolean;
-  /** The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 500 characters. For custom mode, please use `lyric` and `style`. */
-  prompt?: Record<string, unknown>;
+  /** For replace_section, use local new lyrics for the selected interval, preferably matching lyric, not inspiration or style text; this does not guarantee word-for-word singing. For ordinary inspiration generation (`custom` is `false`), the prompt must not exceed 500 characters. Ordinary custom generation uses lyric and style. For add_stem, this optional field describes the track to add. */
+  prompt?: string;
   /** Audio ID used for generating additional audio based on existing audio. This field is required when `action` is `extend` or `concat`. */
   audioId?: string;
   /** Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is mainly used for generation in custom mode (`custom` is `true`); some models or actions may not support it, in which case the value is ignored or an error is returned. It is a target only — the finished length is reported by the `duration` field in the response and may differ slightly. */
@@ -75,6 +75,8 @@ export interface SunoGenerateOptions {
   underpaintingStart?: number;
   /** When `action` is `replace_section`, specify the start time (in seconds) of the segment to be replaced. */
   replaceSectionStart?: number;
+  /** For replace_section, full_song (default) stitches both candidates and returns 2 complete songs without another concat; their duration is not guaranteed to match the source. candidates returns 2 unstitched replacements; select a candidate and call concat. For another edit, use the selected complete song ID and recheck the interval. */
+  replaceSectionResultMode?: "candidates" | "full_song";
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
   /** Wait for completion before returning the handle. */
@@ -274,8 +276,9 @@ export class Suno {
     if (options.replaceSectionEnd !== undefined) body["replace_section_end"] = options.replaceSectionEnd;
     if (options.underpaintingStart !== undefined) body["underpainting_start"] = options.underpaintingStart;
     if (options.replaceSectionStart !== undefined) body["replace_section_start"] = options.replaceSectionStart;
+    if (options.replaceSectionResultMode !== undefined) body["replace_section_result_mode"] = options.replaceSectionResultMode;
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "negativeTags", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
+      if (!["action", "async", "audioId", "audioUrls", "audioWeight", "callbackUrl", "continueAt", "custom", "duration", "instrumental", "lyric", "lyricPrompt", "mashupAudioIds", "maxWait", "model", "negativeTags", "overpaintingEnd", "overpaintingStart", "personaId", "pollInterval", "prompt", "replaceSectionEnd", "replaceSectionResultMode", "replaceSectionStart", "samplesEnd", "samplesStart", "style", "styleInfluence", "title", "underpaintingEnd", "underpaintingStart", "variationCategory", "vocalGender", "wait", "weirdness"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }

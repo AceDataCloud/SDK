@@ -69,6 +69,36 @@ describe.each(compatibleModels)('Public compatible model %s', (model) => {
   );
 });
 
+describe('Fable 5.2 Messages', () => {
+  it.each([false, true])('preserves effort and automatic tool choice with stream=%s', async (streaming) => {
+    const request = jest.fn().mockResolvedValue({});
+    const requestStream = jest.fn().mockImplementation(async function* () {});
+    const chat = new Chat({ request, requestStream } as any);
+    const options = {
+      model: 'claude-fable-5-2', messages: [], maxTokens: 4096,
+      output_config: { effort: 'high' }, tool_choice: { type: 'auto' },
+    };
+    const body = {
+      model: options.model, messages: [], max_tokens: 4096,
+      output_config: options.output_config, tool_choice: options.tool_choice,
+    };
+    if (streaming) {
+      const stream = await chat.messages.create({ ...options, stream: true });
+      for await (const chunk of stream) {
+        throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+      }
+      expect(requestStream).toHaveBeenCalledWith('POST', '/v1/messages', {
+        json: { ...body, stream: true },
+      });
+      expect(request).not.toHaveBeenCalled();
+    } else {
+      await chat.messages.create(options);
+      expect(request).toHaveBeenCalledWith('POST', '/v1/messages', { json: body });
+      expect(requestStream).not.toHaveBeenCalled();
+    }
+  });
+});
+
 describe('Messages structured output', () => {
   it.each([false, true])('preserves output_config.format with stream=%s', async (streaming) => {
     const request = jest.fn().mockResolvedValue({});

@@ -161,6 +161,8 @@ through the SDK's normal error handling.
 Use the exact model ID `claude-fable-5-2`. Native Messages preserves thinking and
 tool content blocks. Omit `temperature`, `top_p` and `top_k`; adaptive thinking is
 always enabled, and the output budget covers thinking plus the final answer.
+For tools, use `tool_choice={"type": "auto"}`, not `any` or a forced tool.
+Fable 5.1 and Fable 5 remain separate model IDs; upgrade by changing `model` explicitly.
 Count Tokens and Responses are not published for this model. Consult the
 [current model page](https://platform.acedata.cloud/models/claude-fable-5-2?m=chat)
 for account availability and package-dependent prices; model discovery alone does
@@ -337,6 +339,55 @@ not trigger reference-video billing. Do not combine `video_list` with
 `generate_audio=True`. `AsyncAceDataCloud` uses the same fields with `await`.
 
 ## Suno music processing
+
+### Replace a section
+
+Use the completed song's `data[].id`, not the task ID. Listen to the source and
+use `client.suno.timing(audio_id=...)` to choose a complete phrase; replace the
+example ID and 30–50 second interval with your own. Supply only the local new
+lyrics, preferably the same text in `lyric` and `prompt`, not the whole song.
+
+```python
+local_lyrics = "Evening winds along the quiet lane\nCarry our story home again"
+task = client.suno.generate(
+    action="replace_section",
+    audio_id="YOUR_COMPLETED_AUDIO_ID",
+    model="chirp-v5-5",
+    lyric=local_lyrics,
+    prompt=local_lyrics,
+    replace_section_start=30.0,
+    replace_section_end=50.0,
+    replace_section_result_mode="full_song",
+)
+result = task.wait()
+songs = result["response"]["data"]
+```
+
+Omitting `replace_section_result_mode` uses the server's `full_song` default:
+two complete songs, with no further `concat`. Listen to both results and check
+`audio_url`, `duration`, new words and transitions. Success does not guarantee
+word-for-word lyrics or the original duration; the `duration` request field
+cannot lock a replacement's length. Returned `lyric` is metadata, not a
+transcription, and may be empty if source lyric timing is unavailable.
+
+For another edit, use the selected complete song's `id` and recheck its timing;
+do not reuse old coordinates or send its whole returned lyric as local input.
+For manual selection, request `replace_section_result_mode="candidates"`, then
+call `client.suno.generate(action="concat", audio_id=selected_candidate_id)` and
+wait for the complete song. Candidates are unstitched clips, possibly with context.
+If results still sing old words or grow too long, check the source, interval and
+local lyrics, then the other result; more polling cannot change completed audio.
+Keep the task ID, source ID, request and result audio for support. Async clients
+use the same fields with `await` and `await task.wait()`.
+
+### Processing charges
+
+Standard successful-request charges are **0.56 Credits** for `action="stems"`
+(vocals and accompaniment together count once), **0.08 Credits** for
+`client.suno.lyrics(...)` (multiple candidates still count once), and **0.15 Credits**
+for `client.suno.voices(...)`. Failed requests are not charged; applicable discounts
+follow the actual bill. `all_stems`, `extract_stem` and other actions have their own
+prices, not the `stems` rate.
 
 `client.suno.persona(name=..., audio_id=...)` creates a singer style with
 `POST /suno/persona`; creation still follows the endpoint's pricing rules.
