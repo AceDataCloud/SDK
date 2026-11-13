@@ -157,6 +157,31 @@ if err != nil { panic(err) }
 pass-through does not guarantee model support; API errors are returned through
 the SDK's normal error handling.
 
+### Claude Fable 5.2
+
+Use the exact model ID `claude-fable-5-2`. Native Messages preserves thinking and
+tool content blocks. Omit `temperature`, `top_p` and `top_k`; adaptive thinking is
+always enabled, and the output budget covers thinking plus the final answer.
+Count Tokens and Responses are not published for this model. Consult the
+[current model page](https://platform.acedata.cloud/models/claude-fable-5-2?m=chat)
+for account availability and package-dependent prices; model discovery alone does
+not guarantee a successful generation.
+
+```go
+client, err := acedatacloud.NewClient(
+    acedatacloud.WithAPIToken("<token>"),
+    acedatacloud.WithBaseURL("https://api.acedata.cloud"),
+)
+if err != nil { panic(err) }
+response, err := client.Chat().Messages().Create(ctx, acedatacloud.MessagesRequest{
+    Model: "claude-fable-5-2",
+    Messages: []map[string]any{{"role": "user", "content": "Explain this code."}},
+    MaxTokens: 4096,
+    Extra: map[string]any{"output_config": map[string]any{"effort": "high"}},
+})
+if err != nil { panic(err) }
+```
+
 ## Images (task-based)
 
 ```go

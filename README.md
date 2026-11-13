@@ -35,6 +35,10 @@ Use the [English/Chinese first-use templates and real API-key screenshot sources
 | TypeScript | [typescript](typescript/) | `@acedatacloud/sdk` |
 | Go | [go](go/) | `github.com/AceDataCloud/SDK/go` |
 
+## Claude Fable 5.2
+
+Native Messages examples for `claude-fable-5-2`: [Python](python/README.md#claude-fable-52), [TypeScript](typescript/README.md#claude-fable-52), and [Go](go/README.md#claude-fable-52). All three SDKs accept the exact model ID without a new client release.
+
 ## Framework examples
 
 - [LangChain chat](examples/langchain/): use `langchain-openai` with the
