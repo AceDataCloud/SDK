@@ -156,6 +156,28 @@ with AceDataCloud(
 Parameter pass-through does not guarantee model support; API errors are returned
 through the SDK's normal error handling.
 
+### Claude Fable 5.2
+
+Use the exact model ID `claude-fable-5-2`. Native Messages preserves thinking and
+tool content blocks. Omit `temperature`, `top_p` and `top_k`; adaptive thinking is
+always enabled, and the output budget covers thinking plus the final answer.
+Count Tokens and Responses are not published for this model. Consult the
+[current model page](https://platform.acedata.cloud/models/claude-fable-5-2?m=chat)
+for account availability and package-dependent prices; model discovery alone does
+not guarantee a successful generation.
+
+```python
+with AceDataCloud(api_token="your-token", base_url="https://api.acedata.cloud") as client:
+    response = client.chat.messages.create(
+        model="claude-fable-5-2",
+        messages=[{"role": "user", "content": "Explain this code."}],
+        max_tokens=4096,
+        output_config={"effort": "high"},
+    )
+```
+
+The asynchronous client accepts the same model and fields.
+
 ## OpenAI Embeddings
 
 ```python
