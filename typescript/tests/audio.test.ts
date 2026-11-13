@@ -1,6 +1,6 @@
 import { Audio } from '../src/resources/audio';
 import { Fish } from '../src/resources/providers/fish';
-import { Suno } from '../src/resources/providers/suno';
+import { Suno, SunoGenerateOptions } from '../src/resources/providers/suno';
 import { Producer, ProducerGenerateOptions } from '../src/resources/providers/producer';
 import { Maestro } from '../src/resources/providers/maestro';
 import { WebExtrator } from '../src/resources/webextrator';
@@ -108,6 +108,28 @@ describe('Audio resource', () => {
       },
     });
   });
+
+  it.each([undefined, 'full_song', 'candidates'] as const)(
+    'maps Suno replacement lyrics and result mode (%s)', async (replaceSectionResultMode) => {
+      const request = jest.fn().mockResolvedValue({});
+      const options: SunoGenerateOptions = {
+        action: 'replace_section', audioId: 'source-audio',
+        lyric: 'Local new lyrics', prompt: 'Local new lyrics',
+        replaceSectionStart: 0, replaceSectionEnd: 12.5, replaceSectionResultMode,
+      };
+
+      await new Suno({ request } as any).generate(options);
+
+      expect(request).toHaveBeenCalledWith('POST', '/suno/audios', {
+        json: {
+          action: 'replace_section', audio_id: 'source-audio',
+          lyric: 'Local new lyrics', prompt: 'Local new lyrics',
+          replace_section_start: 0, replace_section_end: 12.5, async: true,
+          ...(replaceSectionResultMode === undefined ? {} : { replace_section_result_mode: replaceSectionResultMode }),
+        },
+      });
+    }
+  );
 
   it.each([undefined, '', 'no distorted guitars; '.repeat(100)])(
     'preserves Suno negativeTags without truncation (%p)', async (negativeTags) => {

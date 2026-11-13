@@ -139,6 +139,55 @@ def test_nano_banana_model_defaults_and_public_variants(client):
     assert "resolution" not in transport.request.call_args.kwargs["json"]
 
 
+@pytest.mark.parametrize("mode", [None, "full_song", "candidates"])
+def test_suno_replacement_serializes_local_lyrics(client, mode):
+    transport = Mock()
+    transport.request.return_value = {}
+    client.suno._transport = transport
+    options = {
+        "action": "replace_section",
+        "audio_id": "source-audio",
+        "lyric": "Local new lyrics",
+        "prompt": "Local new lyrics",
+        "replace_section_start": 0.0,
+        "replace_section_end": 12.5,
+    }
+    if mode is not None:
+        options["replace_section_result_mode"] = mode
+
+    handle = client.suno.generate(**options)
+
+    assert isinstance(handle, TaskHandle)
+    transport.request.assert_called_once_with("POST", "/suno/audios", json={**options, "async": True})
+    assert "replace_section_result_mode" in inspect.signature(client.suno.generate).parameters
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", [None, "full_song", "candidates"])
+async def test_async_suno_replacement_serializes_local_lyrics(mode):
+    from unittest.mock import AsyncMock
+
+    async with AsyncAceDataCloud(api_token="test-token") as client:
+        transport = Mock(request=AsyncMock(return_value={}))
+        client.suno._transport = transport
+        options = {
+            "action": "replace_section",
+            "audio_id": "source-audio",
+            "lyric": "Local new lyrics",
+            "prompt": "Local new lyrics",
+            "replace_section_start": 0.0,
+            "replace_section_end": 12.5,
+        }
+        if mode is not None:
+            options["replace_section_result_mode"] = mode
+
+        handle = await client.suno.generate(**options)
+
+        assert isinstance(handle, AsyncTaskHandle)
+        transport.request.assert_awaited_once_with("POST", "/suno/audios", json={**options, "async": True})
+        assert "replace_section_result_mode" in inspect.signature(client.suno.generate).parameters
+
+
 @pytest.mark.parametrize("negative_tags", [None, "", "no distorted guitars; " * 100])
 def test_suno_negative_tags_are_not_truncated(client, negative_tags):
     transport = Mock()

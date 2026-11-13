@@ -12,7 +12,7 @@ type Suno struct {
 
 // SunoGenerateRequest is the input to suno.Generate.
 type SunoGenerateRequest struct {
-	// Lyrics for generating music under custom mode (`custom` is `true`). `chirp-v3-5` and `chirp-v4` have a maximum
+	// For replace_section, use local new lyrics for the selected interval, not the whole song; matching local lyrics
 	Lyric string
 	// The model used for generating music has a default value of `chirp-v4`.
 	Model string
@@ -24,8 +24,8 @@ type SunoGenerateRequest struct {
 	Action string
 	// Whether to enable the custom mode flag. If `true`, the audio will be generated based on the lyrics; otherwise,
 	Custom bool
-	// The prompt words for generating music in inspiration mode (when `custom` is set to `false`) must not exceed 50
-	Prompt map[string]any
+	// For replace_section, use local new lyrics for the selected interval, preferably matching lyric, not inspiratio
+	Prompt string
 	// Audio ID used for generating additional audio based on existing audio. This field is required when `action` is
 	AudioID string
 	// Target length of the generated track in seconds, given as an integer, typically between 10 and 360. It is main
@@ -70,6 +70,8 @@ type SunoGenerateRequest struct {
 	UnderpaintingStart float64
 	// When `action` is `replace_section`, specify the start time (in seconds) of the segment to be replaced.
 	ReplaceSectionStart float64
+	// For replace_section, full_song (default) stitches both candidates and returns 2 complete songs without another
+	ReplaceSectionResultMode string
 	// Async submits without blocking; poll the returned handle. Defaults true.
 	Async *bool
 	// CallbackURL optionally receives the completion webhook.
@@ -96,7 +98,7 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 		body["action"] = r.Action
 	}
 	body["custom"] = r.Custom
-	if r.Prompt != nil {
+	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
 	}
 	if r.AudioID != "" {
@@ -160,8 +162,11 @@ func (r SunoGenerateRequest) toBody() map[string]any {
 	if r.UnderpaintingStart != 0 {
 		body["underpainting_start"] = r.UnderpaintingStart
 	}
-	if r.ReplaceSectionStart != 0 {
+	if r.ReplaceSectionStart != 0 || r.Action == "replace_section" {
 		body["replace_section_start"] = r.ReplaceSectionStart
+	}
+	if r.ReplaceSectionResultMode != "" {
+		body["replace_section_result_mode"] = r.ReplaceSectionResultMode
 	}
 	body["async"] = true
 	if r.Async != nil {

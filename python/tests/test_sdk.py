@@ -727,6 +727,54 @@ async def test_async_openai_embeddings(async_client, model):
 # ── Chat Messages (Claude Native) ────────────────────────────────────
 
 
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+def test_fable_52_messages_options(client, stream):
+    route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+    body = {
+        "model": "claude-fable-5-2",
+        "messages": [],
+        "max_tokens": 4096,
+        "output_config": {"effort": "high"},
+        "tool_choice": {"type": "auto"},
+    }
+
+    result = client.chat.messages.create(**body, stream=stream)
+    if stream:
+        assert list(result) == []
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == {**body, **({"stream": True} if stream else {})}
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("stream", [False, True])
+@respx.mock
+async def test_async_fable_52_messages_options(stream):
+    route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+        return_value=httpx.Response(200, text="", headers={"content-type": "text/event-stream"})
+        if stream
+        else httpx.Response(200, json={})
+    )
+    body = {
+        "model": "claude-fable-5-2",
+        "messages": [],
+        "max_tokens": 4096,
+        "output_config": {"effort": "high"},
+        "tool_choice": {"type": "auto"},
+    }
+
+    async with AsyncAceDataCloud(api_token="test-token", base_url="https://api.acedata.cloud") as client:
+        result = await client.chat.messages.create(**body, stream=stream)
+        if stream:
+            assert [chunk async for chunk in result] == []
+    assert route.call_count == 1
+    assert json.loads(route.calls.last.request.content) == {**body, **({"stream": True} if stream else {})}
+
+
 @respx.mock
 def test_chat_messages(client):
     mock_response = {
