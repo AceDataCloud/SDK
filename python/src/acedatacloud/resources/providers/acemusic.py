@@ -90,6 +90,48 @@ class Acemusic:
             body["callback_url"] = callback_url
         return self._transport.request("POST", "/acemusic/lyrics", json=body)
 
+    def tasks(
+        self,
+        *,
+        action: Literal["retrieve", "retrieve_batch", "list"],
+        id: str | None = None,
+        ids: list[str] | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        type: Literal["audios", "lyrics"] | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        created_at_min: float | None = None,
+        created_at_max: float | None = None,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> dict[str, Any]:
+        """ACE Music Tasks"""
+        body: dict[str, Any] = {}
+        body["action"] = action
+        if id is not None:
+            body["id"] = id
+        if ids is not None:
+            body["ids"] = ids
+        if page is not None:
+            body["page"] = page
+        if page_size is not None:
+            body["page_size"] = page_size
+        if type is not None:
+            body["type"] = type
+        if limit is not None:
+            body["limit"] = limit
+        if offset is not None:
+            body["offset"] = offset
+        if created_at_min is not None:
+            body["created_at_min"] = created_at_min
+        if created_at_max is not None:
+            body["created_at_max"] = created_at_max
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return self._transport.request("POST", "/acemusic/tasks", json=body)
+
 
 class AsyncAcemusic:
     """Asynchronous acemusic client."""
@@ -156,3 +198,45 @@ class AsyncAcemusic:
         if callback_url is not None:
             body["callback_url"] = callback_url
         return await self._transport.request("POST", "/acemusic/lyrics", json=body)
+
+    async def tasks(
+        self,
+        *,
+        action: Literal["retrieve", "retrieve_batch", "list"],
+        id: str | None = None,
+        ids: list[str] | None = None,
+        page: int | None = None,
+        page_size: int | None = None,
+        type: Literal["audios", "lyrics"] | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        created_at_min: float | None = None,
+        created_at_max: float | None = None,
+        callback_url: str | None = None,
+        **extra: Any,
+    ) -> dict[str, Any]:
+        """ACE Music Tasks"""
+        body: dict[str, Any] = {}
+        body["action"] = action
+        if id is not None:
+            body["id"] = id
+        if ids is not None:
+            body["ids"] = ids
+        if page is not None:
+            body["page"] = page
+        if page_size is not None:
+            body["page_size"] = page_size
+        if type is not None:
+            body["type"] = type
+        if limit is not None:
+            body["limit"] = limit
+        if offset is not None:
+            body["offset"] = offset
+        if created_at_min is not None:
+            body["created_at_min"] = created_at_min
+        if created_at_max is not None:
+            body["created_at_max"] = created_at_max
+        body.update(extra)
+        if callback_url is not None:
+            body["callback_url"] = callback_url
+        return await self._transport.request("POST", "/acemusic/tasks", json=body)

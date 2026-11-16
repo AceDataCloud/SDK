@@ -429,6 +429,11 @@
     "id": "b3637223-92ae-5e2f-8536-6df3ef16c509",
     "path": "/acemusic/lyrics",
     "name": "ACE Music Lyrics Generation API"
+   },
+   {
+    "id": "cd422d13-3e61-5d2e-88fc-7281ff471565",
+    "path": "/acemusic/tasks",
+    "name": "ACE Music Tasks API"
    }
   ],
   "tasks": "/acemusic/tasks"

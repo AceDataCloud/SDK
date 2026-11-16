@@ -301,6 +301,13 @@ class Endpoint:
         props: dict[str, dict] = schema.get("properties") or {}
         self.summary = summary(spec)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
+        # ACE Music offers mutually exclusive pagination shapes. Server defaults
+        # apply only when neither shape is sent; materializing page defaults
+        # beside an explicit limit/offset would create an invalid request.
+        if alias == "acemusic" and path.endswith("/tasks"):
+            for param in self.params:
+                if param.name in {"page", "page_size"}:
+                    param.schema = {key: value for key, value in param.schema.items() if key != "default"}
         header_parameters = [
             p for p in (operation(spec).get("parameters") or [])
             if p.get("in") == "header" and p.get("name") != "accept"

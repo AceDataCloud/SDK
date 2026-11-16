@@ -47,6 +47,26 @@ export interface AcemusicLyricsOptions {
   [key: string]: unknown;
 }
 
+export interface AcemusicTasksOptions {
+  action: "retrieve" | "retrieve_batch" | "list";
+  id?: string;
+  ids?: string[];
+  page?: number;
+  pageSize?: number;
+  /** Optional history type filter. */
+  type?: "audios" | "lyrics";
+  /** Alternative history page size; use page/page_size or limit/offset consistently. */
+  limit?: number;
+  offset?: number;
+  /** Inclusive creation-time lower bound, Unix seconds. */
+  createdAtMin?: number;
+  /** Inclusive creation-time upper bound, Unix seconds. */
+  createdAtMax?: number;
+  callbackUrl?: string;
+  /** Any parameter added upstream before the SDK is regenerated. */
+  [key: string]: unknown;
+}
+
 /** acemusic client. */
 export class Acemusic {
   constructor(private transport: Transport) {}
@@ -88,6 +108,28 @@ export class Acemusic {
     }
     if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
     return (await this.transport.request('POST', "/acemusic/lyrics", { json: body })) as Record<string, unknown>;
+  }
+
+  /** ACE Music Tasks */
+  async tasks(options: AcemusicTasksOptions): Promise<Record<string, unknown>> {
+    const body: Record<string, unknown> = {};
+    body["action"] = options.action;
+    if (options.id !== undefined) body["id"] = options.id;
+    if (options.ids !== undefined) body["ids"] = options.ids;
+    if (options.page !== undefined) body["page"] = options.page;
+    if (options.pageSize !== undefined) body["page_size"] = options.pageSize;
+    if (options.type !== undefined) body["type"] = options.type;
+    if (options.limit !== undefined) body["limit"] = options.limit;
+    if (options.offset !== undefined) body["offset"] = options.offset;
+    if (options.createdAtMin !== undefined) body["created_at_min"] = options.createdAtMin;
+    if (options.createdAtMax !== undefined) body["created_at_max"] = options.createdAtMax;
+    for (const [key, value] of Object.entries(options)) {
+      if (!["action", "async", "callbackUrl", "createdAtMax", "createdAtMin", "id", "ids", "limit", "maxWait", "offset", "page", "pageSize", "pollInterval", "type", "wait"].includes(key) && value !== undefined) {
+        body[key] = value;
+      }
+    }
+    if (options.callbackUrl !== undefined) body.callback_url = options.callbackUrl;
+    return (await this.transport.request('POST', "/acemusic/tasks", { json: body })) as Record<string, unknown>;
   }
 
 }

@@ -50,3 +50,23 @@ def test_timeout_never_resubmits_generation():
     with pytest.raises(TimeoutError):
         client.acemusic.generate(prompt="folk")
     assert route.call_count == 1
+
+
+def test_typed_task_filters_do_not_mix_pagination_modes():
+    client = AceDataCloud(api_token="token")
+    transport = Mock()
+    transport.request.return_value = {"items": [], "count": 0}
+    client.acemusic._transport = transport
+    client.acemusic.tasks(action="list", type="audios", limit=10, offset=20, created_at_min=100.0, created_at_max=200.0)
+    assert transport.request.call_args.kwargs["json"] == {
+        "action": "list",
+        "type": "audios",
+        "limit": 10,
+        "offset": 20,
+        "created_at_min": 100.0,
+        "created_at_max": 200.0,
+    }
+    client.acemusic.tasks(action="list", page=2, page_size=5)
+    assert transport.request.call_args.kwargs["json"] == {"action": "list", "page": 2, "page_size": 5}
+    client.acemusic.tasks(action="retrieve", id="original")
+    assert transport.request.call_args.kwargs["json"] == {"action": "retrieve", "id": "original"}

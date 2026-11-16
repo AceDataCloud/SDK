@@ -189,3 +189,22 @@ def test_hyphenated_header_has_valid_python_parameter_and_wire_name():
     source = render(service)
     compile(source, "acemusic-generated", "exec")
     assert '"Idempotency-Key": idempotency_key' in source
+
+
+def test_acemusic_task_generation_keeps_distinct_action_types_and_pagination():
+    service = Service(
+        "acemusic",
+        {
+            "endpoints": [
+                {"id": "4c52eae4-e361-5ccb-9af4-1892e918649f", "path": "/acemusic/audios"},
+                {"id": "cd422d13-3e61-5d2e-88fc-7281ff471565", "path": "/acemusic/tasks"},
+            ]
+        },
+        Path(__file__).resolve().parents[2] / "scripts/specs",
+    )
+    source = render(service)
+    assert 'action: Literal["generate"] | None = None' in source
+    assert 'action: Literal["retrieve", "retrieve_batch", "list"]' in source
+    task = next(ep for ep in service.endpoints if ep.path.endswith("/tasks"))
+    assert next(p for p in task.params if p.name == "page").default() is None
+    assert next(p for p in task.params if p.name == "page_size").default() is None

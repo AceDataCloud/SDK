@@ -46,3 +46,19 @@ func TestAceMusicPartialFailureIsTerminal(t *testing.T) {
 		t.Fatal("partial group was not terminal")
 	}
 }
+
+func TestAceMusicTaskFilterSerialization(t *testing.T) {
+	body := (AcemusicTasksRequest{Action: "list", Type: "audios", Limit: 10, Offset: 20, CreatedAtMin: 100, CreatedAtMax: 200}).toBody()
+	for _, key := range []string{"page", "page_size"} {
+		if _, ok := body[key]; ok {
+			t.Fatalf("unexpected default %s: %v", key, body)
+		}
+	}
+	if body["limit"] != 10 || body["offset"] != 20 || body["type"] != "audios" || body["created_at_min"] != float64(100) {
+		t.Fatalf("wrong filters %v", body)
+	}
+	paged := (AcemusicTasksRequest{Action: "list", Page: 2, PageSize: 5}).toBody()
+	if paged["page"] != 2 || paged["page_size"] != 5 {
+		t.Fatalf("wrong page %v", paged)
+	}
+}

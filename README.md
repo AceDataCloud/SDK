@@ -256,3 +256,8 @@ partial failure is terminal and does not become full success because one audio U
 exists. ACE Music generation/lyrics submissions are not automatically retried after
 network or server errors. Reconcile a lost submission before creating a replacement.
 Package publication and API deployment are release prerequisites.
+
+The ACE Music provider also has a typed `tasks`/`Tasks` method for retrieve,
+retrieve_batch and list. History accepts type (`audios`/`lyrics`), creation-time
+bounds, and either page/page_size or limit/offset. Do not mix pagination shapes;
+unset page fields remain omitted so offset queries stay valid.

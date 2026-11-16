@@ -29,4 +29,15 @@ describe('ACE Music', () => {
       expect(mock).toHaveBeenCalledTimes(1);
     } finally { global.fetch=previous; }
   });
+  it('passes task filters without mixing pagination shapes', async () => {
+    const request = jest.fn().mockResolvedValue({items:[],count:0});
+    const provider = new Acemusic({request} as any);
+    await provider.tasks({action:'list',type:'audios',limit:10,offset:20,createdAtMin:100,createdAtMax:200});
+    expect(request).toHaveBeenLastCalledWith('POST','/acemusic/tasks',{json:{
+      action:'list',type:'audios',limit:10,offset:20,created_at_min:100,created_at_max:200,
+    }});
+    await provider.tasks({action:'list',page:2,pageSize:5});
+    expect(request).toHaveBeenLastCalledWith('POST','/acemusic/tasks',{json:{action:'list',page:2,page_size:5}});
+  });
+
 });
