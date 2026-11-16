@@ -349,7 +349,34 @@
           },
           "request": {
             "type": "object",
-            "description": "The caller-owned public creation parameters."
+            "description": "The caller-owned public creation parameters.",
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt": {
+                "type": "string"
+              },
+              "lyric": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "custom": {
+                "type": "boolean"
+              },
+              "async": {
+                "type": "boolean"
+              }
+            }
           },
           "response": {
             "$ref": "#/components/schemas/AceMusicResult"
