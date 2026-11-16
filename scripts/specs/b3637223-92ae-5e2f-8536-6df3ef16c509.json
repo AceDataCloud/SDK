@@ -36,10 +36,12 @@
                 "properties": {
                   "prompt": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 1,
+                    "maxLength": 20000
                   },
                   "style": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 20000
                   }
                 }
               }
@@ -167,6 +169,30 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Durable task accepted. Save task_id and query the original task; this is not a completed result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "task_id"
+                  ],
+                  "properties": {
+                    "task_id": {
+                      "type": "string"
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }

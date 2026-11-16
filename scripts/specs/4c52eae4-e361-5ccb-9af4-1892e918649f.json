@@ -52,18 +52,26 @@
                   },
                   "prompt": {
                     "type": "string",
-                    "description": "Creation idea. Required when custom is false."
+                    "description": "Creation idea. Required when custom is false.",
+                    "maxLength": 20000,
+                    "minLength": 1
                   },
                   "lyric": {
                     "type": "string",
-                    "description": "Custom lyrics. Required when custom is true."
+                    "description": "Custom lyrics. Required when custom is true.",
+                    "maxLength": 20000,
+                    "minLength": 1
                   },
                   "style": {
                     "type": "string",
-                    "description": "Musical style for custom creation."
+                    "description": "Musical style for custom creation.",
+                    "maxLength": 20000,
+                    "minLength": 1
                   },
                   "title": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 20000,
+                    "minLength": 1
                   },
                   "async": {
                     "type": "boolean",
@@ -73,7 +81,9 @@
                   "callback_url": {
                     "type": "string",
                     "format": "uri",
-                    "description": "Optional HTTPS callback for the final result. Implies asynchronous execution."
+                    "description": "Optional HTTPS callback for the final result. Implies asynchronous execution.",
+                    "maxLength": 20000,
+                    "minLength": 1
                   }
                 },
                 "oneOf": [
@@ -87,7 +97,26 @@
                     },
                     "required": [
                       "prompt"
-                    ]
+                    ],
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "lyric"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "title"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "style"
+                          ]
+                        }
+                      ]
+                    }
                   },
                   {
                     "properties": {
@@ -102,7 +131,12 @@
                       "lyric",
                       "style",
                       "title"
-                    ]
+                    ],
+                    "not": {
+                      "required": [
+                        "prompt"
+                      ]
+                    }
                   }
                 ]
               }
@@ -214,6 +248,30 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Durable task accepted. Save task_id and query the original task; this is not a completed result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "task_id"
+                  ],
+                  "properties": {
+                    "task_id": {
+                      "type": "string"
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
