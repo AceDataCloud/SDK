@@ -14,7 +14,7 @@ import time
 from typing import Any
 
 _DONE = {"succeed", "succeeded", "success", "completed", "complete", "finished"}
-_FAILED = {"failed", "failure", "error", "cancelled", "canceled", "rejected"}
+_FAILED = {"failed", "failure", "error", "cancelled", "canceled", "rejected", "partial_failed"}
 
 
 def _status_words(node: Any, depth: int = 0) -> list[str]:
@@ -80,6 +80,11 @@ def task_status(state: dict[str, Any]) -> str:
     artifact URL appearing. This normaliser is deliberately broad; narrowing it
     silently hangs whichever service it drops.
     """
+    group_state = str(state.get("state") or state.get("status") or "").lower()
+    if group_state in _FAILED:
+        return "failed"
+    if group_state and group_state not in _DONE:
+        return ""
     response = state.get("response")
     if response is None:
         response = state

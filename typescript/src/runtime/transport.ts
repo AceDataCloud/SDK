@@ -221,7 +221,7 @@ export class Transport {
           } catch {
             body = { error: { code: 'unknown', message: text } };
           }
-          if (!paymentAttempted && RETRY_STATUS_CODES.has(resp.status) && attempt < this.maxRetries) {
+          if (!paymentAttempted && !["/acemusic/audios", "/acemusic/lyrics"].includes(path) && RETRY_STATUS_CODES.has(resp.status) && attempt < this.maxRetries) {
             await sleep(backoffDelay(attempt) * 1000);
             attempt += 1;
             continue;
@@ -238,7 +238,7 @@ export class Transport {
         } else {
           lastError = err as Error;
         }
-        if (!paymentAttempted && attempt < this.maxRetries) {
+        if (!paymentAttempted && !["/acemusic/audios", "/acemusic/lyrics"].includes(path) && attempt < this.maxRetries) {
           await sleep(backoffDelay(attempt) * 1000);
           attempt += 1;
           continue;

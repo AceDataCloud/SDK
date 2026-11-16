@@ -6,7 +6,7 @@ import "context"
 type AudioGenerateRequest struct {
 	// Prompt is the required text prompt (or text-to-speech text for fish).
 	Prompt string
-	// Provider selects the backend: "suno", "producer", "fish".
+	// Provider selects the backend: "suno", "producer", "fish", "acemusic".
 	Provider string
 	// Model is optional — provider-specific model identifier.
 	Model string
@@ -46,7 +46,11 @@ func (a *AudioResource) Generate(ctx context.Context, req AudioGenerateRequest) 
 	} else {
 		body = map[string]any{"prompt": req.Prompt}
 		if req.Tags != "" {
-			body["tags"] = req.Tags
+			if provider == "acemusic" {
+				body["style"] = req.Tags
+			} else {
+				body["tags"] = req.Tags
+			}
 		}
 		if req.Model != "" {
 			body["model"] = req.Model

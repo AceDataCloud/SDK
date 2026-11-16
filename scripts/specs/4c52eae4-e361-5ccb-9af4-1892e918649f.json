@@ -1,0 +1,393 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ACE Music Audios API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud"
+    }
+  ],
+  "paths": {
+    "/acemusic/audios": {
+      "post": {
+        "operationId": "acemusic_audios",
+        "summary": "ACE Music Audios",
+        "description": "Create one group of two song candidates from an idea or custom lyrics. A complete group is billed once; final partial or failed groups are free. Submission is asynchronous by default.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "ACE Music"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "generate"
+                    ],
+                    "default": "generate"
+                  },
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "acemusic-v1.1",
+                      "acemusic-v1"
+                    ],
+                    "default": "acemusic-v1.1"
+                  },
+                  "custom": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "Creation idea. Required when custom is false."
+                  },
+                  "lyric": {
+                    "type": "string",
+                    "description": "Custom lyrics. Required when custom is true."
+                  },
+                  "style": {
+                    "type": "string",
+                    "description": "Musical style for custom creation."
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Return a persistent task ID; query /acemusic/tasks for the result."
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Optional HTTPS callback for the final result. Implies asynchronous execution."
+                  }
+                },
+                "oneOf": [
+                  {
+                    "properties": {
+                      "custom": {
+                        "enum": [
+                          false
+                        ]
+                      }
+                    },
+                    "required": [
+                      "prompt"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "custom": {
+                        "enum": [
+                          true
+                        ]
+                      }
+                    },
+                    "required": [
+                      "custom",
+                      "lyric",
+                      "style",
+                      "title"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request accepted or result available. Inspect the task state before treating generation as complete.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "task_id"
+                      ],
+                      "properties": {
+                        "task_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/AceMusicResult"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unsupported model.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient balance for a paid operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied or content rejected.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found for this caller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency key reused with a different request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Service failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Reuse the same key for the same creation request to retrieve its original task. A different payload with the same key is rejected."
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "AceMusicTrack": {
+        "type": "object",
+        "required": [
+          "id",
+          "model",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "lyric": {
+            "type": "string"
+          },
+          "style": {
+            "type": "string"
+          },
+          "audio_url": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "AceMusicResult": {
+        "type": "object",
+        "required": [
+          "success",
+          "task_id"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "succeeded",
+              "partial_failed",
+              "failed"
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AceMusicTrack"
+            }
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AceMusicTask": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "finished_at": {
+            "type": "number",
+            "nullable": true
+          },
+          "request": {
+            "type": "object",
+            "description": "The caller-owned public creation parameters."
+          },
+          "response": {
+            "$ref": "#/components/schemas/AceMusicResult"
+          }
+        }
+      },
+      "AceMusicError": {
+        "type": "object",
+        "required": [
+          "success",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

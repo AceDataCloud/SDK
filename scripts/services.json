@@ -416,5 +416,21 @@
    }
   ],
   "tasks": "/qwen-image/tasks"
+ },
+ "acemusic": {
+  "category": "AI Audio",
+  "endpoints": [
+   {
+    "id": "4c52eae4-e361-5ccb-9af4-1892e918649f",
+    "path": "/acemusic/audios",
+    "name": "ACE Music Audios Generation API"
+   },
+   {
+    "id": "b3637223-92ae-5e2f-8536-6df3ef16c509",
+    "path": "/acemusic/lyrics",
+    "name": "ACE Music Lyrics Generation API"
+   }
+  ],
+  "tasks": "/acemusic/tasks"
  }
 }

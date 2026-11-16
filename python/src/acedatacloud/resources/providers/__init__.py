@@ -1,5 +1,7 @@
 """Provider-axis clients, generated from the platform OpenAPI specs."""
 
+from .acemusic import Acemusic as Acemusic
+from .acemusic import AsyncAcemusic as AsyncAcemusic
 from .digitalhuman import AsyncDigitalhuman as AsyncDigitalhuman
 from .digitalhuman import Digitalhuman as Digitalhuman
 from .dreamina import AsyncDreamina as AsyncDreamina
@@ -36,6 +38,8 @@ from .wan import AsyncWan as AsyncWan
 from .wan import Wan as Wan
 
 __all__ = [
+    "Acemusic",
+    "AsyncAcemusic",
     "Digitalhuman",
     "AsyncDigitalhuman",
     "Dreamina",

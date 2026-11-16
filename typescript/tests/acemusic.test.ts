@@ -1,0 +1,32 @@
+import { Acemusic } from '../src/resources/providers/acemusic';
+import { TaskHandle, taskStatus } from '../src/runtime/tasks';
+import { Transport } from '../src/runtime/transport';
+
+describe('ACE Music', () => {
+  it('submits once with a correctly named idempotency header', async () => {
+    const request = jest.fn().mockResolvedValue({task_id:'original'});
+    const provider = new Acemusic({request} as any);
+    const task = await provider.generate({prompt:'folk', idempotencyKey:'stable'});
+    expect(task).toBeInstanceOf(TaskHandle);
+    expect(task.id).toBe('original');
+    expect(request).toHaveBeenCalledWith('POST','/acemusic/audios',{
+      json:{action:'generate',model:'acemusic-v1.1',custom:false,prompt:'folk',async:true},
+      headers:{'Idempotency-Key':'stable'},
+    });
+  });
+  it('keeps processing groups pending and treats partial failure as terminal', () => {
+    const response={data:[{state:'succeeded',audio_url:'https://cdn.acedata.cloud/one.mp3'}]};
+    expect(taskStatus({state:'processing',response})).toBe('');
+    expect(taskStatus({state:'partial_failed',response})).toBe('failed');
+  });
+  it('does not retry a lost paid submission', async () => {
+    const previous=global.fetch;
+    const mock=jest.fn().mockRejectedValue(new Error('lost response'));
+    global.fetch=mock as any;
+    try {
+      const transport=new Transport({apiToken:'token',maxRetries:2});
+      await expect(transport.request('POST','/acemusic/audios',{json:{prompt:'folk'}})).rejects.toThrow();
+      expect(mock).toHaveBeenCalledTimes(1);
+    } finally { global.fetch=previous; }
+  });
+});

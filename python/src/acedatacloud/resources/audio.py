@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 from acedatacloud._runtime.tasks import AsyncTaskHandle, TaskHandle
 
-AudioProvider = Literal["suno", "producer", "fish"]
+AudioProvider = Literal["suno", "producer", "fish", "acemusic"]
 
 
 class Audio:
@@ -84,7 +84,7 @@ class Audio:
             if model is not None:
                 body["model"] = model
             if tags is not None:
-                body["tags"] = tags
+                body["style" if provider == "acemusic" else "tags"] = tags
             if callback_url is not None:
                 body["callback_url"] = callback_url
             if async_ is not None:
@@ -176,7 +176,7 @@ class AsyncAudio:
             if model is not None:
                 body["model"] = model
             if tags is not None:
-                body["tags"] = tags
+                body["style" if provider == "acemusic" else "tags"] = tags
             if callback_url is not None:
                 body["callback_url"] = callback_url
             if async_ is not None:

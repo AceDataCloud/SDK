@@ -21,6 +21,7 @@ func taskIDFrom(result map[string]any) string {
 
 // providers holds the provider-axis clients, one per service.
 type providers struct {
+	acemusic     *Acemusic
 	digitalhuman *Digitalhuman
 	dreamina     *Dreamina
 	fish         *Fish
@@ -43,6 +44,7 @@ type providers struct {
 
 func newProviders(tr *transport) *providers {
 	return &providers{
+		acemusic:     &Acemusic{t: tr},
 		digitalhuman: &Digitalhuman{t: tr},
 		dreamina:     &Dreamina{t: tr},
 		fish:         &Fish{t: tr},
@@ -63,6 +65,9 @@ func newProviders(tr *transport) *providers {
 		kling:        &Kling{t: tr},
 	}
 }
+
+// Acemusic returns the acemusic provider client.
+func (c *Client) Acemusic() *Acemusic { return c.providers.acemusic }
 
 // Digitalhuman returns the digitalhuman provider client.
 func (c *Client) Digitalhuman() *Digitalhuman { return c.providers.digitalhuman }

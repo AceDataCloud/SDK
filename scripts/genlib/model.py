@@ -56,7 +56,10 @@ def pascal(name: str) -> str:
 
 def py_param(name: str) -> str:
     """`async` and friends are reserved; the SDK's convention is a trailing _."""
-    return f"{name}_" if keyword.iskeyword(name) else name
+    normalized = re.sub(r"[^a-zA-Z0-9_]", "_", name)
+    if normalized != name:
+        normalized = normalized.lower()
+    return f"{normalized}_" if keyword.iskeyword(normalized) else normalized
 
 
 def operation(spec: dict) -> dict:

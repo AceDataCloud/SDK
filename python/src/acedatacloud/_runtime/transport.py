@@ -162,13 +162,21 @@ class SyncTransport:
                     status_code=0,
                     code="timeout",
                 )
-                if not payment_attempted and attempt < self._max_retries:
+                if (
+                    not payment_attempted
+                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and attempt < self._max_retries
+                ):
                     time.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
                 raise timeout_error from exc
             except httpx.TransportError as exc:
-                if not payment_attempted and attempt < self._max_retries:
+                if (
+                    not payment_attempted
+                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and attempt < self._max_retries
+                ):
                     time.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
@@ -196,7 +204,12 @@ class SyncTransport:
                 except Exception:
                     body = {"error": {"code": "unknown", "message": resp.text}}
 
-                if not payment_attempted and _should_retry(resp.status_code) and attempt < self._max_retries:
+                if (
+                    not payment_attempted
+                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and _should_retry(resp.status_code)
+                    and attempt < self._max_retries
+                ):
                     time.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
@@ -375,13 +388,21 @@ class AsyncTransport:
                     status_code=0,
                     code="timeout",
                 )
-                if not payment_attempted and attempt < self._max_retries:
+                if (
+                    not payment_attempted
+                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and attempt < self._max_retries
+                ):
                     await asyncio.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
                 raise timeout_error from exc
             except httpx.TransportError as exc:
-                if not payment_attempted and attempt < self._max_retries:
+                if (
+                    not payment_attempted
+                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and attempt < self._max_retries
+                ):
                     await asyncio.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
@@ -411,7 +432,12 @@ class AsyncTransport:
                 except Exception:
                     body = {"error": {"code": "unknown", "message": resp.text}}
 
-                if not payment_attempted and _should_retry(resp.status_code) and attempt < self._max_retries:
+                if (
+                    not payment_attempted
+                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and _should_retry(resp.status_code)
+                    and attempt < self._max_retries
+                ):
                     await asyncio.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue

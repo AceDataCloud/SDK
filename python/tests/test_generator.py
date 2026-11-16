@@ -175,3 +175,17 @@ def test_endpoint_extracts_non_accept_header_parameters():
     }
     endpoint = Endpoint("fish", "/fish/tts", spec)
     assert [param.name for param in endpoint.header_params] == ["model"]
+
+
+def test_hyphenated_header_has_valid_python_parameter_and_wire_name():
+    from genlib.model import py_param
+
+    assert py_param("Idempotency-Key") == "idempotency_key"
+    service = Service(
+        "acemusic",
+        {"endpoints": [{"id": "4c52eae4-e361-5ccb-9af4-1892e918649f", "path": "/acemusic/audios"}]},
+        Path(__file__).resolve().parents[2] / "scripts/specs",
+    )
+    source = render(service)
+    compile(source, "acemusic-generated", "exec")
+    assert '"Idempotency-Key": idempotency_key' in source

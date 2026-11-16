@@ -576,3 +576,15 @@ GIF generation and editing are available for `gpt-image-2.6-flare`, its `:revers
 GIF defaults to a 512x512 preview, 9 frames and 200 ms per frame; actual dimensions may be adjusted by the model. The static 4K presets (`3840x2160`, `2160x3840`) remain supported for PNG/JPEG/WebP generation and editing on all 2.6 variants. GIF has separate size/frame constraints.
 
 GPT Image 2.6 supports `complexity="low"|"medium"|"high"` (omitted: model default high). Static edits accept `markup`: a PNG with transparent pixels, matching the first reference after orientation, up to 16,777,216 pixels per image and 40MB for the annotation. JSON accepts an HTTPS URL, PNG data URL or an object containing only `image_url`; multipart accepts an annotation file. Do not combine markup with mask, GIF or prompt_rewriter. GIF frame count is 2–16; frame duration is 20–655350ms, rounded to 10ms. GIF rejects masks, custom compression and partial streaming. Pricing is unchanged.
+
+
+## ACE Music
+
+The ACE Music provider exposes idea/custom song generation and a separately priced
+lyrics assistant. Models are `acemusic-v1.1` (default) and `acemusic-v1`; generation
+uses `custom=false, prompt=...` or `custom=true, lyric=..., style=..., title=...`.
+A task targets two MP3 candidates. Preserve the original task ID for polling;
+partial failure is terminal and does not become full success because one audio URL
+exists. ACE Music generation/lyrics submissions are not automatically retried after
+network or server errors. Reconcile a lost submission before creating a replacement.
+Package publication and API deployment are release prerequisites.

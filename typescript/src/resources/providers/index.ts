@@ -1,5 +1,6 @@
 /** Provider-axis clients, generated from the platform OpenAPI specs. */
 
+export { Acemusic } from './acemusic';
 export { Digitalhuman } from './digitalhuman';
 export { Dreamina } from './dreamina';
 export { Fish } from './fish';
@@ -19,6 +20,7 @@ export { Suno } from './suno';
 export { Wan } from './wan';
 
 import { Transport } from '../../runtime/transport';
+import { Acemusic } from './acemusic';
 import { Digitalhuman } from './digitalhuman';
 import { Dreamina } from './dreamina';
 import { Fish } from './fish';
@@ -39,6 +41,7 @@ import { Wan } from './wan';
 
 /** Bind every generated provider client onto `client`. */
 export function attachProviders(client: Record<string, unknown>, transport: Transport): void {
+  client.acemusic = new Acemusic(transport);
   client.digitalhuman = new Digitalhuman(transport);
   client.dreamina = new Dreamina(transport);
   client.fish = new Fish(transport);

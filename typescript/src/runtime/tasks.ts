@@ -19,7 +19,7 @@ export interface TaskHandleOptions {
 }
 
 const DONE = new Set(['succeed', 'succeeded', 'success', 'completed', 'complete', 'finished']);
-const FAILED = new Set(['failed', 'failure', 'error', 'cancelled', 'canceled', 'rejected']);
+const FAILED = new Set(['failed', 'failure', 'error', 'cancelled', 'canceled', 'rejected', 'partial_failed']);
 
 function statusWords(node: unknown, depth = 0): string[] {
   if (depth > 6) return [];
@@ -126,6 +126,9 @@ export function failureReason(state: Record<string, unknown> | null): string {
  * service it drops.
  */
 export function taskStatus(state: Record<string, unknown>): 'succeeded' | 'failed' | '' {
+  const groupState = String(state.state ?? state.status ?? '').toLowerCase();
+  if (FAILED.has(groupState)) return 'failed';
+  if (groupState && !DONE.has(groupState)) return '';
   const response = (state.response ?? state) as Record<string, unknown> | null;
   if (!response || typeof response !== 'object') return '';
 
