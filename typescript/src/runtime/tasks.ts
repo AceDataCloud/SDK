@@ -128,7 +128,8 @@ export function failureReason(state: Record<string, unknown> | null): string {
 export function taskStatus(state: Record<string, unknown>): 'succeeded' | 'failed' | '' {
   const groupState = String(state.state ?? state.status ?? '').toLowerCase();
   if (FAILED.has(groupState)) return 'failed';
-  if (groupState && !DONE.has(groupState)) return '';
+  if (DONE.has(groupState)) return artifactUrls(state).length > 0 ? 'succeeded' : 'failed';
+  if (groupState) return '';
   const response = (state.response ?? state) as Record<string, unknown> | null;
   if (!response || typeof response !== 'object') return '';
 

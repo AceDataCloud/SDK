@@ -83,7 +83,9 @@ def task_status(state: dict[str, Any]) -> str:
     group_state = str(state.get("state") or state.get("status") or "").lower()
     if group_state in _FAILED:
         return "failed"
-    if group_state and group_state not in _DONE:
+    if group_state in _DONE:
+        return "succeeded" if artifact_urls(state) else "failed"
+    if group_state:
         return ""
     response = state.get("response")
     if response is None:

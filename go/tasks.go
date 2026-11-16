@@ -142,7 +142,13 @@ func taskStatus(state map[string]any) string {
 	if failedWords[groupState] {
 		return "failed"
 	}
-	if groupState != "" && !doneWords[groupState] {
+	if doneWords[groupState] {
+		if len(ArtifactURLs(state)) > 0 {
+			return "succeeded"
+		}
+		return "failed"
+	}
+	if groupState != "" {
 		return ""
 	}
 	resp := state

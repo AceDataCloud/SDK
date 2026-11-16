@@ -38,6 +38,9 @@ def test_group_state_outranks_one_song_and_partial_is_terminal():
     assert task_status(pending) == ""
     pending["state"] = "partial_failed"
     assert task_status(pending) == "failed"
+    pending["state"] = "succeeded"
+    pending["response"]["data"].append({"state": "failed"})
+    assert task_status(pending) == "succeeded"
 
 
 @respx.mock
