@@ -1,0 +1,472 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ACE Music Lyrics API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud"
+    }
+  ],
+  "paths": {
+    "/acemusic/lyrics": {
+      "post": {
+        "operationId": "acemusic_lyrics",
+        "summary": "ACE Music Lyrics",
+        "description": "Generate a title and editable lyrics. This is a separate paid operation; generating a song does not implicitly invoke it.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "ACE Music"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 20000
+                  },
+                  "style": {
+                    "type": "string",
+                    "maxLength": 20000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request accepted or result available. Inspect the task state before treating generation as complete.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "task_id",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "task_id": {
+                      "type": "string"
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "title",
+                          "text"
+                        ],
+                        "properties": {
+                          "title": {
+                            "type": "string"
+                          },
+                          "text": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or unsupported model.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient balance for a paid operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied or content rejected.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found for this caller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency key reused with a different request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Service failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Durable task accepted. Save task_id and query the original task; this is not a completed result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "task_id"
+                  ],
+                  "properties": {
+                    "task_id": {
+                      "type": "string"
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "AceMusicTrack": {
+        "type": "object",
+        "required": [
+          "id",
+          "model",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "lyric": {
+            "type": "string"
+          },
+          "style": {
+            "type": "string"
+          },
+          "audio_url": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "AceMusicResult": {
+        "type": "object",
+        "required": [
+          "success",
+          "task_id"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "succeeded",
+              "partial_failed",
+              "failed"
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AceMusicTrack"
+            }
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AceMusicTask": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "finished_at": {
+            "type": "number",
+            "nullable": true
+          },
+          "request": {
+            "type": "object",
+            "description": "The caller-owned public creation parameters.",
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt": {
+                "type": "string"
+              },
+              "lyric": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "custom": {
+                "type": "boolean"
+              },
+              "async": {
+                "type": "boolean"
+              }
+            }
+          },
+          "response": {
+            "$ref": "#/components/schemas/AceMusicTaskResult"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "audios",
+              "lyrics"
+            ]
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "number"
+          },
+          "elapsed": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "AceMusicError": {
+        "type": "object",
+        "required": [
+          "success",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AceMusicTaskResult": {
+        "type": "object",
+        "required": [
+          "success",
+          "task_id"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "created",
+              "submitting",
+              "processing",
+              "storing",
+              "submission_unknown",
+              "succeeded",
+              "partial_failed",
+              "failed"
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AceMusicTrack"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "title",
+                    "text"
+                  ],
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

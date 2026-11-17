@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .acemusic import Acemusic, AsyncAcemusic
 from .digitalhuman import AsyncDigitalhuman, Digitalhuman
 from .dreamina import AsyncDreamina, Dreamina
 from .fish import AsyncFish, Fish
@@ -31,6 +32,7 @@ from .wan import AsyncWan, Wan
 def attach(client: Any, transport: Any, *, is_async: bool) -> None:
     """Bind every generated provider client onto ``client``."""
     if is_async:
+        client.acemusic = AsyncAcemusic(transport)
         client.digitalhuman = AsyncDigitalhuman(transport)
         client.dreamina = AsyncDreamina(transport)
         client.fish = AsyncFish(transport)
@@ -49,6 +51,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.suno = AsyncSuno(transport)
         client.wan = AsyncWan(transport)
     else:
+        client.acemusic = Acemusic(transport)
         client.digitalhuman = Digitalhuman(transport)
         client.dreamina = Dreamina(transport)
         client.fish = Fish(transport)

@@ -124,8 +124,12 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 	extraAuth := map[string]string{}
 	paymentAttempted := false
 
+	maxRetries := t.opts.maxRetries
+	if r.Path == "/acemusic/audios" || r.Path == "/acemusic/lyrics" {
+		maxRetries = 0
+	}
 	var lastErr error
-	for attempt := 0; attempt <= t.opts.maxRetries; attempt++ {
+	for attempt := 0; attempt <= maxRetries; attempt++ {
 		req, err := http.NewRequestWithContext(ctx, r.Method, fullURL, bytes.NewReader(bodyBytes))
 		if err != nil {
 			return nil, fmt.Errorf("build request: %w", err)
@@ -146,7 +150,7 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 				return nil, &TimeoutError{&APIError{Message: err.Error(), ErrCode: "timeout"}}
 			}
 			lastErr = &TransportError{&APIError{Message: err.Error()}}
-			if attempt < t.opts.maxRetries {
+			if attempt < maxRetries {
 				time.Sleep(backoff(attempt))
 				continue
 			}
@@ -179,7 +183,7 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 			if err := json.Unmarshal(respBody, &parsed); err != nil {
 				parsed = map[string]any{"error": map[string]any{"code": "unknown", "message": string(respBody)}}
 			}
-			if retryStatus[resp.StatusCode] && attempt < t.opts.maxRetries {
+			if retryStatus[resp.StatusCode] && attempt < maxRetries {
 				time.Sleep(backoff(attempt))
 				continue
 			}

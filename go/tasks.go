@@ -115,7 +115,7 @@ var doneWords = map[string]bool{
 }
 
 var failedWords = map[string]bool{
-	"failed": true, "failure": true, "error": true,
+	"partial_failed": true, "failed": true, "failure": true, "error": true,
 	"cancelled": true, "canceled": true, "rejected": true,
 }
 
@@ -134,6 +134,23 @@ func terminalStatus(state map[string]any) bool {
 
 // taskStatus reduces a poll response to "succeeded", "failed" or "" (running).
 func taskStatus(state map[string]any) string {
+	groupState, _ := state["state"].(string)
+	if groupState == "" {
+		groupState, _ = state["status"].(string)
+	}
+	groupState = strings.ToLower(groupState)
+	if failedWords[groupState] {
+		return "failed"
+	}
+	if doneWords[groupState] {
+		if len(ArtifactURLs(state)) > 0 {
+			return "succeeded"
+		}
+		return "failed"
+	}
+	if groupState != "" {
+		return ""
+	}
 	resp := state
 	if r, ok := state["response"].(map[string]any); ok {
 		resp = r

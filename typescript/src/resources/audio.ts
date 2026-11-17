@@ -3,7 +3,7 @@
 import { Transport } from '../runtime/transport';
 import { TaskHandle } from '../runtime/tasks';
 
-export type AudioProvider = 'suno' | 'producer' | 'fish' | (string & {});
+export type AudioProvider = 'suno' | 'producer' | 'fish' | 'acemusic' | (string & {});
 
 export class Audio {
   constructor(private transport: Transport) {}
@@ -62,7 +62,7 @@ export class Audio {
     } else {
       const body: Record<string, unknown> = { prompt, ...rest };
       if (model !== undefined) body.model = model;
-      if (tags !== undefined) body.tags = tags;
+      if (tags !== undefined) body[provider === 'acemusic' ? 'style' : 'tags'] = tags;
       if (callbackUrl !== undefined) body.callback_url = callbackUrl;
       result = await this.transport.request('POST', `/${provider}/audios`, { json: body });
     }

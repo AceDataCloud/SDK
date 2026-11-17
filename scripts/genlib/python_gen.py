@@ -129,6 +129,9 @@ def _aliases(svc: Service) -> tuple[dict[str, str], list[str]]:
         for p in ep.params:
             if p.is_control or p.name in mapping:
                 continue
+            # ACE Music has separate generation and task action enums.
+            if svc.alias == "acemusic" and p.name == "action":
+                continue
             explicit_alias = p.schema.get("x-python-type-alias")
             if explicit_alias:
                 mapping[p.name] = explicit_alias
