@@ -518,7 +518,7 @@ safe defaults for missing keys and do not share cached config across users.
 The SDK supports a pluggable `paymentHandler` that is invoked when the
 API returns `402 Payment Required`. Combine it with
 [`@acedatacloud/x402-client`](https://github.com/AceDataCloud/X402Client)
-to pay for requests on-chain (Base, Solana, SKALE) instead of using a
+to pay for requests on-chain (Base, Solana) instead of using a
 Bearer token:
 
 ```bash
@@ -532,7 +532,7 @@ import { createX402PaymentHandler } from '@acedatacloud/x402-client';
 const client = new AceDataCloud({
   // No apiToken needed — the x402 handler pays per request.
   paymentHandler: createX402PaymentHandler({
-    network: 'base',               // or 'solana' | 'skale'
+    network: 'base',               // or 'solana'
     evmProvider: window.ethereum,
     evmAddress: '0xYourAddress...',
   }),
