@@ -33,13 +33,18 @@ class Acemusic:
     def generate(
         self,
         *,
-        action: Literal["generate"] | None = None,
+        action: Literal["generate", "upload", "cover", "mashup"] | None = None,
         model: Literal["acemusic-v1.1", "acemusic-v1"] | None = None,
         custom: bool | None = None,
         prompt: str | None = None,
         lyric: str | None = None,
         style: str | None = None,
         title: str | None = None,
+        audio_url: str | None = None,
+        name: str | None = None,
+        audio_id: str | None = None,
+        mashup_audio_ids: list[str] | None = None,
+        audio_influence: float | None = None,
         idempotency_key: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -51,8 +56,10 @@ class Acemusic:
         """ACE Music Audios"""
         body: dict[str, Any] = {}
         body["action"] = action if action is not None else "generate"
-        body["model"] = model if model is not None else "acemusic-v1.1"
-        body["custom"] = custom if custom is not None else False
+        if model is not None:
+            body["model"] = model
+        if custom is not None:
+            body["custom"] = custom
         if prompt is not None:
             body["prompt"] = prompt
         if lyric is not None:
@@ -61,6 +68,16 @@ class Acemusic:
             body["style"] = style
         if title is not None:
             body["title"] = title
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if name is not None:
+            body["name"] = name
+        if audio_id is not None:
+            body["audio_id"] = audio_id
+        if mashup_audio_ids is not None:
+            body["mashup_audio_ids"] = mashup_audio_ids
+        if audio_influence is not None:
+            body["audio_influence"] = audio_influence
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -142,13 +159,18 @@ class AsyncAcemusic:
     async def generate(
         self,
         *,
-        action: Literal["generate"] | None = None,
+        action: Literal["generate", "upload", "cover", "mashup"] | None = None,
         model: Literal["acemusic-v1.1", "acemusic-v1"] | None = None,
         custom: bool | None = None,
         prompt: str | None = None,
         lyric: str | None = None,
         style: str | None = None,
         title: str | None = None,
+        audio_url: str | None = None,
+        name: str | None = None,
+        audio_id: str | None = None,
+        mashup_audio_ids: list[str] | None = None,
+        audio_influence: float | None = None,
         idempotency_key: str | None = None,
         async_: bool | None = None,
         wait: bool = False,
@@ -160,8 +182,10 @@ class AsyncAcemusic:
         """ACE Music Audios"""
         body: dict[str, Any] = {}
         body["action"] = action if action is not None else "generate"
-        body["model"] = model if model is not None else "acemusic-v1.1"
-        body["custom"] = custom if custom is not None else False
+        if model is not None:
+            body["model"] = model
+        if custom is not None:
+            body["custom"] = custom
         if prompt is not None:
             body["prompt"] = prompt
         if lyric is not None:
@@ -170,6 +194,16 @@ class AsyncAcemusic:
             body["style"] = style
         if title is not None:
             body["title"] = title
+        if audio_url is not None:
+            body["audio_url"] = audio_url
+        if name is not None:
+            body["name"] = name
+        if audio_id is not None:
+            body["audio_id"] = audio_id
+        if mashup_audio_ids is not None:
+            body["mashup_audio_ids"] = mashup_audio_ids
+        if audio_influence is not None:
+            body["audio_influence"] = audio_influence
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url

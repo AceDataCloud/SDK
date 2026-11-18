@@ -19,7 +19,7 @@ func TestAceMusicGenerationContract(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Fatal(err)
 		}
-		if body["model"] != "acemusic-v1.1" || body["async"] != true || body["prompt"] != "folk" {
+		if body["async"] != true || body["prompt"] != "folk" {
 			t.Errorf("wrong payload: %v", body)
 		}
 		w.Header().Set("Content-Type", "application/json")
@@ -60,5 +60,33 @@ func TestAceMusicTaskFilterSerialization(t *testing.T) {
 	paged := (AcemusicTasksRequest{Action: "list", Page: 2, PageSize: 5}).toBody()
 	if paged["page"] != 2 || paged["page_size"] != 5 {
 		t.Fatalf("wrong page %v", paged)
+	}
+}
+
+func TestAceMusicReferenceActionSerialization(t *testing.T) {
+	cases := []AcemusicGenerateRequest{
+		{Action: "upload", AudioURL: "https://example.com/reference.mp3"},
+		{Action: "cover", AudioID: "track-a", Lyric: "Verse", Style: "Folk"},
+		{Action: "mashup", MashupAudioIDs: []string{"a", "b"}, Lyric: "Verse", Style: "Folk", AudioInfluence: 80},
+	}
+	for _, request := range cases {
+		body := request.toBody()
+		for _, name := range []string{"model", "custom"} {
+			if _, exists := body[name]; exists {
+				t.Fatalf("%s injected %s: %v", request.Action, name, body)
+			}
+		}
+		if body["action"] != request.Action || body["async"] != true {
+			t.Fatalf("wrong body %v", body)
+		}
+		if request.Action == "upload" && body["audio_url"] != request.AudioURL {
+			t.Fatal(body)
+		}
+		if request.Action == "cover" && body["audio_id"] != request.AudioID {
+			t.Fatal(body)
+		}
+		if request.Action == "mashup" && len(body["mashup_audio_ids"].([]string)) != 2 {
+			t.Fatal(body)
+		}
 	}
 }

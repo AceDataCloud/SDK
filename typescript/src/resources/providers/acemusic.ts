@@ -17,16 +17,30 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface AcemusicGenerateOptions {
-  action?: "generate";
+  /** generate creates new songs, upload imports one audio reference, cover reworks one owned track, and mashup blends exactly two owned tracks. */
+  action?: "generate" | "upload" | "cover" | "mashup";
+  /** Generation supports both models. Cover and mashup use acemusic-v1.1. Omit for upload. */
   model?: "acemusic-v1.1" | "acemusic-v1";
+  /** Only used by generate: false for an idea, true for supplied lyrics. */
   custom?: boolean;
   /** Creation idea. Required when custom is false. */
   prompt?: string;
-  /** Custom lyrics. Required when custom is true. */
+  /** Lyrics for custom generation, cover or mashup. */
   lyric?: string;
-  /** Musical style for custom creation. */
+  /** Musical style for custom generation, cover or mashup. */
   style?: string;
+  /** Required for custom generation; optional for cover and mashup. */
   title?: string;
+  /** HTTPS source audio URL for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks. */
+  audioUrl?: string;
+  /** Optional display name for an upload. */
+  name?: string;
+  /** Public platform track ID owned by the caller. Required for cover; optional on upload to associate the import with an existing reference track. */
+  audioId?: string;
+  /** Exactly two distinct caller-owned public track IDs. The selected references must be compatible with each other. */
+  mashupAudioIds?: string[];
+  /** Audio reference strength for cover and mashup. Defaults to 60. */
+  audioInfluence?: number;
   idempotencyKey?: string;
   /** Submit asynchronously and poll. Defaults to true. */
   async?: boolean;
@@ -75,14 +89,19 @@ export class Acemusic {
   async generate(options: AcemusicGenerateOptions = {}): Promise<TaskHandle> {
     const body: Record<string, unknown> = {};
     body["action"] = options.action ?? "generate";
-    body["model"] = options.model ?? "acemusic-v1.1";
-    body["custom"] = options.custom ?? false;
+    if (options.model !== undefined) body["model"] = options.model;
+    if (options.custom !== undefined) body["custom"] = options.custom;
     if (options.prompt !== undefined) body["prompt"] = options.prompt;
     if (options.lyric !== undefined) body["lyric"] = options.lyric;
     if (options.style !== undefined) body["style"] = options.style;
     if (options.title !== undefined) body["title"] = options.title;
+    if (options.audioUrl !== undefined) body["audio_url"] = options.audioUrl;
+    if (options.name !== undefined) body["name"] = options.name;
+    if (options.audioId !== undefined) body["audio_id"] = options.audioId;
+    if (options.mashupAudioIds !== undefined) body["mashup_audio_ids"] = options.mashupAudioIds;
+    if (options.audioInfluence !== undefined) body["audio_influence"] = options.audioInfluence;
     for (const [key, value] of Object.entries(options)) {
-      if (!["action", "async", "callbackUrl", "custom", "idempotencyKey", "lyric", "maxWait", "model", "pollInterval", "prompt", "style", "title", "wait"].includes(key) && value !== undefined) {
+      if (!["action", "async", "audioId", "audioInfluence", "audioUrl", "callbackUrl", "custom", "idempotencyKey", "lyric", "mashupAudioIds", "maxWait", "model", "name", "pollInterval", "prompt", "style", "title", "wait"].includes(key) && value !== undefined) {
         body[key] = value;
       }
     }

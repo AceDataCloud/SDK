@@ -301,6 +301,18 @@ class Endpoint:
         props: dict[str, dict] = schema.get("properties") or {}
         self.summary = summary(spec)
         self.params = [Param(n, s, n in required) for n, s in props.items()]
+        # Action branches may explicitly forbid a field with a global default.
+        # Let the server apply those defaults rather than injecting a generate
+        # model/custom value into upload, cover or mashup requests.
+        branches = schema.get("oneOf") or []
+        for param in self.params:
+            if any(
+                any(param.name in item.get("required", []) for item in branch.get("not", {}).get("anyOf", []))
+                for branch in branches
+            ):
+                param.schema = {key: value for key, value in param.schema.items() if key != "default"}
+                if param.type == "boolean":
+                    param.schema["x-go-omit-false"] = True
         # ACE Music offers mutually exclusive pagination shapes. Server defaults
         # apply only when neither shape is sent; materializing page defaults
         # beside an explicit limit/offset would create an invalid request.
