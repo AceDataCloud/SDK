@@ -328,7 +328,7 @@ async def test_async_x402_payment_handler_supports_streaming():
     + [("aichat", False)],
 )
 @respx.mock
-@pytest.mark.parametrize("model", ["gpt-5.6-sol-fast", "gpt-6.1-terra"])
+@pytest.mark.parametrize("model", ["gpt-5.6-sol-fast", "gpt-6.1-terra", "gpt-6.2-astra", "gpt-6.2-sol"])
 def test_compatible_model_passthrough(client, operation, stream, model):
     from acedatacloud import AiChatModel
 
@@ -371,8 +371,9 @@ def test_compatible_model_passthrough(client, operation, stream, model):
 )
 @respx.mock
 @pytest.mark.asyncio
-async def test_async_sol_fast_model_passthrough(async_client, operation, stream):
-    body = {"model": "gpt-5.6-sol-fast"}
+@pytest.mark.parametrize("model", ["gpt-5.6-sol-fast", "gpt-6.2-astra", "gpt-6.2-sol"])
+async def test_async_compatible_model_passthrough(async_client, operation, stream, model):
+    body = {"model": model}
     if operation == "responses":
         path = "/openai/responses"
         create = async_client.openai.responses.create

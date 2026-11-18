@@ -587,6 +587,8 @@ func TestPublicChatModelsPassthrough(t *testing.T) {
 	}{
 		{"claude-opus-5-5", 0, map[string]any{"n": 1, "tool_choice": "auto"}},
 		{"gemini-4-argon", 32768, nil},
+		{"gpt-6.2-astra", 64, nil},
+		{"gpt-6.2-sol", 64, nil},
 		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "low"}},
 		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "high"}},
 		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "max"}},
