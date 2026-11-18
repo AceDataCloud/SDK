@@ -4,7 +4,7 @@ import { OpenAI } from '../src/resources/openai';
 import { NanoBanana, NanoBananaGenerateOptions } from '../src/resources/providers/nano-banana';
 import { TaskHandle } from '../src/runtime/tasks';
 
-const compatibleModels: AiChatModel[] = ['gpt-5.6-sol-fast', 'gpt-6.1-terra'];
+const compatibleModels: AiChatModel[] = ['gpt-5.6-sol-fast', 'gpt-6.1-terra', 'gpt-6.2-astra', 'gpt-6.2-sol'];
 
 describe.each(compatibleModels)('Public compatible model %s', (model) => {
   it.each(['completions', 'responses', 'messages', 'aichat'])(
