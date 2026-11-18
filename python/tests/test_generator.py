@@ -203,8 +203,21 @@ def test_acemusic_task_generation_keeps_distinct_action_types_and_pagination():
         Path(__file__).resolve().parents[2] / "scripts/specs",
     )
     source = render(service)
-    assert 'action: Literal["generate"] | None = None' in source
+    assert 'action: Literal["generate", "upload", "cover", "mashup"] | None = None' in source
     assert 'action: Literal["retrieve", "retrieve_batch", "list"]' in source
     task = next(ep for ep in service.endpoints if ep.path.endswith("/tasks"))
     assert next(p for p in task.params if p.name == "page").default() is None
     assert next(p for p in task.params if p.name == "page_size").default() is None
+
+
+def test_action_forbidden_defaults_are_left_to_the_server():
+    service = Service(
+        "acemusic",
+        {"endpoints": [{"id": "4c52eae4-e361-5ccb-9af4-1892e918649f", "path": "/acemusic/audios"}]},
+        Path(__file__).resolve().parents[2] / "scripts/specs",
+    )
+    parameters = {parameter.name: parameter for parameter in service.endpoints[0].params}
+    for field in ("model", "custom", "audio_influence"):
+        assert parameters[field].default() is None
+    assert parameters["action"].default() == "generate"
+    assert parameters["custom"].schema["x-go-omit-false"] is True

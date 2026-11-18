@@ -10,7 +10,7 @@ describe('ACE Music', () => {
     expect(task).toBeInstanceOf(TaskHandle);
     expect(task.id).toBe('original');
     expect(request).toHaveBeenCalledWith('POST','/acemusic/audios',{
-      json:{action:'generate',model:'acemusic-v1.1',custom:false,prompt:'folk',async:true},
+      json:{action:'generate',prompt:'folk',async:true},
       headers:{'Idempotency-Key':'stable'},
     });
   });
@@ -38,6 +38,17 @@ describe('ACE Music', () => {
     }});
     await provider.tasks({action:'list',page:2,pageSize:5});
     expect(request).toHaveBeenLastCalledWith('POST','/acemusic/tasks',{json:{action:'list',page:2,page_size:5}});
+  });
+
+  it.each([
+    [{action:'upload',audioUrl:'https://example.com/reference.mp3'}, {action:'upload',audio_url:'https://example.com/reference.mp3',async:true}],
+    [{action:'cover',audioId:'track-a',lyric:'Verse',style:'Folk'}, {action:'cover',audio_id:'track-a',lyric:'Verse',style:'Folk',async:true}],
+    [{action:'mashup',mashupAudioIds:['a','b'],lyric:'Verse',style:'Folk',audioInfluence:80}, {action:'mashup',mashup_audio_ids:['a','b'],lyric:'Verse',style:'Folk',audio_influence:80,async:true}],
+  ])('does not inject defaults from other actions', async (options, expected) => {
+    const request = jest.fn().mockResolvedValue({task_id:'original'});
+    const provider = new Acemusic({request} as any);
+    await provider.generate(options as any);
+    expect(request.mock.calls[0][2].json).toEqual(expected);
   });
 
 });

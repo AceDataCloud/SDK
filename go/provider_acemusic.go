@@ -12,20 +12,30 @@ type Acemusic struct {
 
 // AcemusicGenerateRequest is the input to acemusic.Generate.
 type AcemusicGenerateRequest struct {
-	// optional
+	// generate creates new songs, upload imports one MP3 audio reference, cover reworks one owned track, and mashup
 	Action string
-	// optional
+	// Generation supports both models. Cover and mashup use acemusic-v1.1. Omit for upload.
 	Model string
-	// optional
+	// Only used by generate: false for an idea, true for supplied lyrics.
 	Custom bool
 	// Creation idea. Required when custom is false.
 	Prompt string
-	// Custom lyrics. Required when custom is true.
+	// Lyrics for custom generation, cover or mashup.
 	Lyric string
-	// Musical style for custom creation.
+	// Musical style for custom generation, cover or mashup.
 	Style string
-	// optional
+	// Required for custom generation; optional for cover and mashup.
 	Title string
+	// HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated
+	AudioURL string
+	// Optional display name for an upload.
+	Name string
+	// Public platform track ID owned by the caller. Required for cover; optional on upload to associate the import w
+	AudioID string
+	// Exactly two distinct caller-owned public track IDs. The selected references must be compatible with each other
+	MashupAudioIDs []string
+	// Audio reference strength for cover and mashup. Defaults to 60.
+	AudioInfluence float64
 	// optional
 	IdempotencyKey string
 	// Async submits without blocking; poll the returned handle. Defaults true.
@@ -45,10 +55,10 @@ func (r AcemusicGenerateRequest) toBody() map[string]any {
 	}
 	if r.Model != "" {
 		body["model"] = r.Model
-	} else {
-		body["model"] = "acemusic-v1.1"
 	}
-	body["custom"] = r.Custom
+	if r.Custom {
+		body["custom"] = r.Custom
+	}
 	if r.Prompt != "" {
 		body["prompt"] = r.Prompt
 	}
@@ -60,6 +70,21 @@ func (r AcemusicGenerateRequest) toBody() map[string]any {
 	}
 	if r.Title != "" {
 		body["title"] = r.Title
+	}
+	if r.AudioURL != "" {
+		body["audio_url"] = r.AudioURL
+	}
+	if r.Name != "" {
+		body["name"] = r.Name
+	}
+	if r.AudioID != "" {
+		body["audio_id"] = r.AudioID
+	}
+	if r.MashupAudioIDs != nil {
+		body["mashup_audio_ids"] = r.MashupAudioIDs
+	}
+	if r.AudioInfluence != 0 {
+		body["audio_influence"] = r.AudioInfluence
 	}
 	body["async"] = true
 	if r.Async != nil {

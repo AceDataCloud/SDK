@@ -278,7 +278,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AceMusicTrack"
-            }
+            },
+            "description": "One track for a successful upload, or two candidates for a complete generate/cover/mashup group. A partial group may retain only its successful candidate."
           },
           "error": {
             "type": "object",
@@ -343,6 +344,45 @@
               },
               "async": {
                 "type": "boolean"
+              },
+              "audio_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://",
+                "minLength": 1,
+                "maxLength": 20000,
+                "description": "HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 20000,
+                "description": "Optional display name for an upload."
+              },
+              "audio_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 20000,
+                "description": "Public platform track ID owned by the caller. Required for cover; optional on upload to associate the import with an existing reference track."
+              },
+              "mashup_audio_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 20000
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "uniqueItems": true,
+                "description": "Exactly two distinct caller-owned public track IDs. The selected references must be compatible with each other."
+              },
+              "audio_influence": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 100,
+                "default": 60,
+                "description": "Audio reference strength for cover and mashup. Defaults to 60."
               }
             }
           },
@@ -354,7 +394,8 @@
             "enum": [
               "audios",
               "lyrics"
-            ]
+            ],
+            "description": "Audio tasks include generate, upload, cover and mashup. Lyrics tasks use lyrics."
           },
           "trace_id": {
             "type": "string"
