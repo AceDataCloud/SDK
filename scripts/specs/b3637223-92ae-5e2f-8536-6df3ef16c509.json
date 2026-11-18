@@ -351,7 +351,7 @@
                 "pattern": "^https://",
                 "minLength": 1,
                 "maxLength": 20000,
-                "description": "HTTPS source audio URL for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
+                "description": "HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
               },
               "name": {
                 "type": "string",

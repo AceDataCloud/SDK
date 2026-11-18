@@ -12,7 +12,7 @@ type Acemusic struct {
 
 // AcemusicGenerateRequest is the input to acemusic.Generate.
 type AcemusicGenerateRequest struct {
-	// generate creates new songs, upload imports one audio reference, cover reworks one owned track, and mashup blen
+	// generate creates new songs, upload imports one MP3 audio reference, cover reworks one owned track, and mashup
 	Action string
 	// Generation supports both models. Cover and mashup use acemusic-v1.1. Omit for upload.
 	Model string
@@ -26,7 +26,7 @@ type AcemusicGenerateRequest struct {
 	Style string
 	// Required for custom generation; optional for cover and mashup.
 	Title string
-	// HTTPS source audio URL for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks.
+	// HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated
 	AudioURL string
 	// Optional display name for an upload.
 	Name string

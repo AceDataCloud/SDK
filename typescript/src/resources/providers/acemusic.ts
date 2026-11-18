@@ -17,7 +17,7 @@ function taskId(result: Record<string, unknown>): string {
 }
 
 export interface AcemusicGenerateOptions {
-  /** generate creates new songs, upload imports one audio reference, cover reworks one owned track, and mashup blends exactly two owned tracks. */
+  /** generate creates new songs, upload imports one MP3 audio reference, cover reworks one owned track, and mashup blends exactly two owned tracks. */
   action?: "generate" | "upload" | "cover" | "mashup";
   /** Generation supports both models. Cover and mashup use acemusic-v1.1. Omit for upload. */
   model?: "acemusic-v1.1" | "acemusic-v1";
@@ -31,7 +31,7 @@ export interface AcemusicGenerateOptions {
   style?: string;
   /** Required for custom generation; optional for cover and mashup. */
   title?: string;
-  /** HTTPS source audio URL for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks. */
+  /** HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks. */
   audioUrl?: string;
   /** Optional display name for an upload. */
   name?: string;

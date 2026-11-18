@@ -14,7 +14,7 @@
       "post": {
         "operationId": "acemusic_audios",
         "summary": "ACE Music Audios",
-        "description": "Generate, cover or mash up one group of two song candidates, or import one audio reference from an HTTPS URL. Complete two-track groups and successful one-track imports have separate prices. Final failed or partial generation groups are free. Save the original task ID and query it instead of resubmitting.",
+        "description": "Generate, cover or mash up one group of two song candidates, or import one MP3 audio reference from an HTTPS URL. Complete two-track groups and successful one-track imports have separate prices. Final failed or partial generation groups are free. Save the original task ID and query it instead of resubmitting.",
         "security": [
           {
             "bearerAuth": []
@@ -40,7 +40,7 @@
                       "mashup"
                     ],
                     "default": "generate",
-                    "description": "generate creates new songs, upload imports one audio reference, cover reworks one owned track, and mashup blends exactly two owned tracks."
+                    "description": "generate creates new songs, upload imports one MP3 audio reference, cover reworks one owned track, and mashup blends exactly two owned tracks."
                   },
                   "model": {
                     "type": "string",
@@ -98,7 +98,7 @@
                     "pattern": "^https://",
                     "minLength": 1,
                     "maxLength": 20000,
-                    "description": "HTTPS source audio URL for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
+                    "description": "HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
                   },
                   "name": {
                     "type": "string",
@@ -713,7 +713,7 @@
                 "pattern": "^https://",
                 "minLength": 1,
                 "maxLength": 20000,
-                "description": "HTTPS source audio URL for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
+                "description": "HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
               },
               "name": {
                 "type": "string",
