@@ -17,6 +17,12 @@ export {
 } from './runtime/errors';
 
 export { TaskHandle, TaskHandleOptions } from './runtime/tasks';
+export { Acemusic } from './resources/providers/acemusic';
+export type {
+  AcemusicGenerateOptions,
+  AcemusicLyricsOptions,
+  AcemusicTasksOptions,
+} from './resources/providers/acemusic';
 
 export type {
   PaymentHandler,

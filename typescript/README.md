@@ -593,3 +593,16 @@ The ACE Music provider also has a typed `tasks`/`Tasks` method for retrieve,
 retrieve_batch and list. History accepts type (`audios`/`lyrics`), creation-time
 bounds, and either page/page_size or limit/offset. Do not mix pagination shapes;
 unset page fields remain omitted so offset queries stay valid.
+
+The package root exports the ACE Music provider and its request types:
+
+```typescript
+import { AceDataCloud, type AcemusicGenerateOptions } from '@acedatacloud/sdk';
+
+const client = new AceDataCloud({ apiToken: process.env.ACEDATACLOUD_API_TOKEN });
+const request: AcemusicGenerateOptions = {
+  action: 'cover', audioId: 'owned-platform-audio-id',
+  lyric: '[Verse] Your lyrics', style: 'acoustic pop', audioInfluence: 60,
+};
+const task = await client.acemusic.generate(request);
+```
