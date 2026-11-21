@@ -1,7 +1,7 @@
 import json
-from pathlib import Path
 import subprocess
 import unittest
+from pathlib import Path
 
 from test_make_suno_contract import EVALUATOR
 
