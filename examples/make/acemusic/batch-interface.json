@@ -1,0 +1,23 @@
+[
+  {
+    "name": "count",
+    "label": "Count",
+    "type": "number"
+  },
+  {
+    "name": "task_ids",
+    "label": "Task IDs",
+    "type": "array",
+    "spec": {
+      "type": "text"
+    }
+  },
+  {
+    "name": "states",
+    "label": "States",
+    "type": "array",
+    "spec": {
+      "type": "text"
+    }
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "url": "/acemusic/tasks",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "action": "retrieve_batch",
+    "ids": "{{parameters.task_ids}}"
+  },
+  "log": {
+    "sanitize": [
+      "request.headers.authorization",
+      "response.body.request",
+      "response.body.items"
+    ]
+  },
+  "response": {
+    "valid": {
+      "condition": "{{!body.error && body.count >= 0}}",
+      "message": "Unexpected ACE Music task list.",
+      "type": "RuntimeError"
+    },
+    "output": {
+      "count": "{{body.count}}",
+      "task_ids": "{{map(ifempty(body.items, emptyarray), \"id\")}}",
+      "states": "{{map(ifempty(body.items, emptyarray), \"state\")}}"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "name": "audio_url",
+    "label": "Public HTTPS MP3 URL",
+    "type": "url",
+    "required": true,
+    "validate": {
+      "pattern": "^https://[^/\\s]+/",
+      "min": 1,
+      "max": 20000
+    }
+  }
+]

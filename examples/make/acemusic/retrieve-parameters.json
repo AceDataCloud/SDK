@@ -1,0 +1,8 @@
+[
+  {
+    "name": "task_id",
+    "label": "Task ID",
+    "type": "text",
+    "required": true
+  }
+]

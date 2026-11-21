@@ -1,0 +1,25 @@
+{
+  "url": "https://api.acedata.cloud/acemusic/tasks",
+  "method": "POST",
+  "type": "json",
+  "headers": {
+    "Authorization": "Bearer {{parameters.apiKey}}"
+  },
+  "body": {
+    "action": "list",
+    "page": 1,
+    "page_size": 1
+  },
+  "response": {
+    "valid": "{{statusCode === 200 && !body.error && body.count >= 0}}",
+    "error": {
+      "message": "[{{statusCode}}] Check application key and ACE Music task access."
+    }
+  },
+  "log": {
+    "sanitize": [
+      "request.headers.authorization",
+      "response.body"
+    ]
+  }
+}
