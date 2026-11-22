@@ -82,6 +82,7 @@ def test_aichat_deepseek_model_suggestions_match():
         "deepseek-v4-flash",
         "deepseek-flash",
         "deepseek-v4-pro",
+        "deepseek-v4-pro-0813",
         "deepseek-v3.2",
     ]
     assert [model for model in get_args(AiChatModel) if model.startswith("deepseek-")] == expected
