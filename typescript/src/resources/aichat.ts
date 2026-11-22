@@ -82,9 +82,15 @@ export type AiChatModel =
   | 'deepseek-v3-250324'
   | 'deepseek-v4-flash'
   | 'grok-3'
+  | 'glm-5.3'
+  | 'glm-5.2'
   | 'glm-5.1'
+  | 'glm-5'
+  | 'glm-5-turbo'
   | 'glm-4.7'
   | 'glm-4.6'
+  | 'glm-4.5'
+  | 'glm-4.5v'
   | 'glm-3-turbo'
   | (string & {});
 
