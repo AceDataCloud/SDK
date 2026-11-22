@@ -2,7 +2,7 @@
 
 Create Suno music tasks in Make with your own **Ace Data Cloud** API token, then retrieve the **same task ID** until the audio is ready. This independent app project contains **Generate Suno music**, **Get a Suno task**, and **Make an API call**. It is provided by Ace Data Cloud; it is not an official Suno app or an affiliation claim.
 
-[简体中文](README.zh-CN.md) · [Current API access and pricing](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_readme_pricing) · [API documentation](https://platform.acedata.cloud/documents/suno-audios?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_readme_docs)
+[简体中文](README.zh-CN.md) · [Current API access and pricing](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen) · [API documentation](https://platform.acedata.cloud/documents/suno-audios?utm_source=make&utm_medium=integration&utm_campaign=evergreen)
 
 **Community directory name:** `Suno` under the current form's service-only naming rule; **provided by Ace Data Cloud** is the integration identity in the description/publisher page. This README title is not an approved directory label. [Submission rules checked 2026-10-19](../COMMUNITY_SUBMISSION.md).
 
@@ -18,7 +18,7 @@ Official Make reference screenshot, downloaded 2026-10-17; its capture date/vers
 
 ## 2. Register and get your Ace Data Cloud API token
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_readme_api_key). Register/sign in. If **General application** is missing, choose **Initialize General Application**.
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen). Register/sign in. If **General application** is missing, choose **Initialize General Application**.
 2. Open General application or your Suno-enabled application. Copy its API key, or select **Manage Keys → Create** for a separate `Make Suno` key. Review expiration, allowed APIs, usage limits, service access, and current balance/prices. Allow `/suno/audios` for generation and `/suno/tasks` for lookup; this Connection also validates through `GET /v1/models`, so restricted keys must allow that read. Do not expand a restricted key blindly.
 
 ![Copy an application API key or open Manage Keys](./_assets/tutorial/get-api-key-en.png)
@@ -52,7 +52,7 @@ Before any paid action, run **Make an API call** with `GET /v1/models`. For an e
 | Connection rejected / 401 / restricted key | Raw application token, expiration, `/v1/models` read permission, Suno API permissions, service access, usage limit, and balance. |
 | Pending or no audio URLs | Query the same task ID later. A preview URL or accepted task is not a completed generation. |
 | A string instead of the expected task response object | Stop and inspect the task contract. The module rejects unsupported envelopes rather than guessing success. |
-| 429, timeout, 5xx, or ambiguous submission | No automatic application-error replay is configured. Inspect [request history](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_readme_usages) before submitting again; transport/scenario replay can still duplicate a paid request. |
+| 429, timeout, 5xx, or ambiguous submission | No automatic application-error replay is configured. Inspect [request history](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen) before submitting again; transport/scenario replay can still duplicate a paid request. |
 | Failed task | Preserve task/trace ID for support; never include your token or private request data. |
 | Media unavailable | Confirm all tracks reached `succeeded`, then check the returned URL from your Make/browser environment. |
 

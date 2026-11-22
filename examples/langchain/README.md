@@ -22,7 +22,7 @@ On Windows, activate the environment with `.venv\Scripts\Activate.ps1` in
 PowerShell. The example pins `langchain-openai==1.7.0`; CI also checks 1.6.6.
 
 Get an application API key from
-[Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_langchain_readme_api_key).
+[Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 Sign in or register, initialize **General application** if needed, and open
 **Keys / Manage Keys → Create** to give this integration a separate key.
 Check its service access, expiration, allowed APIs, usage limit, and balance.
@@ -46,7 +46,7 @@ python3 examples/langchain/chat.py --mode tools
 In PowerShell, set the key with `$env:ACEDATACLOUD_API_TOKEN='your token'`.
 The default model is `gpt-4o-mini`; set `ACEDATACLOUD_MODEL` to another model
 available to your account in the
-[model directory and current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_langchain_readme_pricing).
+[model directory and current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 `ACEDATACLOUD_BASE_URL` defaults to
 `https://api.acedata.cloud/v1` and can point to a local mock or staging endpoint.
 Do not include `/chat/completions` in the base URL.
@@ -63,7 +63,7 @@ or agent loop you add can create more billable requests.
 The example prints the API response ID and `usage_metadata` token counts when
 available. Keep the response ID for troubleshooting. Token counts are not the
 charged Credits; check the
-[Usage History](https://platform.acedata.cloud/console/usages?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_langchain_readme_usage) for the actual
+[Usage History](https://platform.acedata.cloud/console/usages?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) for the actual
 charge. Streaming usage is off by default for compatibility. Use
 `--mode stream --stream-usage` with a model that supports OpenAI's
 `stream_options.include_usage` to request final token counts; if the service

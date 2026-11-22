@@ -30,8 +30,8 @@ The [live Community form](https://f.make.com/submit-your-app), checked 2026-10-1
 
 **HappyHorse video workflows in Make, provided by Ace Data Cloud.** Choose the service/model explicitly, submit once, then connect completed media to your automation. Bring your own token. Make operations and Ace API billing are separate.
 
-- [Get API token](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=happyhorse_make_listing_api_key)
-- [Current prices](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=happyhorse_make_listing_pricing)
+- [Get API token](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen)
+- [Current prices](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen)
 - Install button: pending real reviewed Make invite/listing URL.
 
 Use the EN/ZH README as reviewable onboarding; screenshot provenance is [recorded](../suno/ASSET_SOURCES.md). Real HappyHorse Make screenshots, support/publisher contact, logo rights, invite/landing links, fresh scenarios and paid acceptance remain to supply. No account, agreement, new payment or permissions were created.

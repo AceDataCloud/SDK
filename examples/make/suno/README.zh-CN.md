@@ -2,7 +2,7 @@
 
 用自己的 **Ace Data Cloud API Token** 在 Make 提交 Suno 音乐任务，再查询**同一个任务 ID**取得最终音频。本独立 App 包含 **Generate Suno music**、**Get a Suno task** 和通用接口模块；它不是 Suno 官方应用，也不表示第三方授权或合作关系。
 
-[English](README.md) · [当前服务与价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_zh_pricing)
+[English](README.md) · [当前服务与价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen)
 
 **Community目录名称按当前表单填写 `Suno`，不把开发者公司名加进App名称；Ace Data Cloud身份放在描述、提供者和landing页。** README标题只是说明集成提供者，不是已批准目录名。[2026-10-19核验的投稿规则](../COMMUNITY_SUBMISSION.md)。
 
@@ -18,7 +18,7 @@
 
 ## 2. 注册、登录并取得专用 Token
 
-1. 打开 [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_zh_api_key)，注册/登录。若缺少 **General application**，先点 **Initialize General Application**。
+1. 打开 [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen)，注册/登录。若缺少 **General application**，先点 **Initialize General Application**。
 2. 在 General application 或可访问 Suno 的应用中复制 API Key，或通过 **Manage Keys → Create** 创建 `Make Suno` 专用 Key。检查有效期、用量限制、服务权限、当前余额与价格。生成需 `/suno/audios`，查询需 `/suno/tasks`；Connection 还读取 `/v1/models` 验证认证，受限 Key 需有该读取权限，不要盲目放宽权限。
 
 ![复制 API Key 或打开 Manage Keys](./_assets/tutorial/get-api-key-en.png)
@@ -46,7 +46,7 @@
 
 - 401/连接失败：检查 Token 完整值、有效期、允许 API、Suno 权限、用量限制和余额。
 - `pending`/空音频：查询同一 ID；预览不等于终态，不重新生成。
-- 429/超时/5xx：先查[请求记录](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_zh_usages)，避免重复扣费。场景重放和传输错误仍可能造成重复请求。
+- 429/超时/5xx：先查[请求记录](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen)，避免重复扣费。场景重放和传输错误仍可能造成重复请求。
 - 返回字符串或未知结构：模块拒绝不支持的返回结构，先检查合同，不猜成功。
 - 公开安装入口缺失：当前仍是待发布源项目，不能宣称已搜索安装。
 

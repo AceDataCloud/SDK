@@ -31,7 +31,7 @@ class OnboardingTests(unittest.TestCase):
             )
             self.assertIn("Dify tutorial", text)
 
-    def test_source_is_existing_contract_and_all_four_tags_are_present(self):
+    def test_source_is_existing_contract_and_all_three_tags_are_present(self):
         import re
 
         text = module.render(self.profile)
@@ -39,9 +39,7 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(len(urls), 2)
         for url in urls:
             query = parse_qs(urlsplit(url).query)
-            self.assertEqual(
-                set(query), {"utm_source", "utm_medium", "utm_campaign", "utm_content"}
-            )
+            self.assertEqual(set(query), {"utm_source", "utm_medium", "utm_campaign"})
             self.assertEqual(query["utm_source"], ["opensource"])
             self.assertEqual(query["utm_medium"], ["referral"])
             self.assertEqual(query["utm_campaign"], ["evergreen"])
