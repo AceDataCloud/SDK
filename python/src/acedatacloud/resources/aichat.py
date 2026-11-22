@@ -78,6 +78,7 @@ AiChatModel = Literal[
     "o4-mini-2025-04-16",
     "o4-mini-all",
     "o4-mini-high-all",
+    "deepseek-v4.1-flash-1017",
     "deepseek-v4.1-flash",
     "deepseek-v4-flash",
     "deepseek-flash",
