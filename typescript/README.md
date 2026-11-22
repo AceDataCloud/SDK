@@ -4,6 +4,23 @@ Official TypeScript/Node.js client for the [AceDataCloud API](https://platform.a
 
 Requires Node.js 18+ (uses native `fetch`).
 
+## Unified chat protocols
+
+```typescript
+import { AceDataCloud } from '@acedatacloud/sdk';
+
+const client = new AceDataCloud({ apiToken: 'YOUR_API_TOKEN', baseURL: 'https://api.acedata.cloud' });
+const completion = await client.chat.completions.create({
+  model: 'gemini-4-argon', messages: [{ role: 'user', content: 'Hello' }],
+});
+const response = await client.responses.create({ model: 'gpt-5-pro', input: 'Hello' });
+const message = await client.chat.messages.create({
+  model: 'claude-sonnet-5-5', messages: [{ role: 'user', content: 'Hello' }], maxTokens: 128,
+});
+```
+
+These methods use `/v1/chat/completions`, `/v1/responses`, and `/v1/messages`, respectively, with Bearer authentication. Choose the protocol listed for the model; a single API's model suggestions are not the entire catalog. Pass `stream: true` and iterate the returned async generator for streaming. Explicit model IDs are preserved without fallback. Existing `client.openai` methods keep their original routes. Calls use your application balance according to current pricing.
+
 ## Get your Ace Data Cloud API key
 
 1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.

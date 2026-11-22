@@ -2,6 +2,23 @@
 
 Official Python client for the [AceDataCloud API](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 
+## Unified chat protocols
+
+```python
+from acedatacloud import AceDataCloud
+
+client = AceDataCloud(api_token="YOUR_API_TOKEN", base_url="https://api.acedata.cloud")
+completion = client.chat.completions.create(
+    model="gemini-4-argon", messages=[{"role": "user", "content": "Hello"}]
+)
+response = client.responses.create(model="gpt-5-pro", input="Hello")
+message = client.chat.messages.create(
+    model="claude-sonnet-5-5", messages=[{"role": "user", "content": "Hello"}], max_tokens=128
+)
+```
+
+These methods use `/v1/chat/completions`, `/v1/responses`, and `/v1/messages`, respectively, with Bearer authentication. Choose the protocol listed for the model; a single API's model suggestions are not the entire catalog. `AsyncAceDataCloud` exposes the same methods. All three support `stream=True`; await the async method before iterating its async stream. Existing `client.openai` methods keep their original routes. Calls use your application balance according to current pricing.
+
 ## Get your Ace Data Cloud API key
 
 1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.

@@ -4,6 +4,8 @@
 
 **Community目录名称按当前表单填写 `GPT Image`，不把开发者公司名加进App名称；Ace Data Cloud身份放在描述、提供者和landing页。** README标题只是说明集成提供者，不是已批准目录名。[2026-10-19核验的投稿规则](../COMMUNITY_SUBMISSION.md)。
 
+型号和画质选项由 `scripts/sync_from_platformbackend.py --services openai` 从固定的 OpenAI 兼容图片 API 合同刷新，覆盖该 API 合同中的全部型号。请选择对应型号支持的画质（DALL-E 2 使用 `standard`；DALL-E 3 使用 `standard` 或 `hd`）。本原生动作仍只返回一张图片 URL；编辑、base64 或未展示参数请使用 Make an API Call。本仓库提供私有 Make 应用源码，不代表已获官方市场审批。
+
 ## 1. 正确安装入口
 
 **官方Make安装链接待发布，尚未部署、审核或上架。** 发布后核对提供者为Ace Data Cloud，再装到目标组织。开发者用本目录manifest配对自己的独立测试App，先查已有应用，不能指向Suno/聊天/其他服务origin。[配对说明](../README.md#set-up-a-private-testing-app)。

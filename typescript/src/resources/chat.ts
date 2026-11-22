@@ -1,6 +1,7 @@
 /** Chat resources — native provider APIs (Claude Messages). */
 
 import { Transport } from '../runtime/transport';
+import { Completions } from './openai';
 
 export class Messages {
   constructor(private transport: Transport) {}
@@ -56,8 +57,10 @@ export class Messages {
 
 export class Chat {
   readonly messages: Messages;
+  readonly completions: Completions;
 
   constructor(transport: Transport) {
     this.messages = new Messages(transport);
+    this.completions = new Completions(transport, '/v1/chat/completions');
   }
 }

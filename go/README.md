@@ -11,6 +11,12 @@ Mirrors the design of the [Python](../python) and [TypeScript](../typescript) SD
 - Pluggable `PaymentHandler` hook for on-chain x402 payments — see the
   companion [X402Client Go package](https://github.com/AceDataCloud/X402Client/tree/main/go).
 
+## Unified chat protocols
+
+Use `client.Chat().Completions().Create(ctx, ChatCompletionRequest{...})` for `/v1/chat/completions`, `client.Responses().Create(ctx, ResponsesRequest{...})` for `/v1/responses`, and `client.Chat().Messages().Create(ctx, MessagesRequest{...})` for `/v1/messages`. Each namespace also has `CreateStream`. Authentication uses the configured Bearer token; explicit model IDs are preserved without fallback.
+
+Choose the protocol published for your model: `claude-sonnet-5-5` uses Messages, while models such as `gemini-4-argon` use Chat Completions. A single API's enum count is not the full cross-protocol catalog. Existing `client.OpenAI()` methods keep their current routes. Calls use your application balance according to current pricing.
+
 ## Get your Ace Data Cloud API key
 
 1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.

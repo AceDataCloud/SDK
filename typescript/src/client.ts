@@ -12,7 +12,7 @@ import { Search } from './resources/search';
 import { Tasks } from './resources/tasks';
 import { Files } from './resources/files';
 import { Platform } from './resources/platform';
-import { OpenAI } from './resources/openai';
+import { OpenAI, Responses } from './resources/openai';
 import { Glm } from './resources/glm';
 import { Veo } from './resources/veo';
 import { Kling } from './resources/kling';
@@ -40,6 +40,7 @@ export interface AceDataCloudOptions {
 export class AceDataCloud {
   readonly aichat: AiChat;
   readonly chat: Chat;
+  readonly responses: Responses;
   readonly captcha: Captcha;
   readonly images: Images;
   readonly audio: Audio;
@@ -72,6 +73,7 @@ export class AceDataCloud {
 
     this.aichat = new AiChat(this.transport);
     this.chat = new Chat(this.transport);
+    this.responses = new Responses(this.transport, '/v1/responses');
     this.captcha = new Captcha(this.transport);
     this.images = new Images(this.transport);
     this.audio = new Audio(this.transport);

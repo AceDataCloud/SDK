@@ -37,6 +37,16 @@ Use the [English/Chinese first-use templates and real API-key screenshot sources
 
 ## Claude Fable 5.2
 
+Unified chat entrypoints use the public `/v1` protocols and accept explicit model IDs across providers:
+
+| Protocol | Python / TypeScript | Go |
+| --- | --- | --- |
+| Chat Completions | `client.chat.completions.create(...)` | `client.Chat().Completions().Create(...)` |
+| Responses | `client.responses.create(...)` | `client.Responses().Create(...)` |
+| Messages | `client.chat.messages.create(...)` | `client.Chat().Messages().Create(...)` |
+
+Use the protocol published for the selected model. For example, `claude-sonnet-5-5` uses Messages, while `gpt-4o-image` is also a Chat Completions model. These methods preserve the model ID; they do not substitute another model or fall back to a different protocol. Per-API enum counts are not the complete cross-protocol catalog. Existing `client.openai` methods retain their current routes.
+
 Native Messages examples for `claude-fable-5-2`: [Python](python/README.md#claude-fable-52), [TypeScript](typescript/README.md#claude-fable-52), and [Go](go/README.md#claude-fable-52). All three SDKs accept the exact model ID without a new client release.
 
 ## Framework examples

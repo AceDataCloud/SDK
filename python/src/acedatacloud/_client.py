@@ -18,7 +18,7 @@ from acedatacloud.resources.files import AsyncFiles, Files
 from acedatacloud.resources.glm import AsyncGlm, Glm
 from acedatacloud.resources.images import AsyncImages, Images
 from acedatacloud.resources.kling import AsyncKling, Kling
-from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI
+from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI, _AsyncResponses, _Responses
 from acedatacloud.resources.platform import AsyncPlatform, Platform
 from acedatacloud.resources.providers import _attach as _providers
 from acedatacloud.resources.search import AsyncSearch, Search
@@ -57,6 +57,7 @@ class AceDataCloud:
         )
         self.aichat = AiChat(self._transport)
         self.chat = Chat(self._transport)
+        self.responses = _Responses(self._transport, path="/v1/responses")
         self.captcha = Captcha(self._transport)
         self.images = Images(self._transport)
         self.audio = Audio(self._transport)
@@ -110,6 +111,7 @@ class AsyncAceDataCloud:
         )
         self.aichat = AsyncAiChat(self._transport)
         self.chat = AsyncChat(self._transport)
+        self.responses = _AsyncResponses(self._transport, path="/v1/responses")
         self.captcha = AsyncCaptcha(self._transport)
         self.images = AsyncImages(self._transport)
         self.audio = AsyncAudio(self._transport)

@@ -29,8 +29,8 @@ export type OpenAIImageModel =
   | 'nano-banana-pro'
   | (string & {});
 
-class Completions {
-  constructor(private transport: Transport) {}
+export class Completions {
+  constructor(private transport: Transport, private path = '/openai/chat/completions') {}
 
   async create(opts: {
     model: string;
@@ -57,11 +57,11 @@ class Completions {
       body.stream = true;
       return this.streamResponse(body);
     }
-    return this.transport.request('POST', '/openai/chat/completions', { json: body });
+    return this.transport.request('POST', this.path, { json: body });
   }
 
   private async *streamResponse(body: Record<string, unknown>): AsyncGenerator<Record<string, unknown>> {
-    for await (const chunk of this.transport.requestStream('POST', '/openai/chat/completions', { json: body })) {
+    for await (const chunk of this.transport.requestStream('POST', this.path, { json: body })) {
       yield JSON.parse(chunk);
     }
   }
@@ -74,8 +74,8 @@ class ChatNamespace {
   }
 }
 
-class Responses {
-  constructor(private transport: Transport) {}
+export class Responses {
+  constructor(private transport: Transport, private path = '/openai/responses') {}
 
   async create(opts: {
     model: string;
@@ -102,11 +102,11 @@ class Responses {
       body.stream = true;
       return this.streamResponse(body);
     }
-    return this.transport.request('POST', '/openai/responses', { json: body });
+    return this.transport.request('POST', this.path, { json: body });
   }
 
   private async *streamResponse(body: Record<string, unknown>): AsyncGenerator<Record<string, unknown>> {
-    for await (const chunk of this.transport.requestStream('POST', '/openai/responses', { json: body })) {
+    for await (const chunk of this.transport.requestStream('POST', this.path, { json: body })) {
       yield JSON.parse(chunk);
     }
   }

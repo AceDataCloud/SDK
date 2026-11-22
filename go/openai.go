@@ -107,7 +107,9 @@ type OpenAIResource struct {
 func (o *OpenAIResource) Chat() *OpenAIChat { return &OpenAIChat{t: o.t} }
 
 // Responses returns the responses sub-namespace.
-func (o *OpenAIResource) Responses() *OpenAIResponses { return &OpenAIResponses{t: o.t} }
+func (o *OpenAIResource) Responses() *OpenAIResponses {
+	return &OpenAIResponses{t: o.t, path: "/openai/responses"}
+}
 
 // Images returns the OpenAI-compatible image sub-namespace.
 func (o *OpenAIResource) Images() *OpenAIImages { return &OpenAIImages{t: o.t} }
@@ -190,20 +192,23 @@ func (c *OpenAIChatCompletions) CreateStream(ctx context.Context, req ChatComple
 	return streamDecode(c.t, "/v1/chat/completions", req.toBody())
 }
 
-// OpenAIResponses exposes “/openai/responses“.
-type OpenAIResponses struct{ t *transport }
+// OpenAIResponses exposes the configured OpenAI-compatible Responses endpoint.
+type OpenAIResponses struct {
+	t    *transport
+	path string
+}
 
 // Create performs a blocking responses.create.
 func (r *OpenAIResponses) Create(ctx context.Context, req ResponsesRequest) (map[string]any, error) {
 	body := req.toBody()
 	delete(body, "stream")
-	return r.t.do(ctx, requestOpts{Method: "POST", Path: "/openai/responses", Body: body})
+	return r.t.do(ctx, requestOpts{Method: "POST", Path: r.path, Body: body})
 }
 
 // CreateStream performs a streaming responses.create.
 func (r *OpenAIResponses) CreateStream(ctx context.Context, req ResponsesRequest) (<-chan map[string]any, <-chan error) {
 	req.Stream = true
-	return streamDecode(r.t, "/openai/responses", req.toBody())
+	return streamDecode(r.t, r.path, req.toBody())
 }
 
 // streamDecode wraps transport.stream and parses each SSE data line as JSON.
