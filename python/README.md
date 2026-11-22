@@ -8,9 +8,7 @@ Official Python client for the [AceDataCloud API](https://platform.acedata.cloud
 from acedatacloud import AceDataCloud
 
 client = AceDataCloud(api_token="YOUR_API_TOKEN", base_url="https://api.acedata.cloud")
-completion = client.chat.completions.create(
-    model="gemini-4-argon", messages=[{"role": "user", "content": "Hello"}]
-)
+completion = client.chat.completions.create(model="gemini-4-argon", messages=[{"role": "user", "content": "Hello"}])
 response = client.responses.create(model="gpt-5-pro", input="Hello")
 message = client.chat.messages.create(
     model="claude-sonnet-5-5", messages=[{"role": "user", "content": "Hello"}], max_tokens=128
