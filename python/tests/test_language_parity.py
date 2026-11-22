@@ -77,6 +77,7 @@ def test_every_provider_is_reachable_from_the_client():
 @pytest.mark.skipif(not TS_PROVIDERS.exists(), reason="typescript sources not present")
 def test_aichat_deepseek_model_suggestions_match():
     expected = [
+        "deepseek-v4.1-flash-1017",
         "deepseek-v4.1-flash",
         "deepseek-v4-flash",
         "deepseek-flash",
