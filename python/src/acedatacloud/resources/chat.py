@@ -6,6 +6,8 @@ import json as _json
 from collections.abc import Iterator
 from typing import Any
 
+from acedatacloud.resources.openai_compat import _AsyncCompletions, _Completions
+
 
 class _Messages:
     """Namespace for chat.messages operations."""
@@ -88,14 +90,16 @@ class _AsyncMessages:
 
 
 class Chat:
-    """Synchronous chat client for native provider APIs."""
+    """Unified Chat Completions and native Messages client."""
 
     def __init__(self, transport: Any) -> None:
         self.messages = _Messages(transport)
+        self.completions = _Completions(transport, path="/v1/chat/completions")
 
 
 class AsyncChat:
-    """Async chat client for native provider APIs."""
+    """Async unified Chat Completions and native Messages client."""
 
     def __init__(self, transport: Any) -> None:
         self.messages = _AsyncMessages(transport)
+        self.completions = _AsyncCompletions(transport, path="/v1/chat/completions")

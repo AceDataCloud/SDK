@@ -36,9 +36,14 @@ func (r MessagesRequest) toBody() map[string]any {
 	return body
 }
 
-// ChatResource groups native chat endpoints.
+// ChatResource groups unified Chat Completions and native Messages endpoints.
 type ChatResource struct {
 	t *transport
+}
+
+// Completions returns the unified chat completions sub-namespace.
+func (c *ChatResource) Completions() *OpenAIChatCompletions {
+	return &OpenAIChatCompletions{t: c.t}
 }
 
 // Messages returns the messages sub-namespace.

@@ -53,9 +53,13 @@ func NewClient(opts ...Option) (*Client, error) {
 // “/openai/responses“).
 func (c *Client) OpenAI() *OpenAIResource { return c.openai }
 
-// Chat returns the native chat resource (“/v1/messages“ — Anthropic
-// Messages API shape).
+// Chat returns unified Chat Completions and native Messages resources.
 func (c *Client) Chat() *ChatResource { return c.chat }
+
+// Responses returns the unified Responses resource (“/v1/responses“).
+func (c *Client) Responses() *OpenAIResponses {
+	return &OpenAIResponses{t: c.transport, path: "/v1/responses"}
+}
 
 // Captcha returns the captcha resource (“/captcha/*“).
 func (c *Client) Captcha() *CaptchaResource { return c.captcha }

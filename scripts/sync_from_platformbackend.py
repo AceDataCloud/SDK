@@ -100,12 +100,62 @@ def sync_specs(
     return sorted(path.stem for path in updates)
 
 
+def sync_make_choices(
+    manifest: Path, snapshots: Path, apps: Path, requested: list[str]
+) -> list[str]:
+    """Refresh existing Make select fields from the same pinned API snapshots."""
+    services = json.loads(manifest.read_text(encoding="utf-8"))
+    selected = set(services) if requested == ["all"] else set(requested) & set(services)
+    endpoints = {
+        endpoint["path"]: endpoint["id"]
+        for alias in selected
+        for endpoint in services[alias]["endpoints"]
+    }
+    changed = []
+    for communication in sorted(apps.glob("*/generate-communication.json")):
+        path = json.loads(communication.read_text(encoding="utf-8")).get("url")
+        api_id = endpoints.get(path)
+        if not api_id:
+            continue
+        spec = json.loads((snapshots / f"{api_id}.json").read_text(encoding="utf-8"))
+        schema = spec["paths"][path]["post"]["requestBody"]["content"][
+            "application/json"
+        ]["schema"]
+        if "$ref" in schema:
+            schema = spec["components"]["schemas"][schema["$ref"].rsplit("/", 1)[-1]]
+        parameters = communication.with_name("generate-parameters.json")
+        fields = json.loads(parameters.read_text(encoding="utf-8"))
+        updated = False
+        for field in fields:
+            values = schema.get("properties", {}).get(field.get("name"), {}).get("enum")
+            if field.get("type") != "select" or not isinstance(values, list):
+                continue
+            labels = {
+                option["value"]: option["label"] for option in field.get("options", [])
+            }
+            options = [
+                {"label": labels.get(value, str(value)), "value": value}
+                for value in values
+            ]
+            if field.get("options") != options:
+                field["options"] = options
+                updated = True
+        if updated:
+            parameters.write_text(
+                json.dumps(fields, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            changed.append(str(parameters))
+    return changed
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--backend-dir", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, default=Path("scripts/services.json"))
     parser.add_argument("--specs", type=Path, default=Path("scripts/specs"))
     parser.add_argument("--services", default="all")
+    parser.add_argument("--make-apps", type=Path, default=Path("examples/make"))
     args = parser.parse_args()
     requested = [value.strip() for value in args.services.split(",") if value.strip()]
     if not requested or ("all" in requested and requested != ["all"]):
@@ -113,7 +163,12 @@ def main() -> int:
             "--services must be 'all' or a nonempty comma-separated service list"
         )
     changed = sync_specs(args.backend_dir, args.manifest, args.specs, requested)
-    print(f"Updated {len(changed)} pinned API snapshots.")
+    make_changed = sync_make_choices(
+        args.manifest, args.specs, args.make_apps, requested
+    )
+    print(
+        f"Updated {len(changed)} pinned API snapshots and {len(make_changed)} Make parameter files."
+    )
     return 0
 
 

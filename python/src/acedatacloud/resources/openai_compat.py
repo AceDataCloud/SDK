@@ -37,8 +37,9 @@ OpenAIImageModel = Literal[
 class _Completions:
     """Namespace for openai.chat.completions."""
 
-    def __init__(self, transport: Any) -> None:
+    def __init__(self, transport: Any, *, path: str = "/openai/chat/completions") -> None:
         self._transport = transport
+        self._path = path
 
     def create(
         self,
@@ -52,16 +53,17 @@ class _Completions:
         if stream:
             body["stream"] = True
             return self._stream(body)
-        return self._transport.request("POST", "/openai/chat/completions", json=body)
+        return self._transport.request("POST", self._path, json=body)
 
     def _stream(self, body: dict[str, Any]) -> Iterator[dict[str, Any]]:
-        for chunk in self._transport.request_stream("POST", "/openai/chat/completions", json=body):
+        for chunk in self._transport.request_stream("POST", self._path, json=body):
             yield _json.loads(chunk)
 
 
 class _AsyncCompletions:
-    def __init__(self, transport: Any) -> None:
+    def __init__(self, transport: Any, *, path: str = "/openai/chat/completions") -> None:
         self._transport = transport
+        self._path = path
 
     async def create(
         self,
@@ -75,10 +77,10 @@ class _AsyncCompletions:
         if stream:
             body["stream"] = True
             return self._stream(body)
-        return await self._transport.request("POST", "/openai/chat/completions", json=body)
+        return await self._transport.request("POST", self._path, json=body)
 
     async def _stream(self, body: dict[str, Any]):
-        async for chunk in self._transport.request_stream("POST", "/openai/chat/completions", json=body):
+        async for chunk in self._transport.request_stream("POST", self._path, json=body):
             yield _json.loads(chunk)
 
 
@@ -93,8 +95,9 @@ class _AsyncChatNamespace:
 
 
 class _Responses:
-    def __init__(self, transport: Any) -> None:
+    def __init__(self, transport: Any, *, path: str = "/openai/responses") -> None:
         self._transport = transport
+        self._path = path
 
     def create(
         self,
@@ -108,16 +111,17 @@ class _Responses:
         if stream:
             body["stream"] = True
             return self._stream(body)
-        return self._transport.request("POST", "/openai/responses", json=body)
+        return self._transport.request("POST", self._path, json=body)
 
     def _stream(self, body: dict[str, Any]) -> Iterator[dict[str, Any]]:
-        for chunk in self._transport.request_stream("POST", "/openai/responses", json=body):
+        for chunk in self._transport.request_stream("POST", self._path, json=body):
             yield _json.loads(chunk)
 
 
 class _AsyncResponses:
-    def __init__(self, transport: Any) -> None:
+    def __init__(self, transport: Any, *, path: str = "/openai/responses") -> None:
         self._transport = transport
+        self._path = path
 
     async def create(
         self,
@@ -131,10 +135,10 @@ class _AsyncResponses:
         if stream:
             body["stream"] = True
             return self._stream(body)
-        return await self._transport.request("POST", "/openai/responses", json=body)
+        return await self._transport.request("POST", self._path, json=body)
 
     async def _stream(self, body: dict[str, Any]):
-        async for chunk in self._transport.request_stream("POST", "/openai/responses", json=body):
+        async for chunk in self._transport.request_stream("POST", self._path, json=body):
             yield _json.loads(chunk)
 
 

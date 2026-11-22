@@ -6,6 +6,8 @@ Use GPT Image in Make with your **Ace Data Cloud application API token**. This s
 
 **Community directory name:** `GPT Image` under the current form's service-only naming rule; **provided by Ace Data Cloud** is the integration identity in the description/publisher page. This README title is not an approved directory label. [Submission rules checked 2026-10-19](../COMMUNITY_SUBMISSION.md).
 
+The model and quality choices are refreshed from the pinned OpenAI-compatible image API by `scripts/sync_from_platformbackend.py --services openai`. All model IDs in that API contract are included; choose the quality supported by your model (DALL-E 2: `standard`; DALL-E 3: `standard` or `hd`). This native action remains one URL result; use Make an API Call for edits, base64, or parameters not exposed here. This repository is source for a private Make app, not evidence of public Marketplace approval.
+
 ## 1. Install the correct integration
 
 **Official Make installation URL: pending.** This is an independently deployable source project, not a published Make app. After publication, use the real approved install link and verify the integration provider is **Ace Data Cloud**. A similarly named app by someone else is not this integration.
