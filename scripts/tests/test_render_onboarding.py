@@ -39,9 +39,7 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(len(urls), 2)
         for url in urls:
             query = parse_qs(urlsplit(url).query)
-            self.assertEqual(
-                set(query), {"utm_source", "utm_medium", "utm_campaign"}
-            )
+            self.assertEqual(set(query), {"utm_source", "utm_medium", "utm_campaign"})
             self.assertEqual(query["utm_source"], ["opensource"])
             self.assertEqual(query["utm_medium"], ["referral"])
             self.assertEqual(query["utm_campaign"], ["evergreen"])
