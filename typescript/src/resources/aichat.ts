@@ -5,13 +5,24 @@ import { Transport } from '../runtime/transport';
 export type AiChatModel =
   | 'gpt-6.2-astra'
   | 'gpt-6.2-sol'
+  | 'gpt-6.1-sol'
   | 'mimo-v2.6-pro'
   | 'mimo-v2.6-flash'
   | 'gpt-6.1-terra'
+  | 'gpt-6-sol'
+  | 'gpt-6-luna'
+  | 'grok-4.7'
+  | 'gemini-3.8-flash'
+  | 'gpt-6-astra'
+  | 'gpt-5.6-luna'
+  | 'gpt-5.6-terra'
   | 'gpt-5.6-sol-fast'
+  | 'gpt-5.6-sol'
   | 'gpt-5.5'
   | 'gpt-5.5-pro'
   | 'gpt-5.4'
+  | 'gpt-5.4-mini'
+  | 'gpt-5.4-nano'
   | 'gpt-5.4-pro'
   | 'gpt-5.2'
   | 'gpt-5.1'
@@ -79,6 +90,7 @@ export type AiChatModel =
   | 'deepseek-v4.1-flash-1017'
   | 'deepseek-v4.1-flash'
   | 'deepseek-v4-flash'
+  | 'grok-4.5'
   | 'deepseek-flash'
   | 'deepseek-v4-pro'
   | 'deepseek-v3.2'
@@ -92,8 +104,7 @@ export type AiChatModel =
   | 'glm-4.6'
   | 'glm-4.5'
   | 'glm-4.5v'
-  | 'glm-3-turbo'
-  | (string & {});
+  | 'glm-3-turbo';
 
 export class AiChat {
   constructor(private transport: Transport) {}
