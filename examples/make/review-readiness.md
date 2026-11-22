@@ -64,6 +64,6 @@ The [official prerequisites](https://developers.make.com/custom-apps-documentati
 
 ## Acquisition and attribution
 
-The README API-key link uses `utm_source=make`, `utm_medium=integration`, `utm_campaign=evergreen`, and `utm_content=make_readme_api_key`. For a future Make landing page, use `make_listing_api_key` as the content value and keep the same source/medium/campaign.
+The README API-key link uses `utm_source=make`, `utm_medium=integration`, and `utm_campaign=evergreen`.
 
 Before claiming conversion, verify landing-page arrival, persisted registration source, application/key creation, Make connection, successful scenario execution, and the matching usage record. A GitHub commit, link click, package download or listing view is insufficient evidence of the whole funnel. The current project has no Make-hosted attribution or conversion evidence.

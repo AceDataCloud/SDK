@@ -38,7 +38,7 @@ API 请求被拦截，未匹配请求会失败。输出标为 `synthetic-offline
 
 ## 连接自己的账户
 
-1. [注册或登录](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_register_zh)，打开[应用控制台 Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_api_key_zh)。
+1. [注册或登录](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，打开[应用控制台 Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。
 2. 找到 **General application**；没有时点 **Initialize General Application**。
    通用应用 Key 仍受当前账户服务权限约束，专用应用仅限其服务；本流程同时需要 Google Search 与 WebExtrator。
 3. 复制应用的 **API Key**；或 **Manage Keys → Create** 新建 `LlamaIndex search/extraction` 专用 Key。
@@ -57,9 +57,9 @@ API 请求被拦截，未匹配请求会失败。输出标为 `synthetic-offline
 这些图只展示账户步骤，不是本示例真实运行证据。
 
 5. 开启真实调用前核当前权限、用量、余额与价格：
-   [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_serp_example_docs_zh) ·
-   [WebExtrator 提取 API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_docs_zh) ·
-   [当前模型/服务价格](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_pricing_zh)。
+   [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
+   [WebExtrator 提取 API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
+   [当前模型/服务价格](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。
    本教程不假定固定单价或免费额度。
 
 在 shell 中设置 `ACEDATACLOUD_API_TOKEN`，然后显式开启：
@@ -75,7 +75,7 @@ python workflow.py --live --query "LlamaIndex search tools" --max-pages 1
 
 鉴权、限流、提取失败、空正文或意外 pending 均会报错。
 只有完成的 `data` 会进入索引；若已得到 task ID 却没有正文，
-按[任务查询指南](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_task_guide_zh)
+按[任务查询指南](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)
 查询同一 ID，避免重新提交提取。结果保留 `text`、`url`、`title`、`task_id` 和 `trace_id`。
 
 ## 放入自己的 Agent

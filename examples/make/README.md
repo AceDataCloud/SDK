@@ -18,7 +18,7 @@ Each child directory has its own manifest, complete deployment files, service-sp
 
 ## Get your AceDataCloud API token
 
-1. Open [AceDataCloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=make_readme_api_key). Sign in or register, then open **General application** (initialize it if needed), or a dedicated application with access to the chat model you intend to use.
+1. Open [AceDataCloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen). Sign in or register, then open **General application** (initialize it if needed), or a dedicated application with access to the chat model you intend to use.
 2. Choose **Keys / Manage Keys → Create** and name a separate key for Make. Review its expiration, usage limitation, allowed APIs, and application balance before copying it. A task-query permission does not grant generation permission. Any trial allowance is whatever your account currently displays.
 3. Copy only the raw token into the Make Connection password field. An application API key is different from a `platform-...` account-management token and from the Make deployment API key used below.
 

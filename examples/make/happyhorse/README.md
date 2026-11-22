@@ -2,7 +2,7 @@
 
 Use HappyHorse in Make with your **Ace Data Cloud application API token**. This standalone app project provides **Generate a HappyHorse video**, **Get a HappyHorse task**, and **Make an API call**. Independent integration provided by Ace Data Cloud; no third-party official status or affiliation is claimed.
 
-[简体中文](README.zh-CN.md) · [Current pricing](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=happyhorse_make_readme_pricing)
+[简体中文](README.zh-CN.md) · [Current pricing](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen)
 
 **Community directory name:** `HappyHorse` under the current form's service-only naming rule; **provided by Ace Data Cloud** is the integration identity in the description/publisher page. This README title is not an approved directory label. [Submission rules checked 2026-10-19](../COMMUNITY_SUBMISSION.md).
 
@@ -18,7 +18,7 @@ Official Make Geocodify screenshot, downloaded 2026-10-17; original capture date
 
 ## 2. Register, sign in and obtain a service-enabled API token
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=happyhorse_make_readme_api_key), register/sign in, and initialize **General application** if it is absent.
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen), register/sign in, and initialize **General application** if it is absent.
 2. Open General application or a HappyHorse-enabled application. Copy its API key, or choose **Manage Keys → Create** for a separately named `Make HappyHorse` key. Review expiration, usage limit, service access, balance and current pricing. Allowed APIs must cover `/happyhorse/videos` for generation, `/happyhorse/tasks` for task lookup, and the Connection's free `GET /v1/models`; do not broaden permissions blindly.
 
 ![Ace Applications: copy a key or open Manage Keys](../suno/_assets/tutorial/get-api-key-en.png)
@@ -49,7 +49,7 @@ After checking the selected model's current restrictions/prices and obtaining an
 2. Run creation **once**. It sends `/happyhorse/videos` with `async=true`, no callback placeholder, no automatic model fallback or application-error retry, and returns `task_id`, `status=pending`, `success=false`. An accepted task is not finished media.
 3. Add **Get a HappyHorse task**. Map the creation module's **Task ID** with Make's variable picker; it posts `{"action":"retrieve","id":"<same-task-id>"}` to `/happyhorse/tasks`. Query that ID in a lookup-only scenario if pending; do not replay the generation route.
 4. Use **Completed video URL** only when **Status=succeeded** and **Terminal success=true**. The module requires: finished_at exists, response.success=true, exactly one data item has state=succeeded and video_url. Pending/failed/unknown/string response envelopes and unsupported cardinality do not produce final media. Only safe task/trace/status fields and the media URL are mapped; internal request/user/credential data is not returned.
-5. Check the one generation's usage record and current account package conversion; Make operation credits and Ace API Credits are separate. Scenario/transport replay may duplicate a billed request, so inspect [request history](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=happyhorse_make_readme_usages) before any resubmission.
+5. Check the one generation's usage record and current account package conversion; Make operation credits and Ace API Credits are separate. Scenario/transport replay may duplicate a billed request, so inspect [request history](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen) before any resubmission.
 
 ## 4. Free verification and troubleshooting
 

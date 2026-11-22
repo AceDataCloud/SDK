@@ -14,8 +14,8 @@
 
 ## 2. 登录Ace并复制或创建专用Token
 
-1. 打开 [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=nano_banana_make_zh_api_key) 注册/登录；没有General application时先初始化。
-2. 复制General application或可用服务应用的API Key，或 **Manage Keys → Create** 创建`Make Nano Banana`专用Key；核有效期、用量限制、余额与[当前价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=nano_banana_make_zh_pricing)。允许API需覆盖生成`/nano-banana/images`、查询`/nano-banana/tasks`和连接读取`/v1/models`，不盲目扩权。
+1. 打开 [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen) 注册/登录；没有General application时先初始化。
+2. 复制General application或可用服务应用的API Key，或 **Manage Keys → Create** 创建`Make Nano Banana`专用Key；核有效期、用量限制、余额与[当前价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen)。允许API需覆盖生成`/nano-banana/images`、查询`/nano-banana/tasks`和连接读取`/v1/models`，不盲目扩权。
 
 ![Ace Applications: copy a key or open Manage Keys](../suno/_assets/tutorial/get-api-key-en.png)
 
@@ -33,7 +33,7 @@ One generated image only: `action=generate`, `count=1`, Nano Banana 2 / 2.1 / Pr
 
 获准预算后只运行一次生成，返回task_id/pending，不代表完成。把Task ID用变量选择器映射到 **Get a Nano Banana task**；它只调用`/nano-banana/tasks`的retrieve，不生成。pending时使用仅查询场景读同ID，不重跑生成。只有Status=succeeded、Terminal success=true时使用 **Completed image URL**。模型/尺寸/时长受当前账户与模型约束，不能把其他服务字段照搬。
 
-先免费运行通用模块 **GET /v1/models**，再查询自己已有任务；没有已成功任务就保留待验收，不使用他人ID。检查原任务/trace和唯一生成账单，Make操作额度与Ace Credits分开；[请求记录](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=nano_banana_make_zh_usages)。
+先免费运行通用模块 **GET /v1/models**，再查询自己已有任务；没有已成功任务就保留待验收，不使用他人ID。检查原任务/trace和唯一生成账单，Make操作额度与Ace Credits分开；[请求记录](https://platform.acedata.cloud/console/usages?utm_source=make&utm_medium=integration&utm_campaign=evergreen)。
 
 ## 4. 常见问题与发布
 

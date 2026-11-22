@@ -14,9 +14,9 @@ suno models
 
 ## 2. Register/sign in and create a key
 
-Open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_api_key), register/sign in, and choose **Initialize General Application** if needed. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
+Open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen), register/sign in, and choose **Initialize General Application** if needed. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
 
-Check model/service access, expiration, usage limits, balance and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=suno_cli_readme_pricing). If Allowed APIs is enabled, allow `/suno/audios`, `/suno/tasks`; task-query permission does not grant generation access. Copy only the raw token, without Bearer, quotation marks or spaces. A platform management token and a Discord proxy credential are different credentials.
+Check model/service access, expiration, usage limits, balance and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). If Allowed APIs is enabled, allow `/suno/audios`, `/suno/tasks`; task-query permission does not grant generation access. Copy only the raw token, without Bearer, quotation marks or spaces. A platform management token and a Discord proxy credential are different credentials.
 
 ![Copy the application key](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
 

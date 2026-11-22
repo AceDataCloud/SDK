@@ -1,11 +1,11 @@
 # AceDataCloud SDK
 
-Official SDK clients for the [AceDataCloud API](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_catalog_readme_platform).
+Official SDK clients for the [AceDataCloud API](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 
 ## Get your Ace Data Cloud API key
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_catalog_readme_api_key). Sign in, or register an account first.
-2. Find **General application**. If it has not been created, choose **Initialize General Application**. A general key can use the services available to your account; a dedicated application's key is limited to its service. Check the required service/model access and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sdk_catalog_readme_pricing).
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.
+2. Find **General application**. If it has not been created, choose **Initialize General Application**. A general key can use the services available to your account; a dedicated application's key is limited to its service. Check the required service/model access and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 3. Copy the **API Key** from the application card, or open **Keys / Manage Keys → Create** to create a separate key for this integration. Give it a recognizable name so you can revoke or rotate it independently.
 4. When creating a key, review **Expiration Time**, **Set Usage Limitation**, and **Allowed APIs**. Enable only the restrictions you need, allow the operations you will call, then click **Create** and copy the token from the key list. Task lookup does not grant permission to submit a generation. Confirm the application's balance can cover your first request; any trial allowance is whatever your account currently displays.
 5. Copy only the token value, without quotation marks, spaces, or `Bearer `. An API Key / API Token field expects this raw value; only a manually configured HTTP `Authorization` header needs the `Bearer ` prefix. A `platform-...` account-management token cannot replace a generation API key.
@@ -22,7 +22,7 @@ Use this application key for API requests. SDK account-management methods requir
 
 The public SDK is shared infrastructure for independently named service integrations. Keep the service identity visible (for example **Suno by Ace Data Cloud**) and point users to that platform's verified install entry, not only to a generic API URL. The SDK itself is not a default provider listing in another application.
 
-Use the [English/Chinese first-use templates and real API-key screenshot sources](docs/integration-onboarding/README.md) to build the service's installation → application key → host credential → first request → same-task retrieval guide. The templates preserve the current four UTM fields and require platform-specific instructions; they do not generate fake screenshots or claim a marketplace release.
+Use the [English/Chinese first-use templates and real API-key screenshot sources](docs/integration-onboarding/README.md) to build the service's installation → application key → host credential → first request → same-task retrieval guide. The templates preserve the current three UTM fields and require platform-specific instructions; they do not generate fake screenshots or claim a marketplace release.
 
 ## Languages
 

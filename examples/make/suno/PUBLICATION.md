@@ -39,7 +39,7 @@ Partial tracks remain pending and all failed/pending tasks hide audio URLs. Only
 
 **Value:** Describe music, submit once, and connect the completed audio to your workflow. Bring your own Ace Data Cloud API token. Make operation charges and Ace API generation charges are separate; consult current prices and account restrictions.
 
-**Install:** pending Make's real installation link. **Get API token:** <https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_listing_api_key>. **Pricing:** <https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen&utm_content=suno_make_listing_pricing>.
+**Install:** pending Make's real installation link. **Get API token:** <https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen>. **Pricing:** <https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen>.
 
 Use the linked English/Chinese README as the developer landing material until a reviewed site URL is selected. Actual public listing form, install link, logo rights and support contact remain owner-supplied. UTM source/medium/campaign/content values identify this Make entry; no conversion, paid-user or revenue claim is made.
 

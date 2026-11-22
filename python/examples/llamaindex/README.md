@@ -47,7 +47,7 @@ The output contains retrieved `text`, `url`, `title`, `task_id`, and `trace_id`.
 
 ## Use your Ace account
 
-1. [Register or sign in](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_register) and open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_api_key).
+1. [Register or sign in](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) and open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 2. Find **General application**. If absent, choose **Initialize General Application**.
    Its key can use services your account is entitled to; a dedicated application's
    key is service-limited. This workflow requires both Google Search and WebExtrator access.
@@ -71,9 +71,9 @@ is unknown. The historical `Dify tutorial` example name should be replaced by
 Never put a real token in a prompt, notebook output, screenshot or Git.
 
 5. Check your current permissions, quota, balance and prices before live calls:
-   [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_serp_example_docs) ·
-   [WebExtrator extraction API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_docs) ·
-   [current model/service prices](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_search_extraction_example_pricing).
+   [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
+   [WebExtrator extraction API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
+   [current model/service prices](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
    No fixed price or free allowance is assumed here.
 
 Set `ACEDATACLOUD_API_TOKEN` in your shell, then opt in:
@@ -92,7 +92,7 @@ credits. This example installs no payment handler and initiates no on-chain paym
 The workflow fails on authentication, rate limits, failed extraction, empty content,
 or an unexpectedly pending task. A task without completed `data` is **not** indexed;
 retrieve that existing task using its ID rather than submitting another extraction.
-See [task retrieval](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=llamaindex_webextrator_example_task_guide).
+See [task retrieval](https://platform.acedata.cloud/documents/webextrator-tasks?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 
 ## Attach the tools to your agent
 

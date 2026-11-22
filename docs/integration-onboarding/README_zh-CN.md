@@ -21,7 +21,7 @@ python3 scripts/render_onboarding.py --profile docs/integration-onboarding/profi
 
 新 profile 必须写准安装入口、真实 Token 粘贴位置、生成/查询 API、首用步骤、同 ID 查询。脚本只生成说明，不装软件、不建账号、不保存Key、不启动服务、不调用API。
 
-保留已有四项 UTM：source、medium=referral、campaign=evergreen、服务/宿主 content。共享 GitHub/包 README 使用 opensource；单独渲染包页面才可用 pypi/npm。不要把营销参数加到协议地址、OAuth或Key；不借此改全局归因规范。
+保留已有三项 UTM：source、medium=referral、campaign=evergreen。共享 GitHub/包 README 使用 opensource；单独渲染包页面才可用 pypi/npm。不要把营销参数加到协议地址、OAuth或Key；不借此改全局归因规范。
 
 ## 真图与限制
 

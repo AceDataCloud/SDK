@@ -1,7 +1,6 @@
 {
   "service": "Suno",
   "host": "CLI",
-  "entry": "suno_cli",
   "utm_source": "opensource",
   "install_url": "https://pypi.org/project/suno-cli/",
   "install_steps": "```bash\npython -m pip install suno-cli\nsuno --help\nsuno models\n```",

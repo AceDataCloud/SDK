@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit
 
@@ -19,7 +18,6 @@ def render(profile: dict, language: str = "en") -> str:
     required = {
         "service",
         "host",
-        "entry",
         "utm_source",
         "install_url",
         "install_steps",
@@ -37,8 +35,6 @@ def render(profile: dict, language: str = "en") -> str:
         raise ValueError(f"missing host-specific fields: {sorted(missing)}")
     if profile["utm_source"] not in SOURCES:
         raise ValueError("use an approved source from the existing marketing contract")
-    if not re.fullmatch(r"[a-z0-9][a-z0-9_]{0,60}", profile["entry"]):
-        raise ValueError("entry must be a stable lowercase attribution identifier")
     if urlsplit(profile["install_url"]).scheme != "https":
         raise ValueError(
             "install_url must be the verified HTTPS package/marketplace entry"
@@ -46,13 +42,12 @@ def render(profile: dict, language: str = "en") -> str:
     if language not in {"en", "zh-CN"}:
         raise ValueError("language must be en or zh-CN")
 
-    def cta(path: str, placement: str) -> str:
+    def cta(path: str) -> str:
         query = urlencode(
             {
                 "utm_source": profile["utm_source"],
                 "utm_medium": "referral",
                 "utm_campaign": "evergreen",
-                "utm_content": f"{profile['entry']}_readme_{placement}",
             }
         )
         return f"https://platform.acedata.cloud{path}?{query}"
@@ -73,9 +68,9 @@ def render(profile: dict, language: str = "en") -> str:
 
 ## 2. 注册/登录并创建 Key
 
-打开 [Applications / 我的应用]({cta("/console/applications", "api_key")})，注册或登录。没有通用应用时选 **Initialize General Application / 初始化通用应用**。复制已有 API Key，或 **Manage Keys → Create** 创建本宿主专用 Key。
+打开 [Applications / 我的应用]({cta("/console/applications")})，注册或登录。没有通用应用时选 **Initialize General Application / 初始化通用应用**。复制已有 API Key，或 **Manage Keys → Create** 创建本宿主专用 Key。
 
-核对模型/服务权限、有效期、用量限制、余额和[当前价格]({cta("/models", "pricing")})。如果启用 Allowed APIs，应允许本例的 {operations}；查询权限不等于生成权限。只复制 Token 字符串，不加 Bearer、引号或空格。平台管理 Token 和 Discord 代理凭据均不能代替此 Key。
+核对模型/服务权限、有效期、用量限制、余额和[当前价格]({cta("/models")})。如果启用 Allowed APIs，应允许本例的 {operations}；查询权限不等于生成权限。只复制 Token 字符串，不加 Bearer、引号或空格。平台管理 Token 和 Discord 代理凭据均不能代替此 Key。
 """
     else:
         text = f"""# {service} by Ace Data Cloud: first use in {host}
@@ -90,9 +85,9 @@ Open the [verified install entry]({profile["install_url"]}) and confirm the main
 
 ## 2. Register/sign in and create a key
 
-Open [Applications]({cta("/console/applications", "api_key")}), register/sign in, and choose **Initialize General Application** if needed. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
+Open [Applications]({cta("/console/applications")}), register/sign in, and choose **Initialize General Application** if needed. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
 
-Check model/service access, expiration, usage limits, balance and [current pricing]({cta("/models", "pricing")}). If Allowed APIs is enabled, allow {operations}; task-query permission does not grant generation access. Copy only the raw token, without Bearer, quotation marks or spaces. A platform management token and a Discord proxy credential are different credentials.
+Check model/service access, expiration, usage limits, balance and [current pricing]({cta("/models")}). If Allowed APIs is enabled, allow {operations}; task-query permission does not grant generation access. Copy only the raw token, without Bearer, quotation marks or spaces. A platform management token and a Discord proxy credential are different credentials.
 """
     text += f"\n![Copy the application key]({ASSETS}/get-api-key-en.png)\n\n![Create a dedicated key]({ASSETS}/create-api-key-en.png)\n\n"
     text += (

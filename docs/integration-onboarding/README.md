@@ -25,7 +25,7 @@ python3 scripts/render_onboarding.py \
 
 A new profile must supply its verified install entry, exact host token field, the service's generation/task-query operations, first-use instructions and same-task commands. The renderer never installs, authenticates, creates accounts, stores a key, starts a server or calls a generation API.
 
-The existing UTM contract is preserved: `utm_source`, `utm_medium=referral`, `utm_campaign=evergreen`, and service/host-specific `utm_content`. Shared GitHub/package README text uses `opensource`; a separately rendered PyPI/npm page may use `pypi`/`npm`. Do not append marketing tags to protocol endpoints or credential values. This utility does not authorize adding a new global source/channel rule.
+The existing UTM contract is preserved: `utm_source`, `utm_medium=referral`, and `utm_campaign=evergreen`. Shared GitHub/package README text uses `opensource`; a separately rendered PyPI/npm page may use `pypi`/`npm`. Do not append marketing tags to protocol endpoints or credential values. This utility does not authorize adding a new global source/channel rule.
 
 ## Real screenshot assets and their limits
 
