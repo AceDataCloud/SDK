@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import get_args
 
 import pytest
 
-from acedatacloud import AceDataCloud
+from acedatacloud import AceDataCloud, AiChatModel
 
 REPO = Path(__file__).resolve().parents[2]
 TS_PROVIDERS = REPO / "typescript" / "src" / "resources" / "providers"
@@ -71,3 +72,17 @@ def test_every_provider_is_reachable_from_the_client():
     client = AceDataCloud(api_token="test")
     for name in _python_providers():
         assert hasattr(client, name), f"generated {name} but the client does not expose it"
+
+
+@pytest.mark.skipif(not TS_PROVIDERS.exists(), reason="typescript sources not present")
+def test_aichat_deepseek_model_suggestions_match():
+    expected = [
+        "deepseek-v4.1-flash",
+        "deepseek-v4-flash",
+        "deepseek-flash",
+        "deepseek-v4-pro",
+        "deepseek-v3.2",
+    ]
+    assert [model for model in get_args(AiChatModel) if model.startswith("deepseek-")] == expected
+    ts_source = (TS_PROVIDERS.parent / "aichat.ts").read_text()
+    assert re.findall(r"^  \| '(deepseek-[^']+)'$", ts_source, re.MULTILINE) == expected
