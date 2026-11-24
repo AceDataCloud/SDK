@@ -14,6 +14,8 @@ from ..._runtime.tasks import AsyncTaskHandle, TaskHandle
 SeedreamModel = Literal[
     "doubao-seedream-5-0-pro-260628",
     "doubao-seedream-5-0-lite-260128",
+    "doubao-seedream-5-5-261028",
+    "doubao-seedream-5-0-flash-260915",
     "doubao-seedream-4-0-250828",
     "doubao-seedream-4-5-251128",
 ]
@@ -53,7 +55,8 @@ class Seedream:
         tools: list[dict[str, Any]] | None = None,
         optimize_prompt_options: dict[str, Any] | None = None,
         layer_decomposition: bool | None = None,
-        background: Literal["transparent", "opaque"] | None = None,
+        background: Literal["auto", "transparent", "opaque"] | None = None,
+        layer_decomposition_options: dict[str, Any] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -61,7 +64,7 @@ class Seedream:
         callback_url: str | None = None,
         **extra: Any,
     ) -> TaskHandle:
-        """Call /seedream/images."""
+        """Seedream Images"""
         body: dict[str, Any] = {}
         body["model"] = model
         if prompt is not None:
@@ -90,6 +93,8 @@ class Seedream:
             body["layer_decomposition"] = layer_decomposition
         if background is not None:
             body["background"] = background
+        if layer_decomposition_options is not None:
+            body["layer_decomposition_options"] = layer_decomposition_options
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
@@ -123,7 +128,8 @@ class AsyncSeedream:
         tools: list[dict[str, Any]] | None = None,
         optimize_prompt_options: dict[str, Any] | None = None,
         layer_decomposition: bool | None = None,
-        background: Literal["transparent", "opaque"] | None = None,
+        background: Literal["auto", "transparent", "opaque"] | None = None,
+        layer_decomposition_options: dict[str, Any] | None = None,
         async_: bool | None = None,
         wait: bool = False,
         poll_interval: float = 3.0,
@@ -131,7 +137,7 @@ class AsyncSeedream:
         callback_url: str | None = None,
         **extra: Any,
     ) -> AsyncTaskHandle:
-        """Call /seedream/images."""
+        """Seedream Images"""
         body: dict[str, Any] = {}
         body["model"] = model
         if prompt is not None:
@@ -160,6 +166,8 @@ class AsyncSeedream:
             body["layer_decomposition"] = layer_decomposition
         if background is not None:
             body["background"] = background
+        if layer_decomposition_options is not None:
+            body["layer_decomposition_options"] = layer_decomposition_options
         body.update(extra)
         if callback_url is not None:
             body["callback_url"] = callback_url
