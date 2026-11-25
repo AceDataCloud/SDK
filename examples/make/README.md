@@ -1,5 +1,7 @@
 # AceDataCloud for Make
 
+[ACE Music for Make](acemusic/README.md) provides a standalone source app for song generation, reference audio, lyrics and original-task recovery.
+
 This directory is a source-controlled [Make Apps Editor local app](https://developers.make.com/custom-apps-documentation/get-started/make-apps-editor/apps-sdk/local-development-for-apps), with a Basic Connection, **Create a chat completion** action, and **Make an API call** universal module. The app calls only `https://api.acedata.cloud`.
 
 **Current state:** The local components have not been installed in a Make account or run in a Make scenario. `makecomapp.json` has no origin until a Make developer pairs it with a private custom app. This is an Apps Editor project, not a Make scenario blueprint or a public listing.

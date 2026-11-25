@@ -1,0 +1,36 @@
+{
+  "url": "/acemusic/tasks",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "action": "retrieve",
+    "id": "{{parameters.task_id}}"
+  },
+  "log": {
+    "sanitize": [
+      "request.headers.authorization",
+      "response.body.request",
+      "response.body.items"
+    ]
+  },
+  "response": {
+    "valid": {
+      "condition": "{{body.id === parameters.task_id && (!get(body, \"response.task_id\") || get(body, \"response.task_id\") === parameters.task_id)}}",
+      "message": "Returned task does not match the original ID.",
+      "type": "RuntimeError"
+    },
+    "temp": {
+      "group": "{{ifempty(get(body,\"response.status\"), ifempty(body.state, body.status))}}",
+      "state": "{{if(temp.group === \"succeeded\", \"succeeded\", if(temp.group === \"partial_failed\", \"partial_failed\", if(temp.group === \"failed\", \"failed\", \"pending\")))}}"
+    },
+    "output": {
+      "task_id": "{{body.id}}",
+      "status": "{{temp.state}}",
+      "success": "{{temp.state === \"succeeded\"}}",
+      "trace_id": "{{ifempty(body.trace_id, get(body, \"response.trace_id\"))}}",
+      "audio_urls": "{{if(temp.state === \"succeeded\" || temp.state === \"partial_failed\", map(ifempty(get(body, \"response.data\"), emptyarray), \"audio_url\", \"state\", \"succeeded\"), emptyarray)}}",
+      "titles": "{{if(temp.state === \"succeeded\" || temp.state === \"partial_failed\", map(ifempty(get(body, \"response.data\"), emptyarray), \"title\", \"state\", \"succeeded\"), emptyarray)}}",
+      "lyrics": "{{if(temp.state === \"succeeded\", map(ifempty(get(body,\"response.data\"), emptyarray), \"text\"), emptyarray)}}"
+    }
+  }
+}
