@@ -1,5 +1,0 @@
-:root{color-scheme:light dark;font:14px/1.45 system-ui,sans-serif}
-body{margin:0}main{display:grid;gap:14px;padding:16px}
-form,label,section,article{display:grid;gap:8px}article{padding:10px 0;border-top:1px solid GrayText}
-input,button{box-sizing:border-box;font:inherit;padding:8px;width:100%}audio{width:100%}
-p:empty,section:empty{display:none}p{margin:0}

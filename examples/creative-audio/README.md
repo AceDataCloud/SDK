@@ -1,7 +1,0 @@
-# Use an ACE Music track in Canva or Adobe Express
-
-These panels can submit a paid ACE Music task on an explicit click or import tracks from an existing, owned task. They display the group state and preserve the surviving track of a partial result. The application token is held only in the current panel and goes only to the Ace Data Cloud service endpoints. Audio is uploaded to the editor only after the user selects **Add track to design**. Source audio must be yours or licensed for use in your design.
-
-Run `npm ci && npm test && npm run build` with Node 22 or later. For Canva, configure asset and design content write permissions, upload `dist/canva/app.js` in the Developer Portal, and test in a design that supports audio. The code identifies generated audio as app-generated. For Adobe Express, load the contents of `dist/adobe` through the add-on developer sandbox and assign the ID provided by Adobe before packaging for public review.
-
-Get a key with ACE Music access in [Applications](https://platform.acedata.cloud/console/applications). Enter the original task ID, preview an available track, then insert it. To create music, expand Create a soundtrack and select Generate with credits. Save the returned task ID and use Find tracks to query it. If the result is uncertain, check task history before retrying. ACE Music can return vocals; a publisher must not describe it as an instrumental-only generator. Test both a completed track and a pending task in a real editor before public submission.

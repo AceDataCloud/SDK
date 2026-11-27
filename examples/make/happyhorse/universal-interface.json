@@ -1,5 +1,0 @@
-[
-  {"name": "body", "label": "Body", "type": "any"},
-  {"name": "headers", "label": "Headers", "type": "collection"},
-  {"name": "statusCode", "label": "Status code", "type": "number"}
-]
