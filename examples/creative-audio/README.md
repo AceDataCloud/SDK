@@ -6,4 +6,6 @@ Run `npm ci && npm test && npm run build` with Node 22 or later. For Canva, conf
 
 Get a key with ACE Music access in [Applications](https://platform.acedata.cloud/console/applications). Enter the original task ID, preview an available track, then insert it. To create music, expand Create a soundtrack and select Generate with credits. Save the returned task ID and use Find tracks to query it. If the result is uncertain, check task history before retrying. ACE Music can return vocals; a publisher must not describe it as an instrumental-only generator. Test both a completed track and a pending task in a real editor before public submission.
 
+[Watch the Canva editor walkthrough](canva/walkthrough.mp4) for a demonstration of the free sample and the account requirement for generation.
+
 In the Canva panel, anyone can preview **Studio chimes** and add the six-second sample to a design without an Ace account or credits. This original synthesized cue is included under the repository license. Its upload uses Canva’s stock-asset AI disclosure. User-generated ACE Music tracks keep the app-generated disclosure.
