@@ -5,6 +5,16 @@ function english(id, values = {}) {
   return messages[id].defaultMessage.replace(/\{(\w+)\}/g, (_, key) => String(values[key]));
 }
 
+function bindFormAction(form, run) {
+  const activate = (event) => {
+    event.preventDefault();
+    if (form.reportValidity()) run();
+  };
+  // Express blocks native form submission in its iframe before the submit event fires.
+  form.querySelector("button").addEventListener("click", activate);
+  form.addEventListener("submit", activate);
+}
+
 export function mountPanel(root, insertTrack, translate = english, openLink) {
   root.innerHTML = `<form><label><span data-message="appToken"></span><input type="password" autocomplete="off" required></label>
     <label><span data-message="taskId"></span><input type="text" required></label>
@@ -27,8 +37,7 @@ export function mountPanel(root, insertTrack, translate = english, openLink) {
   const generation = root.querySelector("details form");
   const generateButton = generation.querySelector("button");
   let attempt;
-  generation.onsubmit = async (event) => {
-    event.preventDefault();
+  bindFormAction(generation, async () => {
     const prompt = generation.querySelector("textarea").value.trim();
     if (!token.value.trim()) { status.textContent = translate("tokenRequired"); return; }
     if (!attempt || attempt.prompt !== prompt) attempt = { prompt, key: crypto.randomUUID() };
@@ -42,10 +51,9 @@ export function mountPanel(root, insertTrack, translate = english, openLink) {
     } catch (error) {
       status.textContent = translate("uncertain");
     } finally { generateButton.disabled = false; }
-  };
+  });
   let requestNumber = 0;
-  form.onsubmit = async (event) => {
-    event.preventDefault();
+  bindFormAction(form, async () => {
     const request = ++requestNumber;
     results.replaceChildren();
     status.textContent = translate("searching");
@@ -72,5 +80,5 @@ export function mountPanel(root, insertTrack, translate = english, openLink) {
     } catch (error) {
       if (request === requestNumber) status.textContent = translate("lookupFailed");
     }
-  };
+  });
 }

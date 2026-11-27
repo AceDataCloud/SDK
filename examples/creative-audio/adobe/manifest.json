@@ -1,1 +1,19 @@
-{"testId":"ace-music-track-import","name":"ACE Music","version":"0.1.0","manifestVersion":2,"requirements":{"apps":[{"name":"Express","apiVersion":1}]},"entryPoints":[{"type":"panel","id":"audio","main":"index.html"}]}
+{
+  "testId": "ace-music-track-import",
+  "name": "ACE Music",
+  "version": "0.1.0",
+  "manifestVersion": 2,
+  "requirements": {
+    "apps": [{ "name": "Express", "apiVersion": 1 }]
+  },
+  "entryPoints": [
+    {
+      "type": "panel",
+      "id": "audio",
+      "main": "index.html",
+      "permissions": {
+        "sandbox": ["allow-popups", "allow-popups-to-escape-sandbox"]
+      }
+    }
+  ]
+}
