@@ -89,6 +89,16 @@ def _backoff_delay(attempt: int) -> float:
     return base + jitter
 
 
+_TRIPO_SUBMISSIONS = {"/tripo/generations", "/tripo/models", "/tripo/animations"}
+
+
+def _request_base(base: str, path: str, headers: dict[str, str]) -> str:
+    # Tripo accepts application tokens on the API gateway and has no x402 route.
+    if base == "https://x402.acedata.cloud" and path.startswith("/tripo/") and headers.get("authorization"):
+        return "https://api.acedata.cloud"
+    return base
+
+
 class SyncTransport:
     """Synchronous HTTP transport using httpx."""
 
@@ -140,8 +150,11 @@ class SyncTransport:
         extra_headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         base = self._platform_base_url if platform else self._base_url
-        url = f"{base}{path}"
         headers = {**self._headers, **(extra_headers or {})}
+        url = f"{_request_base(base, path, headers) if not platform else base}{path}"
+        may_retry = path not in {"/acemusic/audios", "/acemusic/lyrics"} and (
+            path not in _TRIPO_SUBMISSIONS or any(k.lower() == "idempotency-key" and v for k, v in headers.items())
+        )
         extra_auth_headers: dict[str, str] = {}
         payment_attempted = False
 
@@ -162,21 +175,13 @@ class SyncTransport:
                     status_code=0,
                     code="timeout",
                 )
-                if (
-                    not payment_attempted
-                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
-                    and attempt < self._max_retries
-                ):
+                if not payment_attempted and may_retry and attempt < self._max_retries:
                     time.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
                 raise timeout_error from exc
             except httpx.TransportError as exc:
-                if (
-                    not payment_attempted
-                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
-                    and attempt < self._max_retries
-                ):
+                if not payment_attempted and may_retry and attempt < self._max_retries:
                     time.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
@@ -206,7 +211,7 @@ class SyncTransport:
 
                 if (
                     not payment_attempted
-                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and may_retry
                     and _should_retry(resp.status_code)
                     and attempt < self._max_retries
                 ):
@@ -366,8 +371,11 @@ class AsyncTransport:
         import asyncio
 
         base = self._platform_base_url if platform else self._base_url
-        url = f"{base}{path}"
         headers = {**self._headers, **(extra_headers or {})}
+        url = f"{_request_base(base, path, headers) if not platform else base}{path}"
+        may_retry = path not in {"/acemusic/audios", "/acemusic/lyrics"} and (
+            path not in _TRIPO_SUBMISSIONS or any(k.lower() == "idempotency-key" and v for k, v in headers.items())
+        )
         extra_auth_headers: dict[str, str] = {}
         payment_attempted = False
 
@@ -388,21 +396,13 @@ class AsyncTransport:
                     status_code=0,
                     code="timeout",
                 )
-                if (
-                    not payment_attempted
-                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
-                    and attempt < self._max_retries
-                ):
+                if not payment_attempted and may_retry and attempt < self._max_retries:
                     await asyncio.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
                 raise timeout_error from exc
             except httpx.TransportError as exc:
-                if (
-                    not payment_attempted
-                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
-                    and attempt < self._max_retries
-                ):
+                if not payment_attempted and may_retry and attempt < self._max_retries:
                     await asyncio.sleep(_backoff_delay(attempt))
                     attempt += 1
                     continue
@@ -434,7 +434,7 @@ class AsyncTransport:
 
                 if (
                     not payment_attempted
-                    and path not in {"/acemusic/audios", "/acemusic/lyrics"}
+                    and may_retry
                     and _should_retry(resp.status_code)
                     and attempt < self._max_retries
                 ):

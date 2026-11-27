@@ -20,3 +20,24 @@ def test_rig_check_and_batch_keep_their_own_request_shape():
     assert transport.request.call_args.kwargs["json"] == {"action": "rig_check", "model_id": "source", "async": True}
     client.tasks(action="retrieve_batch", ids=["one", "two"])
     assert transport.request.call_args.kwargs["json"] == {"action": "retrieve_batch", "ids": ["one", "two"]}
+
+
+def test_tripo_uses_the_bearer_gateway_without_replaying_an_unkeyed_submission():
+    import httpx
+    import pytest
+    from acedatacloud import AceDataCloud
+    from acedatacloud._runtime.errors import TransportError
+
+    client = AceDataCloud(api_token="token", max_retries=2)
+    seen = []
+
+    def interrupted(request):
+        seen.append((request.url.host, request.headers["authorization"]))
+        raise httpx.ConnectError("unavailable", request=request)
+
+    client._transport._client.close()
+    with httpx.Client(transport=httpx.MockTransport(interrupted)) as http:
+        client._transport._client = http
+        with pytest.raises(TransportError):
+            client.tripo.generate(prompt="a chair")
+    assert seen == [("api.acedata.cloud", "Bearer token")]
