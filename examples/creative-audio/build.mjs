@@ -10,3 +10,5 @@ await build({entryPoints:["canva/app.js"],bundle:true,format:"iife",outfile:"dis
     const { readFile }=await import("node:fs/promises");
     return {contents:"const s=document.createElement('style');s.textContent="+JSON.stringify(await readFile(a.path,"utf8"))+";document.head.append(s);",loader:"js"};
   });}}]});
+
+await copyFile("shared/messages.json", "dist/canva/messages_en.json");

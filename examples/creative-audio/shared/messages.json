@@ -1,0 +1,21 @@
+{
+  "appToken": {"defaultMessage":"Application token","description":"Label for the user's Ace Data Cloud application token."},
+  "taskId": {"defaultMessage":"Existing ACE Music task ID","description":"Label for the ID used to look up an existing music job."},
+  "find": {"defaultMessage":"Find tracks","description":"Button to retrieve a task and list its available audio tracks."},
+  "create": {"defaultMessage":"Create a soundtrack","description":"Heading that opens the optional music generation form."},
+  "prompt": {"defaultMessage":"Describe the soundtrack","description":"Label for a text description of the music the user wants."},
+  "cost": {"defaultMessage":"Generation uses your Ace application credits. You can listen before adding a track.","description":"Billing notice above the button that submits a new generation."},
+  "generate": {"defaultMessage":"Generate with credits","description":"Button that explicitly starts a paid ACE Music generation."},
+  "getToken": {"defaultMessage":"Get an application token","description":"Link to the Ace Data Cloud application console."},
+  "tokenRequired": {"defaultMessage":"Enter your Ace application token first.","description":"Shown before submission if the token field is empty."},
+  "accepted": {"defaultMessage":"Task accepted. Save its ID and use Find tracks to check the original task.","description":"Success message after the service returns a new task ID."},
+  "uncertain": {"defaultMessage":"Submission was not confirmed. Check your Ace task history before retrying.","description":"Recovery instruction when it is uncertain whether the request was accepted."},
+  "searching": {"defaultMessage":"Looking up your task…","description":"Progress message while retrieving an existing task."},
+  "results": {"defaultMessage":"Task status: {state}. Tracks available: {count}.","description":"Lookup summary. State is the service's status and count is how many tracks can be previewed."},
+  "insert": {"defaultMessage":"Add track to design","description":"Button for inserting the selected audio track into the current design."},
+  "inserted": {"defaultMessage":"Track added.","description":"Confirmation after the editor inserts an audio track."},
+  "insertFailed": {"defaultMessage":"Could not add this track to the design.","description":"Error shown when the editor cannot import selected audio."},
+  "lookupFailed": {"defaultMessage":"Task lookup failed. Check your token and the original task ID.","description":"Lookup error with recovery steps."},
+  "unsupported": {"defaultMessage":"This design type does not support audio tracks.","description":"Shown when the current Canva design cannot contain audio tracks."},
+  "durationMissing": {"defaultMessage":"This track has no usable duration.","description":"Shown when the service omitted audio duration required by Canva."}
+}
