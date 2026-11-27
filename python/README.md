@@ -130,6 +130,8 @@ passes model-specific fields through without rewriting model IDs or enforcing a 
   Omit `temperature` and `top_p` to use model defaults; do not set temperature below
   1 or a non-default top-p. Use `tool_choice="auto"`, not forced tools. For native
   thinking blocks, signatures, and native tool semantics, use `client.chat.messages`.
+- `gemini-4-neon` supports Chat Completions, streaming and function calling.
+  Reserve output tokens for both reasoning and the final reply.
 - `gemini-4-argon`: supports text and streaming Chat Completions. Thinking can
   consume output budget; Google recommends at least `max_tokens=32768` for ordinary
   tasks. This does not expose Interactions background long-output functionality.
