@@ -106,6 +106,8 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 	base := t.opts.baseURL
 	if r.Platform {
 		base = t.opts.platformURL
+	} else if base == defaultAPIBase && strings.HasPrefix(r.Path, "/tripo/") && t.headers["Authorization"] != "" {
+		base = "https://api.acedata.cloud"
 	}
 	fullURL := base + r.Path
 	if len(r.Query) > 0 {
@@ -125,7 +127,8 @@ func (t *transport) do(ctx context.Context, r requestOpts) (map[string]any, erro
 	paymentAttempted := false
 
 	maxRetries := t.opts.maxRetries
-	if r.Path == "/acemusic/audios" || r.Path == "/acemusic/lyrics" {
+	tripoSubmission := r.Path == "/tripo/generations" || r.Path == "/tripo/models" || r.Path == "/tripo/animations"
+	if r.Path == "/acemusic/audios" || r.Path == "/acemusic/lyrics" || (tripoSubmission && r.ExtraHeaders["Idempotency-Key"] == "") {
 		maxRetries = 0
 	}
 	var lastErr error

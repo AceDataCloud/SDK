@@ -162,13 +162,19 @@ export class Transport {
       headers?: Record<string, string>;
     } = {}
   ): Promise<Record<string, unknown>> {
-    const base = opts.platform ? this.platformBaseURL : this.baseURL;
+    const headers = { ...this.headers, ...(opts.headers ?? {}) };
+    let base = opts.platform ? this.platformBaseURL : this.baseURL;
+    if (!opts.platform && base === 'https://x402.acedata.cloud' && path.startsWith('/tripo/') && headers.authorization) {
+      base = 'https://api.acedata.cloud';
+    }
+    const tripoSubmission = ['/tripo/generations', '/tripo/models', '/tripo/animations'].includes(path);
+    const mayRetry = !['/acemusic/audios', '/acemusic/lyrics'].includes(path) &&
+      (!tripoSubmission || Object.entries(headers).some(([key,value]) => key.toLowerCase() === 'idempotency-key' && value));
     let url = `${base}${path}`;
     if (opts.params) {
       const qs = new URLSearchParams(opts.params).toString();
       url += `?${qs}`;
     }
-    const headers = { ...this.headers, ...(opts.headers ?? {}) };
     const timeoutMs = opts.timeout ?? this.timeout;
 
     let lastError: Error | null = null;
@@ -221,7 +227,7 @@ export class Transport {
           } catch {
             body = { error: { code: 'unknown', message: text } };
           }
-          if (!paymentAttempted && !["/acemusic/audios", "/acemusic/lyrics"].includes(path) && RETRY_STATUS_CODES.has(resp.status) && attempt < this.maxRetries) {
+          if (!paymentAttempted && mayRetry && RETRY_STATUS_CODES.has(resp.status) && attempt < this.maxRetries) {
             await sleep(backoffDelay(attempt) * 1000);
             attempt += 1;
             continue;
@@ -238,7 +244,7 @@ export class Transport {
         } else {
           lastError = err as Error;
         }
-        if (!paymentAttempted && !["/acemusic/audios", "/acemusic/lyrics"].includes(path) && attempt < this.maxRetries) {
+        if (!paymentAttempted && mayRetry && attempt < this.maxRetries) {
           await sleep(backoffDelay(attempt) * 1000);
           attempt += 1;
           continue;
