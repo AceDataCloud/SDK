@@ -1,0 +1,20 @@
+version: 1
+streams:
+  - canonical_operation: openai.chat.completions.create
+    stream:
+      kind: sse
+      eventType: delta
+      rawContentType: text/event-stream
+      finalEventRule: "data: [DONE]"
+  - canonical_operation: openai.responses.create
+    stream:
+      kind: sse
+      eventType: response.output_text.delta
+      rawContentType: text/event-stream
+      finalEventRule: "data: [DONE]"
+  - canonical_operation: chat.messages.create
+    stream:
+      kind: sse
+      eventType: content_block_delta
+      rawContentType: text/event-stream
+      finalEventRule: "data: [DONE]"

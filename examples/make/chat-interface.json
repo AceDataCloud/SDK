@@ -1,0 +1,9 @@
+[
+  {"name": "id", "label": "Completion ID", "type": "text"},
+  {"name": "content", "label": "Reply", "type": "text"},
+  {"name": "model", "label": "Model", "type": "text"},
+  {"name": "finish_reason", "label": "Finish reason", "type": "text"},
+  {"name": "prompt_tokens", "label": "Input tokens", "type": "number"},
+  {"name": "completion_tokens", "label": "Output tokens", "type": "number"},
+  {"name": "total_tokens", "label": "Total tokens", "type": "number"}
+]

@@ -1,0 +1,89 @@
+[
+  {
+    "name": "prompt",
+    "label": "Video description",
+    "type": "text",
+    "required": true,
+    "help": "Describe a text-to-video scene. Image/reference/video editing is not exposed."
+  },
+  {
+    "name": "model",
+    "label": "HappyHorse model",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "HappyHorse 1.1 Text to video",
+        "value": "happyhorse-1.1-t2v"
+      },
+      {
+        "label": "HappyHorse 1.0 Text to video",
+        "value": "happyhorse-1.0-t2v"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "resolution",
+    "label": "Resolution",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "720P",
+        "value": "720P"
+      },
+      {
+        "label": "1080P",
+        "value": "1080P"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "ratio",
+    "label": "Aspect ratio",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "16:9",
+        "value": "16:9"
+      },
+      {
+        "label": "9:16",
+        "value": "9:16"
+      },
+      {
+        "label": "1:1",
+        "value": "1:1"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "duration",
+    "label": "Target seconds",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "3 seconds",
+        "value": 3
+      },
+      {
+        "label": "5 seconds",
+        "value": 5
+      },
+      {
+        "label": "10 seconds",
+        "value": 10
+      },
+      {
+        "label": "15 seconds",
+        "value": 15
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  }
+]

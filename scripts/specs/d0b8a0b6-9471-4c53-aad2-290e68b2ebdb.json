@@ -1,0 +1,820 @@
+{
+  "paths": {
+    "/qwen-image/images": {
+      "post": {
+        "summary": "$t(api_description_qwen_image_images)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "$t(qwen_image_images_response_200_success)"
+                    },
+                    "task_id": {
+                      "type": "string",
+                      "description": "$t(qwen_image_images_response_200_task_id)"
+                    },
+                    "trace_id": {
+                      "type": "string",
+                      "description": "$t(qwen_image_images_response_200_trace_id)"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "image_url"
+                        ],
+                        "properties": {
+                          "image_url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "$t(qwen_image_images_response_image_url)"
+                          }
+                        }
+                      },
+                      "description": "$t(qwen_image_images_response_data)"
+                    },
+                    "usage": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "description": "$t(qwen_image_images_response_usage)"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_200)"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "The specified token is not matched with API."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "$t(qwen_image_images_response_400_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is not matched with API.",
+                              "description": "$t(qwen_image_images_response_400_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_400_trace_id)"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_not_implemented",
+                          "message": "The API is not implemented."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_not_implemented",
+                              "description": "$t(qwen_image_images_response_400_error_code_2)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The API is not implemented.",
+                              "description": "$t(qwen_image_images_response_400_error_message_2)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_400_trace_id_2)"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "disabled",
+                          "message": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "disabled",
+                              "description": "$t(qwen_image_images_response_400_error_code_3)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your application has been disabled by Ace Data Cloud due to abnormal usage behavior, please contact our support to get more information.",
+                              "description": "$t(qwen_image_images_response_400_error_message_3)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_400_trace_id_3)"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "bad_request",
+                          "message": "model is invalid."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "bad_request",
+                              "description": "$t(qwen_image_images_response_400_error_code_4)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "model is invalid.",
+                              "description": "$t(qwen_image_images_response_400_error_message_4)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_400_trace_id_4)"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_token",
+                          "message": "No token specified for the request."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_token",
+                              "description": "$t(qwen_image_images_response_400_error_code_5)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "No token specified for the request.",
+                              "description": "$t(qwen_image_images_response_400_error_message_5)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_400_trace_id_5)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_400)"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "invalid_token",
+                          "message": "The specified token is invalid or wrong."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "invalid_token",
+                              "description": "$t(qwen_image_images_response_401_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "The specified token is invalid or wrong.",
+                              "description": "$t(qwen_image_images_response_401_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_401_trace_id)"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_expired",
+                          "message": "token expired."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_expired",
+                              "description": "$t(qwen_image_images_response_401_error_code_2)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token expired.",
+                              "description": "$t(qwen_image_images_response_401_error_message_2)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_401_trace_id_2)"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "token_mismatched",
+                          "message": "token and api does not match."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "token_mismatched",
+                              "description": "$t(qwen_image_images_response_401_error_code_3)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "token and api does not match.",
+                              "description": "$t(qwen_image_images_response_401_error_message_3)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_401_trace_id_3)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_401)"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "used_up",
+                          "message": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "used_up",
+                              "description": "$t(qwen_image_images_response_403_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Your balance is not sufficient for current request, please buy more in Ace Data Cloud.",
+                              "description": "$t(qwen_image_images_response_403_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_403_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_403)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "no_api",
+                          "message": "API does not exist, please make sure url is correct."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "no_api",
+                              "description": "$t(qwen_image_images_response_404_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "API does not exist, please make sure url is correct.",
+                              "description": "$t(qwen_image_images_response_404_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_404_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_404)"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "request_too_large",
+                          "message": "Request body is too large."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "request_too_large",
+                              "description": "$t(qwen_image_images_response_413_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Request body is too large.",
+                              "description": "$t(qwen_image_images_response_413_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_413_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_413)"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "too_many_requests",
+                          "message": "You have exceeded the rate limit."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "too_many_requests",
+                              "description": "$t(qwen_image_images_response_429_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "You have exceeded the rate limit.",
+                              "description": "$t(qwen_image_images_response_429_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_429_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_429)"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "example": {
+                        "error": {
+                          "code": "api_error",
+                          "message": "Internal server error."
+                        },
+                        "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab"
+                      },
+                      "properties": {
+                        "error": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "api_error",
+                              "description": "$t(qwen_image_images_response_500_error_code)"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Internal server error.",
+                              "description": "$t(qwen_image_images_response_500_error_message)"
+                            }
+                          }
+                        },
+                        "trace_id": {
+                          "type": "string",
+                          "description": "$t(qwen_image_images_response_500_trace_id)"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "$t(qwen_image_images_response_500)"
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "schema": {
+              "enum": [
+                "application/json"
+              ],
+              "type": "string"
+            },
+            "required": false,
+            "description": "$t(qwen_image_images_param_accept)"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model",
+                  "prompt"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "qwen-image-3.0",
+                      "qwen-image-3.0-pro"
+                    ],
+                    "default": "qwen-image-3.0",
+                    "description": "$t(qwen_image_images_model)",
+                    "rank": 1
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 18000,
+                    "description": "$t(qwen_image_images_prompt)",
+                    "rank": 2
+                  },
+                  "image_urls": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "description": "$t(qwen_image_images_image_urls)",
+                    "rank": 3
+                  },
+                  "n": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 6,
+                    "default": 1,
+                    "description": "$t(qwen_image_images_n)",
+                    "rank": 4
+                  },
+                  "size": {
+                    "type": "string",
+                    "pattern": "^[0-9]+\\*[0-9]+$",
+                    "example": "1024*1024",
+                    "description": "$t(qwen_image_images_size)",
+                    "rank": 5
+                  },
+                  "prompt_extend": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "$t(qwen_image_images_prompt_extend)",
+                    "rank": 6
+                  },
+                  "prompt_extend_mode": {
+                    "type": "string",
+                    "enum": [
+                      "direct",
+                      "agent"
+                    ],
+                    "default": "direct",
+                    "description": "$t(qwen_image_images_prompt_extend_mode)",
+                    "rank": 7
+                  },
+                  "enable_thinking": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "$t(qwen_image_images_enable_thinking)",
+                    "rank": 8
+                  },
+                  "negative_prompt": {
+                    "type": "string",
+                    "description": "$t(qwen_image_images_negative_prompt)",
+                    "rank": 9
+                  },
+                  "seed": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647,
+                    "description": "$t(qwen_image_images_seed)",
+                    "rank": 10
+                  },
+                  "watermark": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "$t(qwen_image_images_watermark)",
+                    "rank": 11
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "$t(qwen_image_images_callback_url)",
+                    "rank": 12
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "$t(qwen_image_images_async)",
+                    "rank": 13
+                  }
+                }
+              },
+              "example": {
+                "model": "doubao-qwen-image-5-0-260128",
+                "prompt": "a white siamese cat",
+                "size": "2K"
+              }
+            }
+          },
+          "required": true
+        },
+        "operationId": "qwenImageImagesCreate"
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud",
+      "description": "$t(qwen_image_images_servers)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "translations": {
+    "qwen_image_images_response_200_success": "标识本次请求是否成功的布尔标志。",
+    "qwen_image_images_response_200_task_id": "本次请求的任务 ID。",
+    "qwen_image_images_response_200_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_200_data": "根据提示词生成或编辑的输出图像列表。",
+    "qwen_image_images_response_200_data_prompt": "生成时所使用的提示词",
+    "qwen_image_images_response_200_data_image_url": "封面或预览图片的 URL",
+    "qwen_image_images_response_200": "请求成功（OK）。",
+    "qwen_image_images_response_400_error_code": "响应的错误码。",
+    "qwen_image_images_response_400_error_message": "响应的错误信息。",
+    "qwen_image_images_response_400_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_400_error_code_2": "响应的错误码。",
+    "qwen_image_images_response_400_error_message_2": "响应的错误信息。",
+    "qwen_image_images_response_400_trace_id_2": "本次请求的追踪 ID。",
+    "qwen_image_images_response_400_error_code_3": "响应的错误码。",
+    "qwen_image_images_response_400_error_message_3": "响应的错误信息。",
+    "qwen_image_images_response_400_trace_id_3": "本次请求的追踪 ID。",
+    "qwen_image_images_response_400_error_code_4": "响应的错误码。",
+    "qwen_image_images_response_400_error_message_4": "响应的错误信息。",
+    "qwen_image_images_response_400_trace_id_4": "本次请求的追踪 ID。",
+    "qwen_image_images_response_400_error_code_5": "响应的错误码。",
+    "qwen_image_images_response_400_error_message_5": "响应的错误信息。",
+    "qwen_image_images_response_400_trace_id_5": "本次请求的追踪 ID。",
+    "qwen_image_images_response_400": "请求错误，可能是参数缺失或无效。",
+    "qwen_image_images_response_401_error_code": "响应的错误码。",
+    "qwen_image_images_response_401_error_message": "响应的错误信息。",
+    "qwen_image_images_response_401_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_401_error_code_2": "响应的错误码。",
+    "qwen_image_images_response_401_error_message_2": "响应的错误信息。",
+    "qwen_image_images_response_401_trace_id_2": "本次请求的追踪 ID。",
+    "qwen_image_images_response_401_error_code_3": "响应的错误码。",
+    "qwen_image_images_response_401_error_message_3": "响应的错误信息。",
+    "qwen_image_images_response_401_trace_id_3": "本次请求的追踪 ID。",
+    "qwen_image_images_response_401": "未授权，授权令牌无效或缺失。",
+    "qwen_image_images_response_403_error_code": "响应的错误码。",
+    "qwen_image_images_response_403_error_message": "响应的错误信息。",
+    "qwen_image_images_response_403_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_403": "未授权，授权令牌无效或缺失。",
+    "qwen_image_images_response_404_error_code": "响应的错误码。",
+    "qwen_image_images_response_404_error_message": "响应的错误信息。",
+    "qwen_image_images_response_404_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_404": "未授权，授权令牌无效或缺失。",
+    "qwen_image_images_response_413_error_code": "响应的错误码。",
+    "qwen_image_images_response_413_error_message": "响应的错误信息。",
+    "qwen_image_images_response_413_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_413": "未授权，授权令牌无效或缺失。",
+    "qwen_image_images_response_429_error_code": "响应的错误码。",
+    "qwen_image_images_response_429_error_message": "响应的错误信息。",
+    "qwen_image_images_response_429_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_429": "请求过多，已超出速率限制。",
+    "qwen_image_images_response_500_error_code": "响应的错误码。",
+    "qwen_image_images_response_500_error_message": "响应的错误信息。",
+    "qwen_image_images_response_500_trace_id": "本次请求的追踪 ID。",
+    "qwen_image_images_response_500": "服务器内部错误，服务端发生异常。",
+    "qwen_image_images_param_accept": "指定服务器返回响应的格式。如未指定，默认格式为 `application/json`。",
+    "qwen_image_images_model": {
+      "zh-cn": "模型名称。",
+      "en": "Model name."
+    },
+    "qwen_image_images_prompt": {
+      "zh-cn": "图像生成或编辑提示词。",
+      "en": "Image generation or editing prompt."
+    },
+    "qwen_image_images_image": "需要进行图像编辑的参考图片链接，支持可访问的 http/https URL，或 `data:image/png;base64,iVBORw0KG...` 格式的 base64 编码图像字符串。每张图片大小不得超过 10MB。Qwen Image 5.0 Pro、5.0 Lite、4.5 和 4.0 均支持图像编辑。",
+    "qwen_image_images_size": {
+      "zh-cn": "输出尺寸，像素面积需在 512×512 至 2048×2048 之间。",
+      "en": "Output dimensions with pixel area between 512×512 and 2048×2048."
+    },
+    "qwen_image_images_sequential_image_generation": "默认值为 `disabled`。设置为 `auto` 可让模型生成一组风格连贯的相关图像（多图一致性，跨帧共享角色、风格与细节）。仅支持 `doubao-qwen-image-5.0-lite`、`doubao-qwen-image-4.5` 和 `doubao-qwen-image-4.0`。",
+    "qwen_image_images_sequential_image_generation_options_max_images": "本次请求最多生成的图像数量，范围 [1, 15]。注意：`（`image` 中的参考图数量）+（本次生成的图像数量）不得超过 15`。",
+    "qwen_image_images_sequential_image_generation_options": "批量图像生成的可调参数。仅在 `sequential_image_generation=auto` 时生效。仅支持 `doubao-qwen-image-5.0-lite`、`doubao-qwen-image-4.5` 和 `doubao-qwen-image-4.0`。",
+    "qwen_image_images_stream": "是否以流式方式返回所有图片，默认为 `false`。仅支持 `doubao-qwen-image-5.0-lite`、`doubao-qwen-image-4.5` 和 `doubao-qwen-image-4.0`。",
+    "qwen_image_images_response_format": "响应格式，默认为 `url`，也支持 `b64_json`。",
+    "qwen_image_images_watermark": {
+      "zh-cn": "是否添加水印。",
+      "en": "Whether to add a watermark."
+    },
+    "qwen_image_images_output_format": "输出图像的文件格式，默认为 `jpeg`。仅支持 `doubao-qwen-image-5.0-pro` 和 `doubao-qwen-image-5.0-lite`。",
+    "qwen_image_images_tools": "模型可调用的工具列表。目前仅支持 `web_search`。仅适用于 `doubao-qwen-image-5.0-lite`。",
+    "qwen_image_images_optimize_prompt_options_mode": "提示词优化模式。`standard` 质量更高但速度较慢；`fast` 速度更快但质量相对较低。",
+    "qwen_image_images_optimize_prompt_options": "可选的提示词优化配置。仅支持 `doubao-qwen-image-5.0-lite`、`doubao-qwen-image-4.5`（仅限 `standard` 模式）和 `doubao-qwen-image-4.0`。",
+    "qwen_image_images_callback_url": {
+      "zh-cn": "异步完成回调地址。",
+      "en": "Callback URL for asynchronous completion."
+    },
+    "qwen_image_images_async": {
+      "zh-cn": "是否立即返回任务 ID。",
+      "en": "Whether to return a task ID immediately."
+    },
+    "qwen_image_images_servers": "Ace Data Cloud API 服务器",
+    "qwen_image_images_image_urls": {
+      "zh-cn": "可选的 1–3 张参考图；传入后执行图像编辑。",
+      "en": "Optional 1–3 reference images; providing them enables image editing."
+    },
+    "qwen_image_images_n": {
+      "zh-cn": "输出图片数量，1–6 张。",
+      "en": "Number of output images, from 1 to 6."
+    },
+    "qwen_image_images_prompt_extend": {
+      "zh-cn": "是否增强提示词。",
+      "en": "Whether to enhance the prompt."
+    },
+    "qwen_image_images_prompt_extend_mode": {
+      "zh-cn": "提示词增强模式；agent 仅用于文生图。",
+      "en": "Prompt enhancement mode; agent is text-to-image only."
+    },
+    "qwen_image_images_enable_thinking": {
+      "zh-cn": "是否启用增强推理。",
+      "en": "Whether to enable enhanced reasoning."
+    },
+    "qwen_image_images_negative_prompt": {
+      "zh-cn": "不希望出现在图像中的内容。",
+      "en": "Content to exclude from the image."
+    },
+    "qwen_image_images_seed": {
+      "zh-cn": "随机种子。",
+      "en": "Random seed."
+    },
+    "qwen_image_images_response_image_url": {
+      "zh-cn": "永久保存的生成图片地址。",
+      "en": "Permanently stored generated image URL."
+    },
+    "qwen_image_images_response_data": {
+      "zh-cn": "生成图片列表。",
+      "en": "Generated image list."
+    },
+    "qwen_image_images_response_usage": {
+      "zh-cn": "实际图像输入输出计量。",
+      "en": "Actual image input and output usage."
+    },
+    "api_description_qwen_image_images": "Qwen Image 图像生成与编辑接口。"
+  }
+}

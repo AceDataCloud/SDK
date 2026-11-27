@@ -1,0 +1,30 @@
+{
+  "url": "/acemusic/lyrics",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "prompt": "{{parameters.prompt}}",
+    "style": "{{parameters.style}}"
+  },
+  "log": {
+    "sanitize": [
+      "request.headers.authorization",
+      "response.body.request",
+      "response.body.items"
+    ]
+  },
+  "response": {
+    "valid": {
+      "condition": "{{!body.error && body.success !== false && (body.task_id || length(ifempty(body.data, emptyarray)) > 0)}}",
+      "message": "Unexpected lyrics reply. Inspect task history before resubmitting.",
+      "type": "RuntimeError"
+    },
+    "output": {
+      "task_id": "{{body.task_id}}",
+      "trace_id": "{{body.trace_id}}",
+      "status": "{{if(length(ifempty(body.data, emptyarray)) > 0, \"succeeded\", \"pending\")}}",
+      "texts": "{{map(ifempty(body.data, emptyarray), \"text\")}}",
+      "titles": "{{map(ifempty(body.data, emptyarray), \"title\")}}"
+    }
+  }
+}

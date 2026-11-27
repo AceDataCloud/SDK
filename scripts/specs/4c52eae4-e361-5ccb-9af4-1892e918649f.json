@@ -1,0 +1,875 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ACE Music Audios API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud"
+    }
+  ],
+  "paths": {
+    "/acemusic/audios": {
+      "post": {
+        "operationId": "acemusic_audios",
+        "summary": "ACE Music Audios",
+        "description": "Generate, cover or mash up one group of two song candidates, or import one MP3 audio reference from an HTTPS URL. Complete two-track groups and successful one-track imports have separate prices. Final failed or partial generation groups are free. Save the original task ID and query it instead of resubmitting.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "ACE Music"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "generate",
+                      "upload",
+                      "cover",
+                      "mashup"
+                    ],
+                    "default": "generate",
+                    "description": "generate creates new songs, upload imports one MP3 audio reference, cover reworks one owned track, and mashup blends exactly two owned tracks."
+                  },
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "acemusic-v1.1",
+                      "acemusic-v1"
+                    ],
+                    "default": "acemusic-v1.1",
+                    "description": "Generation supports both models. Cover and mashup use acemusic-v1.1. Omit for upload."
+                  },
+                  "custom": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Only used by generate: false for an idea, true for supplied lyrics."
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "Creation idea. Required when custom is false.",
+                    "maxLength": 20000,
+                    "minLength": 1
+                  },
+                  "lyric": {
+                    "type": "string",
+                    "description": "Lyrics for custom generation, cover or mashup.",
+                    "maxLength": 20000,
+                    "minLength": 1
+                  },
+                  "style": {
+                    "type": "string",
+                    "description": "Musical style for custom generation, cover or mashup.",
+                    "maxLength": 20000,
+                    "minLength": 1
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 20000,
+                    "minLength": 1,
+                    "description": "Required for custom generation; optional for cover and mashup."
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Return a persistent task ID; query /acemusic/tasks for the result."
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Optional HTTPS callback for the final result. Implies asynchronous execution.",
+                    "maxLength": 20000,
+                    "minLength": 1
+                  },
+                  "audio_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "pattern": "^https://",
+                    "minLength": 1,
+                    "maxLength": 20000,
+                    "description": "HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 20000,
+                    "description": "Optional display name for an upload."
+                  },
+                  "audio_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 20000,
+                    "description": "Public platform track ID owned by the caller. Required for cover; optional on upload to associate the import with an existing reference track."
+                  },
+                  "mashup_audio_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 20000
+                    },
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "uniqueItems": true,
+                    "description": "Exactly two distinct caller-owned public track IDs. The selected references must be compatible with each other."
+                  },
+                  "audio_influence": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 60,
+                    "description": "Audio reference strength for cover and mashup. Defaults to 60."
+                  }
+                },
+                "oneOf": [
+                  {
+                    "properties": {
+                      "action": {
+                        "enum": [
+                          "generate"
+                        ]
+                      },
+                      "custom": {
+                        "enum": [
+                          false
+                        ]
+                      }
+                    },
+                    "required": [
+                      "prompt"
+                    ],
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "lyric"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "style"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "title"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_url"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "name"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_id"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "mashup_audio_ids"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_influence"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "action": {
+                        "enum": [
+                          "generate"
+                        ]
+                      },
+                      "custom": {
+                        "enum": [
+                          true
+                        ]
+                      }
+                    },
+                    "required": [
+                      "custom",
+                      "lyric",
+                      "style",
+                      "title"
+                    ],
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "prompt"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_url"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "name"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_id"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "mashup_audio_ids"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_influence"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "action": {
+                        "enum": [
+                          "upload"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "audio_url"
+                    ],
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "model"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "custom"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "prompt"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "lyric"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "style"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "title"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "mashup_audio_ids"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_influence"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "action": {
+                        "enum": [
+                          "cover"
+                        ]
+                      },
+                      "model": {
+                        "enum": [
+                          "acemusic-v1.1"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "audio_id",
+                      "lyric",
+                      "style"
+                    ],
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "custom"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "prompt"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_url"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "name"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "mashup_audio_ids"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "action": {
+                        "enum": [
+                          "mashup"
+                        ]
+                      },
+                      "model": {
+                        "enum": [
+                          "acemusic-v1.1"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "mashup_audio_ids",
+                      "lyric",
+                      "style"
+                    ],
+                    "not": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "custom"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "prompt"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_url"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "name"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "audio_id"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "action": "generate",
+                "model": "acemusic-v1.1",
+                "custom": false,
+                "prompt": "A warm acoustic folk song about returning home",
+                "async": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request accepted or result available. Generation, cover and mashup target two tracks; upload targets one. Inspect the original task state before treating it as complete.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "task_id"
+                      ],
+                      "properties": {
+                        "task_id": {
+                          "type": "string"
+                        },
+                        "trace_id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/AceMusicResult"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request, unsupported model/action or incompatible references.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient balance for a paid operation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied or content rejected.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found for this caller.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency key reused with a different request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Service failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AceMusicError"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Durable task accepted. Save task_id and query the original task; this is not a completed result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "task_id"
+                  ],
+                  "properties": {
+                    "task_id": {
+                      "type": "string"
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Reuse the same key for the same creation request to retrieve its original task. A different payload with the same key is rejected."
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "AceMusicTrack": {
+        "type": "object",
+        "required": [
+          "id",
+          "model",
+          "state"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "lyric": {
+            "type": "string"
+          },
+          "style": {
+            "type": "string"
+          },
+          "audio_url": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "AceMusicResult": {
+        "type": "object",
+        "required": [
+          "success",
+          "task_id"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "succeeded",
+              "partial_failed",
+              "failed"
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AceMusicTrack"
+            },
+            "description": "One track for a successful upload, or two candidates for a complete generate/cover/mashup group. A partial group may retain only its successful candidate."
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AceMusicTask": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "finished_at": {
+            "type": "number",
+            "nullable": true
+          },
+          "request": {
+            "type": "object",
+            "description": "The caller-owned public creation parameters.",
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "prompt": {
+                "type": "string"
+              },
+              "lyric": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "custom": {
+                "type": "boolean"
+              },
+              "async": {
+                "type": "boolean"
+              },
+              "audio_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://",
+                "minLength": 1,
+                "maxLength": 20000,
+                "description": "HTTPS URL of an MP3 source file for upload. Use audio_id or mashup_audio_ids for already imported or generated tracks."
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 20000,
+                "description": "Optional display name for an upload."
+              },
+              "audio_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 20000,
+                "description": "Public platform track ID owned by the caller. Required for cover; optional on upload to associate the import with an existing reference track."
+              },
+              "mashup_audio_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 20000
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "uniqueItems": true,
+                "description": "Exactly two distinct caller-owned public track IDs. The selected references must be compatible with each other."
+              },
+              "audio_influence": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 100,
+                "default": 60,
+                "description": "Audio reference strength for cover and mashup. Defaults to 60."
+              }
+            }
+          },
+          "response": {
+            "$ref": "#/components/schemas/AceMusicTaskResult"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "audios",
+              "lyrics"
+            ],
+            "description": "Audio tasks include generate, upload, cover and mashup. Lyrics tasks use lyrics."
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "number"
+          },
+          "elapsed": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "AceMusicError": {
+        "type": "object",
+        "required": [
+          "success",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AceMusicTaskResult": {
+        "type": "object",
+        "required": [
+          "success",
+          "task_id"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "created",
+              "submitting",
+              "processing",
+              "storing",
+              "submission_unknown",
+              "succeeded",
+              "partial_failed",
+              "failed"
+            ]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AceMusicTrack"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "title",
+                    "text"
+                  ],
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

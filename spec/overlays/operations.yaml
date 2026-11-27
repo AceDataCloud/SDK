@@ -1,0 +1,56 @@
+version: 1
+operations:
+  - canonical_operation: openai.chat.completions.create
+    primary_path: /v1/chat/completions
+    method: POST
+    aliases:
+      - /claude/chat/completions
+  - canonical_operation: openai.responses.create
+    primary_path: /openai/responses
+    method: POST
+  - canonical_operation: chat.messages.create
+    primary_path: /v1/messages
+    method: POST
+    aliases:
+      - /claude/messages
+  - canonical_operation: chat.messages.countTokens
+    primary_path: /v1/messages/count_tokens
+    method: POST
+    aliases:
+      - /claude/messages/count_tokens
+  - canonical_operation: images.generate
+    primary_path: /nano-banana/images
+    method: POST
+  - canonical_operation: audio.generate
+    primary_path: /suno/audios
+    method: POST
+  - canonical_operation: video.generate
+    primary_path: /sora/videos
+    method: POST
+  - canonical_operation: search.google
+    primary_path: /serp/google
+    method: POST
+  - canonical_operation: files.upload
+    primary_path: /api/v1/files/
+    method: POST
+  - canonical_operation: platform.applications.list
+    primary_path: /api/v1/applications/
+    method: GET
+  - canonical_operation: platform.applications.create
+    primary_path: /api/v1/applications/
+    method: POST
+  - canonical_operation: platform.credentials.list
+    primary_path: /api/v1/credentials/
+    method: GET
+  - canonical_operation: platform.credentials.create
+    primary_path: /api/v1/credentials/
+    method: POST
+  - canonical_operation: platform.credentials.rotate
+    primary_path: /api/v1/credentials/{credential_id}/rotate/
+    method: POST
+  - canonical_operation: platform.models.list
+    primary_path: /api/v1/models/
+    method: GET
+  - canonical_operation: platform.config.get
+    primary_path: /api/v1/config/
+    method: GET

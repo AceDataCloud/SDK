@@ -1,0 +1,261 @@
+/** OpenAI-compatible facade resources. */
+
+import { Transport } from '../runtime/transport';
+
+export type OpenAIImageModel =
+  | 'dall-e-2'
+  | 'dall-e-3'
+  | 'gpt-image-1'
+  | 'gpt-image-1.5'
+  | 'gpt-image-2'
+  | 'gpt-image-2.5-flare'
+  | 'gpt-image-2.6-flare'
+  | 'gpt-image-2.5-flare:reverse'
+  | 'gpt-image-2.6-flare:reverse'
+  | 'gpt-image-2.5-flare:official'
+  | 'gpt-image-2.6-flare:official'
+  | 'gpt-image-2.5-sunburst'
+  | 'gpt-image-2.6-sunburst'
+  | 'gpt-image-2.5-sunburst:reverse'
+  | 'gpt-image-2.6-sunburst:reverse'
+  | 'gpt-image-2.5-sunburst:official'
+  | 'gpt-image-2.6-sunburst:official'
+  | 'gpt-image-2:reverse'
+  | 'gpt-image-2:official'
+  | 'nano-banana'
+  | 'nano-banana-2-lite'
+  | 'nano-banana-2'
+  | 'nano-banana-2.1'
+  | 'nano-banana-pro'
+  | (string & {});
+
+export class Completions {
+  constructor(private transport: Transport, private path = '/openai/chat/completions') {}
+
+  async create(opts: {
+    model: string;
+    messages: Array<Record<string, unknown>>;
+    stream?: false;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>>;
+  async create(opts: {
+    model: string;
+    messages: Array<Record<string, unknown>>;
+    stream: true;
+    [key: string]: unknown;
+  }): Promise<AsyncGenerator<Record<string, unknown>>>;
+  async create(opts: {
+    model: string;
+    messages: Array<Record<string, unknown>>;
+    stream?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
+    const { model, messages, stream, ...rest } = opts;
+    const body: Record<string, unknown> = { model, messages, ...rest };
+
+    if (stream) {
+      body.stream = true;
+      return this.streamResponse(body);
+    }
+    return this.transport.request('POST', this.path, { json: body });
+  }
+
+  private async *streamResponse(body: Record<string, unknown>): AsyncGenerator<Record<string, unknown>> {
+    for await (const chunk of this.transport.requestStream('POST', this.path, { json: body })) {
+      yield JSON.parse(chunk);
+    }
+  }
+}
+
+class ChatNamespace {
+  readonly completions: Completions;
+  constructor(transport: Transport) {
+    this.completions = new Completions(transport);
+  }
+}
+
+export class Responses {
+  constructor(private transport: Transport, private path = '/openai/responses') {}
+
+  async create(opts: {
+    model: string;
+    input: string | Array<Record<string, unknown>>;
+    stream?: false;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>>;
+  async create(opts: {
+    model: string;
+    input: string | Array<Record<string, unknown>>;
+    stream: true;
+    [key: string]: unknown;
+  }): Promise<AsyncGenerator<Record<string, unknown>>>;
+  async create(opts: {
+    model: string;
+    input: string | Array<Record<string, unknown>>;
+    stream?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown> | AsyncGenerator<Record<string, unknown>>> {
+    const { model, input, stream, ...rest } = opts;
+    const body: Record<string, unknown> = { model, input, ...rest };
+
+    if (stream) {
+      body.stream = true;
+      return this.streamResponse(body);
+    }
+    return this.transport.request('POST', this.path, { json: body });
+  }
+
+  private async *streamResponse(body: Record<string, unknown>): AsyncGenerator<Record<string, unknown>> {
+    for await (const chunk of this.transport.requestStream('POST', this.path, { json: body })) {
+      yield JSON.parse(chunk);
+    }
+  }
+}
+
+class Images {
+  constructor(private transport: Transport) {}
+
+  async generate(opts: {
+    prompt: string;
+    model: OpenAIImageModel;
+    background?: string;
+    moderation?: string;
+    n?: number;
+    outputCompression?: number;
+    outputFormat?: string;
+    frameCount?: number;
+    frameDurationMs?: number;
+    partialImages?: number;
+    size?: string;
+    quality?: string;
+    complexity?: 'low' | 'medium' | 'high';
+    responseFormat?: string;
+    style?: string;
+    callbackUrl?: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { prompt, model, outputCompression, outputFormat, frameCount, frameDurationMs, partialImages, responseFormat, callbackUrl, ...rest } = opts;
+    const body: Record<string, unknown> = { prompt, model, ...rest };
+    if (outputCompression !== undefined) body.output_compression = outputCompression;
+    if (outputFormat !== undefined) body.output_format = outputFormat;
+    if (frameCount !== undefined) body.frame_count = frameCount;
+    if (frameDurationMs !== undefined) body.frame_duration_ms = frameDurationMs;
+    if (partialImages !== undefined) body.partial_images = partialImages;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    return this.transport.request('POST', '/openai/images/generations', { json: body });
+  }
+
+  async edit(opts: {
+    image: string | string[];
+    prompt: string;
+    model?: OpenAIImageModel;
+    n?: number;
+    background?: string;
+    inputFidelity?: string;
+    mask?: string;
+    markup?: string | { image_url: string };
+    outputFormat?: string;
+    frameCount?: number;
+    frameDurationMs?: number;
+    outputCompression?: number;
+    partialImages?: number;
+    quality?: string;
+    complexity?: 'low' | 'medium' | 'high';
+    size?: string;
+    responseFormat?: string;
+    callbackUrl?: string;
+    async?: boolean;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { image, prompt, inputFidelity, mask, outputFormat, frameCount, frameDurationMs, outputCompression, partialImages, responseFormat, callbackUrl, ...rest } = opts;
+    const body: Record<string, unknown> = { image, prompt, ...rest };
+    if (inputFidelity !== undefined) body.input_fidelity = inputFidelity;
+    if (mask !== undefined) body.mask = mask;
+    if (outputFormat !== undefined) body.output_format = outputFormat;
+    if (frameCount !== undefined) body.frame_count = frameCount;
+    if (frameDurationMs !== undefined) body.frame_duration_ms = frameDurationMs;
+    if (outputCompression !== undefined) body.output_compression = outputCompression;
+    if (partialImages !== undefined) body.partial_images = partialImages;
+    if (responseFormat !== undefined) body.response_format = responseFormat;
+    if (callbackUrl !== undefined) body.callback_url = callbackUrl;
+    return this.transport.request('POST', '/openai/images/edits', { json: body });
+  }
+}
+
+class Embeddings {
+  constructor(private transport: Transport) {}
+
+  async create(opts: {
+    model: string;
+    input: string | string[];
+    encodingFormat?: string;
+    dimensions?: number;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { model, input, encodingFormat, dimensions, ...rest } = opts;
+    const body: Record<string, unknown> = { model, input, ...rest };
+    if (encodingFormat !== undefined) body.encoding_format = encodingFormat;
+    if (dimensions !== undefined) body.dimensions = dimensions;
+    return this.transport.request('POST', '/openai/embeddings', { json: body });
+  }
+}
+
+class Tasks {
+  constructor(private transport: Transport) {}
+
+  async retrieve(opts: {
+    id?: string;
+    traceId?: string;
+    [key: string]: unknown;
+  }): Promise<Record<string, unknown>> {
+    const { id, traceId, ...rest } = opts;
+    const body: Record<string, unknown> = { action: 'retrieve', ...rest };
+    if (id !== undefined) body.id = id;
+    if (traceId !== undefined) body.trace_id = traceId;
+    return this.transport.request('POST', '/openai/tasks', { json: body });
+  }
+
+  async retrieveBatch(opts: {
+    ids?: string[];
+    traceIds?: string[];
+    applicationId?: string;
+    userId?: string;
+    type?: string;
+    offset?: number;
+    limit?: number;
+    createdAtMin?: number;
+    createdAtMax?: number;
+    [key: string]: unknown;
+  } = {}): Promise<Record<string, unknown>> {
+    const { ids, traceIds, applicationId, userId, type, offset, limit, createdAtMin, createdAtMax, ...rest } = opts;
+    const body: Record<string, unknown> = { action: 'retrieve_batch', ...rest };
+    if (ids !== undefined) body.ids = ids;
+    if (traceIds !== undefined) body.trace_ids = traceIds;
+    if (applicationId !== undefined) body.application_id = applicationId;
+    if (userId !== undefined) body.user_id = userId;
+    if (type !== undefined) body.type = type;
+    if (offset !== undefined) body.offset = offset;
+    if (limit !== undefined) body.limit = limit;
+    if (createdAtMin !== undefined) body.created_at_min = createdAtMin;
+    if (createdAtMax !== undefined) body.created_at_max = createdAtMax;
+    return this.transport.request('POST', '/openai/tasks', { json: body });
+  }
+}
+
+export class OpenAI {
+  readonly chat: ChatNamespace;
+  readonly responses: Responses;
+  readonly images: Images;
+  readonly embeddings: Embeddings;
+  readonly tasks: Tasks;
+
+  constructor(transport: Transport) {
+    this.chat = new ChatNamespace(transport);
+    this.responses = new Responses(transport);
+    this.images = new Images(transport);
+    this.embeddings = new Embeddings(transport);
+    this.tasks = new Tasks(transport);
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "images": [
+    {
+      "file": "assets/get-api-key-en.png",
+      "source_url": "https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png",
+      "official_page_url": "https://github.com/AceDataCloud/SunoDify/blob/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png",
+      "source_commit": "8d3d03570e73324220f111f7fe343da0792a8071",
+      "source_commit_date": "2026-10-08T17:42:14Z",
+      "download_date": "2026-10-18 Asia/Shanghai",
+      "sha256": "b63787f2bd15af82fef9ab61c99e11c454355ac86e91f7f94559386b795069b7",
+      "limits": "Redacted historical shared platform key UI only; original capture date/frontend version not known; original name Dify tutorial. Not a CLI/host execution, install, media or billing screenshot."
+    },
+    {
+      "file": "assets/create-api-key-en.png",
+      "source_url": "https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png",
+      "official_page_url": "https://github.com/AceDataCloud/SunoDify/blob/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png",
+      "source_commit": "8d3d03570e73324220f111f7fe343da0792a8071",
+      "source_commit_date": "2026-10-08T17:42:14Z",
+      "download_date": "2026-10-18 Asia/Shanghai",
+      "sha256": "977c06780b36ca33f2fb3ba546e2594efe5895400e4cb58d842eb564c3bb09da",
+      "limits": "Redacted historical shared platform key UI only; original capture date/frontend version not known; original name Dify tutorial. Not a CLI/host execution, install, media or billing screenshot."
+    }
+  ],
+  "no_generated_host_ui": true
+}

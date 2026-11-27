@@ -1,0 +1,180 @@
+[
+  {
+    "name": "prompt",
+    "label": "Image description",
+    "type": "text",
+    "required": true,
+    "help": "Describe one image. This first action creates one URL result; edits and base64 output are not exposed."
+  },
+  {
+    "name": "model",
+    "label": "Image model",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "dall-e-2",
+        "value": "dall-e-2"
+      },
+      {
+        "label": "dall-e-3",
+        "value": "dall-e-3"
+      },
+      {
+        "label": "gpt-image-1",
+        "value": "gpt-image-1"
+      },
+      {
+        "label": "gpt-image-1.5",
+        "value": "gpt-image-1.5"
+      },
+      {
+        "label": "GPT Image 2",
+        "value": "gpt-image-2"
+      },
+      {
+        "label": "GPT Image 2.5 Flare",
+        "value": "gpt-image-2.5-flare"
+      },
+      {
+        "label": "gpt-image-2.5-flare:reverse",
+        "value": "gpt-image-2.5-flare:reverse"
+      },
+      {
+        "label": "gpt-image-2.5-flare:official",
+        "value": "gpt-image-2.5-flare:official"
+      },
+      {
+        "label": "GPT Image 2.5 Sunburst",
+        "value": "gpt-image-2.5-sunburst"
+      },
+      {
+        "label": "gpt-image-2.5-sunburst:reverse",
+        "value": "gpt-image-2.5-sunburst:reverse"
+      },
+      {
+        "label": "gpt-image-2.5-sunburst:official",
+        "value": "gpt-image-2.5-sunburst:official"
+      },
+      {
+        "label": "gpt-image-2:reverse",
+        "value": "gpt-image-2:reverse"
+      },
+      {
+        "label": "gpt-image-2:official",
+        "value": "gpt-image-2:official"
+      },
+      {
+        "label": "nano-banana",
+        "value": "nano-banana"
+      },
+      {
+        "label": "nano-banana-2-lite",
+        "value": "nano-banana-2-lite"
+      },
+      {
+        "label": "nano-banana-2",
+        "value": "nano-banana-2"
+      },
+      {
+        "label": "nano-banana-2.1",
+        "value": "nano-banana-2.1"
+      },
+      {
+        "label": "nano-banana-pro",
+        "value": "nano-banana-pro"
+      },
+      {
+        "label": "gpt-image-2.6-flare",
+        "value": "gpt-image-2.6-flare"
+      },
+      {
+        "label": "gpt-image-2.6-flare:reverse",
+        "value": "gpt-image-2.6-flare:reverse"
+      },
+      {
+        "label": "gpt-image-2.6-flare:official",
+        "value": "gpt-image-2.6-flare:official"
+      },
+      {
+        "label": "gpt-image-2.6-sunburst",
+        "value": "gpt-image-2.6-sunburst"
+      },
+      {
+        "label": "gpt-image-2.6-sunburst:reverse",
+        "value": "gpt-image-2.6-sunburst:reverse"
+      },
+      {
+        "label": "gpt-image-2.6-sunburst:official",
+        "value": "gpt-image-2.6-sunburst:official"
+      }
+    ],
+    "help": "All models from the published OpenAI-compatible image API. Select explicitly after checking access and pricing; no automatic fallback."
+  },
+  {
+    "name": "size",
+    "label": "Image size",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "Auto",
+        "value": "auto"
+      },
+      {
+        "label": "1024 × 1024",
+        "value": "1024x1024"
+      },
+      {
+        "label": "1024 × 1536",
+        "value": "1024x1536"
+      },
+      {
+        "label": "1536 × 1024",
+        "value": "1536x1024"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "quality",
+    "label": "Quality",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "Auto",
+        "value": "auto"
+      },
+      {
+        "label": "High",
+        "value": "high"
+      },
+      {
+        "label": "Medium",
+        "value": "medium"
+      },
+      {
+        "label": "Low",
+        "value": "low"
+      },
+      {
+        "label": "xhigh",
+        "value": "xhigh"
+      },
+      {
+        "label": "max",
+        "value": "max"
+      },
+      {
+        "label": "hd",
+        "value": "hd"
+      },
+      {
+        "label": "standard",
+        "value": "standard"
+      }
+    ],
+    "help": "Choose a quality supported by the selected model: DALL-E 2 uses standard; DALL-E 3 uses standard or hd. Check current model documentation for GPT Image and compatible aliases."
+  }
+]

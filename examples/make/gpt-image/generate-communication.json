@@ -1,0 +1,27 @@
+{
+  "url": "/openai/images/generations",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "model": "{{parameters.model}}",
+    "prompt": "{{parameters.prompt}}",
+    "size": "{{parameters.size}}",
+    "quality": "{{parameters.quality}}",
+    "n": 1,
+    "response_format": "url",
+    "async": true
+  },
+  "response": {
+    "valid": {
+      "condition": "{{!body.error && body.success !== false && body.task_id}}",
+      "message": "No accepted task ID. Inspect request history before submitting another generation.",
+      "type": "RuntimeError"
+    },
+    "output": {
+      "task_id": "{{body.task_id}}",
+      "status": "pending",
+      "success": false,
+      "trace_id": "{{body.trace_id}}"
+    }
+  }
+}
