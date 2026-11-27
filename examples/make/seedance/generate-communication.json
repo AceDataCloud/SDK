@@ -1,0 +1,32 @@
+{
+  "url": "/seedance/videos",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "model": "{{parameters.model}}",
+    "content": [
+      {
+        "type": "text",
+        "text": "{{parameters.prompt}}"
+      }
+    ],
+    "resolution": "{{parameters.resolution}}",
+    "ratio": "{{parameters.ratio}}",
+    "duration": "{{parameters.duration}}",
+    "generate_audio": "{{parameters.generate_audio}}",
+    "async": true
+  },
+  "response": {
+    "valid": {
+      "condition": "{{!body.error && body.success !== false && body.task_id}}",
+      "message": "No accepted task ID. Inspect request history before submitting another generation.",
+      "type": "RuntimeError"
+    },
+    "output": {
+      "task_id": "{{body.task_id}}",
+      "status": "pending",
+      "success": false,
+      "trace_id": "{{body.trace_id}}"
+    }
+  }
+}

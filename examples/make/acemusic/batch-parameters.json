@@ -1,0 +1,15 @@
+[
+  {
+    "name": "task_ids",
+    "label": "Task IDs (one per line)",
+    "type": "array",
+    "required": true,
+    "spec": {
+      "type": "text"
+    },
+    "validate": {
+      "minItems": 1,
+      "maxItems": 100
+    }
+  }
+]

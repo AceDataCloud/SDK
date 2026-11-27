@@ -1,0 +1,27 @@
+[
+  {
+    "name": "task_id",
+    "label": "Task ID",
+    "type": "text"
+  },
+  {
+    "name": "status",
+    "label": "Status",
+    "type": "text"
+  },
+  {
+    "name": "success",
+    "label": "Terminal success",
+    "type": "boolean"
+  },
+  {
+    "name": "trace_id",
+    "label": "Trace ID",
+    "type": "text"
+  },
+  {
+    "name": "image_url",
+    "label": "Completed image URL",
+    "type": "text"
+  }
+]

@@ -1,0 +1,1453 @@
+package acedatacloud
+
+import (
+	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestNewClient_RequiresTokenOrHandler(t *testing.T) {
+	t.Setenv("ACEDATACLOUD_API_TOKEN", "")
+	_, err := NewClient()
+	if err == nil {
+		t.Fatal("expected error when no token and no payment handler")
+	}
+	if _, ok := err.(*AuthenticationError); !ok {
+		t.Fatalf("expected AuthenticationError, got %T", err)
+	}
+}
+
+func TestFishModelCreated(t *testing.T) {
+	for _, visibility := range []string{"", "private"} {
+		t.Run("visibility="+visibility, func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/fish/model" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if body["voices"] != "https://example.com/sample-voice.mp3" || body["title"] != "My Custom Voice" {
+					t.Errorf("unexpected body: %+v", body)
+				}
+				if visibility == "" {
+					if _, ok := body["visibility"]; ok {
+						t.Error("visibility must be omitted by default")
+					}
+				} else if body["visibility"] != visibility {
+					t.Errorf("explicit visibility was not preserved: %+v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				_, _ = w.Write([]byte(`{"_id":"d7900c21663f485ab63ebdb7e5905036","visibility":"public"}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			result, err := client.Fish().Model(context.Background(), FishModelRequest{
+				Title: "My Custom Voice", Voices: "https://example.com/sample-voice.mp3", Visibility: visibility,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if result["_id"] != "d7900c21663f485ab63ebdb7e5905036" || result["visibility"] != "public" || calls != 1 {
+				t.Fatalf("unexpected creation result: %+v (%d calls)", result, calls)
+			}
+		})
+	}
+}
+
+func TestProducerActionSpecificInputs(t *testing.T) {
+	for _, req := range []ProducerGenerateRequest{
+		{Action: "generate", Prompt: "A jazz song"},
+		{Action: "generate", Custom: true, Instrumental: true},
+		{Action: "extend", AudioID: "source-audio", ContinueAt: 12.5, Lyric: "New verse"},
+		{Action: "cover", AudioID: "source-audio"},
+	} {
+		body := req.toBody()
+		if req.Prompt == "" {
+			if _, ok := body["prompt"]; ok {
+				t.Error("omitted prompt must not be sent")
+			}
+		}
+		if req.Lyric == "" {
+			if _, ok := body["lyric"]; ok {
+				t.Error("omitted lyric must not be sent")
+			}
+		}
+		if body["action"] != req.Action {
+			t.Errorf("unexpected action: %#v", body)
+		}
+	}
+}
+
+func TestMaestroFreeformStyleAndReferenceVoice(t *testing.T) {
+	body := (MaestroGenerateRequest{
+		Prompt: "Launch video", Style: "watercolor storyboard", Voice: "0123456789abcdef0123456789abcdef",
+	}).toBody()
+	if body["style"] != "watercolor storyboard" || body["voice"] != "0123456789abcdef0123456789abcdef" {
+		t.Fatalf("style and voice must be preserved: %#v", body)
+	}
+}
+
+func TestSunoUploadPersona(t *testing.T) {
+	for _, personaID := range []string{"", "voice-persona"} {
+		t.Run("persona="+personaID, func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/suno/upload" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				expected := map[string]any{"audio_url": "https://example.com/song.mp3"}
+				if personaID != "" {
+					expected["persona_id"] = personaID
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("unexpected upload body: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = client.Suno().Upload(context.Background(), SunoUploadRequest{
+				AudioURL: "https://example.com/song.mp3", PersonaID: personaID,
+			})
+			if err != nil || calls != 1 {
+				t.Fatalf("expected one upload request: calls=%d err=%v", calls, err)
+			}
+		})
+	}
+}
+
+func TestSunoAvailability(t *testing.T) {
+	const audioID = "33333333-3333-4333-8333-333333333333"
+	for _, status := range []int{200, 500, 503} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/suno/availability" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				if r.Header.Get("Authorization") != "Bearer test-token" {
+					t.Error("missing API token")
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, map[string]any{"audio_id": audioID}) {
+					t.Errorf("unexpected body: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(status)
+				if status == 200 {
+					_, _ = w.Write([]byte(`{"success":true,"task_id":"11111111-1111-4111-8111-111111111111","trace_id":"22222222-2222-4222-8222-222222222222","data":{"id":"33333333-3333-4333-8333-333333333333","available":true}}`))
+				} else {
+					_, _ = w.Write([]byte(`{"error":{"code":"availability_unknown","message":"Availability could not be confirmed."},"trace_id":"test-trace"}`))
+				}
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			result, err := client.Suno().Availability(context.Background(), SunoAvailabilityRequest{AudioID: audioID})
+			if calls != 1 {
+				t.Fatalf("expected one request without polling, got %d", calls)
+			}
+			if status == 200 {
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !reflect.DeepEqual(result["data"], map[string]any{"id": audioID, "available": true}) {
+					t.Fatalf("unexpected availability: %#v", result)
+				}
+				if result["task_id"] != "11111111-1111-4111-8111-111111111111" || result["trace_id"] != "22222222-2222-4222-8222-222222222222" {
+					t.Fatalf("lost response identifiers: %#v", result)
+				}
+			} else {
+				apiErr, ok := err.(Error)
+				if !ok || apiErr.Code() != "availability_unknown" || apiErr.StatusCode() != status || apiErr.TraceID() != "test-trace" {
+					t.Fatalf("expected availability error, got %v (result=%#v)", err, result)
+				}
+				if result != nil {
+					t.Fatalf("an error must not become an availability result: %#v", result)
+				}
+			}
+		})
+	}
+}
+
+func TestSunoReplacementSerializesLocalLyrics(t *testing.T) {
+	for _, mode := range []string{"", "full_song", "candidates"} {
+		t.Run("mode="+mode, func(t *testing.T) {
+			body := (SunoGenerateRequest{
+				Action: "replace_section", AudioID: "source-audio",
+				Lyric: "Local new lyrics", Prompt: "Local new lyrics",
+				ReplaceSectionStart: 0, ReplaceSectionEnd: 12.5,
+				ReplaceSectionResultMode: mode,
+			}).toBody()
+			if body["lyric"] != "Local new lyrics" || body["prompt"] != body["lyric"] {
+				t.Fatalf("local lyric strings must be preserved: %#v", body)
+			}
+			if body["audio_id"] != "source-audio" || body["replace_section_end"] != 12.5 || body["replace_section_start"] != float64(0) {
+				t.Fatalf("source, zero start and fractional end must be preserved: %#v", body)
+			}
+			if mode == "" {
+				if _, exists := body["replace_section_result_mode"]; exists {
+					t.Fatal("omitted mode must use the server default")
+				}
+			} else if body["replace_section_result_mode"] != mode {
+				t.Fatalf("explicit mode must be preserved: %#v", body)
+			}
+			if body["async"] != true {
+				t.Fatal("replacement must retain asynchronous task submission")
+			}
+		})
+	}
+	body := (SunoGenerateRequest{Action: "generate", Prompt: "A jazz song"}).toBody()
+	if _, exists := body["replace_section_result_mode"]; exists {
+		t.Fatal("ordinary generation must not receive a replacement-only default")
+	}
+	if _, exists := body["replace_section_start"]; exists {
+		t.Fatal("ordinary generation must not receive replacement coordinates")
+	}
+}
+
+func TestFable52MessagesOptions(t *testing.T) {
+	for _, streaming := range []bool{false, true} {
+		t.Run(fmt.Sprintf("stream=%t", streaming), func(t *testing.T) {
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/v1/messages" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Fatal(err)
+				}
+				expected := map[string]any{
+					"model": "claude-fable-5-2", "messages": []any{}, "max_tokens": float64(4096),
+					"output_config": map[string]any{"effort": "high"},
+					"tool_choice":   map[string]any{"type": "auto"},
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("options changed: got %#v, want %#v", body, expected)
+				}
+				if streaming {
+					w.Header().Set("Content-Type", "text/event-stream")
+				} else {
+					w.Write([]byte(`{}`))
+				}
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			req := MessagesRequest{
+				Model: "claude-fable-5-2", Messages: []map[string]any{}, MaxTokens: 4096,
+				Extra: map[string]any{
+					"output_config": map[string]any{"effort": "high"},
+					"tool_choice":   map[string]any{"type": "auto"},
+				},
+			}
+			if streaming {
+				chunks, errs := client.Chat().Messages().CreateStream(context.Background(), req)
+				for chunk := range chunks {
+					t.Errorf("unexpected chunk: %#v", chunk)
+				}
+				for err := range errs {
+					t.Error(err)
+				}
+			} else if _, err := client.Chat().Messages().Create(context.Background(), req); err != nil {
+				t.Fatal(err)
+			}
+			if calls != 1 {
+				t.Fatalf("expected one request, got %d", calls)
+			}
+		})
+	}
+}
+
+func TestSunoNegativeTagsAreNotTruncated(t *testing.T) {
+	for _, tags := range []string{"", strings.Repeat("no distorted guitars; ", 100)} {
+		body := (SunoGenerateRequest{Custom: true, NegativeTags: tags}).toBody()
+		if tags == "" {
+			if _, exists := body["negative_tags"]; exists {
+				t.Fatal("empty negative_tags must remain omitted")
+			}
+		} else if body["negative_tags"] != tags {
+			t.Fatal("negative_tags was changed or truncated")
+		}
+	}
+}
+
+func TestSunoProcessingErrorsPreserveSupportDetails(t *testing.T) {
+	for code, message := range map[string]string{
+		"api_error":                   "the account may have been offline",
+		"suno_processing_unavailable": "Music processing is unavailable. Contact support with the trace ID.",
+		"suno_model_unavailable":      "The selected model is unavailable for this operation. Contact support with the trace ID.",
+		"suno_processing_failed":      "Music processing returned no audio. Contact support with the trace ID.",
+	} {
+		t.Run(code, func(t *testing.T) {
+			body := map[string]any{"error": map[string]any{"code": code, "message": message}, "trace_id": "test-trace"}
+			err := mapError(http.StatusInternalServerError, body)
+			apiErr, ok := err.(*APIError)
+			if !ok {
+				t.Fatalf("expected APIError, got %T", err)
+			}
+			if apiErr.Code() != code || apiErr.Message != message || apiErr.StatusCode() != 500 || apiErr.TraceID() != "test-trace" {
+				t.Fatalf("lost support details: %+v", apiErr)
+			}
+			if !reflect.DeepEqual(apiErr.Body(), body) {
+				t.Fatalf("lost response body: %+v", apiErr.Body())
+			}
+		})
+	}
+}
+
+func TestNewClient_WithToken(t *testing.T) {
+	c, err := NewClient(WithAPIToken("test-token"))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	if c.OpenAI() == nil || c.Chat() == nil || c.Captcha() == nil || c.Images() == nil || c.Tasks() == nil {
+		t.Fatal("resources must be non-nil")
+	}
+}
+
+func TestChatUsagePassthrough(t *testing.T) {
+	for _, operation := range []string{"completions", "responses", "messages"} {
+		t.Run(operation, func(t *testing.T) {
+			usage := map[string]any{
+				"cost": map[string]any{"amount": 0.0123, "currency": "Credits", "list_amount": 0.0246},
+			}
+			path := "/v1/chat/completions"
+			switch operation {
+			case "completions":
+				usage["prompt_tokens"] = float64(100)
+				usage["completion_tokens"] = float64(5)
+				usage["prompt_tokens_details"] = map[string]any{"cached_tokens": float64(40)}
+			case "responses":
+				path = "/openai/responses"
+				usage["input_tokens"] = float64(100)
+				usage["output_tokens"] = float64(5)
+				usage["input_tokens_details"] = map[string]any{"cached_tokens": float64(40)}
+			case "messages":
+				path = "/v1/messages"
+				usage["input_tokens"] = float64(60)
+				usage["output_tokens"] = float64(5)
+				usage["cache_read_input_tokens"] = float64(40)
+				usage["cache_creation_input_tokens"] = float64(10)
+			}
+			payload := map[string]any{"usage": usage}
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != http.MethodPost || r.URL.Path != path {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_ = json.NewEncoder(w).Encode(payload)
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var result map[string]any
+			switch operation {
+			case "completions":
+				result, err = client.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{Model: "gpt-5.6-sol-fast", Messages: []map[string]any{}})
+			case "responses":
+				result, err = client.OpenAI().Responses().Create(context.Background(), ResponsesRequest{Model: "gpt-5.6-sol-fast", Input: "Hello"})
+			case "messages":
+				result, err = client.Chat().Messages().Create(context.Background(), MessagesRequest{Model: "gpt-5.6-sol-fast", Messages: []map[string]any{}})
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(result, payload) {
+				t.Fatalf("reported usage was changed: %#v, want %#v", result, payload)
+			}
+		})
+	}
+}
+
+func TestChatConfigurationPassthrough(t *testing.T) {
+	for _, operation := range []string{"create", "stream", "count_tokens"} {
+		t.Run(operation, func(t *testing.T) {
+			extra := map[string]any{
+				"thinking": map[string]any{
+					"type": "between_tools", "display": "updates", "extension": map[string]any{"enabled": true},
+				},
+			}
+			if operation != "count_tokens" {
+				extra["metadata"] = map[string]any{"user_id": "example-user-001"}
+				extra["output_config"] = map[string]any{
+					"effort": "future-effort", "extension": true,
+					"format": map[string]any{"type": "json_schema", "schema": map[string]any{"type": "object"}},
+				}
+				extra["temperature"] = 0.7
+			}
+			expected := map[string]any{
+				"model": "claude-sonnet-5-5", "messages": []any{},
+			}
+			for key, value := range extra {
+				expected[key] = value
+			}
+			path := "/v1/messages"
+			if operation == "count_tokens" {
+				path += "/count_tokens"
+			} else {
+				expected["max_tokens"] = float64(4096)
+			}
+			if operation == "stream" {
+				expected["stream"] = true
+			}
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != path {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				if r.Header.Get("anthropic-beta") != "thinking-display-updates-2026-08-18" {
+					t.Errorf("missing beta header: %+v", r.Header)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("body = %+v, want %+v", body, expected)
+				}
+				if operation == "stream" {
+					w.Header().Set("Content-Type", "text/event-stream")
+				} else {
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{}`))
+				}
+			}))
+			defer srv.Close()
+
+			client, err := NewClient(
+				WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0),
+				WithHeaders(map[string]string{"anthropic-beta": "thinking-display-updates-2026-08-18"}),
+			)
+			if err != nil {
+				t.Fatalf("NewClient: %v", err)
+			}
+			req := MessagesRequest{Model: "claude-sonnet-5-5", Messages: []map[string]any{}, Extra: extra}
+			switch operation {
+			case "create":
+				_, err = client.Chat().Messages().Create(context.Background(), req)
+			case "count_tokens":
+				_, err = client.Chat().Messages().CountTokens(context.Background(), req)
+			case "stream":
+				chunks, errs := client.Chat().Messages().CreateStream(context.Background(), req)
+				for chunk := range chunks {
+					t.Errorf("unexpected chunk: %+v", chunk)
+				}
+				err = <-errs
+			}
+			if err != nil {
+				t.Fatalf("%s: %v", operation, err)
+			}
+			if calls != 1 {
+				t.Errorf("got %d calls, want 1", calls)
+			}
+		})
+	}
+}
+
+func TestSolFastModelPassthrough(t *testing.T) {
+	for _, operation := range []string{"completions", "responses", "messages"} {
+		for _, streaming := range []bool{false, true} {
+			name := operation
+			if streaming {
+				name += "_stream"
+			}
+			t.Run(name, func(t *testing.T) {
+				model := "gpt-5.6-sol-fast"
+				messages := []map[string]any{{"role": "user", "content": "Hello"}}
+				expected := map[string]any{"model": model}
+				path := "/v1/chat/completions"
+				if operation == "responses" {
+					path = "/openai/responses"
+					expected["input"] = "Hello"
+				} else {
+					expected["messages"] = []any{map[string]any{"role": "user", "content": "Hello"}}
+					if operation == "messages" {
+						path = "/v1/messages"
+						expected["max_tokens"] = float64(64)
+					}
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != path {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Errorf("decode request: %v", err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					if streaming {
+						w.Header().Set("Content-Type", "text/event-stream")
+					} else {
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatalf("NewClient: %v", err)
+				}
+				ctx := context.Background()
+				var chunks <-chan map[string]any
+				var errs <-chan error
+				switch operation {
+				case "completions":
+					req := ChatCompletionRequest{Model: model, Messages: messages}
+					if streaming {
+						chunks, errs = client.OpenAI().Chat().Completions().CreateStream(ctx, req)
+					} else {
+						_, err = client.OpenAI().Chat().Completions().Create(ctx, req)
+					}
+				case "responses":
+					req := ResponsesRequest{Model: model, Input: "Hello"}
+					if streaming {
+						chunks, errs = client.OpenAI().Responses().CreateStream(ctx, req)
+					} else {
+						_, err = client.OpenAI().Responses().Create(ctx, req)
+					}
+				case "messages":
+					req := MessagesRequest{Model: model, Messages: messages, MaxTokens: 64}
+					if streaming {
+						chunks, errs = client.Chat().Messages().CreateStream(ctx, req)
+					} else {
+						_, err = client.Chat().Messages().Create(ctx, req)
+					}
+				}
+				if streaming {
+					for chunk := range chunks {
+						t.Errorf("unexpected chunk: %+v", chunk)
+					}
+					err = <-errs
+				}
+				if err != nil {
+					t.Fatalf("%s: %v", name, err)
+				}
+				if calls != 1 {
+					t.Errorf("got %d calls, want 1", calls)
+				}
+			})
+		}
+	}
+}
+
+func TestPublicChatModelsPassthrough(t *testing.T) {
+	for _, tc := range []struct {
+		model     string
+		maxTokens int
+		extra     map[string]any
+	}{
+		{"claude-opus-5-5", 0, map[string]any{"n": 1, "tool_choice": "auto"}},
+		{"gemini-4-argon", 32768, nil},
+		{"gpt-6.2-astra", 64, nil},
+		{"gpt-6.2-sol", 64, nil},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "low"}},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "high"}},
+		{"kimi-k3.1-pro", 0, map[string]any{"reasoning_effort": "max"}},
+		{"kimi-k3", 0, map[string]any{"reasoning_effort": "max"}},
+	} {
+		for _, streaming := range []bool{false, true} {
+			t.Run(fmt.Sprintf("%s/%v/stream=%t", tc.model, tc.extra["reasoning_effort"], streaming), func(t *testing.T) {
+				req := ChatCompletionRequest{
+					Model: tc.model, Messages: []map[string]any{{"role": "user", "content": "Hello"}},
+					MaxTokens: tc.maxTokens, Extra: tc.extra,
+				}
+				expected := map[string]any{
+					"model": tc.model, "messages": []any{map[string]any{"role": "user", "content": "Hello"}},
+				}
+				for key, value := range tc.extra {
+					if key == "n" {
+						value = float64(1)
+					}
+					expected[key] = value
+				}
+				if tc.maxTokens > 0 {
+					expected["max_tokens"] = float64(tc.maxTokens)
+				}
+				if streaming {
+					expected["stream"] = true
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != "/v1/chat/completions" {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Error(err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					if streaming {
+						w.Header().Set("Content-Type", "text/event-stream")
+					} else {
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatal(err)
+				}
+				completions := client.OpenAI().Chat().Completions()
+				if streaming {
+					chunks, errs := completions.CreateStream(context.Background(), req)
+					for chunk := range chunks {
+						t.Errorf("unexpected chunk: %+v", chunk)
+					}
+					err = <-errs
+				} else {
+					_, err = completions.Create(context.Background(), req)
+				}
+				if err != nil || calls != 1 {
+					t.Fatalf("err=%v, calls=%d; want one successful request", err, calls)
+				}
+			})
+		}
+	}
+}
+
+func TestOpenAIImageQualityPassthrough(t *testing.T) {
+	for _, model := range []OpenAIImageModel{
+		OpenAIImageModelGPTImage25Flare, OpenAIImageModelGPTImage25Sunburst,
+		OpenAIImageModelGPTImage26Flare, OpenAIImageModelGPTImage26Sunburst,
+		OpenAIImageModelGPTImage25FlareReverse, OpenAIImageModelGPTImage25SunburstReverse,
+		OpenAIImageModelGPTImage26FlareReverse, OpenAIImageModelGPTImage26SunburstReverse,
+		OpenAIImageModelGPTImage25FlareOfficial, OpenAIImageModelGPTImage25SunburstOfficial,
+		OpenAIImageModelGPTImage26FlareOfficial, OpenAIImageModelGPTImage26SunburstOfficial,
+	} {
+		for _, quality := range []string{"xhigh", "max"} {
+			for _, operation := range []string{"generations", "edits"} {
+				t.Run(model+"/"+quality+"/"+operation, func(t *testing.T) {
+					req := OpenAIImageRequest{Model: model, Prompt: "A vase", Extra: map[string]any{"quality": quality}}
+					expected := map[string]any{"model": model, "prompt": "A vase", "quality": quality}
+					if operation == "edits" {
+						req.Image = "https://example.com/vase.png"
+						expected["image"] = req.Image
+					}
+					calls := 0
+					srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						calls++
+						var body map[string]any
+						if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+							t.Errorf("decode request: %v", err)
+						}
+						if r.URL.Path != "/openai/images/"+operation || !reflect.DeepEqual(body, expected) {
+							t.Errorf("unexpected image request: path=%s body=%#v", r.URL.Path, body)
+						}
+						w.Header().Set("Content-Type", "application/json")
+						_, _ = w.Write([]byte(`{}`))
+					}))
+					defer srv.Close()
+					client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+					if err != nil {
+						t.Fatal(err)
+					}
+					if operation == "edits" {
+						_, err = client.OpenAI().Images().Edit(context.Background(), req)
+					} else {
+						_, err = client.OpenAI().Images().Generate(context.Background(), req)
+					}
+					if err != nil || calls != 1 {
+						t.Fatalf("expected one image request: calls=%d err=%v", calls, err)
+					}
+				})
+			}
+		}
+	}
+}
+
+func TestOpenAIImageOfficialVariants(t *testing.T) {
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		switch calls {
+		case 1:
+			if r.URL.Path != "/openai/images/generations" || body["model"] != string(OpenAIImageModelGPTImage25FlareOfficial) {
+				t.Fatalf("unexpected generation request: path=%s body=%+v", r.URL.Path, body)
+			}
+		case 2:
+			if r.URL.Path != "/openai/images/edits" || body["model"] != string(OpenAIImageModelGPTImage25SunburstOfficial) {
+				t.Fatalf("unexpected edit request: path=%s body=%+v", r.URL.Path, body)
+			}
+			if body["image"] != "https://example.com/cat.png" {
+				t.Fatalf("unexpected edit image: %+v", body)
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"data":[]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	_, err := c.OpenAI().Images().Generate(context.Background(), OpenAIImageRequest{
+		Model: OpenAIImageModelGPTImage25FlareOfficial, Prompt: "A cat",
+	})
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	_, err = c.OpenAI().Images().Edit(context.Background(), OpenAIImageRequest{
+		Model: OpenAIImageModelGPTImage25SunburstOfficial, Prompt: "Add a hat", Image: "https://example.com/cat.png",
+	})
+	if err != nil {
+		t.Fatalf("Edit: %v", err)
+	}
+	if calls != 2 {
+		t.Fatalf("expected 2 calls, got %d", calls)
+	}
+}
+
+func TestNanoBanana21Requests(t *testing.T) {
+	for _, action := range []string{"generate", "edit"} {
+		for _, resolution := range []string{"1K", "2K", "4K"} {
+			t.Run(action+"_"+resolution, func(t *testing.T) {
+				expected := map[string]any{
+					"action": action, "model": "nano-banana-2.1", "prompt": "A vase",
+					"resolution": resolution, "aspect_ratio": "1:1", "count": float64(1), "async": true,
+				}
+				req := NanoBananaGenerateRequest{
+					Action: action, Model: "nano-banana-2.1", Prompt: "A vase",
+					Resolution: resolution, AspectRatio: "1:1",
+				}
+				if action == "edit" {
+					req.ImageURLs = []string{"https://example.com/vase.png"}
+					expected["image_urls"] = []any{"https://example.com/vase.png"}
+				}
+				calls := 0
+				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					calls++
+					if r.Method != http.MethodPost || r.URL.Path != "/nano-banana/images" {
+						t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+					}
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Errorf("decode request: %v", err)
+					}
+					if !reflect.DeepEqual(body, expected) {
+						t.Errorf("body = %+v, want %+v", body, expected)
+					}
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write([]byte(`{}`))
+				}))
+				defer srv.Close()
+				client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+				if err != nil {
+					t.Fatalf("NewClient: %v", err)
+				}
+				handle, err := client.NanoBanana().Generate(context.Background(), req)
+				if err != nil || handle == nil {
+					t.Fatalf("Generate: handle=%v err=%v", handle, err)
+				}
+				if calls != 1 {
+					t.Errorf("got %d calls, want 1", calls)
+				}
+			})
+		}
+	}
+}
+
+func TestNanoBananaDefaults(t *testing.T) {
+	body := (NanoBananaGenerateRequest{Action: "generate", Prompt: "A vase"}).toBody()
+	for _, field := range []string{"model", "resolution"} {
+		if _, exists := body[field]; exists {
+			t.Errorf("backend default overridden: %+v", body)
+		}
+	}
+}
+
+func TestOpenAIImagesNanoBanana21(t *testing.T) {
+	for _, operation := range []string{"generations", "edits"} {
+		t.Run(operation, func(t *testing.T) {
+			req := OpenAIImageRequest{Model: OpenAIImageModelNanoBanana21, Prompt: "A vase"}
+			expected := map[string]any{"model": "nano-banana-2.1", "prompt": "A vase"}
+			if operation == "edits" {
+				req.Image = "https://example.com/vase.png"
+				expected["image"] = req.Image
+			}
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				if r.Method != http.MethodPost || r.URL.Path != "/openai/images/"+operation {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Errorf("decode request: %v", err)
+				}
+				if !reflect.DeepEqual(body, expected) {
+					t.Errorf("body = %+v, want %+v", body, expected)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatalf("NewClient: %v", err)
+			}
+			if operation == "edits" {
+				_, err = client.OpenAI().Images().Edit(context.Background(), req)
+			} else {
+				_, err = client.OpenAI().Images().Generate(context.Background(), req)
+			}
+			if err != nil {
+				t.Fatalf("%s: %v", operation, err)
+			}
+			if calls != 1 {
+				t.Errorf("got %d calls, want 1", calls)
+			}
+		})
+	}
+}
+
+func TestSeedreamGenerateOmitsExampleOnlySize(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/seedream/images" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if _, ok := body["size"]; ok {
+			t.Errorf("example-only size must be omitted: %+v", body)
+		}
+		if body["model"] != "doubao-seedream-5-0-260128" || body["prompt"] != "a cat" {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"success":true,"task_id":"seedream-1","data":[{"image_url":"https://cdn.example.com/seedream.png"}]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Seedream().Generate(context.Background(), SeedreamGenerateRequest{
+		Model:  "doubao-seedream-5-0-260128",
+		Prompt: "a cat",
+	})
+	if err != nil {
+		t.Fatalf("Seedream Generate: %v", err)
+	}
+	if task.ID != "seedream-1" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+	if got := task.URLs(); len(got) != 1 || got[0] != "https://cdn.example.com/seedream.png" {
+		t.Fatalf("unexpected array response URLs: %+v", got)
+	}
+}
+
+func TestSeedreamGenerateSendsExplicitSize(t *testing.T) {
+	body := SeedreamGenerateRequest{Size: "4K"}.toBody()
+	if body["size"] != "4K" {
+		t.Fatalf("explicit size missing: %+v", body)
+	}
+}
+
+func TestMaestroGenerate(t *testing.T) {
+	for _, langs := range [][]string{nil, {"en"}} {
+		t.Run(strings.Join(langs, ","), func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method != "POST" || r.URL.Path != "/maestro/videos" {
+					t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+				}
+				var body map[string]any
+				_ = json.NewDecoder(r.Body).Decode(&body)
+				wantLang := "zh-cn"
+				if langs != nil {
+					wantLang = langs[0]
+				}
+				if !reflect.DeepEqual(body["langs"], []any{wantLang}) {
+					t.Errorf("unexpected languages: %+v", body["langs"])
+				}
+				if _, ok := body["quality"]; ok {
+					t.Errorf("retired quality sent: %+v", body)
+				}
+				if body["duration"] != float64(300) || body["scenario"] != "drama" || body["async"] != true {
+					t.Errorf("unexpected body: %+v", body)
+				}
+				_, _ = w.Write([]byte(`{"task_id":"task-maestro"}`))
+			}))
+			defer srv.Close()
+			c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+			task, err := c.Maestro().Generate(context.Background(), MaestroGenerateRequest{
+				Prompt: "Launch video", Langs: langs, Duration: 300, Scenario: "drama",
+			})
+			if err != nil {
+				t.Fatalf("Maestro Generate: %v", err)
+			}
+			if task.ID != "task-maestro" {
+				t.Fatalf("unexpected task id: %q", task.ID)
+			}
+		})
+	}
+}
+
+func TestMaestroRejectsInvalidLanguageCount(t *testing.T) {
+	for _, langs := range [][]string{{}, {"en", "de"}} {
+		task, err := (&Maestro{}).Generate(context.Background(), MaestroGenerateRequest{
+			Prompt: "Launch video", Langs: langs,
+		})
+		if task != nil || err == nil || !strings.Contains(err.Error(), "langs must contain exactly one item") {
+			t.Fatalf("expected language validation, got task=%v err=%v", task, err)
+		}
+	}
+}
+
+func TestMinimaxGenerate(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/minimax/videos" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "MiniMax-H3" || body["resolution"] != "2K" || body["duration"] != float64(5) {
+			t.Errorf("unexpected body: %+v", body)
+		}
+		if body["async"] != true {
+			t.Errorf("expected async request: %+v", body)
+		}
+		_, _ = w.Write([]byte(`{"task_id":"minimax-1"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	task, err := c.Minimax().Generate(context.Background(), MinimaxGenerateRequest{
+		Model:      "MiniMax-H3",
+		Content:    []map[string]any{{"type": "text", "text": "A cat"}},
+		Resolution: "2K",
+		Duration:   5,
+		Ratio:      "16:9",
+	})
+	if err != nil {
+		t.Fatalf("Minimax Generate: %v", err)
+	}
+	if task.ID != "minimax-1" {
+		t.Fatalf("unexpected task id: %q", task.ID)
+	}
+}
+
+func TestCaptchaEndpoints(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.URL.Path {
+		case "/captcha/recognition/hcaptcha":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-recognition-task"}`))
+		case "/captcha/token/hcaptcha":
+			_, _ = w.Write([]byte(`{"task_id":"captcha-token-task"}`))
+		case "/captcha/tasks":
+			_, _ = w.Write([]byte(`{"status":"succeeded"}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	if _, err := c.Captcha().Recognition().HCaptcha(context.Background(), CaptchaRecognitionHCaptchaRequest{
+		Queries:  []string{"cat", "dog"},
+		Question: "Choose cats",
+		Async:    true,
+	}); err != nil {
+		t.Fatalf("Recognition HCaptcha: %v", err)
+	}
+	if _, err := c.Captcha().Token().HCaptcha(context.Background(), CaptchaTokenHCaptchaRequest{
+		WebsiteKey: "site-key",
+		WebsiteURL: "https://accounts.hcaptcha.com/demo",
+		Async:      true,
+	}); err != nil {
+		t.Fatalf("Token HCaptcha: %v", err)
+	}
+	if _, err := c.Captcha().Tasks().Retrieve(context.Background(), "task-1", nil); err != nil {
+		t.Fatalf("Tasks Retrieve: %v", err)
+	}
+}
+
+func TestChatCompletions_Create(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/v1/chat/completions" {
+			t.Errorf("unexpected path %s", r.URL.Path)
+		}
+		if r.Header.Get("Authorization") != "Bearer token-abc" {
+			t.Errorf("missing auth header")
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["model"] != "gpt-4o-mini" {
+			t.Errorf("bad model: %v", body["model"])
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id":"c1","choices":[{"message":{"role":"assistant","content":"hi"}}]}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("token-abc"), WithBaseURL(srv.URL))
+	res, err := c.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{
+		Model:    "gpt-4o-mini",
+		Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["id"] != "c1" {
+		t.Fatalf("bad response: %+v", res)
+	}
+}
+
+func TestTransport_RetriesOn503(t *testing.T) {
+	attempts := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts++
+		if attempts < 2 {
+			w.WriteHeader(503)
+			_, _ = w.Write([]byte(`{"error":{"code":"unknown","message":"busy"}}`))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL), WithMaxRetries(3))
+	res, err := c.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{
+		Model:    "m",
+		Messages: []map[string]any{{"role": "user", "content": "x"}},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if res["ok"] != true {
+		t.Fatalf("bad response: %+v", res)
+	}
+	if attempts != 2 {
+		t.Fatalf("expected 2 attempts, got %d", attempts)
+	}
+}
+
+func TestTransport_MapErrorNon401(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(429)
+		_, _ = w.Write([]byte(`{"error":{"code":"too_many_requests","message":"slow down"},"trace_id":"abc"}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL), WithMaxRetries(0))
+	_, err := c.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{
+		Model:    "m",
+		Messages: []map[string]any{{"role": "user", "content": "x"}},
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	rl, ok := err.(*RateLimitError)
+	if !ok {
+		t.Fatalf("expected RateLimitError, got %T: %v", err, err)
+	}
+	if rl.TraceID() != "abc" {
+		t.Errorf("missing trace_id: %+v", rl)
+	}
+}
+
+func TestTransport_MapErrorWithStringBody(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(402)
+		_, _ = w.Write([]byte(`{"error":"insufficient payment"}`))
+	}))
+	defer srv.Close()
+
+	// No payment handler, so 402 is raised as a plain error.
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL), WithMaxRetries(0))
+	_, err := c.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{
+		Model:    "m",
+		Messages: []map[string]any{{"role": "user", "content": "x"}},
+	})
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("expected *APIError, got %T: %v", err, err)
+	}
+	if apiErr.Message != "insufficient payment" {
+		t.Errorf("bad message: %q", apiErr.Message)
+	}
+}
+
+func TestPaymentHandler_OnSecond402ThenSuccess(t *testing.T) {
+	hit := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hit++
+		if hit == 1 {
+			if r.Header.Get("X-Payment") != "" {
+				t.Errorf("first request should not have X-Payment")
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(402)
+			_, _ = w.Write([]byte(`{"x402Version":2,"accepts":[{"network":"base","scheme":"exact","payTo":"0xabc","asset":"0xusdc","maxAmountRequired":"100"}]}`))
+			return
+		}
+		if got := r.Header.Get("X-Payment"); got != "fake-envelope" {
+			t.Errorf("expected X-Payment=fake-envelope, got %q", got)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"paid":true}`))
+	}))
+	defer srv.Close()
+
+	var received PaymentContext
+	handler := PaymentHandlerFunc(func(ctx context.Context, pctx PaymentContext) (PaymentResult, error) {
+		received = pctx
+		return PaymentResult{Headers: map[string]string{"X-Payment": "fake-envelope"}}, nil
+	})
+
+	c, _ := NewClient(WithBaseURL(srv.URL), WithPaymentHandler(handler))
+	res, err := c.OpenAI().Chat().Completions().Create(context.Background(), ChatCompletionRequest{
+		Model:    "m",
+		Messages: []map[string]any{{"role": "user", "content": "x"}},
+	})
+	if err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+	if res["paid"] != true {
+		t.Fatalf("bad response: %+v", res)
+	}
+	if len(received.Accepts) != 1 || received.Accepts[0]["network"] != "base" {
+		t.Fatalf("payment context not propagated: %+v", received)
+	}
+	if hit != 2 {
+		t.Fatalf("expected 2 hits, got %d", hit)
+	}
+}
+
+func TestPaymentHandler_ParsesPaymentRequiredHeader(t *testing.T) {
+	var calls int
+	required := `{"x402Version":2,"accepts":[{"network":"eip155:8453","scheme":"exact","amount":"1"}]}`
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		if calls == 1 {
+			w.Header().Set("PAYMENT-REQUIRED", base64.StdEncoding.EncodeToString([]byte(required)))
+			w.WriteHeader(http.StatusPaymentRequired)
+			_, _ = w.Write([]byte(`{"error":"payment required"}`))
+			return
+		}
+		if got := r.Header.Get("PAYMENT-SIGNATURE"); got != "signed-payment" {
+			t.Fatalf("expected PAYMENT-SIGNATURE, got %q", got)
+		}
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer srv.Close()
+
+	handler := PaymentHandlerFunc(func(_ context.Context, pctx PaymentContext) (PaymentResult, error) {
+		if got := pctx.Accepts[0]["network"]; got != "eip155:8453" {
+			t.Fatalf("expected canonical network, got %v", got)
+		}
+		return PaymentResult{Headers: map[string]string{"PAYMENT-SIGNATURE": "signed-payment"}}, nil
+	})
+	c, _ := NewClient(WithBaseURL(srv.URL), WithPaymentHandler(handler))
+
+	if _, err := c.transport.do(
+		context.Background(),
+		requestOpts{Method: http.MethodGet, Path: "/paid"},
+	); err != nil {
+		t.Fatal(err)
+	}
+	if calls != 2 {
+		t.Fatalf("expected two calls, got %d", calls)
+	}
+}
+
+func TestPaymentHandler_ParsesPaymentRequiredHeaderForStream(t *testing.T) {
+	var calls int
+	required := `{"x402Version":2,"accepts":[{"network":"eip155:8453","scheme":"exact","amount":"1"}]}`
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		if calls == 1 {
+			w.Header().Set("PAYMENT-REQUIRED", base64.StdEncoding.EncodeToString([]byte(required)))
+			w.WriteHeader(http.StatusPaymentRequired)
+			return
+		}
+		if got := r.Header.Get("PAYMENT-SIGNATURE"); got != "signed-payment" {
+			t.Fatalf("expected PAYMENT-SIGNATURE, got %q", got)
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		_, _ = w.Write([]byte("data: {\"id\":\"chunk-1\"}\n\ndata: [DONE]\n\n"))
+	}))
+	defer srv.Close()
+
+	handler := PaymentHandlerFunc(func(_ context.Context, pctx PaymentContext) (PaymentResult, error) {
+		if got := pctx.Accepts[0]["network"]; got != "eip155:8453" {
+			t.Fatalf("expected canonical network, got %v", got)
+		}
+		return PaymentResult{Headers: map[string]string{"PAYMENT-SIGNATURE": "signed-payment"}}, nil
+	})
+	c, _ := NewClient(WithBaseURL(srv.URL), WithPaymentHandler(handler))
+
+	chunks, errors := c.OpenAI().Chat().Completions().CreateStream(context.Background(), ChatCompletionRequest{
+		Model: "test", Messages: []map[string]any{{"role": "user", "content": "hi"}},
+	})
+	var received []map[string]any
+	for chunk := range chunks {
+		received = append(received, chunk)
+	}
+	for err := range errors {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if calls != 2 || len(received) != 1 || received[0]["id"] != "chunk-1" {
+		t.Fatalf("unexpected stream result calls=%d chunks=%+v", calls, received)
+	}
+}
+
+func TestTaskHandle_WaitCompletes(t *testing.T) {
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		b, _ := io.ReadAll(r.Body)
+		if !strings.Contains(string(b), `"id":"t123"`) {
+			t.Errorf("bad body: %s", b)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if calls < 3 {
+			_, _ = w.Write([]byte(`{"response":{"status":"processing"}}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"response":{"status":"succeeded","url":"https://cdn.example/f.png"}}`))
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	res, err := c.Tasks().Wait(context.Background(), "suno", "t123", 10*time.Millisecond, 2*time.Second)
+	if err != nil {
+		t.Fatalf("Wait: %v", err)
+	}
+	resp := res["response"].(map[string]any)
+	if resp["status"] != "succeeded" {
+		t.Fatalf("bad status: %+v", resp)
+	}
+	if calls != 3 {
+		t.Fatalf("expected 3 polls, got %d", calls)
+	}
+}
+
+func TestImages_GenerateReturnsTaskHandle(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.URL.Path == "/nano-banana/images" {
+			_, _ = w.Write([]byte(`{"task_id":"img-1"}`))
+			return
+		}
+		if r.URL.Path == "/nano-banana/tasks" {
+			_, _ = w.Write([]byte(`{"response":{"status":"succeeded","url":"https://cdn/x.png"}}`))
+			return
+		}
+		t.Errorf("unexpected path %s", r.URL.Path)
+	}))
+	defer srv.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(srv.URL))
+	handle, _, err := c.Images().Generate(context.Background(), ImageGenerateRequest{
+		Prompt:   "a cat",
+		Provider: "nano-banana",
+	})
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	if handle == nil || handle.ID != "img-1" {
+		t.Fatalf("expected task handle with id=img-1, got %+v", handle)
+	}
+	res, err := handle.Wait(context.Background(), 5*time.Millisecond, 1*time.Second)
+	if err != nil {
+		t.Fatalf("Wait: %v", err)
+	}
+	resp := res["response"].(map[string]any)
+	if resp["url"] != "https://cdn/x.png" {
+		t.Fatalf("bad url: %+v", resp)
+	}
+}
+
+// TestGetRecordsTerminalState covers the parity fix: a caller driving its own
+// poll loop only ever calls Get, so Get is where completion must be recorded.
+// Without it, URLs stays empty after a task has plainly finished.
+func TestGetRecordsTerminalState(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"response":{"success":true,"finished_at":"2026-07-27T09:38:41Z",
+			"data":[{"image_url":"https://cdn.example.com/a.png"}]}}`))
+	}))
+	defer server.Close()
+
+	c, err := NewClient(WithAPIToken("t"), WithBaseURL(server.URL))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	h := newTaskHandle("task-1", "/flux/tasks", c.transport, nil)
+	if h.Done() {
+		t.Fatal("handle should not start complete")
+	}
+
+	if _, err := h.Get(context.Background()); err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if !h.Done() {
+		t.Error("Get must record a terminal state")
+	}
+	if urls := h.URLs(); len(urls) != 1 || urls[0] != "https://cdn.example.com/a.png" {
+		t.Errorf("URLs after Get = %v, want the artifact", urls)
+	}
+}
+
+func TestGetLeavesRunningTaskAlone(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"response":{"status":"processing"}}`))
+	}))
+	defer server.Close()
+
+	c, _ := NewClient(WithAPIToken("t"), WithBaseURL(server.URL))
+	h := newTaskHandle("task-1", "/flux/tasks", c.transport, nil)
+	if _, err := h.Get(context.Background()); err != nil {
+		t.Fatalf("Get: %v", err)
+	}
+	if h.Done() {
+		t.Error("a running task must not be marked complete")
+	}
+}
+
+// TestStructuredErrorIsTerminal covers the hailuo shape: success:false with an
+// error object and no finished_at. Reading it as still-running makes a caller
+// poll until timeout instead of surfacing the upstream's reason.
+func TestStructuredErrorIsTerminal(t *testing.T) {
+	state := map[string]any{
+		"response": map[string]any{
+			"success": false,
+			"error":   map[string]any{"code": "api_error", "message": "no channel"},
+		},
+	}
+	if got := taskStatus(state); got != "failed" {
+		t.Errorf("taskStatus = %q, want failed", got)
+	}
+}
+
+func TestTransientErrorKeepsWaiting(t *testing.T) {
+	state := map[string]any{
+		"response": map[string]any{"success": false, "error": "temporary"},
+	}
+	if got := taskStatus(state); got != "" {
+		t.Errorf("taskStatus = %q, want empty (still running)", got)
+	}
+}
+
+func TestOpenAIGifParameters(t *testing.T) {
+	for _, operation := range []string{"generations", "edits"} {
+		t.Run(operation, func(t *testing.T) {
+			req := OpenAIImageRequest{Model: OpenAIImageModelGPTImage26Flare, Prompt: "animate", OutputFormat: "gif", FrameCount: 9, FrameDurationMS: 200}
+			if operation == "edits" {
+				req.Image = "https://example.com/reference.png"
+			}
+			calls := 0
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				calls++
+				var body map[string]any
+				if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+					t.Error(err)
+				}
+				if r.URL.Path != "/openai/images/"+operation || body["output_format"] != "gif" || body["frame_count"] != float64(9) || body["frame_duration_ms"] != float64(200) {
+					t.Errorf("unexpected GIF request: %#v", body)
+				}
+				if operation == "edits" && body["image"] != req.Image {
+					t.Errorf("missing reference image: %#v", body)
+				}
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"task_id":"gif-task"}`))
+			}))
+			defer srv.Close()
+			client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if operation == "edits" {
+				_, err = client.OpenAI().Images().Edit(context.Background(), req)
+			} else {
+				_, err = client.OpenAI().Images().Generate(context.Background(), req)
+			}
+			if err != nil || calls != 1 {
+				t.Fatalf("calls=%d err=%v", calls, err)
+			}
+		})
+	}
+}
+
+func TestOpenAIImageMarkupAndComplexity(t *testing.T) {
+	req := OpenAIImageRequest{Model: OpenAIImageModelGPTImage26Flare, Prompt: "edit", Image: "https://example.test/base.png", Complexity: "low", Markup: map[string]string{"image_url": "https://example.test/markup.png"}}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Error(err)
+		}
+		markup, ok := body["markup"].(map[string]any)
+		if body["complexity"] != "low" || !ok || markup["image_url"] != "https://example.test/markup.png" {
+			t.Errorf("missing advanced image options: %#v", body)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"task_id":"same-id"}`))
+	}))
+	defer srv.Close()
+	client, err := NewClient(WithAPIToken("test-token"), WithBaseURL(srv.URL), WithMaxRetries(0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := client.OpenAI().Images().Edit(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+}

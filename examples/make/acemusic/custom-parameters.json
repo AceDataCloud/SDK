@@ -1,0 +1,46 @@
+[
+  {
+    "name": "lyric",
+    "label": "Lyrics",
+    "type": "text",
+    "required": true,
+    "validate": {
+      "max": 20000
+    }
+  },
+  {
+    "name": "style",
+    "label": "Musical style",
+    "type": "text",
+    "required": true,
+    "validate": {
+      "max": 20000
+    }
+  },
+  {
+    "name": "title",
+    "label": "Title",
+    "type": "text",
+    "required": true,
+    "validate": {
+      "max": 20000
+    }
+  },
+  {
+    "name": "model",
+    "label": "Model",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "acemusic-v1.1",
+        "value": "acemusic-v1.1"
+      },
+      {
+        "label": "acemusic-v1",
+        "value": "acemusic-v1"
+      }
+    ],
+    "default": "acemusic-v1.1"
+  }
+]

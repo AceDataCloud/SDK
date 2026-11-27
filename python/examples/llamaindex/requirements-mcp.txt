@@ -1,0 +1,3 @@
+-r requirements.txt
+llama-index-tools-mcp==0.6.0
+mcp==2.3.0

@@ -1,0 +1,26 @@
+{
+  "url": "/suno/audios",
+  "method": "POST",
+  "type": "json",
+  "body": {
+    "action": "generate",
+    "async": true,
+    "custom": false,
+    "model": "{{parameters.model}}",
+    "prompt": "{{parameters.prompt}}",
+    "instrumental": "{{parameters.instrumental}}"
+  },
+  "response": {
+    "valid": {
+      "condition": "{{!body.error && body.success !== false && body.task_id}}",
+      "message": "No accepted Suno task ID. Inspect request history before sending another generation.",
+      "type": "RuntimeError"
+    },
+    "output": {
+      "task_id": "{{body.task_id}}",
+      "status": "pending",
+      "success": false,
+      "trace_id": "{{body.trace_id}}"
+    }
+  }
+}

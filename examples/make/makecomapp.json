@@ -1,0 +1,51 @@
+{
+  "fileVersion": 1,
+  "generalCodeFiles": {
+    "base": "base.json",
+    "common": null,
+    "readme": null,
+    "groups": null
+  },
+  "components": {
+    "connection": {
+      "apiKey": {
+        "label": "AceDataCloud API token",
+        "connectionType": "basic",
+        "codeFiles": {
+          "params": "connection-parameters.json",
+          "communication": "connection-communication.json"
+        }
+      }
+    },
+    "module": {
+      "createChatCompletion": {
+        "moduleType": "action",
+        "label": "Create a chat completion",
+        "description": "Sends one prompt to an AceDataCloud chat model and returns the reply and token usage.",
+        "actionCrud": "create",
+        "connection": "apiKey",
+        "codeFiles": {
+          "mappableParams": "chat-parameters.json",
+          "communication": "chat-communication.json",
+          "interface": "chat-interface.json"
+        }
+      },
+      "makeAnApiCall": {
+        "moduleType": "universal",
+        "label": "Make an API call",
+        "description": "Performs an arbitrary authorized API call.",
+        "connection": "apiKey",
+        "codeFiles": {
+          "mappableParams": "universal-parameters.json",
+          "communication": "universal-communication.json",
+          "interface": "universal-interface.json"
+        }
+      }
+    },
+    "rpc": {},
+    "webhook": {},
+    "function": {},
+    "endpoint": {}
+  },
+  "origins": []
+}

@@ -1,0 +1,10 @@
+version: 1
+uploads:
+  - canonical_operation: files.upload
+    upload:
+      ownedBy: files
+      accepts:
+        - file-path
+        - bytes
+        - stream
+      resultField: file_url

@@ -1,0 +1,316 @@
+import { AiChat, AiChatModel } from '../src/resources/aichat';
+import { Chat } from '../src/resources/chat';
+import { OpenAI } from '../src/resources/openai';
+import { NanoBanana, NanoBananaGenerateOptions } from '../src/resources/providers/nano-banana';
+import { TaskHandle } from '../src/runtime/tasks';
+
+const compatibleModels: AiChatModel[] = ['gpt-5.6-sol-fast', 'gpt-6.1-terra', 'gpt-6.2-astra', 'gpt-6.2-sol'];
+
+describe.each(compatibleModels)('Public compatible model %s', (model) => {
+  it.each(['completions', 'responses', 'messages', 'aichat'])(
+    'preserves the public model ID in %s requests',
+    async (operation) => {
+      const request = jest.fn().mockResolvedValue({});
+      const transport = { request } as any;
+      const openai = new OpenAI(transport);
+      const messages = [{ role: 'user', content: 'Hello' }];
+      let path: string;
+      let body: Record<string, unknown>;
+      switch (operation) {
+        case 'completions':
+          path = '/openai/chat/completions';
+          body = { model, messages };
+          await openai.chat.completions.create({ model, messages });
+          break;
+        case 'responses':
+          path = '/openai/responses';
+          body = { model, input: 'Hello' };
+          await openai.responses.create({ model, input: 'Hello' });
+          break;
+        case 'messages':
+          path = '/v1/messages';
+          body = { model, messages, max_tokens: 64 };
+          await new Chat(transport).messages.create({ model, messages, maxTokens: 64 });
+          break;
+        default:
+          path = '/aichat/conversations';
+          body = { model, question: 'Hello' };
+          await new AiChat(transport).create({ model, question: 'Hello' });
+      }
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(request).toHaveBeenCalledWith('POST', path, { json: body });
+    }
+  );
+
+  it.each(['completions', 'responses', 'messages'])(
+    'preserves the public model ID in streaming %s requests',
+    async (operation) => {
+      const requestStream = jest.fn().mockImplementation(async function* () {});
+      const transport = { requestStream } as any;
+      const openai = new OpenAI(transport);
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const stream = operation === 'completions'
+        ? await openai.chat.completions.create({ model, messages, stream: true })
+        : operation === 'responses'
+          ? await openai.responses.create({ model, input: 'Hello', stream: true })
+          : await new Chat(transport).messages.create({ model, messages, maxTokens: 64, stream: true });
+      for await (const chunk of stream) {
+        throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+      }
+      const path = operation === 'completions' ? '/openai/chat/completions'
+        : operation === 'responses' ? '/openai/responses' : '/v1/messages';
+      const body = operation === 'responses' ? { input: 'Hello' }
+        : operation === 'messages' ? { messages, max_tokens: 64 } : { messages };
+      expect(requestStream).toHaveBeenCalledTimes(1);
+      expect(requestStream).toHaveBeenCalledWith('POST', path, {
+        json: { model, ...body, stream: true },
+      });
+    }
+  );
+});
+
+describe('Fable 5.2 Messages', () => {
+  it.each([false, true])('preserves effort and automatic tool choice with stream=%s', async (streaming) => {
+    const request = jest.fn().mockResolvedValue({});
+    const requestStream = jest.fn().mockImplementation(async function* () {});
+    const chat = new Chat({ request, requestStream } as any);
+    const options = {
+      model: 'claude-fable-5-2', messages: [], maxTokens: 4096,
+      output_config: { effort: 'high' }, tool_choice: { type: 'auto' },
+    };
+    const body = {
+      model: options.model, messages: [], max_tokens: 4096,
+      output_config: options.output_config, tool_choice: options.tool_choice,
+    };
+    if (streaming) {
+      const stream = await chat.messages.create({ ...options, stream: true });
+      for await (const chunk of stream) {
+        throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+      }
+      expect(requestStream).toHaveBeenCalledWith('POST', '/v1/messages', {
+        json: { ...body, stream: true },
+      });
+      expect(request).not.toHaveBeenCalled();
+    } else {
+      await chat.messages.create(options);
+      expect(request).toHaveBeenCalledWith('POST', '/v1/messages', { json: body });
+      expect(requestStream).not.toHaveBeenCalled();
+    }
+  });
+});
+
+describe('Messages structured output', () => {
+  it.each([false, true])('preserves output_config.format with stream=%s', async (streaming) => {
+    const request = jest.fn().mockResolvedValue({});
+    const requestStream = jest.fn().mockImplementation(async function* () {});
+    const chat = new Chat({ request, requestStream } as any);
+    const body = {
+      model: 'claude-sonnet-5-5',
+      messages: [{ role: 'user', content: 'Return a JSON object.' }],
+      output_config: { format: { type: 'json_schema', schema: { type: 'object' } } },
+    };
+    if (streaming) {
+      const stream = await chat.messages.create({ ...body, stream: true });
+      for await (const chunk of stream) {
+        throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+      }
+      expect(requestStream).toHaveBeenCalledWith('POST', '/v1/messages', {
+        json: { ...body, max_tokens: 4096, stream: true },
+      });
+      expect(request).not.toHaveBeenCalled();
+    } else {
+      await chat.messages.create(body);
+      expect(request).toHaveBeenCalledWith('POST', '/v1/messages', {
+        json: { ...body, max_tokens: 4096 },
+      });
+      expect(requestStream).not.toHaveBeenCalled();
+    }
+  });
+});
+
+describe('Public Chat Completions models', () => {
+  it.each([
+    { model: 'claude-opus-5-5', n: 1, tool_choice: 'auto' },
+    { model: 'gemini-4-argon', max_tokens: 32768 },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'low' },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'high' },
+    { model: 'kimi-k3.1-pro', reasoning_effort: 'max' },
+    { model: 'kimi-k3', reasoning_effort: 'max' },
+  ])('passes through $model and its options without injecting defaults', async (options) => {
+    const request = jest.fn().mockResolvedValue({});
+    const requestStream = jest.fn().mockImplementation(async function* () {});
+    const openai = new OpenAI({ request, requestStream } as any);
+    const body = { ...options, messages: [{ role: 'user', content: 'Hello' }] };
+
+    await openai.chat.completions.create(body);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith('POST', '/openai/chat/completions', { json: body });
+
+    const stream = await openai.chat.completions.create({ ...body, stream: true });
+    for await (const chunk of stream) {
+      throw new Error(`Unexpected chunk: ${JSON.stringify(chunk)}`);
+    }
+    expect(requestStream).toHaveBeenCalledTimes(1);
+    expect(requestStream).toHaveBeenCalledWith('POST', '/openai/chat/completions', {
+      json: { ...body, stream: true },
+    });
+  });
+});
+
+describe('Nano Banana 2.1', () => {
+  it.each(['generate', 'edit'] as const)(
+    'serializes %s at every supported resolution',
+    async (action) => {
+      for (const resolution of ['1K', '2K', '4K'] as const) {
+        const request = jest.fn().mockResolvedValue({});
+        const nanoBanana = new NanoBanana({ request } as any);
+        const options: NanoBananaGenerateOptions = {
+          action,
+          model: 'nano-banana-2.1',
+          prompt: 'A vase',
+          resolution,
+          aspectRatio: '1:1',
+        };
+        if (action === 'edit') options.imageUrls = ['https://example.com/vase.png'];
+
+        const task = await nanoBanana.generate(options);
+
+        expect(task).toBeInstanceOf(TaskHandle);
+        expect(request).toHaveBeenCalledTimes(1);
+        expect(request).toHaveBeenCalledWith('POST', '/nano-banana/images', {
+          json: {
+            action,
+            model: 'nano-banana-2.1',
+            prompt: 'A vase',
+            resolution,
+            aspect_ratio: '1:1',
+            ...(action === 'edit' ? { image_urls: options.imageUrls } : {}),
+            count: 1,
+            async: true,
+          },
+        });
+      }
+    }
+  );
+
+  it('preserves backend defaults and only advertises published variants', async () => {
+    type Model = NanoBananaGenerateOptions['model'];
+    const official21IsSupported: 'nano-banana-2.1:official' extends Model ? true : false = false;
+    const official2: Model = 'nano-banana-2:official';
+    expect(official21IsSupported).toBe(false);
+    expect(official2).toBe('nano-banana-2:official');
+    const request = jest.fn().mockResolvedValue({});
+
+    await new NanoBanana({ request } as any).generate({ action: 'generate', prompt: 'A vase' });
+
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('model');
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('resolution');
+  });
+});
+
+describe('OpenAI resource', () => {
+  it.each(['text-embedding-3-small', 'text-embedding-3-large'])(
+    'sends supported embedding model %s and optional parameters',
+    async (model) => {
+      const request = jest.fn().mockResolvedValue({});
+      const openai = new OpenAI({ request } as any);
+
+      await openai.embeddings.create({
+        model,
+        input: ['Hello!', 'Goodbye!'],
+        encodingFormat: 'base64',
+        dimensions: 256,
+      });
+
+      expect(request).toHaveBeenCalledWith('POST', '/openai/embeddings', {
+        json: {
+          model,
+          input: ['Hello!', 'Goodbye!'],
+          encoding_format: 'base64',
+          dimensions: 256,
+        },
+      });
+    }
+  );
+
+  it.each([
+    'gpt-image-2.5-flare:reverse', 'gpt-image-2.5-sunburst:reverse',
+    'gpt-image-2.6-flare:reverse', 'gpt-image-2.6-sunburst:reverse',
+    'gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official', 'nano-banana-2.1',
+    'gpt-image-2.6-flare:official', 'gpt-image-2.6-sunburst:official',
+  ] as const)(
+    'sends %s to both image endpoints',
+    async (model) => {
+      const request = jest.fn().mockResolvedValue({ data: [] });
+      const openai = new OpenAI({ request } as any);
+
+      await openai.images.generate({ prompt: 'A cat', model });
+      await openai.images.edit({ image: 'https://example.com/cat.png', prompt: 'Add a hat', model });
+
+      expect(request).toHaveBeenNthCalledWith(1, 'POST', '/openai/images/generations', {
+        json: { prompt: 'A cat', model },
+      });
+      expect(request).toHaveBeenNthCalledWith(2, 'POST', '/openai/images/edits', {
+        json: { image: 'https://example.com/cat.png', prompt: 'Add a hat', model },
+      });
+    }
+  );
+
+  it.each(['xhigh', 'max'])('passes through extended image quality %s', async (quality) => {
+    for (const model of [
+      'gpt-image-2.5-flare', 'gpt-image-2.5-sunburst',
+      'gpt-image-2.6-flare', 'gpt-image-2.6-sunburst',
+      'gpt-image-2.5-flare:reverse', 'gpt-image-2.5-sunburst:reverse',
+      'gpt-image-2.6-flare:reverse', 'gpt-image-2.6-sunburst:reverse',
+      'gpt-image-2.5-flare:official', 'gpt-image-2.5-sunburst:official',
+      'gpt-image-2.6-flare:official', 'gpt-image-2.6-sunburst:official',
+    ] as const) {
+      const request = jest.fn().mockResolvedValue({});
+      const openai = new OpenAI({ request } as any);
+      const options = { model, prompt: 'A vase', quality };
+      const editOptions = { ...options, image: 'https://example.com/vase.png' };
+
+      await openai.images.generate(options);
+      await openai.images.edit(editOptions);
+
+      expect(request).toHaveBeenCalledTimes(2);
+      expect(request).toHaveBeenNthCalledWith(1, 'POST', '/openai/images/generations', { json: options });
+      expect(request).toHaveBeenNthCalledWith(2, 'POST', '/openai/images/edits', { json: editOptions });
+    }
+  });
+
+  it('keeps dynamically discovered image model IDs compatible', async () => {
+    const request = jest.fn().mockResolvedValue({ data: [] });
+    const openai = new OpenAI({ request } as any);
+    const model: string = 'future-image-model';
+
+    await openai.images.generate({ prompt: 'A cat', model });
+
+    expect(request).toHaveBeenCalledWith('POST', '/openai/images/generations', {
+      json: { prompt: 'A cat', model },
+    });
+  });
+});
+
+
+describe('OpenAI native GIF options', () => {
+  it.each(['generate', 'edit'] as const)('maps frame controls to API field names for %s', async operation => {
+    const request = jest.fn().mockResolvedValue({ task_id: 'gif-task' });
+    const openai = new OpenAI({ request } as any);
+    const options = { model: 'gpt-image-2.6-flare', prompt: 'animate', outputFormat: 'gif', frameCount: 9, frameDurationMs: 200 };
+    if (operation === 'edit') await openai.images.edit({ ...options, image: 'https://example.com/reference.png' });
+    else await openai.images.generate(options);
+    expect(request).toHaveBeenCalledWith('POST', '/openai/images/' + (operation === 'edit' ? 'edits' : 'generations'), { json: { model: options.model, prompt: 'animate', output_format: 'gif', frame_count: 9, frame_duration_ms: 200, ...(operation === 'edit' ? { image: 'https://example.com/reference.png' } : {}) } });
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('frameCount');
+    expect(request.mock.calls[0][2].json).not.toHaveProperty('frameDurationMs');
+  });
+});
+
+
+it('preserves image complexity and annotation references in typed requests', async () => {
+  const request = jest.fn().mockResolvedValue({ task_id: 'same-id' });
+  const openai = new OpenAI({ request } as any);
+  const options = { model: 'gpt-image-2.6-flare', prompt: 'edit', image: 'https://example.test/base.png', complexity: 'low' as const, markup: { image_url: 'https://example.test/markup.png' } };
+  await openai.images.edit(options);
+  expect(request).toHaveBeenCalledWith('POST', '/openai/images/edits', { json: options });
+});

@@ -1,0 +1,63 @@
+{
+  "fileVersion": 1,
+  "generalCodeFiles": {
+    "base": "base.json",
+    "common": null,
+    "readme": null,
+    "groups": null
+  },
+  "components": {
+    "connection": {
+      "apiKey": {
+        "label": "Ace Data Cloud API token",
+        "connectionType": "basic",
+        "codeFiles": {
+          "params": "connection-parameters.json",
+          "communication": "connection-communication.json"
+        }
+      }
+    },
+    "module": {
+      "generateMusic": {
+        "moduleType": "action",
+        "label": "Generate Suno music",
+        "description": "Submit one Suno music generation through Ace Data Cloud and return a task ID; billed action.",
+        "connection": "apiKey",
+        "codeFiles": {
+          "mappableParams": "generate-parameters.json",
+          "communication": "generate-communication.json",
+          "interface": "generate-interface.json"
+        },
+        "actionCrud": "create"
+      },
+      "getTask": {
+        "moduleType": "action",
+        "label": "Get a Suno task",
+        "description": "Read the same existing task ID and expose audio URLs only after all tracks succeed.",
+        "connection": "apiKey",
+        "codeFiles": {
+          "mappableParams": "task-parameters.json",
+          "communication": "task-communication.json",
+          "interface": "task-interface.json"
+        },
+        "actionCrud": "read"
+      },
+      "makeAnApiCall": {
+        "moduleType": "universal",
+        "label": "Make an API call",
+        "description": "Call the Ace Data Cloud API with the stored connection.",
+        "connection": "apiKey",
+        "codeFiles": {
+          "mappableParams": "universal-parameters.json",
+          "communication": "universal-communication.json",
+          "interface": "universal-interface.json"
+        }
+      }
+    },
+    "rpc": {},
+    "webhook": {},
+    "function": {},
+    "endpoint": {}
+  },
+  "origins": []
+}

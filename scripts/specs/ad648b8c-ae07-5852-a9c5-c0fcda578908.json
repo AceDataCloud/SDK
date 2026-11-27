@@ -1,0 +1,350 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Kling Video Commerce",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud"
+    }
+  ],
+  "paths": {
+    "/kling/video-commerce": {
+      "post": {
+        "summary": "Kling Commerce Summary",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contents"
+                ],
+                "properties": {
+                  "contents": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "url"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "avatar_image"
+                              ]
+                            },
+                            "url": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "text"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "avatar_id"
+                              ]
+                            },
+                            "text": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 128
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "url"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "ref_image"
+                              ]
+                            },
+                            "url": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "text"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "goods_title"
+                              ]
+                            },
+                            "text": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 500
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "text"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "goods_price"
+                              ]
+                            },
+                            "text": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 256
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "text"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "goods_target_audience"
+                              ]
+                            },
+                            "text": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "text"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "goods_selling_point"
+                              ]
+                            },
+                            "text": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 500
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "type",
+                            "text"
+                          ],
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "speech_script"
+                              ]
+                            },
+                            "text": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 2000
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "description": "Kling Commerce Contents"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "resolution": {
+                        "type": "string",
+                        "enum": [
+                          "720p",
+                          "1080p"
+                        ],
+                        "default": "720p"
+                      },
+                      "aspect_ratio": {
+                        "type": "string",
+                        "enum": [
+                          "9:16",
+                          "16:9"
+                        ],
+                        "default": "9:16"
+                      },
+                      "allow_polish": {
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "voice_id": {
+                        "type": "string"
+                      },
+                      "speech_rate": {
+                        "type": "number",
+                        "enum": [
+                          0.8,
+                          1,
+                          1.2
+                        ]
+                      },
+                      "action_prompt": {
+                        "type": "string",
+                        "maxLength": 2500
+                      },
+                      "bgm_enabled": {
+                        "type": "boolean",
+                        "default": false
+                      }
+                    }
+                  },
+                  "watermark": {
+                    "type": "boolean",
+                    "description": "Kling Commerce Watermark"
+                  },
+                  "async": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Kling Commerce Async"
+                  },
+                  "callback_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Kling Commerce Callback"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kling Commerce Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "task_id": {
+                      "type": "string"
+                    },
+                    "trace_id": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "image",
+                              "video"
+                            ]
+                          },
+                          "image_url": {
+                            "type": "string"
+                          },
+                          "video_url": {
+                            "type": "string"
+                          },
+                          "watermark_url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "properties": {
+                        "seconds": {
+                          "type": "number",
+                          "readOnly": true
+                        },
+                        "image_count": {
+                          "type": "integer",
+                          "readOnly": true
+                        },
+                        "pricing_tier": {
+                          "type": "string",
+                          "readOnly": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "kling_create_video_commerce"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

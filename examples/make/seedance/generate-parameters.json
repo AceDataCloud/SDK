@@ -1,0 +1,100 @@
+[
+  {
+    "name": "prompt",
+    "label": "Video description",
+    "type": "text",
+    "required": true,
+    "help": "Text-to-video description. Up to 1000 characters. Reference uploads and advanced editing are not exposed.",
+    "validate": {
+      "min": 1,
+      "max": 1000
+    }
+  },
+  {
+    "name": "model",
+    "label": "Seedance model",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "Seedance 2.5",
+        "value": "doubao-seedance-2-5-260628"
+      },
+      {
+        "label": "Seedance 2.0",
+        "value": "doubao-seedance-2-0-260128"
+      },
+      {
+        "label": "Seedance 2.0 Fast",
+        "value": "doubao-seedance-2-0-fast-260128"
+      },
+      {
+        "label": "Seedance 2.0 Mini",
+        "value": "doubao-seedance-2-0-mini-260615"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "resolution",
+    "label": "Resolution",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "480p",
+        "value": "480p"
+      },
+      {
+        "label": "720p",
+        "value": "720p"
+      }
+    ],
+    "help": "480p and 720p are supported across the offered models; higher per-model resolutions are outside this first module."
+  },
+  {
+    "name": "ratio",
+    "label": "Aspect ratio",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "16:9",
+        "value": "16:9"
+      },
+      {
+        "label": "9:16",
+        "value": "9:16"
+      },
+      {
+        "label": "1:1",
+        "value": "1:1"
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "duration",
+    "label": "Target seconds",
+    "type": "select",
+    "required": true,
+    "options": [
+      {
+        "label": "5 seconds",
+        "value": 5
+      },
+      {
+        "label": "10 seconds",
+        "value": 10
+      }
+    ],
+    "help": "Select explicitly after checking current model access and pricing; no automatic fallback."
+  },
+  {
+    "name": "generate_audio",
+    "label": "Generate audio",
+    "type": "boolean",
+    "required": true,
+    "default": false
+  }
+]
