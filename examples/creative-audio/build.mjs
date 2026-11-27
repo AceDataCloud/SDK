@@ -1,9 +1,10 @@
 import { build } from "esbuild";
-import { copyFile, mkdir } from "node:fs/promises";
+import { copyFile, cp, mkdir } from "node:fs/promises";
 await mkdir("dist/adobe", { recursive: true });
 await build({entryPoints:["adobe/app.js"], bundle:true,format:"esm",outfile:"dist/adobe/app.js",
   external:["https://express.adobe.com/static/add-on-sdk/sdk.js"],target:"es2022"});
 for (const name of ["index.html","manifest.json"]) await copyFile("adobe/"+name,"dist/adobe/"+name);
+await cp("adobe/icons", "dist/adobe/icons", { recursive: true });
 await copyFile("canva/studio-chimes.mp3", "dist/adobe/studio-chimes.mp3");
 await build({entryPoints:["canva/app.js"],bundle:true,format:"iife",outfile:"dist/canva/app.js",
   target:"es2022",minify:true,define:{"process.env.NODE_ENV":'"production"'},

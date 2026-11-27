@@ -45,6 +45,8 @@ export async function fetchMedia(service, token, id, send = fetch) {
 export function mountMediaImport(root, addMedia) {
   const select = root.querySelector("select");
   for (const [service, spec] of services) select.add(new Option(spec.name, service));
+  const serviceImage = root.querySelector("[data-service-icon]");
+  select.addEventListener("change", () => { serviceImage.src = "icons/" + select.value + ".png"; });
   const form = root.querySelector("form");
   const results = root.querySelector("section");
   const status = root.querySelector("[role=status]");

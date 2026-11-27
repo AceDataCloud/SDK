@@ -9,17 +9,18 @@
 <body>
   <main>
     <details id="media" open>
-      <summary>Import a media task</summary>
+      <summary><img src="icons/ace-media.png" alt="" width="24" height="24" style="vertical-align: middle"> Import a media task</summary>
       <form>
-        <label>Media service <select name="service"></select></label>
+        <label>Media service <img data-service-icon src="icons/suno.png" alt="" width="24" height="24" style="vertical-align: middle"> <select name="service"></select></label>
         <label>Application token <input name="token" type="password" autocomplete="off" required></label>
+        <a id="media-application-link" href="https://platform.acedata.cloud/console/applications?utm_source=adobe-express&amp;utm_medium=referral&amp;utm_campaign=evergreen" target="_blank" rel="noopener noreferrer">Get an application token</a>
         <label>Existing task ID <input name="task" type="text" autocomplete="off" required></label>
         <button type="submit">Find media</button>
       </form>
       <p role="status" aria-live="polite"></p>
       <section></section>
     </details>
-    <details><summary>ACE Music tracks and generation</summary><div id="tasks"></div></details>
+    <details><summary><img src="icons/acemusic.png" alt="" width="24" height="24" style="vertical-align: middle"> ACE Music tracks and generation</summary><div id="tasks"></div></details>
     <section aria-label="Free sample">
       <strong>Studio chimes · free sample</strong>
       <audio id="sample-player" controls preload="none" src="studio-chimes.mp3"></audio>
