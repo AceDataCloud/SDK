@@ -1,6 +1,8 @@
 {
   "appToken": {"defaultMessage":"Application token","description":"Label for the user's Ace Data Cloud application token."},
   "taskId": {"defaultMessage":"Existing ACE Music task ID","description":"Label for the ID used to look up an existing music job."},
+  "sampleTitle": {"defaultMessage":"Studio chimes · free sample","description":"An original six-second example, available to anyone without signing in."},
+  "addSample": {"defaultMessage":"Add sample to design","description":"Button that inserts the free sample into the current design."},
   "find": {"defaultMessage":"Find tracks","description":"Button to retrieve a task and list its available audio tracks."},
   "create": {"defaultMessage":"Create a soundtrack","description":"Heading that opens the optional music generation form."},
   "prompt": {"defaultMessage":"Describe the soundtrack","description":"Label for a text description of the music the user wants."},
