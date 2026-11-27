@@ -193,6 +193,8 @@ class Param:
                 return " | ".join(dict.fromkeys(types))
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
+            if item == "string" and self.schema["items"].get("nullable"):
+                return "list[str | None]"
             if _array_items_are_objects(self.schema):
                 items = self.schema.get("items") or {}
                 properties = items.get("properties") or {} if items.get("additionalProperties") is False else {}
@@ -239,6 +241,8 @@ class Param:
                 return " | ".join(rendered)
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
+            if item == "string" and self.schema["items"].get("nullable"):
+                return "(string | null)[]"
             if _array_items_are_objects(self.schema):
                 items = self.schema.get("items") or {}
                 properties = items.get("properties") or {} if items.get("additionalProperties") is False else {}
@@ -256,6 +260,8 @@ class Param:
     def go_type(self) -> str:
         if self.type == "array":
             item = (self.schema.get("items") or {}).get("type")
+            if item == "string" and self.schema["items"].get("nullable"):
+                return "[]*string"
             if _array_items_are_objects(self.schema):
                 return "[]map[string]any"
             return f"[]{GO_TYPES.get(item, 'any')}"
@@ -281,6 +287,7 @@ _MODALITY_PRIMARY = {
     "AI Image": "images",
     "AI Video": "videos",
     "AI Audio": "audios",
+    "AI 3D": "generations",
 }
 
 
@@ -320,6 +327,14 @@ class Endpoint:
             for param in self.params:
                 if param.name in {"page", "page_size"}:
                     param.schema = {key: value for key, value in param.schema.items() if key != "default"}
+        # These endpoints are discriminated unions. The server applies defaults
+        # only to the selected action and rejects keys belonging to other actions.
+        if alias == "tripo" and path in {"/tripo/models", "/tripo/animations"}:
+            for param in self.params:
+                if not param.required:
+                    param.schema = {key: value for key, value in param.schema.items() if key != "default"}
+                    if param.type in {"boolean", "integer", "number"}:
+                        param.schema["x-go-optional-pointer"] = True
         header_parameters = [
             p for p in (operation(spec).get("parameters") or [])
             if p.get("in") == "header" and p.get("name") != "accept"

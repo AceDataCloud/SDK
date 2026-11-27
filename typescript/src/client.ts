@@ -20,6 +20,7 @@ import { WebExtrator } from './resources/webextrator';
 import { Face } from './resources/face';
 import { ShortUrl } from './resources/shorturl';
 import { attachProviders } from './resources/providers';
+import type { Tripo } from './resources/providers/tripo';
 import type { Acemusic } from './resources/providers/acemusic';
 
 export interface AceDataCloudOptions {
@@ -56,6 +57,7 @@ export class AceDataCloud {
   readonly webextrator: WebExtrator;
   readonly face: Face;
   readonly shorturl: ShortUrl;
+  declare readonly tripo: Tripo;
   declare readonly acemusic: Acemusic;
 
   private transport: Transport;

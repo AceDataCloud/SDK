@@ -271,3 +271,14 @@ The ACE Music provider also has a typed `tasks`/`Tasks` method for retrieve,
 retrieve_batch and list. History accepts type (`audios`/`lyrics`), creation-time
 bounds, and either page/page_size or limit/offset. Do not mix pagination shapes;
 unset page fields remain omitted so offset queries stay valid.
+
+### Tripo 3D
+
+The `tripo` provider exposes generation, model processing, animation and task retrieval in all three clients. In Python, submit and retrieve the same task with:
+
+```python
+job = client.tripo.generate(prompt="A wooden chair", texture="none", idempotency_key="chair-01")
+result = client.tripo.tasks(id=job.id)
+```
+
+Use `models(action="import", model_url=...)` to import a model and `animations(action="rig_check", model_id=...)` to inspect it. Poll the returned task ID until the task contains `response.success`. Successful model tasks expose `response.data[0].model_url`; rig checks return `riggable`. Batch lookup accepts `action="retrieve_batch"` with up to 100 IDs. TypeScript uses `client.tripo` and camelCase options; Go uses `client.Tripo()` and the generated request structs.

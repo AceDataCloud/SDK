@@ -26,6 +26,7 @@ from .qwen_image import AsyncQwenImage, QwenImage
 from .seedance import AsyncSeedance, Seedance
 from .seedream import AsyncSeedream, Seedream
 from .suno import AsyncSuno, Suno
+from .tripo import AsyncTripo, Tripo
 from .wan import AsyncWan, Wan
 
 
@@ -49,6 +50,7 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.seedance = AsyncSeedance(transport)
         client.seedream = AsyncSeedream(transport)
         client.suno = AsyncSuno(transport)
+        client.tripo = AsyncTripo(transport)
         client.wan = AsyncWan(transport)
     else:
         client.acemusic = Acemusic(transport)
@@ -68,4 +70,5 @@ def attach(client: Any, transport: Any, *, is_async: bool) -> None:
         client.seedance = Seedance(transport)
         client.seedream = Seedream(transport)
         client.suno = Suno(transport)
+        client.tripo = Tripo(transport)
         client.wan = Wan(transport)

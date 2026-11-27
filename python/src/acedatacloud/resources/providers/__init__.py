@@ -34,6 +34,8 @@ from .seedream import AsyncSeedream as AsyncSeedream
 from .seedream import Seedream as Seedream
 from .suno import AsyncSuno as AsyncSuno
 from .suno import Suno as Suno
+from .tripo import AsyncTripo as AsyncTripo
+from .tripo import Tripo as Tripo
 from .wan import AsyncWan as AsyncWan
 from .wan import Wan as Wan
 
@@ -72,6 +74,8 @@ __all__ = [
     "AsyncSeedream",
     "Suno",
     "AsyncSuno",
+    "Tripo",
+    "AsyncTripo",
     "Wan",
     "AsyncWan",
 ]

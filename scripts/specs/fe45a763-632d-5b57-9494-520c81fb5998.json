@@ -1,0 +1,450 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Tripo Generations API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud"
+    }
+  ],
+  "paths": {
+    "/tripo/generations": {
+      "post": {
+        "operationId": "tripo_generations",
+        "summary": "Tripo Generations",
+        "description": "Create a 3D model from text, one image or multiple views. Synchronous by default; async or callback_url returns a task receipt.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Tripo"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripoGenerationsRequest"
+              },
+              "example": {
+                "prompt": "A small wooden dining chair",
+                "async": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completed result or async receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "task_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "required": [
+                        "task_id"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        },
+                        "task_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "trace_id": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/TripoModel"
+                          },
+                          "minItems": 1
+                        },
+                        "cost": {
+                          "$ref": "#/components/schemas/TripoCost"
+                        },
+                        "started_at": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "finished_at": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "elapsed": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "task_id",
+                        "trace_id",
+                        "started_at",
+                        "finished_at",
+                        "elapsed",
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden or content rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source model not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Generation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Task pending after synchronous wait",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "description": "Reuse the same key and payload to retrieve the original task.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "TripoError": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "TripoModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "GLB",
+              "STL",
+              "OBJ",
+              "FBX",
+              "USDZ",
+              "3MF"
+            ]
+          },
+          "model_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "maxLength": 8192
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "maxLength": 8192,
+            "description": "Optional preview image."
+          },
+          "container": {
+            "type": "string",
+            "enum": [
+              "ZIP"
+            ]
+          },
+          "normalize_scale": {
+            "type": "number"
+          },
+          "normalize_translation": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "id",
+          "format",
+          "model_url"
+        ]
+      },
+      "TripoCost": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string"
+          },
+          "list_amount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "amount",
+          "currency"
+        ]
+      },
+      "TripoErrorResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/TripoError"
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "number",
+            "minimum": 0
+          },
+          "finished_at": {
+            "type": "number",
+            "minimum": 0
+          },
+          "elapsed": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "success",
+          "error"
+        ]
+      },
+      "TripoGenerationsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "generate"
+            ],
+            "default": "generate"
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "v3.1-20260211",
+              "v3.0-20250812",
+              "v2.5-20250123",
+              "P1-20260311",
+              "P2-20260801"
+            ],
+            "default": "v3.1-20260211"
+          },
+          "texture": {
+            "type": "string",
+            "enum": [
+              "none",
+              "standard"
+            ],
+            "default": "standard"
+          },
+          "async": {
+            "type": "boolean",
+            "default": false,
+            "description": "Return the task ID immediately."
+          },
+          "callback_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "maxLength": 8192,
+            "description": "Receive the final JSON result by HTTPS POST; implies async."
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "maxLength": 8192,
+            "description": "Public PNG or JPEG up to 20 MiB."
+          },
+          "image_urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://",
+              "maxLength": 8192,
+              "nullable": true
+            },
+            "minItems": 2,
+            "maxItems": 4,
+            "description": "Front, left, back, right. Front and at least one other image are required. Use null to skip an optional view."
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "prompt"
+            ]
+          },
+          {
+            "required": [
+              "image_url"
+            ]
+          },
+          {
+            "required": [
+              "image_urls"
+            ]
+          }
+        ],
+        "description": "Supply exactly one input: prompt, image_url, or image_urls."
+      }
+    }
+  }
+}

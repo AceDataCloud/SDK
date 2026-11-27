@@ -21,6 +21,7 @@ from acedatacloud.resources.kling import AsyncKling, Kling
 from acedatacloud.resources.openai_compat import AsyncOpenAI, OpenAI, _AsyncResponses, _Responses
 from acedatacloud.resources.platform import AsyncPlatform, Platform
 from acedatacloud.resources.providers import _attach as _providers
+from acedatacloud.resources.providers.tripo import AsyncTripo, Tripo
 from acedatacloud.resources.search import AsyncSearch, Search
 from acedatacloud.resources.shorturl import AsyncShortUrl, ShortUrl
 from acedatacloud.resources.tasks import AsyncTasks, Tasks
@@ -34,6 +35,8 @@ _PLATFORM_BASE = "https://platform.acedata.cloud"
 
 class AceDataCloud:
     """Synchronous AceDataCloud client."""
+
+    tripo: Tripo
 
     def __init__(
         self,
@@ -88,6 +91,8 @@ class AceDataCloud:
 
 class AsyncAceDataCloud:
     """Asynchronous AceDataCloud client."""
+
+    tripo: AsyncTripo
 
     def __init__(
         self,
