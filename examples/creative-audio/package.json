@@ -8,9 +8,14 @@
     "test": "node --test shared/tasks.test.js"
   },
   "dependencies": {
+    "@canva/app-i18n-kit": "1.3.0",
     "@canva/asset": "2.4.0",
     "@canva/design": "2.14.0",
-    "@canva/platform": "2.2.3"
+    "@canva/intents": "2.9.0",
+    "@canva/platform": "2.2.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-intl": "7.1.14"
   },
   "devDependencies": {
     "esbuild": "0.27.7"
