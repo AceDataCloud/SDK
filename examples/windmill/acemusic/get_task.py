@@ -5,7 +5,7 @@ from urllib.error import HTTPError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 
-class AceDataCloud(TypedDict):
+class ace_data_cloud(TypedDict):
     token: str
 
 
@@ -14,9 +14,9 @@ class _NoRedirect(HTTPRedirectHandler):
         return None
 
 
-def main(ace_data_cloud: AceDataCloud, task_id: str) -> dict:
+def main(connection: ace_data_cloud, task_id: str) -> dict:
     task_id = task_id.strip()
-    token = ace_data_cloud["token"].strip()
+    token = connection["token"].strip()
     if not task_id or not token:
         raise ValueError("An existing ACE Music task ID and an application token are required.")
     request = Request(
