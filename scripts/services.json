@@ -437,5 +437,31 @@
    }
   ],
   "tasks": "/acemusic/tasks"
+ },
+ "tripo": {
+  "category": "AI 3D",
+  "endpoints": [
+   {
+    "id": "fe45a763-632d-5b57-9494-520c81fb5998",
+    "path": "/tripo/generations",
+    "name": "Tripo Generations API"
+   },
+   {
+    "id": "04945c17-4805-538c-987e-02da6e5db11b",
+    "path": "/tripo/models",
+    "name": "Tripo Models API"
+   },
+   {
+    "id": "94b17ff8-cf99-5683-be58-54516cca9d2a",
+    "path": "/tripo/animations",
+    "name": "Tripo Animations API"
+   },
+   {
+    "id": "aef801a9-c700-5417-bd61-a7f5ffc0c5c9",
+    "path": "/tripo/tasks",
+    "name": "Tripo Tasks API"
+   }
+  ],
+  "tasks": "/tripo/tasks"
  }
 }

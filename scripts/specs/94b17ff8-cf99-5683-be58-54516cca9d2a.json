@@ -1,0 +1,606 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Tripo Animations API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.acedata.cloud"
+    }
+  ],
+  "paths": {
+    "/tripo/animations": {
+      "post": {
+        "operationId": "tripo_animations",
+        "summary": "Tripo Animations",
+        "description": "Inspect riggability, rig a model or retarget one to five animation presets. Synchronous by default; async or callback_url returns a task receipt.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "Tripo"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripoAnimationsRequest"
+              },
+              "example": {
+                "action": "rig_check",
+                "model_id": "5db97adc-a877-4587-af16-bbf443aa55de",
+                "async": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completed result or async receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "task_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      },
+                      "required": [
+                        "task_id"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "success": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        },
+                        "task_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "trace_id": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "$ref": "#/components/schemas/TripoModel"
+                              },
+                              {
+                                "$ref": "#/components/schemas/TripoRigCheck"
+                              }
+                            ]
+                          },
+                          "minItems": 1
+                        },
+                        "cost": {
+                          "$ref": "#/components/schemas/TripoCost"
+                        },
+                        "started_at": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "finished_at": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "elapsed": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "success",
+                        "task_id",
+                        "trace_id",
+                        "started_at",
+                        "finished_at",
+                        "elapsed",
+                        "data"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden or content rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source model not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Generation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service temporarily unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Task pending after synchronous wait",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripoErrorResult"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "description": "Reuse the same key and payload to retrieve the original task.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "TripoError": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "TripoModel": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "GLB",
+              "STL",
+              "OBJ",
+              "FBX",
+              "USDZ",
+              "3MF"
+            ]
+          },
+          "model_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "maxLength": 8192
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://",
+            "maxLength": 8192,
+            "description": "Optional preview image."
+          },
+          "container": {
+            "type": "string",
+            "enum": [
+              "ZIP"
+            ]
+          },
+          "normalize_scale": {
+            "type": "number"
+          },
+          "normalize_translation": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "id",
+          "format",
+          "model_url"
+        ]
+      },
+      "TripoCost": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string"
+          },
+          "list_amount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "amount",
+          "currency"
+        ]
+      },
+      "TripoErrorResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/TripoError"
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "number",
+            "minimum": 0
+          },
+          "finished_at": {
+            "type": "number",
+            "minimum": 0
+          },
+          "elapsed": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "success",
+          "error"
+        ]
+      },
+      "TripoAnimationsRequest": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "rig_check"
+                ]
+              },
+              "model_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "model_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://",
+                "maxLength": 8192,
+                "description": "Public HTTPS URL to a supported model file up to 150 MiB."
+              },
+              "async": {
+                "type": "boolean",
+                "default": false,
+                "description": "Return the task ID immediately."
+              },
+              "callback_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://",
+                "maxLength": 8192,
+                "description": "Receive the final JSON result by HTTPS POST; implies async."
+              }
+            },
+            "required": [
+              "action"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "model_id"
+                ]
+              },
+              {
+                "required": [
+                  "model_url"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "rig"
+                ]
+              },
+              "model_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "model_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://",
+                "maxLength": 8192,
+                "description": "Public HTTPS URL to a supported model file up to 150 MiB."
+              },
+              "model": {
+                "type": "string",
+                "enum": [
+                  "v1.0-20240301",
+                  "v2.5-20260210",
+                  "v3.0-20260909"
+                ]
+              },
+              "rig_type": {
+                "type": "string",
+                "enum": [
+                  "biped",
+                  "quadruped",
+                  "hexapod",
+                  "octopod",
+                  "avian",
+                  "serpentine",
+                  "aquatic",
+                  "others"
+                ]
+              },
+              "spec": {
+                "type": "string",
+                "enum": [
+                  "tripo",
+                  "mixamo",
+                  "actorcore",
+                  "unity",
+                  "unreal",
+                  "vrm"
+                ]
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "GLB",
+                  "FBX"
+                ],
+                "default": "GLB"
+              },
+              "async": {
+                "type": "boolean",
+                "default": false,
+                "description": "Return the task ID immediately."
+              },
+              "callback_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://",
+                "maxLength": 8192,
+                "description": "Receive the final JSON result by HTTPS POST; implies async."
+              }
+            },
+            "required": [
+              "action"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "model_id"
+                ]
+              },
+              {
+                "required": [
+                  "model_url"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "action": {
+                "type": "string",
+                "enum": [
+                  "retarget"
+                ]
+              },
+              "model_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "GLB",
+                  "FBX"
+                ],
+                "default": "GLB"
+              },
+              "animation": {
+                "type": "string",
+                "pattern": "^preset:[a-z0-9_]+(:[a-z0-9_]+)*$"
+              },
+              "animations": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^preset:[a-z0-9_]+(:[a-z0-9_]+)*$"
+                },
+                "minItems": 1,
+                "maxItems": 5
+              },
+              "export_with_geometry": {
+                "type": "boolean"
+              },
+              "animate_in_place": {
+                "type": "boolean"
+              },
+              "async": {
+                "type": "boolean",
+                "default": false,
+                "description": "Return the task ID immediately."
+              },
+              "callback_url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://",
+                "maxLength": 8192,
+                "description": "Receive the final JSON result by HTTPS POST; implies async."
+              }
+            },
+            "required": [
+              "action",
+              "model_id"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "animation"
+                ]
+              },
+              {
+                "required": [
+                  "animations"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "TripoRigCheck": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "riggable": {
+            "type": "boolean"
+          },
+          "rig_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "riggable"
+        ]
+      }
+    }
+  }
+}
