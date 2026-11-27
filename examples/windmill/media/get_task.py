@@ -14,7 +14,7 @@ def main(
     connection: ace_data_cloud,
     service: Literal[
         "Suno", "Nano Banana", "GPT Image", "Seedance", "Kling", "Veo",
-        "Seedream", "Flux", "Midjourney", "Hailuo", "Fish Audio", "Wan", "Luma",
+        "Seedream", "Flux", "Hailuo", "Fish Audio", "Wan", "Luma",
     ],
     task_id: str,
 ) -> dict:
@@ -22,7 +22,7 @@ def main(
     services = {
         "Suno": "suno", "Nano Banana": "nano-banana", "GPT Image": "openai",
         "Seedance": "seedance", "Kling": "kling", "Veo": "veo", "Seedream": "seedream",
-        "Flux": "flux", "Midjourney": "midjourney", "Hailuo": "hailuo",
+        "Flux": "flux", "Hailuo": "hailuo",
         "Fish Audio": "fish", "Wan": "wan", "Luma": "luma",
     }
     task_id = task_id.strip()

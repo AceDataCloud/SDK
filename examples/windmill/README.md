@@ -4,7 +4,7 @@ Import the Python scripts as **Common Scripts** and use the existing [Ace Data C
 
 | Script | Inputs | Output |
 | --- | --- | --- |
-| [Retrieve a media task](media/get_task.py) | Service, original task ID and the resource that owns it | Finish time and the native result for Suno, Nano Banana, GPT Image, Seedance, Kling, Veo, Seedream, Flux, Midjourney, Hailuo, Fish Audio, Wan or Luma. Re-run the lookup to check progress. |
+| [Retrieve a media task](media/get_task.py) | Service, original task ID and the resource that owns it | Finish time and the native result for Suno, Nano Banana, GPT Image, Seedance, Kling, Veo, Seedream, Flux, Hailuo, Fish Audio, Wan or Luma. Re-run the lookup to check progress. |
 | [Create a search brief](search/brief.py) | Query, Google Search resource, Chat Completions resource and public model ID | Source snippets and short findings. Each citation URL comes directly from a search result. |
 | [Retrieve an ACE Music task](acemusic/) | ACE Music resource and original task ID | Group status and individual audio tracks. |
 
