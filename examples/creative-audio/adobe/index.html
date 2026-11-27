@@ -1,1 +1,21 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ACE Music</title><link rel="stylesheet" href="app.css"></head><body><main></main><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ACE Music</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <main>
+    <div id="tasks"></div>
+    <section aria-label="Free sample">
+      <strong>Studio chimes · free sample</strong>
+      <audio id="sample-player" controls preload="none" src="studio-chimes.mp3"></audio>
+      <button id="add-sample" type="button">Add sample to design</button>
+      <p id="sample-status" aria-live="polite"></p>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
