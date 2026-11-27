@@ -25,6 +25,7 @@ def test_rig_check_and_batch_keep_their_own_request_shape():
 def test_tripo_uses_the_bearer_gateway_without_replaying_an_unkeyed_submission():
     import httpx
     import pytest
+
     from acedatacloud import AceDataCloud
     from acedatacloud._runtime.errors import TransportError
 
