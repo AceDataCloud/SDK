@@ -16,6 +16,7 @@ async function insertMedia({ type = "audio", title, url }) {
 
 await addOnUISdk.ready;
 mountPanel(document.querySelector("#tasks"), insertMedia);
+document.querySelector("#tasks [data-message=getToken]").href = document.querySelector("#media-application-link").href;
 mountMediaImport(document.querySelector("#media"), insertMedia);
 
 const button = document.querySelector("#add-sample");
