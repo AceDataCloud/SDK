@@ -6,7 +6,7 @@ Keep **Suno by Ace Data Cloud**, **Seedance by Ace Data Cloud**, **HappyHorse by
 
 ## Reuse an actual first-use flow
 
-The [Suno Dify English guide](https://github.com/AceDataCloud/SunoDify/blob/main/README.md) and [Chinese guide](https://github.com/AceDataCloud/SunoDify/blob/main/readme/README_zh_Hans.md) show the model: verified install entry → register/sign in → Applications/General application → copy or create a dedicated API Key → exact host credential location → one first use → retrieve the same task ID → terminal output and troubleshooting.
+The [Suno Dify English guide](https://github.com/AceDataCloud/SunoDify/blob/main/README.md) and [Chinese guide](https://github.com/AceDataCloud/SunoDify/blob/main/readme/README_zh_Hans.md) show the model: verified install entry → register/sign in → Applications/General application → copy the API key using button 1 → exact host credential location → one first use → retrieve the same task ID → terminal output and troubleshooting.
 
 Copy the structure, not the Dify menu names or its generation result into another host. Keep the service's official install URL, package/repository identity and exact commands. An Ace-maintained integration is not an official client from the model owner. Do not invent a default provider, search rank, native button or dedicated package.
 
@@ -30,10 +30,9 @@ The existing UTM contract is preserved: `utm_source`, `utm_medium=referral`, and
 ## Real screenshot assets and their limits
 
 - [Copy an application API key](assets/get-api-key-en.png)
-- [Create a dedicated key](assets/create-api-key-en.png)
 - [Source URLs, commit date and SHA-256](assets.json)
 
-These two unmodified redacted images come from the Suno Dify tutorial commit `8d3d03570e73324220f111f7fe343da0792a8071`, archived 2026-10-08. Original capture time/frontend version is not established. The original “Dify tutorial” key name is an example; use the actual host's name. They prove only the shared platform credential step, not installation or execution in another host.
+Use the redacted copy screenshot immediately after the instruction to click button **1** beside **API KEY**. The image is archived from the pinned Suno Dify tutorial. Link the original source for any host-specific screenshot.
 
 A host image must have an original source and date; the renderer refuses an image without them. If there is no real host capture, it prints the missing-evidence note. Do not generate a fake terminal or GUI to fill the gap. An edited official screenshot must be labeled “official screenshot edit, not actual execution”.
 

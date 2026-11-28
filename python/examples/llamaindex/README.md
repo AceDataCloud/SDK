@@ -47,30 +47,13 @@ The output contains retrieved `text`, `url`, `title`, `task_id`, and `trace_id`.
 
 ## Use your Ace account
 
-1. [Register or sign in](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) and open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
-2. Find **General application**. If absent, choose **Initialize General Application**.
-   Its key can use services your account is entitled to; a dedicated application's
-   key is service-limited. This workflow requires both Google Search and WebExtrator access.
-3. Copy the application's **API Key**, or select **Manage Keys → Create** for a
-   dedicated `LlamaIndex search/extraction` key.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
 
-![Real Ace console: copy the redacted API Key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
+![Button 1 copies the API key from General Application](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
 
-4. When creating a key, review **Expiration Time**, **Set Usage Limitation**, and
-   **Allowed APIs**. If restricting APIs, allow `/serp/google`, `/webextrator/extract`
-   and `/webextrator/tasks` for same-ID recovery. Create it, return to the key list,
-   and copy the raw token. Do not add `Bearer `, quotes, whitespace or the screenshot's
-   redacted characters; a `platform-...` management token cannot replace this key.
+Store the raw key in the server’s `ACEDATACLOUD_API_TOKEN` environment variable. The workflow needs access to `/serp/google` and `/webextrator/extract`, plus `/webextrator/tasks` to retrieve the original task.
 
-![Real Ace console: create a separately named key with optional restrictions](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png)
-
-These are real, redacted Ace console screenshots from the linked fixed SunoDify
-commit, reused and visually checked on **2026-10-19**; capture date/console version
-is unknown. The historical `Dify tutorial` example name should be replaced by
-`LlamaIndex search/extraction`. These show account setup, not this example running.
-Never put a real token in a prompt, notebook output, screenshot or Git.
-
-5. Check your current permissions, quota, balance and prices before live calls:
+Check your current permissions, quota, balance and prices before live calls:
    [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
    [WebExtrator extraction API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
    [current model/service prices](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).

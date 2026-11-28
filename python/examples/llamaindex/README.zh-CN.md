@@ -38,25 +38,13 @@ API 请求被拦截，未匹配请求会失败。输出标为 `synthetic-offline
 
 ## 连接自己的账户
 
-1. [注册或登录](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，打开[应用控制台 Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。
-2. 找到 **General application**；没有时点 **Initialize General Application**。
-   通用应用 Key 仍受当前账户服务权限约束，专用应用仅限其服务；本流程同时需要 Google Search 与 WebExtrator。
-3. 复制应用的 **API Key**；或 **Manage Keys → Create** 新建 `LlamaIndex search/extraction` 专用 Key。
+登录[应用列表](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，打开**通用应用**。首次使用时先点击**初始化通用应用**，再点击 **API KEY** 旁的复制按钮（图中标注 **1**）。
 
-![真实 Ace 控制台：复制已遮挡 Key 或打开 Manage Keys](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
+![通用应用中 API KEY 旁标注 1 的复制按钮](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
 
-4. 按需设置 **Expiration Time**、**Set Usage Limitation** 和 **Allowed APIs**。
-   若限制接口，需允许 `/serp/google`、`/webextrator/extract` 以及同 ID 恢复用的 `/webextrator/tasks`。
-   创建后回 Key 列表复制 Token 本体，不加 `Bearer `、引号、空格或截图遮挡字符。
-   `platform-...` 管理令牌不能代替本流程的服务 Key；不要把真实 Key 放入 prompt、输出、截图或 Git。
+将原始 Key 保存在服务器的 `ACEDATACLOUD_API_TOKEN` 环境变量中。此流程需要 `/serp/google` 与 `/webextrator/extract` 权限，按原任务 ID 查询还需要 `/webextrator/tasks`。
 
-![真实 Ace 控制台：创建独立 Key 和可选权限限制](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png)
-
-图片复用固定 SunoDify 提交的真实脱敏控制台截图，**2026-10-19 复用并目视核验**；
-原拍摄日期与控制台版本未知。旧示例名 `Dify tutorial` 应改填 `LlamaIndex search/extraction`。
-这些图只展示账户步骤，不是本示例真实运行证据。
-
-5. 开启真实调用前核当前权限、用量、余额与价格：
+开启真实调用前核当前权限、用量、余额与价格：
    [Google Search API](https://platform.acedata.cloud/documents/serp-google?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
    [WebExtrator 提取 API](https://platform.acedata.cloud/documents/webextrator-extract?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) ·
    [当前模型/服务价格](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。

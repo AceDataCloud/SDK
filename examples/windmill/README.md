@@ -1,6 +1,12 @@
 # Windmill scripts for Ace Data Cloud
 
-Import the Python scripts as **Common Scripts** and use the existing [Ace Data Cloud resource type](https://hub.windmill.dev/resource_types/661/ace_data_cloud). Create a [service application key](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen), then store it in a Windmill secret and reference that secret from the resource. Choose resources with access to the operations used by each script.
+Import the Python scripts as **Common Scripts** and use the existing [Ace Data Cloud resource type](https://hub.windmill.dev/resource_types/661/ace_data_cloud).
+
+Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
+
+![Button 1 copies the API key from General Application](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+
+Store the copied key in a Windmill secret and reference that secret from the resource. Choose resources with access to the operations used by each script.
 
 | Script | Inputs | Output |
 | --- | --- | --- |

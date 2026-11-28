@@ -29,7 +29,9 @@ class OnboardingTests(unittest.TestCase):
             self.assertIn(
                 "not an official" if language == "en" else "不是模型方官方", text
             )
-            self.assertIn("Dify tutorial", text)
+            self.assertEqual(text.count("/get-api-key-en.png"), 1)
+            self.assertLess(text.index("**1**"), text.index("/get-api-key-en.png"))
+            self.assertNotIn("/create-api-key-en.png", text)
 
     def test_source_is_existing_contract_and_all_three_tags_are_present(self):
         import re
