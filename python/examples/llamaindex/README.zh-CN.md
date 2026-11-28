@@ -39,7 +39,7 @@ API 请求被拦截，未匹配请求会失败。输出标为 `synthetic-offline
 ## 连接自己的账户
 
 1. [注册或登录](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，打开[应用控制台 Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。
-2. 找到 **General application**；没有时点 **Initialize General Application**。
+2. 找到 **General application**。
    通用应用 Key 仍受当前账户服务权限约束，专用应用仅限其服务；本流程同时需要 Google Search 与 WebExtrator。
 3. 复制应用的 **API Key**；或 **Manage Keys → Create** 新建 `LlamaIndex search/extraction` 专用 Key。
 

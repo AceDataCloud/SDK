@@ -12,9 +12,9 @@ suno --help
 suno models
 ```
 
-## 2. Register/sign in and create a key
+## 2. Copy your application API key
 
-Open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen), register/sign in, and choose **Initialize General Application** if needed. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
+Open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen), sign in and open **General Application**. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
 
 Check model/service access, expiration, usage limits, balance and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). If Allowed APIs is enabled, allow `/suno/audios`, `/suno/tasks`; task-query permission does not grant generation access. Copy only the raw token, without Bearer, quotation marks or spaces. A platform management token and a Discord proxy credential are different credentials.
 

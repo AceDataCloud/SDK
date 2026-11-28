@@ -23,8 +23,7 @@ PowerShell. The example pins `langchain-openai==1.7.0`; CI also checks 1.6.6.
 
 Get an application API key from
 [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
-Sign in or register, initialize **General application** if needed, and open
-**Keys / Manage Keys → Create** to give this integration a separate key.
+Sign in or register, open **General Application** and click the copy button beside **API KEY**.
 Check its service access, expiration, allowed APIs, usage limit, and balance.
 Use the raw API key, without `Bearer `; a `platform-...` management token cannot
 replace it. See the [illustrated key setup](../../README.md#get-your-ace-data-cloud-api-key).

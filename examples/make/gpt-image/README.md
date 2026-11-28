@@ -20,7 +20,7 @@ Official Make Geocodify screenshot, downloaded 2026-10-17; original capture date
 
 ## 2. Register, sign in and obtain a service-enabled API token
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen), register/sign in, and initialize **General application** if it is absent.
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen), sign in and open **General Application**.
 2. Open General application or a GPT Image-enabled application. Copy its API key, or choose **Manage Keys → Create** for a separately named `Make GPT Image` key. Review expiration, usage limit, service access, balance and current pricing. Allowed APIs must cover `/openai/images/generations` for generation, `/openai/tasks` for task lookup, and the Connection's free `GET /v1/models`; do not broaden permissions blindly.
 
 ![Ace Applications: copy a key or open Manage Keys](../suno/_assets/tutorial/get-api-key-en.png)

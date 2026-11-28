@@ -66,9 +66,9 @@ def render(profile: dict, language: str = "en") -> str:
 
 {profile["install_steps"]}
 
-## 2. 注册/登录并创建 Key
+## 2. 复制通用应用的 API Key
 
-打开 [Applications / 我的应用]({cta("/console/applications")})，注册或登录。没有通用应用时选 **Initialize General Application / 初始化通用应用**。复制已有 API Key，或 **Manage Keys → Create** 创建本宿主专用 Key。
+打开 [Applications / 我的应用]({cta("/console/applications")})，注册或登录。打开**通用应用**。复制已有 API Key，或 **Manage Keys → Create** 创建本宿主专用 Key。
 
 核对模型/服务权限、有效期、用量限制、余额和[当前价格]({cta("/models")})。如果启用 Allowed APIs，应允许本例的 {operations}；查询权限不等于生成权限。只复制 Token 字符串，不加 Bearer、引号或空格。平台管理 Token 和 Discord 代理凭据均不能代替此 Key。
 """
@@ -83,9 +83,9 @@ Open the [verified install entry]({profile["install_url"]}) and confirm the main
 
 {profile["install_steps"]}
 
-## 2. Register/sign in and create a key
+## 2. Copy your application API key
 
-Open [Applications]({cta("/console/applications")}), register/sign in, and choose **Initialize General Application** if needed. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
+Open [Applications]({cta("/console/applications")}), sign in and open **General Application**. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
 
 Check model/service access, expiration, usage limits, balance and [current pricing]({cta("/models")}). If Allowed APIs is enabled, allow {operations}; task-query permission does not grant generation access. Copy only the raw token, without Bearer, quotation marks or spaces. A platform management token and a Discord proxy credential are different credentials.
 """

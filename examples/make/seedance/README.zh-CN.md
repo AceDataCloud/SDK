@@ -14,7 +14,7 @@
 
 ## 2. 登录Ace并复制或创建专用Token
 
-1. 打开 [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen) 注册/登录；没有General application时先初始化。
+1. 打开 [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen) 注册/登录，打开**通用应用**。
 2. 复制General application或可用服务应用的API Key，或 **Manage Keys → Create** 创建`Make Seedance`专用Key；核有效期、用量限制、余额与[当前价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen)。允许API需覆盖生成`/seedance/videos`、查询`/seedance/tasks`和连接读取`/v1/models`，不盲目扩权。
 
 ![Ace Applications: copy a key or open Manage Keys](../suno/_assets/tutorial/get-api-key-en.png)

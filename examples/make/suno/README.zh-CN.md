@@ -18,7 +18,7 @@
 
 ## 2. 注册、登录并取得专用 Token
 
-1. 打开 [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen)，注册/登录。若缺少 **General application**，先点 **Initialize General Application**。
+1. 打开 [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen)，注册/登录。打开**通用应用**。
 2. 在 General application 或可访问 Suno 的应用中复制 API Key，或通过 **Manage Keys → Create** 创建 `Make Suno` 专用 Key。检查有效期、用量限制、服务权限、当前余额与价格。生成需 `/suno/audios`，查询需 `/suno/tasks`；Connection 还读取 `/v1/models` 验证认证，受限 Key 需有该读取权限，不要盲目放宽权限。
 
 ![复制 API Key 或打开 Manage Keys](./_assets/tutorial/get-api-key-en.png)
