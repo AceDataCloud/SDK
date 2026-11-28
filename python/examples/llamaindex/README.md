@@ -48,7 +48,7 @@ The output contains retrieved `text`, `url`, `title`, `task_id`, and `trace_id`.
 ## Use your Ace account
 
 1. [Register or sign in](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) and open [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
-2. Find **General application**. If absent, choose **Initialize General Application**.
+2. Find **General application**.
    Its key can use services your account is entitled to; a dedicated application's
    key is service-limited. This workflow requires both Google Search and WebExtrator access.
 3. Copy the application's **API Key**, or select **Manage Keys → Create** for a

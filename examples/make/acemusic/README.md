@@ -2,7 +2,7 @@
 
 Open `makecomapp.json` with the Make Apps SDK extension. Bind your own Make test-app origin to this local manifest and synchronize the code files in the app editor. The checked-in source has no production origin, application IDs, or credentials.
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button to the right of **API KEY**.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. Click the copy button to the right of **API KEY**.
 
 ![API key in the General Application card](https://cdn.acedata.cloud/dvc3cg.jpg)
 

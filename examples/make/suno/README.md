@@ -18,7 +18,7 @@ Official Make reference screenshot, downloaded 2026-10-17; its capture date/vers
 
 ## 2. Register and get your Ace Data Cloud API token
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen). Register/sign in. If **General application** is missing, choose **Initialize General Application**.
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen). Register/sign in. Open **General Application**.
 2. Open General application or your Suno-enabled application. Copy its API key, or select **Manage Keys → Create** for a separate `Make Suno` key. Review expiration, allowed APIs, usage limits, service access, and current balance/prices. Allow `/suno/audios` for generation and `/suno/tasks` for lookup; this Connection also validates through `GET /v1/models`, so restricted keys must allow that read. Do not expand a restricted key blindly.
 
 ![Copy an application API key or open Manage Keys](./_assets/tutorial/get-api-key-en.png)

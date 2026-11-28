@@ -2,7 +2,7 @@
 
 Import the Python scripts as **Common Scripts** and use the existing [Ace Data Cloud resource type](https://hub.windmill.dev/resource_types/661/ace_data_cloud).
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button to the right of **API KEY**.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. Click the copy button to the right of **API KEY**.
 
 ![API key in the General Application card](https://cdn.acedata.cloud/dvc3cg.jpg)
 

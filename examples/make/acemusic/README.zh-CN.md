@@ -2,7 +2,7 @@
 
 在 Make Apps SDK 扩展打开 `makecomapp.json`，为本地清单绑定自己的 Make 测试应用，再在应用编辑器同步模块。源码不含正式环境地址、应用 ID 或密钥。
 
-登录[应用列表](https://platform.acedata.cloud/console/applications)，打开**通用应用**。首次使用时先点击**初始化通用应用**，再点击 **API KEY** 旁的复制按钮。
+登录[应用列表](https://platform.acedata.cloud/console/applications)，打开**通用应用**。点击 **API KEY** 旁的复制按钮。
 
 ![获取 Ace Data Cloud API Key](https://cdn.acedata.cloud/dvc3cg.jpg)
 
