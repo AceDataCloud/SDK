@@ -6,7 +6,7 @@
 
 ## 复用真实流程
 
-参考 [Suno Dify 英文](https://github.com/AceDataCloud/SunoDify/blob/main/README.md)和[中文](https://github.com/AceDataCloud/SunoDify/blob/main/readme/README_zh_Hans.md)：准确官方安装入口 → 注册/登录 → Applications/General application → 点击标注 1 的复制按钮 → 宿主实际凭据位置 → 首用 → 同 task ID 查询 → 最终输出/常见问题。
+参考 [Suno Dify 英文](https://github.com/AceDataCloud/SunoDify/blob/main/README.md)和[中文](https://github.com/AceDataCloud/SunoDify/blob/main/readme/README_zh_Hans.md)：准确官方安装入口 → 注册/登录 → Applications/General application → 复制/创建本宿主专用 API Key → 宿主实际凭据位置 → 首用 → 同 task ID 查询 → 最终输出/常见问题。
 
 复用结构，不能把 Dify 菜单或运行结果移植成另一个宿主的截图。Ace 集成不是模型方官方客户端；不能臆造默认 Provider、新按钮、搜索排名或尚不存在的独立包。
 
@@ -25,9 +25,9 @@ python3 scripts/render_onboarding.py --profile docs/integration-onboarding/profi
 
 ## 真图与限制
 
-[复制应用Key](assets/get-api-key-en.png) · [完整出处、日期、SHA](assets.json)
+[复制应用Key](assets/get-api-key-en.png) · [创建专用Key](assets/create-api-key-en.png) · [完整出处、日期、SHA](assets.json)
 
-写明点击 **API KEY** 旁标注 **1** 的复制按钮后，紧跟已脱敏的操作图。原图归档自固定版本的 Suno Dify 教程。宿主自己的操作截图请注明其原始来源。
+两张原图来自 Suno Dify 固定提交 8d3d0357，10-08 已存档；敏感值已遮挡，原拍摄时间/前端版本未核实。Dify tutorial 是原字段示例名，请实际用自己的宿主名。原图只证明共用取密钥步骤，不证明新宿主安装或运行。
 
 宿主图必须有真实来源和日期，缺少时渲染器会拒绝。没有真实图就保留缺证说明，不画假终端/假GUI。官方图编辑预览也必须标“官方原图改编，非实际运行”。
 

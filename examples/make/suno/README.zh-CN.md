@@ -16,16 +16,19 @@
 
 这是 Make 官方 **Geocodify** 教程原图，2026-10-17 下载，拍摄日期和版本未标明；只说明真实模块选择器的操作位置，不证明 Ace/Suno 已安装。[来源](ASSET_SOURCES.md)。
 
-## 2. 复制 Ace Data Cloud API Key
+## 2. 注册、登录并取得专用 Token
 
-登录[应用列表](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen)，打开**通用应用**。首次使用时先点击**初始化通用应用**，再点击 **API KEY** 旁的复制按钮（图中标注 **1**）。
+1. 打开 [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen)，注册/登录。若缺少 **General application**，先点 **Initialize General Application**。
+2. 在 General application 或可访问 Suno 的应用中复制 API Key，或通过 **Manage Keys → Create** 创建 `Make Suno` 专用 Key。检查有效期、用量限制、服务权限、当前余额与价格。生成需 `/suno/audios`，查询需 `/suno/tasks`；Connection 还读取 `/v1/models` 验证认证，受限 Key 需有该读取权限，不要盲目放宽权限。
 
-![通用应用中 API KEY 旁标注 1 的复制按钮](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![复制 API Key 或打开 Manage Keys](./_assets/tutorial/get-api-key-en.png)
 
-检查有效期、用量限制、服务权限、当前余额与价格。生成需 `/suno/audios`，查询需 `/suno/tasks`；Connection 还读取 `/v1/models` 验证认证，受限 Key 需有该读取权限，不要盲目放宽权限。
+![创建带可选权限和用量限制的 Key](./_assets/tutorial/create-api-key-en.png)
 
-1. 在已安装的 Make Suno 模块中点 **Create a connection**，把原始 Token 粘到 **AceDataCloud API token**，不加 `Bearer `，不用 `platform-...` 管理 Token，也不用 Make 开发 Key。
-2. 保存后只读取 `GET /v1/models`；认证通过不代表 Suno 可生成或余额充足。Token 不得出现在提示词、分享蓝图或截图里。
+截图复用固定版本的 SunoDify 图文教程，2026-10-18 取回，凭据已遮挡；它们是 Ace 控制台界面，不是 Make 安装证据。
+
+3. 在已安装的 Make Suno 模块中点 **Create a connection**，把原始 Token 粘到 **Ace Data Cloud API token**，不加 `Bearer `，不用 `platform-...` 管理 Token，也不用 Make 开发 Key。
+4. 保存后只读取 `GET /v1/models`；认证通过不代表 Suno 可生成或余额充足。Token 不得出现在提示词、分享蓝图或截图里。
 
 ## 3. 生成一次，查询同一 ID
 

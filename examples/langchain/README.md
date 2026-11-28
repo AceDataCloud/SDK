@@ -21,11 +21,13 @@ python3 -m pip install -r examples/langchain/requirements.txt pytest
 On Windows, activate the environment with `.venv\Scripts\Activate.ps1` in
 PowerShell. The example pins `langchain-openai==1.7.0`; CI also checks 1.6.6.
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
-
-![Button 1 copies the API key from General Application](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
-
-Store the raw key on your backend as `ACEDATACLOUD_API_TOKEN`. Check the key’s access to the chat model and your application balance before running the example.
+Get an application API key from
+[Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
+Sign in or register, initialize **General application** if needed, and open
+**Keys / Manage Keys → Create** to give this integration a separate key.
+Check its service access, expiration, allowed APIs, usage limit, and balance.
+Use the raw API key, without `Bearer `; a `platform-...` management token cannot
+replace it. See the [illustrated key setup](../../README.md#get-your-ace-data-cloud-api-key).
 
 From the SDK repository root, set the key and run one mode:
 

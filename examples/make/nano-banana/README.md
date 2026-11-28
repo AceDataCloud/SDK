@@ -16,16 +16,19 @@ For an authorized private test, follow the [pairing guide](../README.md#set-up-a
 
 Official Make Geocodify screenshot, downloaded 2026-10-17; original capture date/version unknown. It illustrates the real module picker and does not show Nano Banana installed. [Screenshot provenance](../suno/ASSET_SOURCES.md).
 
-## 2. Copy your Ace Data Cloud API key
+## 2. Register, sign in and obtain a service-enabled API token
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen), register/sign in, and initialize **General application** if it is absent.
+2. Open General application or a Nano Banana-enabled application. Copy its API key, or choose **Manage Keys → Create** for a separately named `Make Nano Banana` key. Review expiration, usage limit, service access, balance and current pricing. Allowed APIs must cover `/nano-banana/images` for generation, `/nano-banana/tasks` for task lookup, and the Connection's free `GET /v1/models`; do not broaden permissions blindly.
 
-![Button 1 copies the API key from General Application](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![Ace Applications: copy a key or open Manage Keys](../suno/_assets/tutorial/get-api-key-en.png)
 
-Review expiration, usage limit, service access, balance and current pricing. Allowed APIs must cover `/nano-banana/images` for generation, `/nano-banana/tasks` for task lookup, and the Connection's free `GET /v1/models`; do not broaden permissions blindly.
+![Ace key creation with restrictions](../suno/_assets/tutorial/create-api-key-en.png)
 
-1. In the installed Make app, click **Create a connection** and paste the raw value into **AceDataCloud API token**. Do not add `Bearer `, use a `platform-...` management token, or confuse it with the Make deployment key.
-2. Save. Only the model-list GET runs for validation; this does not prove paid service access. Keep tokens out of prompts, blueprints, screenshots and universal-module custom headers.
+These are existing, credential-redacted Ace platform screenshots recovered 2026-10-18 from the pinned SunoDify guide; they are not Make installation evidence. The historical `Dify tutorial` key name is an example; use your own name.
+
+3. In the installed Make app, click **Create a connection** and paste the raw value into **Ace Data Cloud API token**. Do not add `Bearer `, use a `platform-...` management token, or confuse it with the Make deployment key.
+4. Save. Only the model-list GET runs for validation; this does not prove paid service access. Keep tokens out of prompts, blueprints, screenshots and universal-module custom headers.
 
 ## 3. Generate once and retrieve the same task
 

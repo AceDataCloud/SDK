@@ -2,9 +2,9 @@
 
 Open `makecomapp.json` with the Make Apps SDK extension. Bind your own Make test-app origin to this local manifest and synchronize the code files in the app editor. The checked-in source has no production origin, application IDs, or credentials.
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button to the right of **API KEY**.
 
-![Button 1 copies the API key from General Application](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![API key in the General Application card](https://cdn.acedata.cloud/dvc3cg.jpg)
 
 Paste the raw key into **AceDataCloud API token** in the Make connection. The key needs ACE Music access. The connection check reads one page of your task history.
 

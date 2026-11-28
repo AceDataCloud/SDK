@@ -14,15 +14,18 @@
 
 原图是Geocodify，2026-10-17下载，原拍摄日期/版本未知；不证明GPT Image已安装。[来源](../suno/ASSET_SOURCES.md)。
 
-## 2. 复制 Ace Data Cloud API Key
+## 2. 登录Ace并复制或创建专用Token
 
-登录[应用列表](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen)，打开**通用应用**。首次使用时先点击**初始化通用应用**，再点击 **API KEY** 旁的复制按钮（图中标注 **1**）。
+1. 打开 [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen) 注册/登录；没有General application时先初始化。
+2. 复制General application或可用服务应用的API Key，或 **Manage Keys → Create** 创建`Make GPT Image`专用Key；核有效期、用量限制、余额与[当前价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen)。允许API需覆盖生成`/openai/images/generations`、查询`/openai/tasks`和连接读取`/v1/models`，不盲目扩权。
 
-![通用应用中 API KEY 旁标注 1 的复制按钮](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![Ace Applications: copy a key or open Manage Keys](../suno/_assets/tutorial/get-api-key-en.png)
 
-检查有效期、用量限制、余额与[当前价格](https://platform.acedata.cloud/models?utm_source=make&utm_medium=integration&utm_campaign=evergreen)。允许API需覆盖生成`/openai/images/generations`、查询`/openai/tasks`和连接读取`/v1/models`，不盲目扩权。
+![Ace key creation with restrictions](../suno/_assets/tutorial/create-api-key-en.png)
 
-1. 在已安装模块点 **Create a connection**，把原始Token填进 **AceDataCloud API token**，不加Bearer，不用platform管理Token或Make开发Key。保存只做免费模型GET；认证不代表生成权限和余额已足够。
+平台真图于2026-10-18从固定SunoDify版本取回，Token已遮挡；图中Dify tutorial仅历史Key名称示例，并非本Make App运行。
+
+3. 在已安装模块点 **Create a connection**，把原始Token填进 **Ace Data Cloud API token**，不加Bearer，不用platform管理Token或Make开发Key。保存只做免费模型GET；认证不代表生成权限和余额已足够。
 
 ## 3. 首版范围与同ID查询
 

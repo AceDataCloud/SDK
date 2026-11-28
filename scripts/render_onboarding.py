@@ -66,11 +66,9 @@ def render(profile: dict, language: str = "en") -> str:
 
 {profile["install_steps"]}
 
-## 2. 复制应用 API Key
+## 2. 注册/登录并创建 Key
 
-登录[应用列表]({cta("/console/applications")})，打开**通用应用**。首次使用时先点击**初始化通用应用**，再点击 **API KEY** 旁的复制按钮（图中标注 **1**）。
-
-![通用应用中 API KEY 旁标注 1 的复制按钮]({ASSETS}/get-api-key-en.png)
+打开 [Applications / 我的应用]({cta("/console/applications")})，注册或登录。没有通用应用时选 **Initialize General Application / 初始化通用应用**。复制已有 API Key，或 **Manage Keys → Create** 创建本宿主专用 Key。
 
 核对模型/服务权限、有效期、用量限制、余额和[当前价格]({cta("/models")})。如果启用 Allowed APIs，应允许本例的 {operations}；查询权限不等于生成权限。只复制 Token 字符串，不加 Bearer、引号或空格。平台管理 Token 和 Discord 代理凭据均不能代替此 Key。
 """
@@ -85,14 +83,18 @@ Open the [verified install entry]({profile["install_url"]}) and confirm the main
 
 {profile["install_steps"]}
 
-## 2. Copy your application API key
+## 2. Register/sign in and create a key
 
-Sign in to [Applications]({cta("/console/applications")}) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
-
-![Button 1 copies the API key from General Application]({ASSETS}/get-api-key-en.png)
+Open [Applications]({cta("/console/applications")}), register/sign in, and choose **Initialize General Application** if needed. Copy its API Key or use **Manage Keys → Create** to name a separate key for this host.
 
 Check model/service access, expiration, usage limits, balance and [current pricing]({cta("/models")}). If Allowed APIs is enabled, allow {operations}; task-query permission does not grant generation access. Copy only the raw token, without Bearer, quotation marks or spaces. A platform management token and a Discord proxy credential are different credentials.
 """
+    text += f"\n![Copy the application key]({ASSETS}/get-api-key-en.png)\n\n![Create a dedicated key]({ASSETS}/create-api-key-en.png)\n\n"
+    text += (
+        "以上为官方历史截图，敏感值已遮挡；原字段名 Dify tutorial，仅示意共用 Key 步骤，不是本宿主运行结果。来源/日期见 assets.json。\n"
+        if zh
+        else "These are historical official screenshots with sensitive values redacted. The original name is Dify tutorial; they show shared key steps, not execution in this host. See assets.json for source and dates.\n"
+    )
     text += f"\n## 3. {'在宿主配置密钥' if zh else 'Configure credentials in this host'}\n\n{profile['credential_location_zh' if zh else 'credential_location']}\n\n"
     if profile.get("host_image_url"):
         if urlsplit(profile["host_image_url"]).scheme != "https":

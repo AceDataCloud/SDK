@@ -20,11 +20,13 @@ Each child directory has its own manifest, complete deployment files, service-sp
 
 ## Get your AceDataCloud API token
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
+1. Open [AceDataCloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen). Sign in or register, then open **General application** (initialize it if needed), or a dedicated application with access to the chat model you intend to use.
+2. Choose **Keys / Manage Keys → Create** and name a separate key for Make. Review its expiration, usage limitation, allowed APIs, and application balance before copying it. A task-query permission does not grant generation permission. Any trial allowance is whatever your account currently displays.
+3. Copy only the raw token into the Make Connection password field. An application API key is different from a `platform-...` account-management token and from the Make deployment API key used below.
 
-![Button 1 copies the API key from General Application](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![Copy an application API key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
 
-Paste the raw key into the Make connection’s password field. Check the key’s allowed APIs and the application balance for the operations in your scenario. The Make developer API key used to deploy an app is a separate credential.
+![Create a separately named key with optional restrictions](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/create-api-key-en.png)
 
 These links carry Make source tags. They provide an acquisition entry point; a successful click alone does not prove registration, installation, or first-use attribution.
 

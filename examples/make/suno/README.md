@@ -16,16 +16,19 @@ Developers can prepare a private test installation with [the pairing instruction
 
 Official Make reference screenshot, downloaded 2026-10-17; its capture date/version is not specified. It shows **Geocodify**, not an installed Ace or Suno app. It illustrates the real Make module picker; the app and module names will differ after installation. [Official source and image provenance](ASSET_SOURCES.md).
 
-## 2. Copy your Ace Data Cloud API key
+## 2. Register and get your Ace Data Cloud API token
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=make&utm_medium=integration&utm_campaign=evergreen). Register/sign in. If **General application** is missing, choose **Initialize General Application**.
+2. Open General application or your Suno-enabled application. Copy its API key, or select **Manage Keys → Create** for a separate `Make Suno` key. Review expiration, allowed APIs, usage limits, service access, and current balance/prices. Allow `/suno/audios` for generation and `/suno/tasks` for lookup; this Connection also validates through `GET /v1/models`, so restricted keys must allow that read. Do not expand a restricted key blindly.
 
-![Button 1 copies the API key from General Application](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![Copy an application API key or open Manage Keys](./_assets/tutorial/get-api-key-en.png)
 
-Review expiration, allowed APIs, usage limits, service access, and current balance/prices. Allow `/suno/audios` for generation and `/suno/tasks` for lookup; this Connection also validates through `GET /v1/models`, so restricted keys must allow that read. Do not expand a restricted key blindly.
+![Create a separate API key with optional restrictions](./_assets/tutorial/create-api-key-en.png)
 
-1. In the installed Make Suno module, click **Create a connection** and paste the **raw token** into **AceDataCloud API token**. Do not add `Bearer ` or use a `platform-...` account-management token. The separate Make developer key is for deployment, not this Connection.
-2. Save. Connection validation calls only `GET https://api.acedata.cloud/v1/models`. A valid token does not prove Suno generation access or sufficient balance. Never put the token in prompts, shared blueprints, screenshots, or request headers in the universal module.
+These credential-redacted platform screenshots come from the pinned [SunoDify guide](https://github.com/AceDataCloud/SunoDify/tree/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial), recovered 2026-10-18. They show Ace account setup, not Make installation.
+
+3. In the installed Make Suno module, click **Create a connection** and paste the **raw token** into **Ace Data Cloud API token**. Do not add `Bearer ` or use a `platform-...` account-management token. The separate Make developer key is for deployment, not this Connection.
+4. Save. Connection validation calls only `GET https://api.acedata.cloud/v1/models`. A valid token does not prove Suno generation access or sufficient balance. Never put the token in prompts, shared blueprints, screenshots, or request headers in the universal module.
 
 ## 3. Create once, query the same task
 
